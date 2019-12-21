@@ -1,0 +1,449 @@
+# Vagga script to build latest GIMP (2.99)
+
+# Requirements of the host machine:
+# vagga installed (see web)
+# uidmap installed
+#     >sudo apt-get install uidmap
+
+# a chain of containers, to minimize rebuilding as changes are made.
+# Each container depends on previous as specified by "!Container foo"
+
+# Goal or current design of this script:
+# 1) use latest packaged dependencies (e.g. glib) from the distribution of the container
+# 2) build artifacts: babl, gegl, gimp
+# 3) install build artifacts in the usual place (don't worry about polluting the container)
+#    i.e. not define any special GIMP_PREFIX
+
+
+containers:
+  
+  # basic OS with dev (compiling)
+  baseOS:
+    setup:
+    # 18.10
+    # - !Ubuntu cosmic
+    # 19.04
+    # - !Ubuntu disco
+    # ubuntu 19.10, which has meson 51
+    - !Ubuntu eoan
+
+    # enable universe repository (where gimp lives)
+    - !UbuntuUniverse
+    # tools for dev (C compiler)
+    - !Install [build-essential]
+    
+
+  # with build tools
+  baseWithTools:
+    setup:
+    - !Container baseOS
+    
+    # meson is a python3 app
+
+    # GIMP build needs setuptools
+    - !Install [python3-setuptools]
+
+    # Install packaged version.
+    # Which might be too old.
+    - !Install [meson]
+
+    # Alternatively, get latest using pip 
+    #- !Sh pip3 install meson
+
+    # meson and autotools use pkg-config
+    - !Install [pkg-config]
+
+    # meson.build calls git
+    - !Install [git]
+
+    # build uses gobject introspection tools
+    - !Install [gobject-introspection]
+
+    # more tools
+    - !Install [ xsltproc]
+
+    # specific to autotools build
+    - !Install [libtool]
+
+    # in8n internationalization
+    - !Install [intltool]
+
+    # build scripts call git and test to establish version
+    - !Sh which git
+    - !Sh which test
+
+
+  # with library dependencies
+  generalDeps:
+    setup:
+    - !Container baseWithTools
+
+    # babl, gegl, GIMP uses glib group of libraries
+    # package comprises glib, gobject, and gio
+    - !Install [glib2.0]
+
+    # the builds deposit introspection data
+    # If omit, get can't find ...gir... when building gegl
+    - !Install [libgirepository1.0-dev]
+
+    # babl specific
+
+    # links against lcms2 (lite color mgt system) library, need the dev flavor
+    - !Install [liblcms2-dev]
+
+    # gegl specific
+
+    # depends on babl (which we build), and these libraries from packages
+    - !Install [libjson-glib-dev]
+
+
+  # with libraries that gimp depends on
+  # !!! Some dependency is through gegl, must be here when gegl built
+  # these are package names, might depend on distribution
+  gimpDeps:
+    setup:
+    - !Container generalDeps
+
+    # Somewhat in reverse order of complain by build
+    
+    # plugin interpreters
+    # Python3 PyGObject.  See earlier, installed Python3
+    - !Install [ python3-gi]
+    # lua
+    - !Install [ luajit]
+    # javascript
+    - !Install [ gjs]
+
+
+    # plugins, mainly file format plugins?
+    # JPEG format
+    - !Install [ libjpeg-dev]
+    # TIFF format
+    - !Install [ libtiff-dev]
+    # PDF format
+    - !Install [ libpoppler-glib-dev]
+    - !Install [ poppler-data]
+
+    # file compressors
+    - !Install [ liblzma-dev]
+    - !Install [ libbz2-dev]
+
+    # ???
+    - !Install [ libxmu-dev]
+    - !Install [ libappstream-glib-dev]
+    - !Install [ librsvg2-dev]
+
+    # mypaint
+    - !Install [ mypaint-brushes]
+    - !Install [ libmypaint-dev]
+
+    # accessibility toolkit
+    - !Install [ libatk1.0-dev]
+
+    #image metadata
+    - !Install [ libgexiv2-dev]
+
+    # graphics toolkit: GTK and GDK
+    - !Install [ libgtk-3-dev]
+    # gtk-encode-symbolic-svg
+    - !Install [ gtk-3-examples]
+    # ?
+    - !Install [ libgdk-pixbuf2.0-dev]
+
+    # renderers
+    - !Install [ libpango1.0-dev]
+    - !Install [ libcairo2-dev]
+
+    environ:
+      HOME: /work/.home
+
+
+  # with babl, gegl, gimp source
+  gimpSourceAndDeps:
+    setup:
+    - !Container gimpDeps
+
+    # latest, bleeding
+    # from shared, bare repository
+    # This causes build to fail, can't find git_version.h ???
+    #- !Git
+    #  url: https://gitlab.gnome.org/GNOME/babl.git
+    #  path: /home/babl
+    #TODO
+    #git clone https://gitlab.gnome.org/GNOME/gegl.git
+    #git clone https://gitlab.gnome.org/GNOME/gimp.git
+
+    # OR most most recent release archive
+    - !Tar
+      url: https://download.gimp.org/pub/babl/0.1/babl-0.1.72.tar.xz
+      path: /home
+
+    - !Tar
+      url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.18.tar.xz
+      path: /home
+
+    # latest, bleeding
+    # note path is to the containing directory
+    - !Git
+      url: https://gitlab.gnome.org/GNOME/gimp.git
+      path: /home/gimp
+
+  
+
+
+    
+  # Complete, ready to build babl
+  bablDev:
+    setup:
+    - !Container gimpSourceAndDeps
+
+    # Build (from source) certain prereqs of gimp: babl, gegl
+
+    # We don't do this.  Instead we install to default place.
+    # set prefix: directory where GIMP build scripts will install stuff
+    #- !Env
+    #  GIMP_PREFIX: /home
+
+    # If Debian, need the architecture label
+    # TODO not working, see below, hardcoded
+    - !Sh echo "Determine architecture"
+    - !Sh dpkg-architecture -qDEB_HOST_MULTIARCH 2> /dev/null
+    - !Env
+      MY_ARCH: dpkg-architecture -qDEB_HOST_MULTIARCH 2> /dev/null
+    - !Sh echo $MY_ARCH
+
+    # Used by GIMP build to detect the build dependencies
+    # E.G. gegl depends on babl installed and uses pkgconfig to find it
+    # This has Debian path prepended
+    # TODO "${GIMP_PREFIX}/lib/${MY_ARCH}/pkgconfig:${GIMP_PREFIX}/lib/pkgconfig:${GIMP_PREFIX}/share/pkgconfig"
+    #- !Env
+    #  PKG_CONFIG_PATH: "/home/lib/x86_64-linux-gnu/pkgconfig:/home/lib/pkgconfig:/home/share/pkgconfig"
+    - !Sh echo $PKG_CONFIG_PATH
+
+
+    # Note babl and gegl build the same
+
+    #  omit: --prefix=${GIMP_PREFIX} \
+    - !Sh |
+        cd /home/babl-0.1.72
+        meson _build \
+         --buildtype=release \
+          -Db_lto=true
+        cd _build
+        ninja
+        ninja install
+
+    # Partial check of installed artifacts, installed in default location
+    #- !Sh test -d /usr/local/share/gir-1.0/babl/Babl-0.1.gir
+
+    
+    
+
+
+  # build gegl
+
+  # When it builds, it lists options that will be built, according to installed libraries it finds
+  # e.g. won't build umfpack if libumfpack5 is not installed
+  # Then at GIMP runtime, it may complain of missing GEGL ops
+
+  geglDev:
+    setup:
+    - !Container bablDev
+  
+    # set prefix: directory where GIMP build scripts will install stuff
+    #- !Env
+    #  GIMP_PREFIX: /home
+
+    # Used by GIMP build to detect the build dependencies
+    # E.G. gegl depends on babl installed and uses pkgconfig to find it
+    # This has Debian path prepended
+    # TODO "${GIMP_PREFIX}/lib/${MY_ARCH}/pkgconfig:${GIMP_PREFIX}/lib/pkgconfig:${GIMP_PREFIX}/share/pkgconfig"
+    #- !Env
+    #  PKG_CONFIG_PATH: "/home/lib/x86_64-linux-gnu/pkgconfig:/home/lib/pkgconfig:/home/share/pkgconfig"
+    #- !Sh echo $PKG_CONFIG_PATH
+
+    # Used to find the glib-introspection dependencies.
+    # gegl builds its introspection data.
+    # To do so, it must find Babl-0.1.gir
+    # was  XDG_DATA_DIRS: "/home/share:/usr/share:$XDG_DATA_DIRS"
+
+    - !Env
+      XDG_DATA_DIRS: "/usr/local/share"
+    
+    - !Sh echo ">>>>>>  XDG_DATA_DIRS"
+    - !Sh echo $XDG_DATA_DIRS
+    - !Sh echo ">>>>>>"
+
+    # !!! Not using     --prefix=${GIMP_PREFIX} \
+    - !Sh |
+        cd /home/gegl-0.4.18
+        meson _build \
+         --buildtype=release \
+          -Db_lto=true
+        cd _build
+        ninja
+        ninja install
+
+    # Show that it installed .so
+    - !Sh ls /usr/local/lib/x86_64-linux-gnu
+
+
+
+  # build gimp using autotools
+  gimpDev:
+    setup:
+    - !Container geglDev
+
+    # Options
+    # See INSTALL or INSTALL.in file in repository.  Seems definitive
+    
+    # list the options
+    #- !Sh |
+    #   cd /home/gimp
+    #   ./configure --help
+
+    - !Env LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
+    - !Env XDG_DATA_DIRS: "/usr/local/share:/usr/share"
+
+    # echo environment
+    - !Sh echo "home ->"  $HOME
+    - !Sh echo "library path ->"  $LD_LIBRARY_PATH
+    - !Sh echo "introspection path ->"  $XDG_DATA_DIRS
+    - !Sh echo "binary path ->" $PATH
+
+    # require libtool now (for autotools build
+
+    # My customization of the bare commands
+    # disabling docs, python, vector-icons
+    # --jobs=4 or -j4
+    # ??? make distclean to alleviate "unrecognized file format"
+
+    # build
+    - !Sh |
+        cd /home/gimp
+        ./autogen.sh --disable-docs --disable-gtk-doc --disable-python --disable-vector-icons
+        make
+        make install
+    
+    # remove DNS file that vagga will recreate after build
+    - !Sh "rm /etc/resolv.conf"
+
+    # HOME: /work/.home
+    environ:
+      LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
+      XDG_DATA_DIRS: "/usr/local/share"
+      PATH: "/usr/local/bin:/usr/bin:/bin"
+
+
+
+
+
+
+
+  # build gimp using meson
+  gimpMesonDev:
+    setup:
+    - !Container gimpDeps
+
+    # build
+    - !Sh |
+        cd /home/gimp
+        meson _build \
+         --prefix=${GIMP_PREFIX} \
+         --buildtype=release \
+         -Djavascript=never \
+         -Dlua=never \
+         -Dpython=always \
+         -Dpoppler=false
+        cd _build
+        ninja
+        ninja install
+
+
+
+ 
+    
+
+
+
+
+commands:
+  testOS: !Command
+    description: Test sanity of OS in container baseOS
+    container: baseOS
+    run: |
+      which which
+      which pkg-config
+      python -V
+
+  testMeson: !Command
+    description: Test sanity of meson in container withTools
+    container: withTools
+    run: |
+      meson -h
+      which pkg-config
+      which python3
+      which intltool
+
+  testSource: !Command
+    description: List contents of cloned source
+    container: gimpSource
+    run: |
+      echo "Contents of /babl"
+      ls /home/babl
+      which git
+
+  testBabl: !Command
+    description: Test build babl
+    container: bablDev
+    run: |
+      ls /home/babl
+
+  #   cd /home/gegl-0.4.18/_build
+  #    ninja test
+
+  testGegl: !Command
+    description: Test built gegl
+    container: geglDev
+    run: |
+      ls /home/gegl
+
+  gimpVersion: !Command
+    description: Run gimp command line in gimpdev container
+    container: gimpDev
+    run: |
+      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
+      echo $LD_LIBRARY_PATH
+      /usr/local/bin/gimp-2.99 --version
+
+  # to run this, use     vagga --use-env DISPLAY gimpRunGUI
+
+  # export GEGL_PATH="/usr/local/bin/gegl"
+  # GEGL_PATH should point to the .so parent directory
+  # gegl -v
+
+  gimpRunGUI: !Command
+    description: Run gimp GUI in gimpdev container
+    container: gimpDev
+    run: |
+      export HOME=/work/.home
+      echo "HOME" $HOME
+      export GIMP_PREFIX="/usr/local"
+      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
+      echo $LD_LIBRARY_PATH
+      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
+      echo $XDG_DATA_DIRS
+      export PATH="/usr/local/bin:$PATH"
+      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu"
+      echo "GEGL_PATH" $GEGL_PATH
+      which gegl
+      
+      
+      /usr/local/bin/gimp-2.99
+
+
+
+
+
+
+

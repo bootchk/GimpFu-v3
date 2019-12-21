@@ -1,0 +1,18 @@
+    # gimp build calls link loader thus need path to built libraries (gegl and babl) installed to GIMP_PREFIX
+    # Since Debian, suffix is the architecture
+    # ":${LD_LIBRARY_PATH}"
+    #- !Env  LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu"
+    - !Sh export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+    - !Sh echo "library path is:"  $LD_LIBRARY_PATH
+
+    # gimp build calls glib introspection thus need path to gir repositories
+    # Here we cat our specific /home/share to the usual suspects
+    #- !Env  XDG_DATA_DIRS: "/home/share:/usr/local/share:/usr/share"
+    - !Sh export XDG_DATA_DIRS="/usr/local/share:${XDG_DATA_DIRS}"
+    - !Sh echo "introspection path is:"  $XDG_DATA_DIRS
+
+    # build looks for executable gegl
+    - !Sh echo $PATH
+    #- !Sh export PATH=/home/bin:$PATH
+    - !Sh export PATH=/usr/local/bin:$PATH
+    - !Sh echo $PATH
