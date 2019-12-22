@@ -328,16 +328,45 @@ containers:
     # remove DNS file that vagga will recreate after build
     - !Sh "rm /etc/resolv.conf"
 
-    # HOME: /work/.home
+    # 
     environ:
       LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
       XDG_DATA_DIRS: "/usr/local/share"
       PATH: "/usr/local/bin:/usr/bin:/bin"
 
 
+  # Local custom GIMP
+  gimpLocal:
+    setup:
+    - !Container gimpDev
 
+    # create .config for GIMP
+    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/test
 
+    # Remove old test.py
+    - !Sh rm /work/.home/.config/GIMP/2.99/plug-ins/test.py
 
+    # create a local python plugin
+    # Create file containing test program.
+    # Create in the conventional directory for local customization of  Linux apps, specically GIMP ($HOME/.config/.... etc.)
+    # Test program language is python, calling pygimp (pdb object) functions.
+    # The test program only proves that the resynthesizer plugin is registered properly, not that it works.
+    # When GIMP starts, it will find this file and execute it (to register the plug-in)
+    # Expect Python "TypeError: wrong number of parameters" and for gimp-console to hang ( you can Ctl-C it. )
+    - !Text
+      /work/.home/.config/GIMP/2.99/plug-ins/test/test.py: |
+        from gimpfu import *
+        # Use images from local resynthesizer repository clone
+        # img = pdb.gimp_file_load("/home/resynthesizer/Test/in_images/brick.png", "/home/resynthesizer/Test/in_images/brick.png")
+        # invoke resynthesizer plugin using its pdb registered name (but with improper parameters)
+        pdb.plug_in_resynthesizer()
+        pdb.gimp_quit(1)
+    
+    # Plugins must be in subdirectory, and executable?
+    
+
+    environ:
+      HOME: /work/.home
 
 
   # build gimp using meson
@@ -416,15 +445,24 @@ commands:
       echo $LD_LIBRARY_PATH
       /usr/local/bin/gimp-2.99 --version
 
+  
+
+
   # to run this, use     vagga --use-env DISPLAY gimpRunGUI
 
   # export GEGL_PATH="/usr/local/bin/gegl"
   # GEGL_PATH should point to the .so parent directory
   # gegl -v
 
+  # gimp typelib in /usr/local/lib/gi...
+  # gegl, babl typelib in /usr/local/lib/x86_64-linux-gnu/gi...
+
+  # export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+  # squelch warnings
+  # export NO_AT_BRIDGE=1 
   gimpRunGUI: !Command
-    description: Run gimp GUI in gimpdev container
-    container: gimpDev
+    description: Run gimp GUI in gimpLocal container
+    container: gimpLocal
     run: |
       export HOME=/work/.home
       echo "HOME" $HOME
@@ -437,11 +475,28 @@ commands:
       export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu"
       echo "GEGL_PATH" $GEGL_PATH
       which gegl
+      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
       
-      
+      chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
+
       /usr/local/bin/gimp-2.99
 
+  gimpListPlugins: !Command
+    description: List local plugins in gimpdev container
+    container: gimpLocal
+    run: |
+      ls -alR $HOME/.config/GIMP/2.99/plug-ins
 
+
+  makePyGimp: !Command
+    description: Remake PyGimp in gimpdev container
+    container: gimpDev
+    run: |
+      cd /home/gimp
+      make
+
+    
 
 
 
