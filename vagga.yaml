@@ -16,7 +16,7 @@
 
 
 containers:
-  
+
   # basic OS with dev (compiling)
   baseOS:
     setup:
@@ -31,13 +31,13 @@ containers:
     - !UbuntuUniverse
     # tools for dev (C compiler)
     - !Install [build-essential]
-    
+
 
   # with build tools
   baseWithTools:
     setup:
     - !Container baseOS
-    
+
     # meson is a python3 app
 
     # GIMP build needs setuptools
@@ -47,7 +47,7 @@ containers:
     # Which might be too old.
     - !Install [meson]
 
-    # Alternatively, get latest using pip 
+    # Alternatively, get latest using pip
     #- !Sh pip3 install meson
 
     # meson and autotools use pkg-config
@@ -61,6 +61,9 @@ containers:
 
     # more tools
     - !Install [ xsltproc]
+
+    # tool to build API docs
+    - !Install [gtk-doc-tools]
 
     # specific to autotools build
     - !Install [libtool]
@@ -96,6 +99,14 @@ containers:
     # depends on babl (which we build), and these libraries from packages
     - !Install [libjson-glib-dev]
 
+    # gimp specific
+
+    # tool to build API docs
+    - !Install []
+
+
+
+
 
   # with libraries that gimp depends on
   # !!! Some dependency is through gegl, must be here when gegl built
@@ -105,7 +116,7 @@ containers:
     - !Container generalDeps
 
     # Somewhat in reverse order of complain by build
-    
+
     # plugin interpreters
     # Python3 PyGObject.  See earlier, installed Python3
     - !Install [ python3-gi]
@@ -158,8 +169,9 @@ containers:
       HOME: /work/.home
 
 
-  # with babl, gegl, gimp source
-  gimpSourceAndDeps:
+  # with babl, gegl source i.e. source for dependencies we will build
+  # we get the source for gimp later, see gimpDev
+  gimpDepsSource:
     setup:
     - !Container gimpDeps
 
@@ -171,7 +183,6 @@ containers:
     #  path: /home/babl
     #TODO
     #git clone https://gitlab.gnome.org/GNOME/gegl.git
-    #git clone https://gitlab.gnome.org/GNOME/gimp.git
 
     # OR most most recent release archive
     - !Tar
@@ -182,20 +193,17 @@ containers:
       url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.18.tar.xz
       path: /home
 
-    # latest, bleeding
-    # note path is to the containing directory
-    - !Git
-      url: https://gitlab.gnome.org/GNOME/gimp.git
-      path: /home/gimp
-
-  
 
 
-    
+
+
+
+
+
   # Complete, ready to build babl
   bablDev:
     setup:
-    - !Container gimpSourceAndDeps
+    - !Container gimpDepsSource
 
     # Build (from source) certain prereqs of gimp: babl, gegl
 
@@ -236,8 +244,8 @@ containers:
     # Partial check of installed artifacts, installed in default location
     #- !Sh test -d /usr/local/share/gir-1.0/babl/Babl-0.1.gir
 
-    
-    
+
+
 
 
   # build gegl
@@ -249,7 +257,7 @@ containers:
   geglDev:
     setup:
     - !Container bablDev
-  
+
     # set prefix: directory where GIMP build scripts will install stuff
     #- !Env
     #  GIMP_PREFIX: /home
@@ -269,7 +277,7 @@ containers:
 
     - !Env
       XDG_DATA_DIRS: "/usr/local/share"
-    
+
     - !Sh echo ">>>>>>  XDG_DATA_DIRS"
     - !Sh echo $XDG_DATA_DIRS
     - !Sh echo ">>>>>>"
@@ -294,9 +302,23 @@ containers:
     setup:
     - !Container geglDev
 
+    # Get source
+
+    # latest, bleeding
+    # note path is to the containing directory
+    #- !Git
+    #  url: https://gitlab.gnome.org/GNOME/gimp.git
+    #  path: /home/gimp
+
+    # copy files from my hacked git repo into the container
+    # note path is to the containing directory
+    - !Copy
+      source: /work/gimp
+      path:  /home/gimp
+
     # Options
     # See INSTALL or INSTALL.in file in repository.  Seems definitive
-    
+
     # list the options
     #- !Sh |
     #   cd /home/gimp
@@ -317,18 +339,21 @@ containers:
     # disabling docs, python, vector-icons
     # --jobs=4 or -j4
     # ??? make distclean to alleviate "unrecognized file format"
+    # --disable-python ?? what does that prevent? PyGimp, or build Python interpreter, or install Python plugins
+    # --disable-docs ?? user manual?
+    # --disable-gtk-doc ?? programmers reference manual (libgimp API and PDB?)
 
     # build
     - !Sh |
         cd /home/gimp
-        ./autogen.sh --disable-docs --disable-gtk-doc --disable-python --disable-vector-icons
-        make
+        ./autogen.sh --disable-docs --disable-vector-icons
+        make -j4
         make install
-    
+
     # remove DNS file that vagga will recreate after build
     - !Sh "rm /etc/resolv.conf"
 
-    # 
+    #
     environ:
       LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
       XDG_DATA_DIRS: "/usr/local/share"
@@ -344,7 +369,7 @@ containers:
     - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/test
 
     # Remove old test.py
-    - !Sh rm /work/.home/.config/GIMP/2.99/plug-ins/test.py
+    #- !Sh rm /work/.home/.config/GIMP/2.99/plug-ins/test.py
 
     # create a local python plugin
     # Create file containing test program.
@@ -356,14 +381,40 @@ containers:
     - !Text
       /work/.home/.config/GIMP/2.99/plug-ins/test/test.py: |
         from gimpfu import *
-        # Use images from local resynthesizer repository clone
-        # img = pdb.gimp_file_load("/home/resynthesizer/Test/in_images/brick.png", "/home/resynthesizer/Test/in_images/brick.png")
-        # invoke resynthesizer plugin using its pdb registered name (but with improper parameters)
-        pdb.plug_in_resynthesizer()
-        pdb.gimp_quit(1)
-    
+        def plugin_func(image, drawable, arg, arg2):
+              print("plugin_func called args: ", arg, arg2)
+        register(
+              "test",
+              "blurb",
+              "help message",
+              "author",
+              "copyright",
+              "year",
+              "Test",
+              "*",
+              [
+                  (PF_IMAGE, "image", "Input image", None),
+                  (PF_DRAWABLE, "drawable", "Input drawable", None),
+                  (PF_STRING, "arg", "The string argument", "default-value"),
+                  (PF_INT, "arg2", "The int argument", 1)
+              ],
+              [],
+              plugin_func,
+              menu="<Image>/Somewhere")
+        main()
+
     # Plugins must be in subdirectory, and executable?
-    
+
+    # Copy a hacked gimpfu.py into the install location from the project directory
+    - !Copy
+      source: /work/gimpfu.py
+      path:  /usr/local/lib/gimp/2.99/python/gimpfu.py
+    - !Copy
+      source: /work/gimpfu_widgets.py
+      path:  /usr/local/lib/gimp/2.99/python/gimpfu_widgets.py
+    - !Copy
+      source: /work/gimpfu_types.py
+      path:  /usr/local/lib/gimp/2.99/python/gimpfu_types.py
 
     environ:
       HOME: /work/.home
@@ -390,8 +441,8 @@ containers:
 
 
 
- 
-    
+
+
 
 
 
@@ -445,7 +496,7 @@ commands:
       echo $LD_LIBRARY_PATH
       /usr/local/bin/gimp-2.99 --version
 
-  
+
 
 
   # to run this, use     vagga --use-env DISPLAY gimpRunGUI
@@ -459,7 +510,7 @@ commands:
 
   # export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
   # squelch warnings
-  # export NO_AT_BRIDGE=1 
+  # export NO_AT_BRIDGE=1
   gimpRunGUI: !Command
     description: Run gimp GUI in gimpLocal container
     container: gimpLocal
@@ -477,7 +528,7 @@ commands:
       which gegl
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
-      
+
       chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
 
       /usr/local/bin/gimp-2.99
@@ -489,16 +540,11 @@ commands:
       ls -alR $HOME/.config/GIMP/2.99/plug-ins
 
 
+  # uncomment ## in gimp/plug-ins/Makefile.am
+  # not working, read-only file system
   makePyGimp: !Command
     description: Remake PyGimp in gimpdev container
     container: gimpDev
     run: |
       cd /home/gimp
       make
-
-    
-
-
-
-
-
