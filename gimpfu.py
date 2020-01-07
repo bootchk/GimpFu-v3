@@ -187,7 +187,7 @@ def register(proc_name, blurb, help, author, copyright, date, label,
              menu=None, domain=None, on_query=None, on_run=None):
     """GimpFu method called to register a new plug-in."""
 
-    print ('register')
+    print ('register', proc_name)
 
     # First sanity check the data
 
@@ -617,13 +617,29 @@ class GimpFu (Gimp.PlugIn):
 
     ## Private specialization methods for GimpFu
 
-    def _create_plugin_procedure_args(self, procedure, formal_params ):
+    def _set_procedure_metadata(self, procedure, name):
+        '''
+        Tell local metadata to Gimp
+        '''
+        procedure.set_image_types(_registered_plugins_[name].IMAGETYPES);
+        procedure.set_documentation (N_(_registered_plugins_[name].BLURB),
+                                     _registered_plugins_[name].HELP,
+                                     name)
+        procedure.set_menu_label(N_(_registered_plugins_[name].MENUITEMLABEL))
+        procedure.set_attribution(_registered_plugins_[name].AUTHOR,
+                                  _registered_plugins_[name].COPYRIGHT,
+                                  _registered_plugins_[name].DATE)
+        procedure.add_menu_path (_registered_plugins_[name].MENUPATH)
+
+
+    def _create_plugin_procedure_args(self, procedure, proc_name ):
         '''
         Add (i.e. declare to Gimp) args to plugin procedure
-        from formal params
-        (as recorded in the local GimpFu registration whose key is "name")
+        from formal params as recorded in local cache under proc_name
         '''
         # dummy arg
+
+        formal_params = _registered_plugins_[proc_name].PARAMS
 
         '''
         cruft
@@ -750,28 +766,32 @@ class GimpFu (Gimp.PlugIn):
         # return all proc_names from local cache
         #TODO this is temp hack, just any one proc_name
         # keys() is not a list. Convert to list, then index
+        # TODO for key in _registered_plugins_:
         return [ list(_registered_plugins_.keys())[0] ]
 
 
+    '''
+    This is called by main() and should be AFTER the call to register().
+    The filename argument is name of the source file, not necessarily the same as given in register(name,...)
+    Until now, we have only registered in the local cache, and not registered with Gimp.
+    '''
+    def do_create_procedure(self, filename):
 
+        # filename not used
+        print ('create procedure(s) from file: ', filename, " .py")
 
-    def do_create_procedure(self, name):
-        # TODO create using GimpFu caller's actual parameter values
-
-        procedure = Gimp.ImageProcedure.new(self, name,
+        '''
+        Register with Gimp all the locally registered plugins.
+        '''
+        for key in _registered_plugins_:
+           procedure = Gimp.ImageProcedure.new(self,
+                                            key,
                                             Gimp.PDBProcType.PLUGIN,
                                             _run, 	# wrapped plugin method
                                             None)
-        procedure.set_image_types(_registered_plugins_[name].IMAGETYPES);
-        procedure.set_documentation (N_(_registered_plugins_[name].BLURB),
-                                     _registered_plugins_[name].HELP,
-                                     name)
-        procedure.set_menu_label(N_(_registered_plugins_[name].MENUITEMLABEL))
-        procedure.set_attribution(_registered_plugins_[name].AUTHOR,
-                                  _registered_plugins_[name].COPYRIGHT,
-                                  _registered_plugins_[name].DATE)
-        procedure.add_menu_path (_registered_plugins_[name].MENUPATH)
+           self._set_procedure_metadata(procedure, key)
+           self._create_plugin_procedure_args(procedure, key)
 
-        self._create_plugin_procedure_args(procedure, _registered_plugins_[name].PARAMS)
-
+        # TODO, we created and registered many, we return only the last one??
+        # Is creating many legal to Gimp 3?
         return procedure

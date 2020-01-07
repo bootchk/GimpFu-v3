@@ -365,45 +365,31 @@ containers:
     setup:
     - !Container gimpDev
 
-    # create .config for GIMP
-    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/test
+    # create container user's .config for GIMP, to hold locally installed plug-ins
+    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins
 
     # Remove old test.py
-    #- !Sh rm /work/.home/.config/GIMP/2.99/plug-ins/test.py
+    - !Sh rm /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
 
-    # create a local python plugin
-    # Create file containing test program.
-    # Create in the conventional directory for local customization of  Linux apps, specically GIMP ($HOME/.config/.... etc.)
-    # Test program language is python, calling pygimp (pdb object) functions.
-    # The test program only proves that the resynthesizer plugin is registered properly, not that it works.
-    # When GIMP starts, it will find this file and execute it (to register the plug-in)
-    # Expect Python "TypeError: wrong number of parameters" and for gimp-console to hang ( you can Ctl-C it. )
-    - !Text
-      /work/.home/.config/GIMP/2.99/plug-ins/test/test.py: |
-        from gimpfu import *
-        def plugin_func(image, drawable, arg, arg2):
-              print("plugin_func called args: ", arg, arg2)
-        register(
-              "test",
-              "blurb",
-              "help message",
-              "author",
-              "copyright",
-              "year",
-              "Test",
-              "*",
-              [
-                  (PF_IMAGE, "image", "Input image", None),
-                  (PF_DRAWABLE, "drawable", "Input drawable", None),
-                  (PF_STRING, "arg", "The string argument", "default-value"),
-                  (PF_INT, "arg2", "The int argument", 1)
-              ],
-              [],
-              plugin_func,
-              menu="<Image>/Somewhere")
-        main()
-
+    # install test plugins from repository to container user's home  (not into the container)
+    # Copy to the conventional directory for local customization of  Linux apps, specically GIMP ($HOME/.config/.... etc.)
+    # When GIMP starts, it will find these plugin files and execute them (to register the plug-in)
     # Plugins must be in subdirectory, and executable?
+    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/test
+    - !Copy
+      source: /work/plug-ins/test.py
+      path: /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
+
+    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/test2
+    - !Copy
+      source: /work/plug-ins/test2.py
+      path: /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
+
+    # rebuild container if test plugin source (in /work i.e. project directory ) changes
+    - !Depends plug-ins
+
 
     # Copy a hacked gimpfu.py into the install location from the project directory
     - !Copy
@@ -529,15 +515,15 @@ commands:
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
 
-      chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
-
       /usr/local/bin/gimp-2.99
+
 
   gimpListPlugins: !Command
     description: List local plugins in gimpdev container
     container: gimpLocal
     run: |
       ls -alR $HOME/.config/GIMP/2.99/plug-ins
+      cat $HOME/.config/GIMP/2.99/plug-ins/test/test.py
 
 
   # uncomment ## in gimp/plug-ins/Makefile.am
