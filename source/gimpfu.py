@@ -90,6 +90,7 @@ import gi
 
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
+from gi.repository import Gimp as gimp
 
 
 # v3
@@ -106,14 +107,38 @@ from gimpfu_types import *
 
 # TODO from gimpenums import *
 
-'''
-Can't call this until we call Gimp.main() to establish self type is GIMPPlugin
-# alias the PDB.  Not referenced here, FBC we expose symbol "pdb" to users of gimpfu
-# Each plugin process has its own instance of GimpPDB ?
-print('calling get_pdb()')
-pdb = gimp.get_pdb()
-assert pdb is not None
-'''
+
+# alias Gimp.PGB as pdb
+
+# This not working, fails assert
+#pdb = GimpFu.get_pdb()
+#if pdb is None:
+#    print(Gimp.pdb_error())
+#assert pdb is not None
+from gimpfu_pdb import GimpfuPDB
+
+pdb = GimpfuPDB()
+
+#gimp = None
+
+def _define_compatibility_aliases():
+    '''
+    alias  PDB and Gimp.
+    FBC.
+    Aliases are uncapitalized.
+    Cannot create aliases until after calling Gimp.main(),
+    which establishes self as GimpPlugin.
+    '''
+    print('Aliasing')
+    #global gimp
+    global pdb
+
+    #gimp = Gimp
+    pdb = Gimp.get_pdb()
+    assert pdb is not None
+
+
+
 
 # Python 3 ugettext() is deprecated, use gettext() which also returns unicode
 import gettext
@@ -172,8 +197,19 @@ def deriveMissingMenu(menu, label, params):
 def makeProcNamePrefixCanonical(proc_name):
     '''
     if given name not canonical, make it so.
-    v2 allowed python_, extension_, plug_in_, file_
+
+    Canonical means having a prefix from a small set,
+    so that from the canonical name, PDB browsers know how implemented.
+
+    v2 allowed underbars, i.e. python_, extension_, plug_in_, file_ prefixes.
     TODO FBC, transliterate _ to -
+
+    Note that prefix python-fu intends to suggest (to browsers of PDB):
+    - fu: simplified API i.e. uses GimpFu module
+    - python: language is python
+    script-fu is similar for Scheme language: simplified API
+    You can write a Python language plugin without the simplified API
+    and then it is author's duty to choose a canonically prefixed name.
     '''
     if (not proc_name.startswith("python-") and
         not proc_name.startswith("extension-") and
@@ -185,7 +221,7 @@ def makeProcNamePrefixCanonical(proc_name):
 def register(proc_name, blurb, help, author, copyright, date, label,
              imagetypes, params, results, function,
              menu=None, domain=None, on_query=None, on_run=None):
-    """GimpFu method called to register a new plug-in."""
+    """GimpFu method that registers a plug-in."""
 
     print ('register', proc_name)
 
@@ -239,6 +275,7 @@ def register(proc_name, blurb, help, author, copyright, date, label,
     makeProcNamePrefixCanonical(proc_name)
 
     # v3 plugin_type in local cache always a dummy value
+    # Gimp enums are not defined yet
     plugin_type = 1
 
     _registered_plugins_[proc_name] = GimpFuProcedure(blurb, help, author, copyright,
@@ -246,7 +283,10 @@ def register(proc_name, blurb, help, author, copyright, date, label,
                                        plugin_type, params, results,
                                        function, menu, domain,
                                        on_query, on_run)
-# TODO
+
+
+
+# TODO still needed in v3?  Not a virtual method of GimpPlugin anymore?
 def _query():
     for plugin in _registered_plugins_.keys():
         (blurb, help, author, copyright, date,
@@ -284,6 +324,9 @@ def _query():
         if on_query:
             on_query()
 
+'''
+TODO replace this with gimp_procedure_config
+
 def _get_defaults(proc_name):
     import gimpshelf
 
@@ -305,7 +348,7 @@ def _set_defaults(proc_name, defaults):
 
     key = "python-fu-save--" + proc_name
     gimpshelf.shelf[key] = defaults
-
+'''
 
 
 def _interact(procedure, stock_args, actualArgs):
@@ -320,8 +363,11 @@ def _interact(procedure, stock_args, actualArgs):
     # effectively a closure, partially bound to stock_args
     def run_script(run_params):
         nonlocal stock_args
+        # TEMP attempt to get pdb into scope
+        # nonlocal function
 
         print("run_script")
+        print("pdb before run_script", pdb)
         params = stock_args + tuple(run_params)
         #TODO _set_defaults(proc_name, params)
         # invoke on unpacked args
@@ -401,6 +447,10 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
     Can actualArgs be a prefix of formal parameters?
     '''
     stock_args = (image, drawable)
+
+    _define_compatibility_aliases()
+    assert pdb is not None
+    print("pdb outside", pdb)
 
     if isBatch:
        try:
@@ -529,8 +579,14 @@ def N_(message):
     return message
 
 
+
+
 '''
 A class whose *instances* will have a prop attribute
+
+Class has one property of each type.
+Properties used only for their type.
+In calls to set_args_from_property
 '''
 class PropHolder (GObject.GObject):
     # copied and hacked to remove '-' from Python GTK+ 3 website tutorial
@@ -562,8 +618,18 @@ class PropHolder (GObject.GObject):
             raise AttributeError('unknown property %s' % prop.name)
 
 
+prop_holder = PropHolder()
+print(prop_holder.props)
+print(prop_holder.props.intprop)
+
+
+
 # lkk rest is my hack trying to understand
 '''
+GimpFu is subclass of Gimp.Plugin.
+At runtime, only methods of such a subclass (or procedures called from methods)
+have access to Gimp and its PDB.
+
 GimpFu is wrapper.
 Has no properties itself.
 More generally (unwrapped) properties  represent params (sic arguments) to ultimate plugin.
@@ -571,9 +637,17 @@ More generally (unwrapped) properties  represent params (sic arguments) to ultim
 _run() above wraps author's "function" i.e. ultimate plugin method
 '''
 class GimpFu (Gimp.PlugIn):
+
+    @classmethod
+    def get_pdb(cls):
+        return Gimp.get_pdb();
+
+
+
     ## Parameters ##
     # Long form: create attribute which is dictionary of GProperty
     # class attribute ??
+    # not used
     __gproperties__ = {
         # nick, blurb, default
         "myProp": (str,
@@ -583,43 +657,12 @@ class GimpFu (Gimp.PlugIn):
                  GObject.ParamFlags.READWRITE)
     }
 
-    '''
-    A GO.Property which we will attempt to redecorate
-    '''
-    '''
-    @GObject.Property(type=str,
-                      default=None,
-                      nick= _("Dummy2"))
-    def dummy2(self):
-    '''
-
-
-
-
-    # Python property used to create procedure args
-    # Note we dynamically redecorate it ??
-
-    _dummy = ""
-
-    #@GObject.Property(type=str,
-    #                  default=None,
-    #                  nick= _("Dummy"))
-    def dummy_getter(self):
-        '''Template string property'''
-        return self._dummy
-        ##return None  # Non-functional getter
-
-    ##@dummy.setter
-    def dummy_setter(self, value):
-        self._dummy = value
-
-
 
     ## Private specialization methods for GimpFu
 
     def _set_procedure_metadata(self, procedure, name):
         '''
-        Tell local metadata to Gimp
+        Convey local plugin metadata to Gimp
         '''
         procedure.set_image_types(_registered_plugins_[name].IMAGETYPES);
         procedure.set_documentation (N_(_registered_plugins_[name].BLURB),
@@ -637,125 +680,18 @@ class GimpFu (Gimp.PlugIn):
         Add (i.e. declare to Gimp) args to plugin procedure
         from formal params as recorded in local cache under proc_name
         '''
-        # dummy arg
 
+        '''
+        This implementation uses one property on self many times.
+        Requires a hack to Gimp, which otherwise refuses to add are many times from same named property.
+        '''
         formal_params = _registered_plugins_[proc_name].PARAMS
-
-        '''
-        cruft
-        Even if programmed correctly, PyGobject issue 227 says it won't work???
-        array = Gimp.GParamSpec.new(1)
-        # Gimp.gimp_param_spec_array ('foo', 'bar', 'zed', Gimp.GIMP_PARAM_READWRITE);
-
-        param_spec = Gimp.g_param_spec_int ("spacing",
-                                       "spacing",
-                                       "Spacing of the brush",
-                                       1, 1000, 10,
-                                       Gimp.GIMP_PARAM_READWRITE);
-        procedure.add_argument(self, param_spec);
-        '''
-
-        '''
-        All we are  doing is telling Gimp the type of the argument.
-        Ideally, we pass Gimp a GParamSpec.
-        But PyGobject #227 might say that is broken.
-        This is a trick.
-        We can use this trick since Gimp is just examining the type and doesn't call the property methods?
-        '''
-
-        '''
-        Try mangling attributes of property
-        '''
-        '''
-        This doesn't work: it fails to show __gproperties__  as an attribute in dir() ???
-        print(dir(GimpFu))
-        print(dir(Gimp.PlugIn))
-        GimpFu.__gproperties__["myProp"].nick = "newNick"
-        procedure.add_argument_from_property(self, "myProp")
-        '''
-
-        '''
-        # Dynamically create new property
-        # default most things
-        # the property name (how it is referenced) is "foo"
-        foo = GObject.Property(type=str, default='bar')
-        print("print(self.foo:)", self.foo)
-        #Fail: AttributeError: 'GimpFu' object has no attribute 'foo'
-
-        # C args are:
-        # procedure: Gimp.Procedure, a GObject, that owns the property
-        # config: GObject on which the property is registered?
-        # propname: str that is name of property
-        #
-        # Since Python, self is passed implicitly as first arg
-        procedure.add_argument_from_property(self, "foo")
-        # Fails:
-
-        foo = GObject.Property(type=int, default=1)
-        procedure.add_argument_from_property(self, "foo")
-        '''
-
-        '''
-        Try .props
-
-        "Each instance also has a props attribute which exposes all properties as instance attributes:"
-        But where is the instance?
-        '''
-        prop_holder = PropHolder()
-        print(prop_holder.props)
-        print(prop_holder.props.intprop)
 
         for i in range(len(formal_params)):
             # TODO map PF_TYPE to types known to Gimp (a smaller set)
-             procedure.add_argument_from_property(prop_holder, "intprop")
+            # use named properties of prop_holder
+            procedure.add_argument_from_property(prop_holder, "intprop")
 
-        '''
-        print(self.props)
-        # <gi._gi.GProps object at 0x7efc9a2e2d90>
-        print(self.props.myProp)
-        # Fail: AttributeError: 'GimpFu' object has no attribute 'do_get_property'
-        print(self.props.myProp.type)
-        self.props.myProp.type = int
-        print(self.props.myProp.type)
-        procedure.add_argument_from_property(self, "myProp")
-        '''
-
-
-
-        '''
-        redecorate a dummy property.
-        A decorator is a function (GObject.Property) having a function parameter (dummy).
-        The dummy must have the same primitive type (e.g. str) as we redecorate I.E. we can't change the type?
-        Goal is to change extra attributes [default, nick] at runtime
-
-        UnboundLocalError: local variable 'dummy' referenced before assignment
-        the function being decorated must be in scope i.e. 'self.dummy', not just 'dummy'
-
-        LibGimp-CRITICAL **: 13:14:37.449: gimp_procedure_add_argument_from_property: assertion 'pspec != NULL' failed
-        ???
-        '''
-        # assigned decorated function to class's attributes
-        # Not: global dummy
-        '''
-        When calling Gobject.Property without syntactic sugar "@", args are as shown
-
-        Returns a "descriptor object", of type <property object>
-        Make it named "rdummy", an attribute of self (a PluginProcedure) since will be instrospecting self
-        '''
-        '''
-        self.dummy_setter("foo")
-        self.rdummy = GObject.Property(getter=self.dummy_getter,
-                                  setter=self.dummy_setter,
-                                  type=str,
-                                  default=None,
-                                  nick= _("FooNick"))
-        print(self.rdummy)
-
-        procedure.add_argument_from_property(self, "rdummy")
-
-        # attempt to reuse identical property: fails with Gimp error
-        # procedure.add_argument_from_property(self, "palette")
-        '''
 
 
     ## GimpPlugIn virtual methods ##
@@ -771,13 +707,15 @@ class GimpFu (Gimp.PlugIn):
 
 
     '''
-    This is called by main() and should be AFTER the call to register().
-    The filename argument is name of the source file, not necessarily the same as given in register(name,...)
-    Until now, we have only registered in the local cache, and not registered with Gimp.
+    Gimp calls this back when the GimpFu plugin calls main(), which calls Gimp.main().
+    Thus it should execute AFTER the GimpFu plugin calls register().
+    Until now, the GimpFu plugin is only registered in the local cache, and not registered with Gimp.
+
+    The filename arg is name of the source file, not necessarily the same as given in register(name,...)
     '''
     def do_create_procedure(self, filename):
 
-        # filename not used
+        # filename not otherwise used
         print ('create procedure(s) from file: ', filename, " .py")
 
         '''
@@ -795,3 +733,12 @@ class GimpFu (Gimp.PlugIn):
         # TODO, we created and registered many, we return only the last one??
         # Is creating many legal to Gimp 3?
         return procedure
+
+
+# alias Gimp.PGB as pdb
+# This not working, fails assert
+#pdb = Gimp.get_pdb()
+#assert pdb is not None
+#pdb = GimpFu.get_pdb()
+#if pdb is None:
+#    print(Gimp.pdb_error())

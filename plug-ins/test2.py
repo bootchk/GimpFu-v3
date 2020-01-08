@@ -8,6 +8,18 @@ from gimpfu import *
 
 def plugin_func(image, drawable, arg, arg2):
       print("plugin_func called")
+
+      # test that pdb is accessible
+      # This works (except for the args) i.e. PDB has a method run_procedure
+      # Gimp.get_pdb().run_procedure('plug-in-plasma', 1)
+
+      # test that pdb is accessible
+      # This fails, attribute gimp_image... not exist
+      #drawable = Gimp.get_pdb().gimp_image_active_drawable(image)
+
+      # test that pdb alias is defined
+      # This works in that pdb is defined, by gimp_image... is still not an attribute of PDB
+      print("pdb inside plugin_func", pdb)
       drawable = pdb.gimp_image_active_drawable(image)
 
 register(

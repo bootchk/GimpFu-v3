@@ -387,20 +387,30 @@ containers:
       path: /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
     - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
 
+    # Can't use the originals, since they have hash bang #! python2
+    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/clothify
+    - !Copy
+      source: /work/plug-ins/clothify.py
+      path: /work/.home/.config/GIMP/2.99/plug-ins/clothify/clothify.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/clothify/clothify.py
+
     # rebuild container if test plugin source (in /work i.e. project directory ) changes
     - !Depends plug-ins
 
 
     # Copy a hacked gimpfu.py into the install location from the project directory
     - !Copy
-      source: /work/gimpfu.py
+      source: /work/source/gimpfu.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu.py
     - !Copy
-      source: /work/gimpfu_widgets.py
+      source: /work/source/gimpfu_widgets.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_widgets.py
     - !Copy
-      source: /work/gimpfu_types.py
+      source: /work/source/gimpfu_types.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_types.py
+    - !Copy
+      source: /work/source/gimpfu_pdb.py
+      path:  /usr/local/lib/gimp/2.99/python/gimpfu_pdb.py
 
     environ:
       HOME: /work/.home
