@@ -84,13 +84,12 @@ import sys
 
 
 import gi
-
-# alias Gimp as gimp FBC
-# TODO, later
-
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
-from gi.repository import Gimp as gimp
+
+# This does not work to alias gimp???
+# then gimp type is IntrospectionModule???
+# from gi.repository import Gimp as gimp
 
 
 # v3
@@ -121,10 +120,10 @@ from gimpfu_enums import *
 #    print(Gimp.pdb_error())
 #assert pdb is not None
 from gimpfu_pdb import GimpfuPDB
-
 pdb = GimpfuPDB()
 
-#gimp = None
+from gimpfu_gimp import GimpfuGimp
+gimp = GimpfuGimp()
 
 def _define_compatibility_aliases():
     '''

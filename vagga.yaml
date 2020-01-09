@@ -387,6 +387,12 @@ containers:
       path: /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
     - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
 
+    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/test3
+    - !Copy
+      source: /work/plug-ins/test3.py
+      path: /work/.home/.config/GIMP/2.99/plug-ins/test3/test3.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test3/test3.py
+
     # Can't use the originals, since they have hash bang #! python2
     - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/clothify
     - !Copy
@@ -411,6 +417,9 @@ containers:
     - !Copy
       source: /work/source/gimpfu_pdb.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_pdb.py
+    - !Copy
+      source: /work/source/gimpfu_gimp.py
+      path:  /usr/local/lib/gimp/2.99/python/gimpfu_gimp.py
     - !Copy
       source: /work/source/gimpfu_enums.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_enums.py

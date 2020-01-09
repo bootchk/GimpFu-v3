@@ -72,9 +72,6 @@ class GimpfuPDB():
     Or should we allow set attribute to mean "store a procedure"?
     '''
 
-    def __init__ (self):
-        self.adaptee = None
-
 
     def _marshall_args(self, *args):
         '''
