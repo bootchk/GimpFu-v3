@@ -18,7 +18,7 @@ def plugin_func(image, drawable, arg, arg2):
       #drawable = Gimp.get_pdb().gimp_image_active_drawable(image)
 
       # test that pdb alias is defined
-      # This works in that pdb is defined, by gimp_image... is still not an attribute of PDB
+      # This works in that pdb is defined, and that gimp_image... seems like an attribute of PDB
       print("pdb inside plugin_func", pdb)
       drawable = pdb.gimp_image_active_drawable(image)
 

@@ -398,7 +398,7 @@ containers:
     - !Depends plug-ins
 
 
-    # Copy a hacked gimpfu.py into the install location from the project directory
+    # Copy hacked gimpfu sources into the install location from the project directory
     - !Copy
       source: /work/source/gimpfu.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu.py
@@ -411,12 +411,17 @@ containers:
     - !Copy
       source: /work/source/gimpfu_pdb.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_pdb.py
+    - !Copy
+      source: /work/source/gimpfu_enums.py
+      path:  /usr/local/lib/gimp/2.99/python/gimpfu_enums.py
 
     environ:
       HOME: /work/.home
 
 
   # build gimp using meson
+  # Not used because it doesn't build gimpfu anyway?
+  # Can't remember why I don't use this
   gimpMesonDev:
     setup:
     - !Container gimpDeps

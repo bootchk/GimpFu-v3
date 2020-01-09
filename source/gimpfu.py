@@ -99,13 +99,18 @@ from gi.repository import GLib
 # for g_param_spec
 from gi.repository import GObject
 
-
+# import types needed for implementation of GimpFu
 from gimpfu_types import *
 
+# import enums so they are exposed to GimpFu authors
+# Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
+# TODO retain old module name FBC?
+# v2 from gimpenums import *
+from gimpfu_enums import *
 
 # TODO import gimpcolor
 
-# TODO from gimpenums import *
+
 
 
 # alias Gimp.PGB as pdb
