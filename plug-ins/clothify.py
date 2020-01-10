@@ -4,11 +4,12 @@ import math
 from gimpfu import *
 
 def clothify(timg, tdrawable, bx=9, by=9, azimuth=135, elevation=45, depth=3):
-    width = tdrawable.width
-    height = tdrawable.height
+    width = tdrawable.width()
+    height = tdrawable.height() # lkk was height
 
     img = gimp.Image(width, height, RGB)
-    img.disable_undo()
+    # lkk was disable_undo
+    img.undo_disable()
 
     layer_one = gimp.Layer(img, "X Dots", width, height, RGB_IMAGE,
                            100, NORMAL_MODE)

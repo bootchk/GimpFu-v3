@@ -423,6 +423,9 @@ containers:
     - !Copy
       source: /work/source/gimpfu_enums.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_enums.py
+    - !Copy
+      source: /work/source/gimpfu_image.py
+      path:  /usr/local/lib/gimp/2.99/python/gimpfu_image.py
 
     environ:
       HOME: /work/.home

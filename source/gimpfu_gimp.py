@@ -6,6 +6,11 @@ from gi.repository import Gimp
 from gi.repository import GObject    # marshalling
 
 
+# import wrapper classes
+from gimpfu_image import GimpfuImage
+
+
+
 class GimpfuGimp():
     '''
     Adaptor to Gimp
@@ -13,8 +18,14 @@ class GimpfuGimp():
     Its attributes appear to have similar names as the Gimp object (from GI).
     E.G. Gimp.Image vs gimp.Image
 
+    Adaption kinds:
+    Some methods are passed straight to Gimp.
+    Some methods are passed to wrapper class in Python (constructor methods)
+
     See gimpfu_pdb, its similar.
     '''
+
+    # TODO some me
 
 
     def _marshall_args(self, *args):
@@ -48,10 +59,35 @@ class GimpfuGimp():
         '''
         print ("gimp adaptor called, args", args)
 
+        # test
 
-        # !!! avoid infinite recursion
+        '''
+        # Futz with args that had property semantics in v2
+        new_args = []
+        for arg in args:
+            print("arg type is:", type(arg))
+            print(arg.invoke())
+            if type(arg) is gi.FunctionInfo:
+                print("arg.invoke")
+                new_arg = arg.invoke()
+            else:
+                new_arg = arg
+            new_args.append(new_arg)
+        '''
+
+        # create name string of method
+
         class_name = object.__getattribute__(self, "adapted_gimp_object_name")
-        method_name = "Gimp." + class_name + ".new"
+
+        # TEMP
+        # dispatch on whether object has been wrapped
+        if class_name != "Image":
+            # pass to Gimp constructor
+            method_name = "Gimp." + class_name + ".new"
+        else:
+            # construct a wrapper object of Gimp object
+            method_name = "Gimpfu" + class_name  # e.g. GimpfuImage, a classname which is a constructor
+
         # eval to get the callable function
         func = eval(method_name)
 
@@ -59,10 +95,13 @@ class GimpfuGimp():
         E.G.
         func = Gimp.Image.new
         func = eval("Gimp.Image.new")
+        return func(*args)
         return Gimp.Image.new(*args)
+        return GimpfuImage(*args)
         '''
 
         result = func(*args)
+        #result = func(*new_args)
         print(result)
         return result
 
