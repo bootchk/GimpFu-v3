@@ -9,15 +9,13 @@ from gi.repository import Gimp
 
 '''
 
-Wraps Gimp.Image.
+Adapts (wraps) Gimp.Image.
 
 Constructor appears in GimpFu plugin code as e.g. : gimp.Image(w, h, RGB)
-I.E. an attribute of gimp instance.
+I.E. an attribute of gimp instance (see gimpfu_gimp.py.)
 
 In PyGimp v2, similar concept implemented by pygimp-image.c
 Since v3, implemented in Python using GI.
-
-An adaptor.
 
 Method kinds:
 Most have an identical signature method in Gimp.Image. (delegated)
@@ -29,14 +27,49 @@ Some are unique to PyGimp, not present in Gimp.Image. (augment)
 
 '''
 
-class GimpfuImage( Gimp.Image) :
+'''
+class adapter vs object adapter
+
+Object adapter: does not inherit Gimp.Image, but owns an instance of it
+Class adapter: multiple inheritance
+TODO which do we need?
+'''
+
+
+# TODO how do we make instances appear to be the type of the adaptee
+# when passed as args to Gimp?????
+
+class GimpfuImage( ) :
 
     def __init__(self, width, height, image_mode):
-        # delegate to super with changed method name "new"
-        super.new(width, height, image_mode)
+        # adaptee has constructor name "new"
+        self._adaptee = Gimp.Image.new(width, height, image_mode)
+
+
+    # Methods we specialize
 
     def insert_layer(self, layer):
         print("insert_layer called")
+        # additional args
         position = 1  #TODO
         # TODO layer unwrap?
-        super.insert_layer(self, layer, -1, position)
+        self._adaptee.insert_layer(self, layer, -1, position)
+
+
+    # Methods and properties offered dynamically.
+    # __getattr__ is only called for methods not found on self
+
+    def __getattr__(self, name):
+        # when name is callable, soon to be called
+        # when name is data member, returns value
+        return getattr(self.__dict__['_adaptee'], name)
+
+
+    def __setattr__(self, name, value):
+        if name in ('_adaptee',):
+            self.__dict__[name] = value
+        else:
+            setattr(self.__dict__['_adaptee'], name, value)
+
+    def __delattr__(self, name):
+        delattr(self.__dict__['_adaptee'], name)

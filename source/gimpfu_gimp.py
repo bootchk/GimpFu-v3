@@ -86,7 +86,9 @@ class GimpfuGimp():
             method_name = "Gimp." + class_name + ".new"
         else:
             # construct a wrapper object of Gimp object
-            method_name = "Gimpfu" + class_name  # e.g. GimpfuImage, a classname which is a constructor
+            # e.g. GimpfuImage, a classname which is a constructor
+            method_name = "Gimpfu" + class_name
+        print("Calling constructor: ", method_name)
 
         # eval to get the callable function
         func = eval(method_name)

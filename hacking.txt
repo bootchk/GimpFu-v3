@@ -1,0 +1,50 @@
+
+Notes for developers of this package.
+
+
+Disambiguation
+
+The gimpfu module is only a part of PyGimp.
+Other parts are the gimpui, etc. (I am not sure of the list).
+This is about gimpfu module.
+The gimpfu module imports some of the other modules.
+It might be that gimpfu can be ported (for many usecases)
+without porting the other modules.
+
+
+Requirements
+
+Ideally this package would do everything documented by:
+
+The user's guide for PyGimp:
+https://www.gimp.org/docs/python/pygimp.html
+
+The v2 code:
+see the Gimp repository say for v2.10
+in the plug-ins/pygimp directory
+
+
+
+Strategy
+
+v2 used static binding to Gimp.
+v3 uses dynamic binding with GI (GObject Introspection)
+
+
+
+Decorator pattern
+
+Makes heavy use of "dynamic decorator pattern".
+See https://python-patterns.guide/gang-of-four/decorator-pattern/
+
+
+Other
+
+Some functionality of v2 has migrated to Gimp:
+  "defaults" aka "persistent settings" now in Gimp as procedure_config
+  Thus gimpshelf module is obsolete.
+
+Some modules of v2 might be little used and thus not ported immediately:
+????
+   gimpthumb     thumbnail i.e. previews???
+   gimpcolor, gimpui     ????
