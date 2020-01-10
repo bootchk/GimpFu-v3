@@ -5,7 +5,7 @@ Notes for developers of this package.
 Disambiguation
 
 The gimpfu module is only a part of PyGimp.
-Other parts are the gimpui, etc. (I am not sure of the list).
+Other parts are the gimpui, etc. modules (I am not sure of the list).
 This is about gimpfu module.
 The gimpfu module imports some of the other modules.
 It might be that gimpfu can be ported (for many usecases)
@@ -27,7 +27,7 @@ in the plug-ins/pygimp directory
 
 Strategy
 
-v2 used static binding to Gimp.
+v2 used static binding to Gimp (binding written in C)
 v3 uses dynamic binding with GI (GObject Introspection)
 
 
@@ -36,6 +36,33 @@ Decorator pattern
 
 Makes heavy use of "dynamic decorator pattern".
 See https://python-patterns.guide/gang-of-four/decorator-pattern/
+
+
+Guide to source files
+
+gimpfu_gimp
+gimpfu_pdb
+
+Provide the aliases "gimp" and "pdb" which GimpFu has always promised,
+more or less to Gimp and Gimp.pdb
+
+gimpfu_image
+gimpfu_layer
+etc.
+
+Are wrappers which provide additional convenience methods provided by GimpFu v2.
+They adapt Gimp.Image, Gimp.Layer, etc.
+
+gimpfu_types  private Python types to GimpFu
+
+gimpfu_maps   supports PF_ constants
+gimpfu_widgets supports generation of GUI for a plugin
+
+In v2 these were inside gimpfu.py
+
+gimpfu_enums  provided Gimp enums to GimpFu authors
+
+In v2 a C language module gimpenumsmodule.c
 
 
 Other

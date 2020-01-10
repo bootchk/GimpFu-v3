@@ -8,7 +8,7 @@ from gi.repository import GObject    # marshalling
 
 # import wrapper classes
 from gimpfu_image import GimpfuImage
-from gimpfu_image import GimpfuLayer
+from gimpfu_layer import GimpfuLayer
 
 
 

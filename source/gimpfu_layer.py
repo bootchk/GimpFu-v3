@@ -19,9 +19,11 @@ see comments at gimpfu_image, which is very similar
 
 class GimpfuLayer( ) :
 
-    def __init__(self, width, height, image_mode):
+    # img->ID, name, width, height, type, opacity, mode);
+    def __init__(self, img, name, width, height, type, opacity, mode):
+        # TODO marshall args that are adapted, back to Gimp object types
         # adaptee has constructor name "new"
-        self._adaptee = Gimp.Layer.new(width, height, image_mode)
+        self._adaptee = Gimp.Layer.new(img, name, width, height, type, opacity, mode)
 
 
     # Methods we specialize
