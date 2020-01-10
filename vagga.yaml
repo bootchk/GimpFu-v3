@@ -426,6 +426,10 @@ containers:
     - !Copy
       source: /work/source/gimpfu_image.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_image.py
+    - !Copy
+      source: /work/source/gimpfu_layer.py
+      path:  /usr/local/lib/gimp/2.99/python/gimpfu_layer.py
+
 
     environ:
       HOME: /work/.home

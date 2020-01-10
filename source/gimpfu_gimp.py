@@ -8,6 +8,7 @@ from gi.repository import GObject    # marshalling
 
 # import wrapper classes
 from gimpfu_image import GimpfuImage
+from gimpfu_image import GimpfuLayer
 
 
 
@@ -79,14 +80,14 @@ class GimpfuGimp():
 
         class_name = object.__getattribute__(self, "adapted_gimp_object_name")
 
-        # TEMP
+        # TEMP  Probably all will be wrapped
         # dispatch on whether object has been wrapped
-        if class_name != "Image":
+        if not (class_name in ("Image", "Layer")):
             # pass to Gimp constructor
             method_name = "Gimp." + class_name + ".new"
         else:
             # construct a wrapper object of Gimp object
-            # e.g. GimpfuImage, a classname which is a constructor
+            # e.g. GimpfuFoo, a classname which is a constructor
             method_name = "Gimpfu" + class_name
         print("Calling constructor: ", method_name)
 
