@@ -50,15 +50,20 @@ gimpfu_image
 gimpfu_layer
 etc.
 
-Are wrappers which provide additional convenience methods provided by GimpFu v2.
+Wrappers which provide additional convenience methods provided by GimpFu v2.
 They adapt Gimp.Image, Gimp.Layer, etc.
+
 
 gimpfu_types  private Python types to GimpFu
 
+In v2 these were inside gimpfu.py, or non-existant types
+
+
 gimpfu_maps   supports PF_ constants
-gimpfu_widgets supports generation of GUI for a plugin
+gimpfu_widgets supports auto generation of GUI for a plugin
 
 In v2 these were inside gimpfu.py
+
 
 gimpfu_enums  provided Gimp enums to GimpFu authors
 
@@ -70,8 +75,20 @@ Other
 Some functionality of v2 has migrated to Gimp:
   "defaults" aka "persistent settings" now in Gimp as procedure_config
   Thus gimpshelf module is obsolete.
+  gimpshelf module might still be necessary if any plugin in the wild used it
+  for off-label(?) uses e.g. persisting other plugin private data
 
 Some modules of v2 might be little used and thus not ported immediately:
-????
+Whether ported depends on use in the wild ????
    gimpthumb     thumbnail i.e. previews???
    gimpcolor, gimpui     ????
+
+
+
+Misc snippets off the internet, pertinent to hoops GimpFu must jump through
+
+mail list "pdb.gimp_get_item_by_id(), or ids and layers and layer groups"
+
+In Python, a "layer" is a reference to a data structure (in C terminology, a pointer to a struct).
+One of the fields is the layer's ID number.
+The PDB only deals with these ID numbers, and PyGimp doesn't provide a direct way to handle IDs.

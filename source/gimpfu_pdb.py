@@ -82,11 +82,17 @@ class GimpfuPDB():
         for x in args:
             # TODO convert to GObject
             # GObject.Value(GObject.TYPE_STRING, tmp))
-            print("marshall arg")
-            print(type(x))
+            print("marshall arg of type:", type(x) )
+
+            # Only primitive Python types and GTypes can be GObject.value()ed
+            # Unwrap wrapped types using idiom for class name
+            # TODO other class names in list
+            if  type(x).__name__ in ("GimpfuImage", "GimpfuLayer") :
+                x = x.unwrap()
 
             # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
-            # ??? I don't understand why insert() doesn't determine the type of its second argument
+            # ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
+            # unless this is a casting operation
 
             marshalled_args.insert(index, GObject.Value(type(x), x))
             index += 1
@@ -104,13 +110,31 @@ class GimpfuPDB():
         return inner_result
 
 
+    def _make_compatible_proc_name(self, name):
+        '''
+        1.  transliterate: names in PDB use hyphen for underbar
+        2.  translate deprecated names
+        '''
+        hyphenized_name = name.replace( '_' , '-')
+
+        #TODO use a map
+        # see commit  233ac80d "script-fu: port all scripts to the new gimp-drawable-edit functions "
+        if hyphenized_name == "gimp-edit-fill":
+            result = "gimp-drawable-edit-fill"
+        else:
+            result = hyphenized_name
+        return result
+
+
+
 
     def  __getattribute__(self, name):
         '''
-        override of Python special method
         Adapts attribute access to become invocation of PDB procedure.
 
-        The usual purpose is to compute the attribute, or get it from an adaptee.
+        Override of Python special method.
+        The more common purpose of such override is to compute the attribute,
+        or get it from an adaptee.
         '''
 
         '''
@@ -123,10 +147,7 @@ class GimpfuPDB():
             # TODO leave some calls unadapted, direct to PDB
             # ??? e.g. run_procedure ???, recursion ???
 
-
-
-            # names in PDB have hyphen instead of underbar
-            mangled_proc_name = name.replace( '_' , '-')
+            mangled_proc_name = object.__getattribute__(self, "_make_compatible_proc_name")(name)
 
             if Gimp.get_pdb().procedure_exists(mangled_proc_name):
 
@@ -136,8 +157,8 @@ class GimpfuPDB():
                 # return intercept function soon to be called
                 return object.__getattribute__(self, "_adaptor_func")
             else:
-                # TODO print name
-                raise Exception("GimpFu: unknown pdb procedure")
+                exception_string = f"GimpFu: unknown pdb procedure {mangled_proc_name}"
+                raise Exception( exception_string )
 
             # OLD
             # will raise AttributeError for names that are not defined by GimpPDB

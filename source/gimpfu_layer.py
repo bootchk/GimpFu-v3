@@ -20,14 +20,22 @@ see comments at gimpfu_image, which is very similar
 class GimpfuLayer( ) :
 
     # img->ID, name, width, height, type, opacity, mode);
-    def __init__(self, img, name, width, height, type, opacity, mode):
-        # TODO marshall args that are adapted, back to Gimp object types
+    def __init__(self, img, name, width, height, type, opacity, layer_mode):
         # adaptee has constructor name "new"
-        self._adaptee = Gimp.Layer.new(img, name, width, height, type, opacity, mode)
+        self._adaptee = Gimp.Layer.new(img.unwrap(), name, width, height, type, opacity, layer_mode)
+        print("new layer", self._adaptee)
+        
+
+    def unwrap(self):
+        ''' Return inner object, of a Gimp type, when passing arg to Gimp'''
+        print("unwrap to", self._adaptee)
+        return self._adaptee
 
 
     # Methods we specialize
 
+    '''
+    example from gimpfu_image
     def insert_layer(self, layer):
         print("insert_layer called")
         # additional args
@@ -35,7 +43,7 @@ class GimpfuLayer( ) :
         # TODO layer unwrap?
         # TODO self is not a Gimp type.  v2 used an ID??
         self._adaptee.insert_layer(self, layer, -1, position)
-
+    '''
 
     # Methods and properties offered dynamically.
     # __getattr__ is only called for methods not found on self

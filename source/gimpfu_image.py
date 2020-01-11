@@ -45,15 +45,18 @@ class GimpfuImage( ) :
         # adaptee has constructor name "new"
         self._adaptee = Gimp.Image.new(width, height, image_mode)
 
+    def unwrap(self):
+        ''' Return inner object of a Gimp type, when passing arg to Gimp'''
+        return self._adaptee
+
 
     # Methods we specialize
 
-    def insert_layer(self, layer):
+    def insert_layer(self, layer, parent=None, position=-1):
         print("insert_layer called")
-        # additional args
-        position = 1  #TODO
-        # TODO layer unwrap?
-        self._adaptee.insert_layer(self, layer, -1, position)
+
+        # Note that first arg to Gimp comes from self
+        self._adaptee.insert_layer(layer.unwrap(), parent, position)
 
 
     # Methods and properties offered dynamically.

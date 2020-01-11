@@ -101,6 +101,14 @@ And a test.py GimpFu plugin is installed in the container (Gimp menu Somewhere/t
 Then you can hack at the .py files in your clone and rerun the last commmand.
 It will take a minute or so to restart (not ideal, probably there is a better way.)
 
+Vagga leaves versioned containers which will fill your disk drive.
+Occasionally you will need to:
+>vagga _clean --unused
+
+To start from scratch (rebuilding your container from nothing):
+>rm -Rf .vagga
+Dragging it to the trash doesn't help free up space.
+
 
 Before you begin creating a dev environment,
 clone the Gimp reposistory into /gimp in the project directory.
