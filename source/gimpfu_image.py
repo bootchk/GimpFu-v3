@@ -65,6 +65,7 @@ class GimpfuImage( ) :
     @property
     def active_layer(self):
         # Delegate to Gimp.Image
+        # TODO wrap it?
         return self._adaptee.get_active_layer()
 
     @active_layer.setter

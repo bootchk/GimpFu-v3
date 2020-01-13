@@ -73,6 +73,7 @@ class GimpfuPDB():
     '''
 
 
+
     def _marshall_args(self, proc_name, *args):
         '''
         1. Gather many args into Gimp.ValueArray and return it.
@@ -81,7 +82,28 @@ class GimpfuPDB():
         GimpFu feature: hide run_mode from calling author
 
         3. Unwrap wrapped arguments so all args are GObjects
+
+        4. Hacky upcast???
         '''
+
+        def try_upcast_to_drawable(arg):
+            '''
+            When type(arg) is subclass of Gimp.Drawable, up cast to Gimp.drawable
+            and return new type, else return original type.
+
+            Require arg a GObject (not wrapped)
+            '''
+            # idiom for class name
+            print("Attempt up cast type", type(arg).__name__ )
+            # Note the names are not prefixed with Gimp ???
+            if type(arg).__name__ in ("Channel", "Layer"):  # TODO more subclasses
+                result = Gimp.Drawable
+            else:
+                result = type(arg)
+            print("upcast result:", result)
+            return result
+
+
         # TODO python-fu- ??
         if proc_name.startswith('plug-in-'):
             marshalled_args = Gimp.ValueArray.new(len(args)+1)
@@ -93,7 +115,6 @@ class GimpfuPDB():
 
 
         for x in args:
-
             # GObject.Value(GObject.TYPE_STRING, tmp))
             print("marshall arg of type:", type(x) )
 
@@ -104,14 +125,15 @@ class GimpfuPDB():
                 # !!! Do not affect the original object by assigning to x
                 go_arg = x.unwrap()
 
-                 # hack, up cast drawable sublclass e.g. layer to superclass drawable
-                if type(x).__name__ in ("GimpfuChannel", "GimpfuLayer"):  # TODO more subclasses
-                   go_arg_type = Gimp.Drawable
-                else:
-                   go_arg_type = type(go_arg)   # e.g. Image
+                # hack: up cast drawable sublclass e.g. layer to superclass drawable
+                go_arg_type = try_upcast_to_drawable(go_arg)
+
             else:
                 go_arg = x
-                go_arg_type = type(go_arg)
+                # arg may be unwrapped result of previous call e.g. type Gimp.Layer
+                # TODO: we wrap and unwrap as needed???
+                # hack that might be removed?
+                go_arg_type = try_upcast_to_drawable(go_arg)
 
             # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
             # ??? I don't understand why GObject.Value() doesn't determine the type of its second argument

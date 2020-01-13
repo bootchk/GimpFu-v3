@@ -23,8 +23,9 @@ def clothify(timg, tdrawable, bx=9, by=9, azimuth=135, elevation=45, depth=3):
     layer_two.name = "Y Dots"
     img.insert_layer(layer_two)
 
-    pdb.plug_in_gauss_rle(img, layer_one, bx, 1, 0)
-    pdb.plug_in_gauss_rle(img, layer_two, by, 0, 1)
+    # lkk add float()
+    pdb.plug_in_gauss_rle(img, layer_one, float(bx), 1, 0)
+    pdb.plug_in_gauss_rle(img, layer_two, float(by), 0, 1)
 
     img.flatten()
 
@@ -32,8 +33,9 @@ def clothify(timg, tdrawable, bx=9, by=9, azimuth=135, elevation=45, depth=3):
 
     pdb.plug_in_c_astretch(img, bump_layer)
     pdb.plug_in_noisify(img, bump_layer, 0, 0.2, 0.2, 0.2, 0.2)
-    pdb.plug_in_bump_map(img, tdrawable, bump_layer, azimuth,
-                         elevation, depth, 0, 0, 0, 0, True, False, 0)
+    #lkk add float()
+    pdb.plug_in_bump_map(img, tdrawable, bump_layer, float(azimuth),
+                         float(elevation), depth, 0, 0, float(0), float(0), True, False, 0)
 
     gimp.delete(img)
 

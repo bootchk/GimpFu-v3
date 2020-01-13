@@ -22,11 +22,10 @@ class GimpfuGimp():
     Adaption kinds:
     Some methods are passed straight to Gimp.
     Some methods are passed to wrapper class in Python (constructor methods)
+    Some methods are specialized (convenience)
 
     See gimpfu_pdb, its similar.
     '''
-
-    # TODO some me
 
 
     def _marshall_args(self, *args):
@@ -49,6 +48,8 @@ class GimpfuGimp():
         return marshalled_args
 
 
+    # TODO, not all names are constructors e.g. Image
+    # some names are methods of Gimp e.g. Gimp.displays_flush()
     def _adaptor_func(self, *args):
         '''
         run a Gimp constructor method "new"
@@ -78,11 +79,13 @@ class GimpfuGimp():
 
         # create name string of method
 
+        # TODO, class_name is misnomer, not every name is a class, some are method names.
         class_name = object.__getattribute__(self, "adapted_gimp_object_name")
 
         # TEMP  Probably all will be wrapped
         # dispatch on whether object has been wrapped
         if not (class_name in ("Image", "Layer")):
+            # TODO this is not right, should be just a method call
             # pass to Gimp constructor
             method_name = "Gimp." + class_name + ".new"
         else:
@@ -110,11 +113,15 @@ class GimpfuGimp():
 
 
 
+    # Methods and properties offered dynamically.
 
-    def  __getattribute__(self, name):
+    def __getattr__(self, name):
+    # !!! not def  __getattribute__(self, name):
         '''
         override of Python special method
         Adapts attribute access to become invocation on Gimp object.
+        __getattr__ is only called for methods not found on self
+        i.e. for methods not defined in this class (non-convenience methods)
         '''
         '''
         Require Gimp object exists.  GimpFu creates it.
@@ -123,6 +130,11 @@ class GimpfuGimp():
 
         # attribute name e.g. "Image"
         # We don't preflight, e.g. check that it is attribute of Gimp object
+
+        # announce names that are better accessed directly on Gimp, i.e. deprecated syntax
+        if name in ("displays_flush", ):
+
+            print(f"gimp.{name} is deprecated, you should use Gimp.{name}")
 
         '''
         We can't just return attribute of Gimp object:
@@ -137,3 +149,31 @@ class GimpfuGimp():
 
         # return intercept function soon to be called
         return object.__getattribute__(self, "_adaptor_func")
+
+
+    # specialized, convenience
+
+    '''
+    These are methods from v2 that we don't intend to deprecate
+    since they have actions on the Python side
+    that some plugins may require.
+    '''
+
+
+    def delete(self, instance):
+        '''
+        From PyGimp Reference:
+        It deletes the gimp thing associated with the Python object given as a parameter.
+        If the object is not an image, layer, channel, drawable or display gimp.delete does nothing.
+        '''
+        #TODO later
+        # For now, assume most programs don't really need to delete,
+        # since they are about to exit anyway
+        '''
+        Maybe:
+        delete instance if it is a wrapped class.
+        Also deleted the adaptee.
+        Gimp.Image.delete() et al says it will not delete
+        if is on display (has a DISPLAY) i.e. if Gimp user created as opposed to just the plugin.
+        '''
+        print("TODO gimp.delete() called")

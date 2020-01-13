@@ -477,6 +477,13 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
        except:
            final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
 
+    '''
+    Make any alterations to user created images visible.
+    GimpFu promises to hide the need for this.
+    '''
+    Gimp.displays_flush()   # !!! Gimp, not gimp
+
+
     # assert final_result is type GimpValueArray
     return final_result
 
