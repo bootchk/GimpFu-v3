@@ -1,0 +1,2 @@
+Calling error for procedure 'plug-in-noisify':
+Procedure 'plug-in-noisify' has been called with a wrong value type for argument 'drawable' (#3). Expected GimpDrawable, got GimpLayer.

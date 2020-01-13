@@ -24,12 +24,57 @@ class GimpfuLayer( ) :
         # adaptee has constructor name "new"
         self._adaptee = Gimp.Layer.new(img.unwrap(), name, width, height, type, opacity, layer_mode)
         print("new layer", self._adaptee)
-        
+
 
     def unwrap(self):
         ''' Return inner object, of a Gimp type, when passing arg to Gimp'''
         print("unwrap to", self._adaptee)
         return self._adaptee
+
+
+    '''
+    copy() was implemented in v2, but I am not sure it went through the __copy__ mechanism.
+    Anyway, a GimpFu author uses layer.copy().
+    That invokes the copy() method, defined here.
+
+     __copy__ is invoked by copy module i.e. copy.copy(foo)
+    Any copy must be deep, to copy attribute _adaptee.
+    To allow Gimpfu plugin authors to use the copy module,
+    we should override __copy__ and __deepcopy__ also.
+    Such MUST call gimp to copy the adaptee.
+    TODO
+
+    See SO "How to override the copy/deepcopy operations for a Python object?"
+    This is a hack of that answer code.
+    '''
+    def copy(self):
+        ''' Deep copy wrapper, with cloned adaptee'''
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+
+        '''
+        clone _adaptee
+        v2 called run_procedure()
+        Here we use Gimp.Layer.copy() directly???
+        '''
+        adaptee_clone = self._adaptee.copy()
+        print("Type of copy adaptee: ", type(adaptee_clone))
+
+        setattr(result, "_adaptee", adaptee_clone)
+        print("Type of copy: ", type(result))
+        return result
+
+    '''
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
+    '''
+
 
 
     # Methods we specialize

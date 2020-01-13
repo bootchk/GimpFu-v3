@@ -73,28 +73,51 @@ class GimpfuPDB():
     '''
 
 
-    def _marshall_args(self, *args):
+    def _marshall_args(self, proc_name, *args):
         '''
-        Gather many args into Gimp.ValueArray
+        1. Gather many args into Gimp.ValueArray and return it.
+
+        2. Optionally prefix args with run mode
+        GimpFu feature: hide run_mode from calling author
+
+        3. Unwrap wrapped arguments so all args are GObjects
         '''
-        marshalled_args = Gimp.ValueArray.new(len(args))
-        index = 0
+        # TODO python-fu- ??
+        if proc_name.startswith('plug-in-'):
+            marshalled_args = Gimp.ValueArray.new(len(args)+1)
+            marshalled_args.insert(0, Gimp.RunMode.NONINTERACTIVE)  # no GUI
+            index = 1
+        else:
+            marshalled_args = Gimp.ValueArray.new(len(args))
+            index = 0
+
+
         for x in args:
-            # TODO convert to GObject
+
             # GObject.Value(GObject.TYPE_STRING, tmp))
             print("marshall arg of type:", type(x) )
 
             # Only primitive Python types and GTypes can be GObject.value()ed
-            # Unwrap wrapped types using idiom for class name
+            # Unwrap wrapped types. Use idiom for class name
             # TODO other class names in list
             if  type(x).__name__ in ("GimpfuImage", "GimpfuLayer") :
-                x = x.unwrap()
+                # !!! Do not affect the original object by assigning to x
+                go_arg = x.unwrap()
+
+                 # hack, up cast drawable sublclass e.g. layer to superclass drawable
+                if type(x).__name__ in ("GimpfuChannel", "GimpfuLayer"):  # TODO more subclasses
+                   go_arg_type = Gimp.Drawable
+                else:
+                   go_arg_type = type(go_arg)   # e.g. Image
+            else:
+                go_arg = x
+                go_arg_type = type(go_arg)
 
             # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
             # ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
             # unless this is a casting operation
 
-            marshalled_args.insert(index, GObject.Value(type(x), x))
+            marshalled_args.insert(index, GObject.Value(go_arg_type, go_arg))
             index += 1
         return marshalled_args
 
@@ -104,9 +127,16 @@ class GimpfuPDB():
         print ("adaptor called, args", args)
         # !!! Must unpack args before passing to _marshall_args
         # !!! avoid infinite recursion
-        inner_result = Gimp.get_pdb().run_procedure( object.__getattribute__(self, "adapted_proc_name"),
-                                     object.__getattribute__(self, "_marshall_args")(*args) )
-        # TODO unmarshall result
+        proc_name = object.__getattribute__(self, "adapted_proc_name")
+        inner_result = Gimp.get_pdb().run_procedure( proc_name ,
+                                     object.__getattribute__(self, "_marshall_args")(proc_name, *args) )
+
+        # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
+        error_str = Gimp.get_pdb().get_last_error()
+        if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
+            raise Exception(error_str)
+
+        # TODO unmarshall result?
         return inner_result
 
 

@@ -56,7 +56,21 @@ class GimpfuImage( ) :
         print("insert_layer called")
 
         # Note that first arg to Gimp comes from self
-        self._adaptee.insert_layer(layer.unwrap(), parent, position)
+        success = self._adaptee.insert_layer(layer.unwrap(), parent, position)
+        if not success:
+            raise Exception("Failed insert_layer")
+
+    # Properties
+
+    @property
+    def active_layer(self):
+        # Delegate to Gimp.Image
+        return self._adaptee.get_active_layer()
+
+    @active_layer.setter
+    def active_layer(self, layer):
+        # TODO:
+        print("active_layer setter TODO")
 
 
     # Methods and properties offered dynamically.

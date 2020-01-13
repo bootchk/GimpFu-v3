@@ -122,6 +122,7 @@ containers:
     - !Install [ python3-gi]
     # lua
     - !Install [ luajit]
+    - !Install [ lua-lgi ]
     # javascript
     - !Install [ gjs]
 
@@ -165,6 +166,13 @@ containers:
     - !Install [ libpango1.0-dev]
     - !Install [ libcairo2-dev]
 
+    # optional but suppress warnings
+    - !Install [ libcanberra-gtk3-module ]
+
+    # optional for browsing API docs
+    - !Install [ yelp ]
+
+
     environ:
       HOME: /work/.home
 
@@ -201,7 +209,7 @@ containers:
 
 
   # Complete, ready to build babl
-  bablDev:
+  bablGeglDev:
     setup:
     - !Container gimpDepsSource
 
@@ -245,30 +253,11 @@ containers:
     #- !Sh test -d /usr/local/share/gir-1.0/babl/Babl-0.1.gir
 
 
+    # build gegl
 
-
-
-  # build gegl
-
-  # When it builds, it lists options that will be built, according to installed libraries it finds
-  # e.g. won't build umfpack if libumfpack5 is not installed
-  # Then at GIMP runtime, it may complain of missing GEGL ops
-
-  geglDev:
-    setup:
-    - !Container bablDev
-
-    # set prefix: directory where GIMP build scripts will install stuff
-    #- !Env
-    #  GIMP_PREFIX: /home
-
-    # Used by GIMP build to detect the build dependencies
-    # E.G. gegl depends on babl installed and uses pkgconfig to find it
-    # This has Debian path prepended
-    # TODO "${GIMP_PREFIX}/lib/${MY_ARCH}/pkgconfig:${GIMP_PREFIX}/lib/pkgconfig:${GIMP_PREFIX}/share/pkgconfig"
-    #- !Env
-    #  PKG_CONFIG_PATH: "/home/lib/x86_64-linux-gnu/pkgconfig:/home/lib/pkgconfig:/home/share/pkgconfig"
-    #- !Sh echo $PKG_CONFIG_PATH
+    # When it builds, it lists options that will be built, according to installed libraries it finds
+    # e.g. won't build umfpack if libumfpack5 is not installed
+    # Then at GIMP runtime, it may complain of missing GEGL ops
 
     # Used to find the glib-introspection dependencies.
     # gegl builds its introspection data.
@@ -292,15 +281,23 @@ containers:
         ninja
         ninja install
 
+    # remove DNS file that vagga will recreate after build
+    - !Sh "rm /etc/resolv.conf"
+
     # Show that it installed .so
     - !Sh ls /usr/local/lib/x86_64-linux-gnu
 
 
 
+  # !!! Note the containers branch here.
+  # Later, choose one of these on which to build gimpLocal
+
+
+
   # build gimp using autotools
-  gimpDev:
+  gimpAMDev:
     setup:
-    - !Container geglDev
+    - !Container bablGeglDev
 
     # Get source
 
@@ -312,6 +309,8 @@ containers:
 
     # copy files from my hacked git repo into the container
     # note path is to the containing directory
+    # First remove it in case meson build futzed with it???
+
     - !Copy
       source: /work/gimp
       path:  /home/gimp
@@ -343,10 +342,12 @@ containers:
     # --disable-docs ?? user manual?
     # --disable-gtk-doc ?? programmers reference manual (libgimp API and PDB?)
 
+    # --disable-vector-icons was working until Jan. 12
+    
     # build
     - !Sh |
         cd /home/gimp
-        ./autogen.sh --disable-docs --disable-vector-icons
+        ./autogen.sh --disable-docs
         make -j4
         make install
 
@@ -356,14 +357,59 @@ containers:
     #
     environ:
       LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
-      XDG_DATA_DIRS: "/usr/local/share"
+      XDG_DATA_DIRS: "/usr/local/share:/usr/share"
       PATH: "/usr/local/bin:/usr/bin:/bin"
+
+
+
+  # build gimp using meson
+  # Not used because it doesn't build gimpfu anyway?
+  # Can't remember why I don't use this
+  gimpMesonDev:
+    setup:
+    - !Container bablGeglDev
+
+    # TODO move this to container gimpSource??
+    # copy files from my hacked git repo into the container
+    # note path is to the container directory
+    - !Copy
+      source: /work/gimp
+      path:  /home/gimp
+
+    # resolve FAILED: cursors/gimp-tool-cursors.c   Related to vector icons?
+    - !Env  XDG_DATA_DIRS: "/usr/local/share:/usr/share"
+
+    # resolve ../plug-ins/common/file-pdf-load.c:32:10: fatal error: poppler.h: No such file or directory
+    - !Env LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
+    # -Dpoppler=false => -Dpdf=false is not correct
+    # -Dpoppler=false still fails to build
+
+    # currently crashes g-ir-scanner SIGILL
+
+    # Note that meson builds out of tree, i.e. does not touch gimp directory
+
+    # scrap:  --prefix=${GIMP_PREFIX} \
+
+    # build
+    - !Sh |
+        cd /home/gimp
+        meson _build \
+         --buildtype=release \
+         -Djavascript=never \
+         -Dlua=never \
+         -Dpython=always \
+         -Dgtk-doc=false
+        cd _build
+        ninja
+        ninja install
 
 
   # Local custom GIMP
   gimpLocal:
     setup:
-    - !Container gimpDev
+    # Choice:
+    - !Container gimpAMDev
+    #- !Container gimpMesonDev
 
     # create container user's .config for GIMP, to hold locally installed plug-ins
     - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins
@@ -430,31 +476,13 @@ containers:
       source: /work/source/gimpfu_layer.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_layer.py
 
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
 
     environ:
       HOME: /work/.home
 
 
-  # build gimp using meson
-  # Not used because it doesn't build gimpfu anyway?
-  # Can't remember why I don't use this
-  gimpMesonDev:
-    setup:
-    - !Container gimpDeps
 
-    # build
-    - !Sh |
-        cd /home/gimp
-        meson _build \
-         --prefix=${GIMP_PREFIX} \
-         --buildtype=release \
-         -Djavascript=never \
-         -Dlua=never \
-         -Dpython=always \
-         -Dpoppler=false
-        cd _build
-        ninja
-        ninja install
 
 
 
@@ -491,27 +519,29 @@ commands:
       which git
 
   testBabl: !Command
-    description: Test build babl
-    container: bablDev
+    description: Test build babl and gegl
+    container: bablGeglDev
     run: |
       ls /home/babl
+      ls /home/gegl
 
   #   cd /home/gegl-0.4.18/_build
   #    ninja test
 
-  testGegl: !Command
-    description: Test built gegl
-    container: geglDev
-    run: |
-      ls /home/gegl
 
   gimpVersion: !Command
     description: Run gimp command line in gimpdev container
-    container: gimpDev
+    container: gimpLocal
     run: |
       export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
       echo $LD_LIBRARY_PATH
       /usr/local/bin/gimp-2.99 --version
+
+  gimpBrowse: !Command
+    description: Browse Gimp GI use --use-env DISPLAY
+    container: gimpLocal
+    run: |
+      yelp /work/.home/gimp-doc
 
 
 
@@ -545,6 +575,7 @@ commands:
       which gegl
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
+      export NO_AT_BRIDGE=1
 
       /usr/local/bin/gimp-2.99
 
