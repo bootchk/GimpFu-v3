@@ -343,7 +343,7 @@ containers:
     # --disable-gtk-doc ?? programmers reference manual (libgimp API and PDB?)
 
     # --disable-vector-icons was working until Jan. 12
-    
+
     # build
     - !Sh |
         cd /home/gimp
@@ -445,6 +445,12 @@ containers:
       source: /work/plug-ins/clothify.py
       path: /work/.home/.config/GIMP/2.99/plug-ins/clothify/clothify.py
     - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/clothify/clothify.py
+    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/shadow_bevel
+    - !Copy
+      source: /work/plug-ins/shadow_bevel.py
+      path: /work/.home/.config/GIMP/2.99/plug-ins/shadow_bevel/shadow_bevel.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/shadow_bevel/shadow_bevel.py
+
 
     # rebuild container if test plugin source (in /work i.e. project directory ) changes
     - !Depends plug-ins

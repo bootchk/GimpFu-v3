@@ -1,4 +1,12 @@
 
+'''
+
+!!!
+This all should go away when Gimp support for auto plugin GUI lands in Gimp 3.
+Not well known that such support is on the roadmap.
+!!!
+
+'''
 
 from collections import namedtuple
 
@@ -60,6 +68,8 @@ def add_control_widgets_to_dialog(box, args, formal_params):
     args: a Gimp type, actual args (could be defaults or last values) as specified by how we registered with Gimp
     formal_params: a Python type, the original formal specs from plugin author in GimpFu notation
     '''
+    print("add_control_widgets")
+
     label = Gtk.Label.new_with_mnemonic("Off_set")
     box.pack_start(label, False, False, 1)
     label.show()
@@ -78,6 +88,7 @@ def add_control_widgets_to_dialog(box, args, formal_params):
     # omit leading 2 boilerplate params
     # TODO should have been hacked off earlier?
     for i in range(2, len(formal_params)):
+        print("Create control, index: ", i)
         # unpack tuple into namedtuple
         a_formal_param = GimpFuFormalParam(*formal_params[i])
 
@@ -91,6 +102,7 @@ def add_control_widgets_to_dialog(box, args, formal_params):
         # Grid right hand side is control widget
 
         widget_factory = _edit_mapping[a_formal_param.PF_TYPE]
+        assert widget_factory is not None   # else mapping incomplete
         #  e.g. widget_factory = StringEntry
 
         # TODO def_val comes from somewhere else? LAST_VALS ?
@@ -99,14 +111,23 @@ def add_control_widgets_to_dialog(box, args, formal_params):
         proc_name = 'bar' # TODO procedure.procedure_name()
 
         # Build args to widget_factory according to PF_TYPE
-        if a_formal_param.PF_TYPE in (PF_SPINNER, PF_SLIDER, PF_RADIO, PF_OPTION):
+        # This is a switch statement
+        # Since data comes from GimpFu author, don't trust it
+        if a_formal_param.PF_TYPE in (PF_SPINNER, PF_RADIO, PF_OPTION):
+            raise RuntimeError("Unhandled PF_ widget type.")
             args = [def_val, a_formal_param.EXTRAS]
         elif a_formal_param.PF_TYPE in (PF_FILE, PF_FILENAME):
             # TODO need keyword 'title'?
             # args = [def_val, title= "%s - %s" % (proc_name, tooltip_text)]
             args = [def_val, "%s - %s" % (proc_name, tooltip_text)]
-        else:
+        elif a_formal_param.PF_TYPE in (PF_INT, PF_STRING, PF_BOOL ):
             args = [def_val]
+        elif a_formal_param.PF_TYPE in (PF_SLIDER, ):
+            # Hack, we are using FloatEntry, should use Slider???
+            args = [def_val]
+        else:
+            raise RuntimeError("Unhandled PF_ widget type.")
+
 
         control_widget = widget_factory(*args)
         # e.g. control_widget = StringEntry(def_val)
@@ -154,7 +175,7 @@ def create_gimp_dialog(args, formal_params):
 
     use_header_bar = Gtk.Settings.get_default().get_property("gtk-dialogs-use-header")
     dialog = Gimp.Dialog(use_header_bar=use_header_bar,
-                         title=_("Offset Palette..."))
+                         title=_("Foo..."))
 
     dialog.add_button("_Cancel", Gtk.ResponseType.CANCEL)
     dialog.add_button("_OK", Gtk.ResponseType.OK)
@@ -510,7 +531,7 @@ class IntEntry(StringEntry):
             return int(self.get_text())
         except ValueError as e:
             raise EntryValueError(e.args)
-'''
+
 class FloatEntry(StringEntry):
         def get_value(self):
             try:
@@ -518,6 +539,7 @@ class FloatEntry(StringEntry):
             except ValueError as e:
                 raise EntryValueError(e.args)
 
+'''
 #    class ArrayEntry(StringEntry):
 #            def get_value(self):
 #                return eval(self.get_text(), {}, {})
@@ -553,6 +575,8 @@ class SpinnerEntry(Gtk.SpinButton):
                                   step, 10 * step, 0)
         Gtk.SpinButton.__init__(self, self.adj, step, precision(step))
 
+'''
+
 class ToggleEntry(Gtk.ToggleButton):
     def __init__(self, default=0):
         Gtk.ToggleButton.__init__(self)
@@ -574,6 +598,8 @@ class ToggleEntry(Gtk.ToggleButton):
     def get_value(self):
         return self.get_active()
 
+
+'''
 class RadioEntry(Gtk.VBox):
     def __init__(self, default=0, items=((_("Yes"), 1), (_("No"), 0))):
         Gtk.VBox.__init__(self, homogeneous=False, spacing=2)
@@ -689,4 +715,7 @@ class DirnameSelector(Gtk.FileChooserButton):
 _edit_mapping = {
         PF_INT         : IntEntry,
         PF_STRING      : StringEntry,
+        PF_BOOL        : ToggleEntry,
+        PF_TOGGLE      : ToggleEntry,
+        PF_SLIDER      : FloatEntry,
         }

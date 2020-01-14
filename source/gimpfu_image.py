@@ -41,9 +41,29 @@ TODO which do we need?
 
 class GimpfuImage( ) :
 
-    def __init__(self, width, height, image_mode):
-        # adaptee has constructor name "new"
-        self._adaptee = Gimp.Image.new(width, height, image_mode)
+    '''
+    See SO "How to overload __init__ method based on argument type?"
+    '''
+    # Constructor exported to Gimpfu authors
+    # Called internally for existing images as GimpfuImage(None, None, None, adaptee)
+    def __init__(self, width=None, height=None, image_mode=None, adaptee=None):
+        '''Initialize  GimpfuImage from attribute values. '''
+        if width is None:
+            self._adaptee = adaptee
+        else:
+            # Gimp constructor named "new"
+            self._adaptee = Gimp.Image.new(width, height, image_mode)
+
+    '''
+    WIP
+    Overload constructors using class methods.
+    # Hidden constructor
+    @classmethod
+    def fromAdaptee(cls, adaptee):
+         "Initialize GimpfuImage from attribute values"
+
+         return cls(data
+    '''
 
     def unwrap(self):
         ''' Return inner object of a Gimp type, when passing arg to Gimp'''
@@ -51,6 +71,15 @@ class GimpfuImage( ) :
 
 
     # Methods we specialize
+
+    def layers(self):
+        '''
+        Override:
+        - to insure returned objects are wrapped ???
+        - because the Gimp name is get_layers
+        '''
+        raise RuntimeError("not implemented")
+
 
     def insert_layer(self, layer, parent=None, position=-1):
         print("insert_layer called")

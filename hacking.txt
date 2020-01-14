@@ -34,6 +34,10 @@ v3 requires author to float(arg)
 We could fix that when marshalling args via introspection of procedure args spec param_specs
 
 
+New features
+
+Tell v2 authors they should not use gettext.install
+
 
 
 

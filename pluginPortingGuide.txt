@@ -1,0 +1,117 @@
+
+Porting PyGimp Plugins to Gimp 3 and Python 3
+
+
+About
+
+This document is for plugin authors.
+It describes the changes you must make to plugin source
+so the plugin will run in Gimp 3.
+
+This is for plugins written in Python using PyGimp.
+In other words, if you import:
+   - gimpfu
+   - gimp
+   - gimpenums
+
+
+
+Changes required by Python 3
+----------------------------
+
+All plugins in Gimp 3 run under Python 3.
+In some cases, Python 3 does not accept code that worked in Python 2.
+So you are required to change any code for those cases.
+
+See elsewhere for a guide to porting Python 2 code to Python 3.
+
+Briefly, if your plugin throws an exception at run time,
+and the errant line of code does not appear to involve Gimp objects,
+you should suspect that you need to make changes.
+
+Syntax
+======
+
+Python3 syntax changed for a few language constructs.
+
+Examples:
+
+    except ValueError, e:    =>      except ValueError as e:
+
+Standard module API
+===================
+
+Some standard modules changed API from Python 2 to Python 3
+
+Examples:
+
+    gettext.install("gimp20-python", gimp.locale_directory, unicode=True) =>
+         gettext.install("gimp20-python", gimp.locale_directory)
+
+
+
+Obsolete PyGimp Modules
+-----------------------
+
+Some modules are obsolete in PyGimp 3 :
+    gimpshelf
+    gimpui
+    gimpcolor (TODO ???)
+
+gimpshelf
+=========
+
+The gimpshelf module was primarily used to persist plugin settings
+within a Gimp session
+(so that the values appearing in a plugin dialog were persistent,
+and so that "Filter>Re Run <Foo>" executed the plugin with last values.)
+
+1) Plugins using the gimpfu module.
+
+The gimpfu module will continue to persist settings
+(just not using gimpshelf module anymore.)
+
+2) Plugins that did not use the gimpfu module
+and used gimpshelf to persist plugin settings.
+
+You will need to recode to use GI to the new Gimp mechanism for persisting plugin settings.
+See example code in a PyGimp plugin that has already been ported to Gimp 3.
+For example see gimp/plugins/goat-exercises/goat-exercise-py3.py
+(TODO does it persist settings?)
+(TODO that is not PyGimp)
+
+2) In a few cases, you might have used gimpshelf module for other purposes.
+
+You will need to use GI as above, or find some other mechanism for persisting.
+
+gimpui
+======
+
+The gimpui module was primarily used when a plugin implemented its own GUI,
+and needed GTK widgets provided by Gimp (in libgimpui), such as a color picker widget.
+
+You will need to recode to use GI to the Gimp objects that implement GUI,
+for example Gimp.TODO
+
+
+
+
+Miscellaneous changes
+---------------------
+
+The image parameter to a plugin is not wrapped.
+For example, it is usually named "timg"
+The attributes of timg cannot be accessed using property notation.
+
+timg.width => timg.width()
+
+TODO maybe this can change
+
+
+
+Rewriting a plugin without PyGimp
+---------------------------------
+
+It is possible to rewrite a plugin without using PyGimp at all.
+
+For example, see

@@ -20,9 +20,14 @@ see comments at gimpfu_image, which is very similar
 class GimpfuLayer( ) :
 
     # img->ID, name, width, height, type, opacity, mode);
-    def __init__(self, img, name, width, height, type, opacity, layer_mode):
-        # adaptee has constructor name "new"
-        self._adaptee = Gimp.Layer.new(img.unwrap(), name, width, height, type, opacity, layer_mode)
+    def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
+        if img is None:
+            # Wrap adaptee
+            self._adaptee = adaptee
+        else:
+            # Totally new, invoked by GimpFu plugin author
+            # Gimp constructor named "new"
+            self._adaptee = Gimp.Layer.new(img.unwrap(), name, width, height, type, opacity, layer_mode)
         print("new layer", self._adaptee)
 
 
@@ -31,6 +36,9 @@ class GimpfuLayer( ) :
         print("unwrap to", self._adaptee)
         return self._adaptee
 
+
+    # Methods we specialize
+    # see other examples  gimpfu_image.py
 
     '''
     copy() was implemented in v2, but I am not sure it went through the __copy__ mechanism.
@@ -47,7 +55,11 @@ class GimpfuLayer( ) :
     See SO "How to override the copy/deepcopy operations for a Python object?"
     This is a hack of that answer code.
     '''
-    def copy(self):
+    '''
+    Arg "alpha" is convenience, on top of Gimp.Layer.copy()
+    TODO alpha not used.  Code to add alpha if "alpha" param is true
+    '''
+    def copy(self, alpha=False):
         ''' Deep copy wrapper, with cloned adaptee'''
         cls = self.__class__
         result = cls.__new__(cls)
@@ -77,18 +89,6 @@ class GimpfuLayer( ) :
 
 
 
-    # Methods we specialize
-
-    '''
-    example from gimpfu_image
-    def insert_layer(self, layer):
-        print("insert_layer called")
-        # additional args
-        position = 1  #TODO
-        # TODO layer unwrap?
-        # TODO self is not a Gimp type.  v2 used an ID??
-        self._adaptee.insert_layer(self, layer, -1, position)
-    '''
 
     # Methods and properties offered dynamically.
     # __getattr__ is only called for methods not found on self

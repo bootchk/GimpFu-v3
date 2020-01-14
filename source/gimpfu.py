@@ -110,7 +110,9 @@ from gimpfu_enums import *
 # TODO import gimpcolor
 
 
-
+# import wrapper classes
+from gimpfu_image import GimpfuImage
+from gimpfu_layer import GimpfuLayer
 
 # alias Gimp.PGB as pdb
 
@@ -146,8 +148,30 @@ def _define_compatibility_aliases():
 
 # Python 3 ugettext() is deprecated, use gettext() which also returns unicode
 import gettext
+'''
+This does not seem to export to the plugin, but maybe we should not.
+This works for this module only.
+See Python gettext documentation.
+Should we install _ locally, or globally?
+Note that this module itself has no translated strings (yet)
+
 t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
+# similar as gettext.install(): put _() in namespace
 _ = t.gettext
+'''
+
+gettext.install("gimp30-python", Gimp.locale_directory,)
+
+
+'''
+# Warn v2 authors
+# Signature that will catch gettext older versions
+def override_gettext_install(name, locale, **kwargs):
+    print("Warning: GimpFu plugins should not call gettext.install, it is already done.")
+
+gettext.install = override_gettext_install
+'''
+
 
 #class error(RuntimeError): pass
 #class CancelError(RuntimeError): pass
@@ -354,6 +378,16 @@ def _set_defaults(proc_name, defaults):
     gimpshelf.shelf[key] = defaults
 '''
 
+def _wrap_stock_args(stock_args):
+    '''
+    Return tuple of wrapped incoming arguments.
+    I.E. create Gimpfu wrappers for Gimp GObject's
+    '''
+    # TODO GimpfuDrawable ???
+    return (GimpfuImage(None, None, None, stock_args[0]),
+            GimpfuLayer(None, None, None, None, None, None, None, stock_args[1]))
+
+
 
 def _interact(procedure, stock_args, actualArgs):
     print("interact called")
@@ -364,15 +398,16 @@ def _interact(procedure, stock_args, actualArgs):
     function = fu_procedure.FUNCTION
     on_run = fu_procedure.ON_RUN
 
+    wrapped_stock_args = _wrap_stock_args(stock_args)
+
     # effectively a closure, partially bound to stock_args
     def run_script(run_params):
-        nonlocal stock_args
+        nonlocal wrapped_stock_args
         # TEMP attempt to get pdb into scope
         # nonlocal function
 
-        print("run_script")
-        print("pdb before run_script", pdb)
-        params = stock_args + tuple(run_params)
+        print("run_script called with pdb", pdb)
+        params = wrapped_stock_args + tuple(run_params)
         #TODO _set_defaults(proc_name, params)
         # invoke on unpacked args
         return function(*params)
@@ -381,7 +416,7 @@ def _interact(procedure, stock_args, actualArgs):
     # leaving only descriptions of GUI-time params
     formal_guiable_params = formal_params[len(stock_args):]
 
-    print(formal_guiable_params)
+    print("guiable formal params:", formal_guiable_params)
     if len(formal_guiable_params) == 0:
          print("no guiable parameters")
          # Since no GUI, was_canceled always false
@@ -474,7 +509,8 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
            else:
                # TODO add result values to Gimp  procedure.add_result ....
                final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
-       except:
+       except Exception as err:
+           print("Exception opening plugin dialog: {0}".format(err))
            final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
 
     '''
