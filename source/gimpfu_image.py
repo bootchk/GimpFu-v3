@@ -5,6 +5,8 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 
+# imports Marshal when needed
+
 
 
 '''
@@ -72,13 +74,7 @@ class GimpfuImage( ) :
 
     # Methods we specialize
 
-    def layers(self):
-        '''
-        Override:
-        - to insure returned objects are wrapped ???
-        - because the Gimp name is get_layers
-        '''
-        raise RuntimeError("not implemented")
+
 
 
     def insert_layer(self, layer, parent=None, position=-1):
@@ -89,7 +85,34 @@ class GimpfuImage( ) :
         if not success:
             raise Exception("Failed insert_layer")
 
-    # Properties
+    # Properties we specialize
+    # In fact GI Gimp does not have property semantics?
+
+    # raise RuntimeError("not implemented")
+
+    @property
+    def layers(self):
+        # avoid circular import, import when needed
+        from gimpfu_marshal import Marshal
+
+        '''
+        Override:
+        - to insure returned objects are wrapped ???
+        - because the Gimp name is get_layers
+
+        Typical use by authors: position=img.layers.index(drawable) + 1
+        And then the result goes out of scope quickly.
+        But note that the wrapped item in the list
+        won't be equal to other wrappers of the same Gimp.Layer
+        UNLESS we also override equality operator for wrapper.
+        '''
+        layer_list = self._adaptee.get_layers()
+        for layer in layer_list:
+            # rebind item in list
+            layer = Marshal.wrap(layer)
+        return layer_list
+
+    # No layers setter
 
     @property
     def active_layer(self):

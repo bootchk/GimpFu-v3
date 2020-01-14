@@ -59,6 +59,7 @@ class GimpfuLayer( ) :
     Arg "alpha" is convenience, on top of Gimp.Layer.copy()
     TODO alpha not used.  Code to add alpha if "alpha" param is true
     '''
+    # TODO just Marshal.wrap() ??? Would work if self has no attributes not computed from adaptee
     def copy(self, alpha=False):
         ''' Deep copy wrapper, with cloned adaptee'''
         cls = self.__class__

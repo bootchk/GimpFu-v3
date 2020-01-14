@@ -109,10 +109,7 @@ from gimpfu_enums import *
 
 # TODO import gimpcolor
 
-
-# import wrapper classes
-from gimpfu_image import GimpfuImage
-from gimpfu_layer import GimpfuLayer
+from gimpfu_marshal import Marshal
 
 # alias Gimp.PGB as pdb
 
@@ -383,9 +380,9 @@ def _wrap_stock_args(stock_args):
     Return tuple of wrapped incoming arguments.
     I.E. create Gimpfu wrappers for Gimp GObject's
     '''
-    # TODO GimpfuDrawable ???
-    return (GimpfuImage(None, None, None, stock_args[0]),
-            GimpfuLayer(None, None, None, None, None, None, None, stock_args[1]))
+    # TODO Marshal may be wrapping a Gimp.Drawable as GimpfuLayer  ???
+    return (Marshal.wrap(stock_args[0]),
+            Marshal.wrap(stock_args[1]))
 
 
 
@@ -510,6 +507,11 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
                # TODO add result values to Gimp  procedure.add_result ....
                final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
        except Exception as err:
+           '''
+           Probably GimpFu module programming error (e.g. bad calls to GTK)
+           According to GLib docs, should be a warning, since this is not recoverable.
+           But it might be GimpFu plugin author programming code (e.g. invalid PARAMS)
+           '''
            print("Exception opening plugin dialog: {0}".format(err))
            final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
 

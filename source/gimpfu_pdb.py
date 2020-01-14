@@ -86,6 +86,7 @@ class GimpfuPDB():
         4. Hacky upcast???
         '''
 
+        # TODO move this to Marshal
         def try_upcast_to_drawable(arg):
             '''
             When type(arg) is subclass of Gimp.Drawable, up cast to Gimp.drawable
@@ -146,7 +147,7 @@ class GimpfuPDB():
 
     def _adaptor_func(self, *args):
         ''' run a PDB procedure whose name was used like "pdb.name()" e.g. like a method call of pdb object '''
-        print ("adaptor called, args", args)
+        print ("pdb adaptor called, args", args)
         # !!! Must unpack args before passing to _marshall_args
         # !!! avoid infinite recursion
         proc_name = object.__getattribute__(self, "adapted_proc_name")
