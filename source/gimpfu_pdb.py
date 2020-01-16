@@ -6,6 +6,7 @@ from gi.repository import Gimp
 from gi.repository import GObject    # marshalling
 
 from gimpfu_marshal import Marshal
+from gimpfu_compatibility import Compat
 
 
 class GimpfuPDB():
@@ -143,22 +144,6 @@ class GimpfuPDB():
         return inner_result
 
 
-    def _make_compatible_proc_name(self, name):
-        '''
-        1.  transliterate: names in PDB use hyphen for underbar
-        2.  translate deprecated names
-        '''
-        hyphenized_name = name.replace( '_' , '-')
-
-        #TODO use a map
-        # see commit  233ac80d "script-fu: port all scripts to the new gimp-drawable-edit functions "
-        if hyphenized_name == "gimp-edit-fill":
-            result = "gimp-drawable-edit-fill"
-        else:
-            result = hyphenized_name
-        return result
-
-
 
 
     def  __getattribute__(self, name):
@@ -180,13 +165,11 @@ class GimpfuPDB():
             # TODO leave some calls unadapted, direct to PDB
             # ??? e.g. run_procedure ???, recursion ???
 
-            mangled_proc_name = object.__getattribute__(self, "_make_compatible_proc_name")(name)
-
-            # Handle deprecated names
-            # TODO many more
-            if mangled_proc_name == 'gimp-threshold':
-                print("Deprecated pdb name:", mangled_proc_name)
-                mangled_proc_name = 'gimp-drawable-threshold'
+            '''
+            Handle hyphens, and deprecated names.
+            '''
+            mangled_proc_name = Compat.make_compatible_proc_name(name)
+            # OLD object.__getattribute__(self, "_make_compatible_proc_name")(name)
 
             if Gimp.get_pdb().procedure_exists(mangled_proc_name):
                 print("return _adaptor_func for pdb.", mangled_proc_name)

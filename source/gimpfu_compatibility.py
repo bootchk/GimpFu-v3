@@ -12,6 +12,44 @@ class Compat():
     And other hacky workarounds of limitations in Gimp
     ???
     '''
+
+    def make_compatible_proc_name(name):
+        '''
+        1.  transliterate: names in PDB use hyphen for underbar
+        2.  translate deprecated names
+        '''
+        hyphenized_name = name.replace( '_' , '-')
+
+        # see Gimp commit  233ac80d "script-fu: port all scripts to the new gimp-drawable-edit functions "
+        deprecated_names_map = {
+            "gimp-edit-fill" : "gimp-drawable-edit-fill",
+            'gimp-threshold' : 'gimp-drawable-threshold',
+        }
+
+        if hyphenized_name in deprecated_names_map:
+            result = deprecated_names_map[hyphenized_name]
+            print("GimpFu: Warning: Deprecated pdb name:", hyphenized_name)
+
+        '''
+        if hyphenized_name == "gimp-edit-fill":
+            result = "gimp-drawable-edit-fill"
+        elif hyphenized_name == 'gimp-threshold':
+            print("Deprecated pdb name:", hyphenized_name)
+            result = 'gimp-drawable-threshold'
+        else:
+            result = hyphenized_name
+        '''
+            
+        return result
+
+
+    # TODO move this to marshal
+
+    '''
+    Seems like need for upcast is inherent in GObj.
+    But probably Gimp should be doing most of the upcasting,
+    so that many plugs don't need to do it.
+    '''
     def try_upcast_to_drawable(arg):
         '''
         When type(arg) is subclass of Gimp.Drawable, up cast to Gimp.drawable
