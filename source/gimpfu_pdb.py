@@ -107,7 +107,7 @@ class GimpfuPDB():
 
             go_arg, go_arg_type = Marshal.unwrap_arg(x)
 
-            #TODO float() where procedure expects float
+            go_arg, go_arg_type = Marshal.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
 
             # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
             # Must pass directly to insert()
@@ -126,10 +126,6 @@ class GimpfuPDB():
         # !!! Must unpack args before passing to _marshall_args
         # !!! avoid infinite recursion
         proc_name = object.__getattribute__(self, "adapted_proc_name")
-
-        procedure = Gimp.get_pdb().lookup_procedure(proc_name)
-        #TODO not .get_config or get_params???
-        # gimp-pdb-get-proc-argument
 
         inner_result = Gimp.get_pdb().run_procedure( proc_name ,
                                      object.__getattribute__(self, "_marshall_args")(proc_name, *args) )

@@ -9,7 +9,7 @@ It describes the changes you must make to plugin source
 so the plugin will run in Gimp 3.
 
 This is for plugins written in Python using PyGimp.
-In other words, if you import:
+In other words, if you import any of these modules:
    - gimpfu
    - gimp
    - gimpenums
@@ -20,9 +20,8 @@ Changes required by Python 3
 ----------------------------
 
 All plugins in Gimp 3 run under Python 3.
-In some cases, Python 3 does not accept code that worked in Python 2.
-So you are required to change any code for those cases.
-
+In some cases, Python 3 does not accept syntax that worked in Python 2.
+In such cases, you must change your code.
 See elsewhere for a guide to porting Python 2 code to Python 3.
 
 Briefly, if your plugin throws an exception at run time,
@@ -44,7 +43,7 @@ Standard module API
 Some standard modules changed API from Python 2 to Python 3
 
 Examples:
-
+    import gettext  # standard module
     gettext.install("gimp20-python", gimp.locale_directory, unicode=True) =>
          gettext.install("gimp20-python", gimp.locale_directory)
 
@@ -101,11 +100,18 @@ Miscellaneous changes
 
 The image parameter to a plugin is not wrapped.
 For example, it is usually named "timg"
-The attributes of timg cannot be accessed using property notation.
+TODO this was fixed.
+
+
+The attributes of Gimpfu objects cannot be accessed using property notation.
 
 timg.width => timg.width()
 
 TODO maybe this can change
+
+The pdb object cannot be accessed using index notation:
+
+pdb['gimp-edit-fill']()    =>    pdb.gimp-edit-fill()
 
 
 
@@ -114,4 +120,4 @@ Rewriting a plugin without PyGimp
 
 It is possible to rewrite a plugin without using PyGimp at all.
 
-For example, see
+For example, see TODO
