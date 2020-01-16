@@ -105,25 +105,30 @@ class GimpfuImage( ) :
         But note that the wrapped item in the list
         won't be equal to other wrappers of the same Gimp.Layer
         UNLESS we also override equality operator for wrapper.
+
+        !!! If you break this, the error is "AttributeError: Image has no attr layers"
         '''
+        print("layers property accessed")
         layer_list = self._adaptee.get_layers()
+        result_list = []
         for layer in layer_list:
             # rebind item in list
-            layer = Marshal.wrap(layer)
-        return layer_list
+            result_list.append(Marshal.wrap(layer))
+        print("layers property returns ", result_list)
+        return result_list
 
     # No layers setter
 
     @property
     def active_layer(self):
         # Delegate to Gimp.Image
-        # TODO wrap it?
+        # TODO wrap it? or lazy wrap
         return self._adaptee.get_active_layer()
 
     @active_layer.setter
     def active_layer(self, layer):
         # TODO:
-        print("active_layer setter TODO")
+        raise RuntimeError("not implemented")
 
 
     # Methods and properties offered dynamically.

@@ -27,7 +27,9 @@ def shadow_bevel(img, drawable, blur, bevel, do_shadow, drop_x, drop_y):
 
     # copy the layer
     # v2 shadow = drawable.copy(True)
-    # lkk drawable is not wrapped, pass through to Gimp.Layer, see what shakes out
+    # lkk drawable.copy is not specialized to have param add_alpha
+    # doesn't it copy alpha also, so technically copy(True) not needed?
+    # TODO specialize copy() to have extra param, I think I already did that
     shadow = drawable.copy()
     img.insert_layer(shadow, position=img.layers.index(drawable) + 1)
     shadow.name = drawable.name + " shadow"

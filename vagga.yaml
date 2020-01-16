@@ -347,7 +347,8 @@ containers:
     # build
     - !Sh |
         cd /home/gimp
-        ./autogen.sh --disable-docs
+        ./autogen.sh --disable-docs  --enable-debug
+        ./configure --help
         make -j4
         make install
 
@@ -484,6 +485,9 @@ containers:
     - !Copy
       source: /work/source/gimpfu_marshal.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_marshal.py
+    - !Copy
+      source: /work/source/gimpfu_compatibility.py
+      path:  /usr/local/lib/gimp/2.99/python/gimpfu_compatibility.py
 
     # TODO use include-regex expression in Copy
 

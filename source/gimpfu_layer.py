@@ -31,6 +31,25 @@ class GimpfuLayer( ) :
         print("new layer", self._adaptee)
 
 
+    def __eq__(self, other):
+         '''
+         Override equality.
+         Two wrappers are equal if their adaptee's are equal.
+
+         Require self and other both wrappers.
+         Otherwise, raise exception.
+         I.E. not general purpose equality such as foo == 1
+         '''
+         try:
+             # Compare ID's or names instead?
+             # Could use public unwrap() for more generality
+             return self._adaptee == other.unwrap()
+         except AttributeError:
+             print("Can't compare GimpfuLayer to type ", type(other))
+             raise
+
+
+
     def unwrap(self):
         ''' Return inner object, of a Gimp type, when passing arg to Gimp'''
         print("unwrap to", self._adaptee)
@@ -61,6 +80,8 @@ class GimpfuLayer( ) :
     '''
     # TODO just Marshal.wrap() ??? Would work if self has no attributes not computed from adaptee
     def copy(self, alpha=False):
+        """
+        OLD
         ''' Deep copy wrapper, with cloned adaptee'''
         cls = self.__class__
         result = cls.__new__(cls)
@@ -72,10 +93,13 @@ class GimpfuLayer( ) :
         Here we use Gimp.Layer.copy() directly???
         '''
         adaptee_clone = self._adaptee.copy()
-        print("Type of copy adaptee: ", type(adaptee_clone))
-
         setattr(result, "_adaptee", adaptee_clone)
-        print("Type of copy: ", type(result))
+        """
+        from gimpfu_marshal import Marshal
+        adaptee_clone = self._adaptee.copy()
+        result =  Marshal.wrap(adaptee_clone)
+
+        print("Copy type: ", adaptee_clone, " into result",  result)
         return result
 
     '''
@@ -88,6 +112,30 @@ class GimpfuLayer( ) :
         return result
     '''
 
+    # Layer inherits Item
+    # TODO inherit ItemWrapper class in Python?
+    @property
+    def name(self):
+        print("Calling Layer.get_name(): ")
+        print(dir(self._adaptee))
+        result = self._adaptee.get_name()
+        print("name: ", result)
+        return result
+    @name.setter
+    def name(self, name):
+        return self._adaptee.set_name(name)
+
+
+    # class Layer
+    @property
+    def lock_alpha(self):
+        return self._adaptee.get_lock_alpha()
+    @lock_alpha.setter
+    def lock_alpha(self, truth):
+        return self._adaptee.set_lock_alpha(truth)
+
+
+    #raise RuntimeError("not implemented")
 
 
 
@@ -95,8 +143,11 @@ class GimpfuLayer( ) :
     # __getattr__ is only called for methods not found on self
 
     def __getattr__(self, name):
-        # when name is callable, soon to be called
-        # when name is data member, returns value
+        '''
+        when name is callable, return callable which is soon to be called
+        when name is data member, returns value
+        !!! This does not preclude public,direct access to _adaptee, use unwrap()
+        '''
         return getattr(self.__dict__['_adaptee'], name)
 
 

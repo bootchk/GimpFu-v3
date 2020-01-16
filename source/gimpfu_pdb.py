@@ -5,6 +5,8 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 from gi.repository import GObject    # marshalling
 
+from gimpfu_marshal import Marshal
+
 
 class GimpfuPDB():
     '''
@@ -84,26 +86,9 @@ class GimpfuPDB():
         3. Unwrap wrapped arguments so all args are GObjects
 
         4. Hacky upcast???
+
+        5. float(args) as needed
         '''
-
-        # TODO move this to Marshal
-        def try_upcast_to_drawable(arg):
-            '''
-            When type(arg) is subclass of Gimp.Drawable, up cast to Gimp.drawable
-            and return new type, else return original type.
-
-            Require arg a GObject (not wrapped)
-            '''
-            # idiom for class name
-            print("Attempt up cast type", type(arg).__name__ )
-            # Note the names are not prefixed with Gimp ???
-            if type(arg).__name__ in ("Channel", "Layer"):  # TODO more subclasses
-                result = Gimp.Drawable
-            else:
-                result = type(arg)
-            print("upcast result:", result)
-            return result
-
 
         # TODO python-fu- ??
         if proc_name.startswith('plug-in-'):
@@ -116,29 +101,18 @@ class GimpfuPDB():
 
 
         for x in args:
-            # GObject.Value(GObject.TYPE_STRING, tmp))
-            print("marshall arg of type:", type(x) )
+            ## GObject.Value(GObject.TYPE_STRING, tmp))
+            ## print("marshall arg:", x )
 
-            # Only primitive Python types and GTypes can be GObject.value()ed
-            # Unwrap wrapped types. Use idiom for class name
-            # TODO other class names in list
-            if  type(x).__name__ in ("GimpfuImage", "GimpfuLayer") :
-                # !!! Do not affect the original object by assigning to x
-                go_arg = x.unwrap()
+            go_arg, go_arg_type = Marshal.unwrap_arg(x)
 
-                # hack: up cast drawable sublclass e.g. layer to superclass drawable
-                go_arg_type = try_upcast_to_drawable(go_arg)
-
-            else:
-                go_arg = x
-                # arg may be unwrapped result of previous call e.g. type Gimp.Layer
-                # TODO: we wrap and unwrap as needed???
-                # hack that might be removed?
-                go_arg_type = try_upcast_to_drawable(go_arg)
+            #TODO float() where procedure expects float
 
             # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
+            # Must pass directly to insert()
+
             # ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
-            # unless this is a casting operation
+            # unless GObject.Value() does some sort of casting
 
             marshalled_args.insert(index, GObject.Value(go_arg_type, go_arg))
             index += 1
@@ -151,6 +125,11 @@ class GimpfuPDB():
         # !!! Must unpack args before passing to _marshall_args
         # !!! avoid infinite recursion
         proc_name = object.__getattribute__(self, "adapted_proc_name")
+
+        procedure = Gimp.get_pdb().lookup_procedure(proc_name)
+        #TODO not .get_config or get_params???
+        # gimp-pdb-get-proc-argument
+
         inner_result = Gimp.get_pdb().run_procedure( proc_name ,
                                      object.__getattribute__(self, "_marshall_args")(proc_name, *args) )
 
@@ -160,6 +139,7 @@ class GimpfuPDB():
             raise Exception(error_str)
 
         # TODO unmarshall result?
+        # Low priority: all PDB calls have side_effects, but don't return objects?
         return inner_result
 
 
@@ -202,9 +182,14 @@ class GimpfuPDB():
 
             mangled_proc_name = object.__getattribute__(self, "_make_compatible_proc_name")(name)
 
-            if Gimp.get_pdb().procedure_exists(mangled_proc_name):
+            # Handle deprecated names
+            # TODO many more
+            if mangled_proc_name == 'gimp-threshold':
+                print("Deprecated pdb name:", mangled_proc_name)
+                mangled_proc_name = 'gimp-drawable-threshold'
 
-                print("return adaptor")
+            if Gimp.get_pdb().procedure_exists(mangled_proc_name):
+                print("return _adaptor_func for pdb.", mangled_proc_name)
                 # remember state for soon-to-come call
                 self.adapted_proc_name = mangled_proc_name
                 # return intercept function soon to be called

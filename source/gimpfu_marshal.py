@@ -3,6 +3,9 @@
 from gimpfu_image import GimpfuImage
 from gimpfu_layer import GimpfuLayer
 
+from gimpfu_compatibility import Compat
+
+
 
 class Marshal():
     '''
@@ -27,6 +30,7 @@ class Marshal():
         the Nones mean we don't know attributes of adaptee,
         but the adaptee has and knows its attributes.
         '''
+        print("Wrap ", gimp_object)
 
         # Dispatch on gimp type
         # This is a switch statement, default is an error
@@ -41,3 +45,32 @@ class Marshal():
             exception_str = f"GimpFu: can't wrap gimp type {gimp_type}"
             raise RuntimeError(exception_str)
         return result
+
+
+    @classmethod
+    def unwrap_arg(cls, arg):
+        '''
+        Unwrap any GimpFu wrapped types to Gimp types
+        E.G. GimpfuImage => Gimp.Image
+        For primitive Python types and GTypes, idempotent, returns given arg unaltered.
+
+        Returns unwrapped arg, type of unwrapped arg
+
+        Only primitive Python types and GTypes can be GObject.value()ed
+        '''
+        # Unwrap wrapped types. Use idiom for class name
+        # TODO other class names in list
+        if  type(arg).__name__ in ("GimpfuImage", "GimpfuLayer") :
+            # !!! Do not affect the original object by assigning to arg
+            result_arg = arg.unwrap()
+
+            # hack: up cast drawable sublclass e.g. layer to superclass drawable
+            result_arg_type = Compat.try_upcast_to_drawable(result_arg)
+        else:
+            result_arg = arg
+            # arg may be unwrapped result of previous call e.g. type Gimp.Layer
+            # TODO: we wrap and unwrap as needed???
+            # hack that might be removed?
+            result_arg_type = Compat.try_upcast_to_drawable(result_arg)
+        print("unwrap_arg", result_arg, result_arg_type)
+        return result_arg, result_arg_type
