@@ -90,26 +90,102 @@ class Marshal():
 
 
 
+    # TODO optimize.  Get all the args at once, memoize
 
     def _get_formal_argument_type(proc_name, index):
         '''
         Get the formal argument type for a PDB procedure
-        where argument identified by index
+        where argument identified by index.
+        Returns an instance of GType e.g. GObject.TYPE_INT
 
         Another implementation: Gimp.get_pdb().run_procedure( proc_name , 'gimp-pdb-get-proc-argument', args)
         '''
         # require procedure in PDB
         procedure = Gimp.get_pdb().lookup_procedure(proc_name)
-        config = procedure.create_config()
-        # assert config is type Gimp.ProcedureConfig, having properties same as args of procedure
-        arg_specs = config.get_values()
+        ## OLD config = procedure.create_config()
+        ## assert config is type Gimp.ProcedureConfig, having properties same as args of procedure
+
+        arg_specs = procedure.get_arguments()    # some docs say it returns a count, it returns a list of GParam??
+        print(arg_specs)
+        # assert is a list
+
+        ## arg_specs = Gimp.ValueArray.new(arg_count)
+        ##config.get_values(arg_specs)
+
         # assert arg_specs is Gimp.ValueArray, sequence describing args of procedure
-        arg_spec = arg_specs.index(index)
-        # assert arg_spec is GObject.Value, describes arg of procedure (its GType is the arg's type)
-        formal_arg_type = arg_spec.get_gtype()
-        # assert type of formal_arg_type is GType
+        arg_spec = arg_specs[index]   # .index(index)
+        print(arg_spec)
+        # assert is-a GObject.GParamSpec or subclass thereof
+        ## OLD assert arg_spec is GObject.Value, describes arg of procedure (its GType is the arg's type)
+
+        '''
+        The type of the subclass of GParamSpec is enough for our purposes.
+        Besides, GParamSpec.get_default_value() doesn't work???
+
+        formal_arg_type = type(arg_spec)
+        '''
+
+        '''
+        print(dir(arg_spec)) shows that arg_spec is NOT a GParamSpec, or at least doesn't have get_default_value.
+        I suppose it is a GParam??
+        Anyway, it has __gtype__
+        '''
+        """
+        formal_default_value = arg_spec.get_default_value()
+        print(formal_default_value)
+        # ??? new to GI 2.38
+        # assert is-a GObject.GValue
+
+        formal_arg_type = formal_default_value.get_gtype()
+        """
+        formal_arg_type = arg_spec.__gtype__
+
+        print( "get_formal_argument returns", formal_arg_type)
+
+        # assert type of formal_arg_type is GObject.GType
+        ## OLD assert formal_arg_type has python type like GParamSpec<Enum>
         return formal_arg_type
 
+
+    def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
+        '''
+        Convert the described actual arg to float if is int
+        and PDB procedure wants a float
+        (procedure's formal parameter is type GObject.TYPE_FLOAT).
+        Only converts Python int to float.
+
+        Returns actual_arg, type(actual_arg),    possibly converted
+
+        Later, GObject will convert Python types to GTypes.
+        '''
+        # require type(actual_arg_type) is Python type or a GType
+
+        result_arg = actual_arg
+        result_arg_type = actual_arg_type
+
+        print("Actual arg type:", type(actual_arg))
+
+        if type(actual_arg) is int:
+            formal_arg_type = Marshal._get_formal_argument_type(proc_name, index)
+            # GType has property "name"
+            print("     Formal art type ", formal_arg_type.name )
+
+            #if formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE :
+            if formal_arg_type.name in ('GParamFloat', 'GParamDouble'): # ParamSpec ???
+                # ??? Tell Gimpfu plugin author their code would be more clear if they used float() themselves
+                # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
+                print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")
+                result_arg = float(actual_arg)  # type conversion
+                result_arg_type = type(result_arg)  # i.e. float
+
+        # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
+        # likewise for value of result_arg
+        print("try_convert_to_float returns ", result_arg, result_arg_type)
+        return result_arg, result_arg_type
+
+
+    """
+    Cruft: more than necessary, but keep it, it documents how to use GTypes
 
     def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
         '''
@@ -138,3 +214,4 @@ class Marshal():
                 result_arg_type = GObject.TYPE_DOUBLE
 
         return result_arg, result_arg_type
+    """

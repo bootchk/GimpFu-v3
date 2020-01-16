@@ -107,7 +107,9 @@ class GimpfuPDB():
 
             go_arg, go_arg_type = Marshal.unwrap_arg(x)
 
-            go_arg, go_arg_type = Marshal.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
+            # Skip stock args, we know they don't need conversion
+            if index > 1:
+                go_arg, go_arg_type = Marshal.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
 
             # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
             # Must pass directly to insert()

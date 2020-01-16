@@ -117,9 +117,9 @@ class GimpfuLayer( ) :
     @property
     def name(self):
         print("Calling Layer.get_name(): ")
-        print(dir(self._adaptee))
+        #print(dir(self._adaptee))
         result = self._adaptee.get_name()
-        print("name: ", result)
+        print("name() returns item name: ", result)
         return result
     @name.setter
     def name(self, name):
