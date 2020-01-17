@@ -418,79 +418,36 @@ containers:
     # Remove old test.py
     - !Sh rm /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
 
-    # install test plugins from repository to container user's home  (not into the container)
+    # install test plugins from repository to container's home  (not exactly in the container?)
     # Copy to the conventional directory for local customization of  Linux apps, specically GIMP ($HOME/.config/.... etc.)
     # When GIMP starts, it will find these plugin files and execute them (to register the plug-in)
     # Plugins must be in subdirectory, and executable?
-    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/test
-    - !Copy
-      source: /work/plug-ins/test.py
-      path: /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
-
-    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/test2
-    - !Copy
-      source: /work/plug-ins/test2.py
-      path: /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
-
-    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/test3
-    - !Copy
-      source: /work/plug-ins/test3.py
-      path: /work/.home/.config/GIMP/2.99/plug-ins/test3/test3.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test3/test3.py
-
     # Can't use the originals, since they have hash bang #! python2
-    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/clothify
-    - !Copy
-      source: /work/plug-ins/clothify.py
-      path: /work/.home/.config/GIMP/2.99/plug-ins/clothify/clothify.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/clothify/clothify.py
-    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins/shadow_bevel
-    - !Copy
-      source: /work/plug-ins/shadow_bevel.py
-      path: /work/.home/.config/GIMP/2.99/plug-ins/shadow_bevel/shadow_bevel.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/shadow_bevel/shadow_bevel.py
 
+    - !Copy
+      source: /work/plug-ins/
+      path: /work/.home/.config/GIMP/2.99/plug-ins
+
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test3/test3.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/clothify/clothify.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/shadow_bevel/shadow_bevel.py
 
     # rebuild container if test plugin source (in /work i.e. project directory ) changes
     - !Depends plug-ins
 
 
     # Copy hacked gimpfu sources into the install location from the project directory
+    # Copy entire directory
+    # Must be a Python package, directory having a ????
+    # First remove the bad gimpfu.py at the top?  Build should not have installed it
+    ##- !Remove /usr/local/lib/gimp/2.99/python/gimpfu.py
     - !Copy
-      source: /work/source/gimpfu.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu.py
-    - !Copy
-      source: /work/source/gimpfu_widgets.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu_widgets.py
-    - !Copy
-      source: /work/source/gimpfu_types.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu_types.py
-    - !Copy
-      source: /work/source/gimpfu_pdb.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu_pdb.py
-    - !Copy
-      source: /work/source/gimpfu_gimp.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu_gimp.py
-    - !Copy
-      source: /work/source/gimpfu_enums.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu_enums.py
-    - !Copy
-      source: /work/source/gimpfu_image.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu_image.py
-    - !Copy
-      source: /work/source/gimpfu_layer.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu_layer.py
-    - !Copy
-      source: /work/source/gimpfu_marshal.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu_marshal.py
-    - !Copy
-      source: /work/source/gimpfu_compatibility.py
-      path:  /usr/local/lib/gimp/2.99/python/gimpfu_compatibility.py
-    - !Copy
-      source: /work/source/adapter.py
-      path:  /usr/local/lib/gimp/2.99/python/adapter.py
+      source: /work/gimpfu
+      path:  /usr/local/lib/gimp/2.99/python
+
+
 
     # TODO use include-regex expression in Copy
 
