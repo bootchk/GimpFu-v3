@@ -433,6 +433,7 @@ containers:
     - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test3/test3.py
     - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/clothify/clothify.py
     - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/shadow_bevel/shadow_bevel.py
+    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/sphere/sphere.py
 
     # rebuild container if test plugin source (in /work i.e. project directory ) changes
     - !Depends plug-ins

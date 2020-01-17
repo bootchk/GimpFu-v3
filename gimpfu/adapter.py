@@ -13,6 +13,12 @@ class Adapter():
     Whereby Adapter owns an instance of Adaptee (composition.)
 
     see comments at gimpfu_image, somewhat similar re dynamic methods
+
+    
+    class adapter vs object adapter
+       Object adapter: does not inherit Gimp.Image, but owns an instance of it
+       Class adapter: multiple inheritance, e.g. GimpfuLayer inherits Gimp.Layer
+          I don't know how to wrap Gimp.Layer using metaprogramming dynamically?
     '''
 
     def __init__(self, adaptee):

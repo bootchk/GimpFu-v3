@@ -1,0 +1,18 @@
+How to Test
+
+
+Two kinds of plugins:
+   - gimpfu: uses plugin convenience: imports gimpfu
+   - pygimp: uses object convenience wrappers: imports gimp
+   - new Gimp 3 Python 3 plugins: use GI alone.
+That is:
+  - not all Python Gimp plugins import GimpFu
+  - PyGimp is no longer required to create a Gimp plugin in Python
+
+Kinds of tests:
+   - test parsing:  that the plugin loads and executes with defaults without exception
+   - test function: that the plugin has same effect on image as it did before
+   - unit tests: short, dummy plugins that don't do much but exercise one feature of GimpFu
+
+Other special tests:
+  - certain modules can be used standalone? gimpui and gimpshelf

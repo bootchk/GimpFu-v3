@@ -4,9 +4,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-
-# imports Marshal when needed
-
+from adapter import Adapter
 
 
 '''
@@ -26,22 +24,14 @@ Some are unique to PyGimp, not present in Gimp.Image. (augment)
     - methods
     - properties (data members)
     TODO do we need to wrap property get/set
-
-'''
-
-'''
-class adapter vs object adapter
-
-Object adapter: does not inherit Gimp.Image, but owns an instance of it
-Class adapter: multiple inheritance
-TODO which do we need?
 '''
 
 
-# TODO how do we make instances appear to be the type of the adaptee
-# when passed as args to Gimp?????
 
-class GimpfuImage( ) :
+
+
+
+class GimpfuImage( Adapter ) :
 
     '''
     See SO "How to overload __init__ method based on argument type?"
@@ -49,12 +39,13 @@ class GimpfuImage( ) :
     # Constructor exported to Gimpfu authors
     # Called internally for existing images as GimpfuImage(None, None, None, adaptee)
     def __init__(self, width=None, height=None, image_mode=None, adaptee=None):
-        '''Initialize  GimpfuImage from attribute values. '''
+        '''Initialize  GimpfuImage from attribute values OR instance of Gimp.Layer. '''
         if width is None:
-            self._adaptee = adaptee
+            final_adaptee = adaptee
         else:
             # Gimp constructor named "new"
-            self._adaptee = Gimp.Image.new(width, height, image_mode)
+            final_adaptee = Gimp.Image.new(width, height, image_mode)
+        super().__init__(final_adaptee)
 
     '''
     WIP
@@ -67,14 +58,8 @@ class GimpfuImage( ) :
          return cls(data
     '''
 
-    def unwrap(self):
-        ''' Return inner object of a Gimp type, when passing arg to Gimp'''
-        return self._adaptee
-
 
     # Methods we specialize
-
-
 
 
     def insert_layer(self, layer, parent=None, position=-1):
@@ -85,10 +70,11 @@ class GimpfuImage( ) :
         if not success:
             raise Exception("Failed insert_layer")
 
+
+
     # Properties we specialize
     # In fact GI Gimp does not have property semantics?
 
-    # raise RuntimeError("not implemented")
 
     @property
     def layers(self):
@@ -119,32 +105,14 @@ class GimpfuImage( ) :
 
     # No layers setter
 
+
     @property
     def active_layer(self):
         # Delegate to Gimp.Image
-        # TODO wrap it? or lazy wrap
+        # TODO wrap result or lazy wrap
         return self._adaptee.get_active_layer()
 
     @active_layer.setter
     def active_layer(self, layer):
         # TODO:
         raise RuntimeError("not implemented")
-
-
-    # Methods and properties offered dynamically.
-    # __getattr__ is only called for methods not found on self
-
-    def __getattr__(self, name):
-        # when name is callable, soon to be called
-        # when name is data member, returns value
-        return getattr(self.__dict__['_adaptee'], name)
-
-
-    def __setattr__(self, name, value):
-        if name in ('_adaptee',):
-            self.__dict__[name] = value
-        else:
-            setattr(self.__dict__['_adaptee'], name, value)
-
-    def __delattr__(self, name):
-        delattr(self.__dict__['_adaptee'], name)
