@@ -36,7 +36,12 @@ def shadow_bevel(img, drawable, blur, bevel, do_shadow, drop_x, drop_y):
     shadow.lock_alpha = False
 
     # threshold the shadow layer to all white
-    pdb.gimp_threshold(shadow, 0, 255)
+    # lkk comment out, needs work
+    # ??? pdb.gimp_drawable_threshold(shadow, foo, 0.0, 1.0)
+    # pdb.gimp_threshold(shadow, 0, 255)
+    # lkk replace threshold with fill
+    pdb.gimp_drawable_fill(shadow, WHITE_FILL)
+
 
     # blur the shadow layer
     pdb.plug_in_gauss_iir(img, shadow, blur, True, True)

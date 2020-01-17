@@ -488,6 +488,9 @@ containers:
     - !Copy
       source: /work/source/gimpfu_compatibility.py
       path:  /usr/local/lib/gimp/2.99/python/gimpfu_compatibility.py
+    - !Copy
+      source: /work/source/adapter.py
+      path:  /usr/local/lib/gimp/2.99/python/adapter.py
 
     # TODO use include-regex expression in Copy
 

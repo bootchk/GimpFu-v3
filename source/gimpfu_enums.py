@@ -40,6 +40,15 @@ NORMAL_MODE = Gimp.LayerMode.NORMAL
 MULTIPLY_MODE = Gimp.LayerMode.MULTIPLY
 
 BACKGROUND_FILL = Gimp.FillType.BACKGROUND
+WHITE_FILL = Gimp.FillType.WHITE
+"""
+from v2 plugin/pygimp/gimpenums-types.defs, which is perl script??
+GIMP_FOREGROUND_FILL")
+'("background-fill" "GIMP_BACKGROUND_FILL")
+'("white-fill" "GIMP_WHITE_FILL")
+'("transparent-fill" "GIMP_TRANSPARENT_FILL")
+'("pattern-fill" "GIMP_PATTERN_FILL")
+"""
 
 # Not work Gimp.BucketFillMode.BG
 

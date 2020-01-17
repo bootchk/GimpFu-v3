@@ -21,14 +21,18 @@ class Compat():
         hyphenized_name = name.replace( '_' , '-')
 
         # see Gimp commit  233ac80d "script-fu: port all scripts to the new gimp-drawable-edit functions "
+        # 'gimp-threshold' : 'gimp-drawable-threshold',  needs param2 channel, and values in range [0.0, 1.0]
         deprecated_names_map = {
             "gimp-edit-fill" : "gimp-drawable-edit-fill",
-            'gimp-threshold' : 'gimp-drawable-threshold',
+
         }
 
         if hyphenized_name in deprecated_names_map:
             result = deprecated_names_map[hyphenized_name]
-            print("GimpFu: Warning: Deprecated pdb name:", hyphenized_name)
+            # TODO print new name
+            print("GimpFu: Warning: Translating deprecated pdb name:", hyphenized_name)
+        else:
+            result = hyphenized_name
 
         '''
         if hyphenized_name == "gimp-edit-fill":
@@ -39,7 +43,7 @@ class Compat():
         else:
             result = hyphenized_name
         '''
-            
+
         return result
 
 

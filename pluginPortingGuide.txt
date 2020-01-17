@@ -94,6 +94,15 @@ for example Gimp.TODO
 
 
 
+Gimp model Changes
+------------------
+
+The model of Channel in Gimp v3 is expanded from v2.
+
+Some procedures, like gimp-threshold have been replaced (gimp-drawable-threshol) and require a new "channel" parameter.
+
+?????
+
 
 Miscellaneous changes
 ---------------------

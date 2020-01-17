@@ -4,112 +4,74 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-
-
-
-'''
-see comments at gimpfu_image, which is very similar
-'''
+from adapter import Adapter
 
 
 
 
-# TODO how do we make instances appear to be the type of the adaptee
-# when passed as args to Gimp?????
 
-class GimpfuLayer( ) :
+class GimpfuLayer( Adapter ) :
 
-    # img->ID, name, width, height, type, opacity, mode);
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
-        if img is None:
-            # Wrap adaptee
-            self._adaptee = adaptee
-        else:
-            # Totally new, invoked by GimpFu plugin author
+
+        if img is not None:
+            # Totally new adaptee, created at behest of GimpFu plugin author
             # Gimp constructor named "new"
-            self._adaptee = Gimp.Layer.new(img.unwrap(), name, width, height, type, opacity, layer_mode)
-        print("new layer", self._adaptee)
+            super().__init__( Gimp.Layer.new(img.unwrap(), name, width, height, type, opacity, layer_mode) )
+        else:
+            # Create wrapper for existing adaptee (from Gimp)
+            # Adaptee was created earlier at behest of Gimp user and is being passed into GimpFu plugin
+            assert adaptee is not None
+            super().__init__(adaptee)
 
-
-    def __eq__(self, other):
-         '''
-         Override equality.
-         Two wrappers are equal if their adaptee's are equal.
-
-         Require self and other both wrappers.
-         Otherwise, raise exception.
-         I.E. not general purpose equality such as foo == 1
-         '''
-         try:
-             # Compare ID's or names instead?
-             # Could use public unwrap() for more generality
-             return self._adaptee == other.unwrap()
-         except AttributeError:
-             print("Can't compare GimpfuLayer to type ", type(other))
-             raise
+        print("new GimpfuLayer with adaptee", self._adaptee)
 
 
 
-    def unwrap(self):
-        ''' Return inner object, of a Gimp type, when passing arg to Gimp'''
-        print("unwrap to", self._adaptee)
-        return self._adaptee
-
-
-    # Methods we specialize
-    # see other examples  gimpfu_image.py
 
     '''
-    copy() was implemented in v2, but I am not sure it went through the __copy__ mechanism.
-    Anyway, a GimpFu author uses layer.copy().
-    That invokes the copy() method, defined here.
+    Methods for convenience.
+    i.e. these were defined in PyGimp v2
 
-     __copy__ is invoked by copy module i.e. copy.copy(foo)
-    Any copy must be deep, to copy attribute _adaptee.
-    To allow Gimpfu plugin authors to use the copy module,
-    we should override __copy__ and __deepcopy__ also.
-    Such MUST call gimp to copy the adaptee.
-    TODO
+    They specialize methods that might exist in Gimp.
+    Specializations:
+    - add convenience parameters
+    - rename: old name => new or simpler name
+    - one call => many subroutines
 
-    See SO "How to override the copy/deepcopy operations for a Python object?"
-    This is a hack of that answer code.
+    see other examples  gimpfu_image.py
     '''
-    '''
-    Arg "alpha" is convenience, on top of Gimp.Layer.copy()
-    TODO alpha not used.  Code to add alpha if "alpha" param is true
-    '''
-    # TODO just Marshal.wrap() ??? Would work if self has no attributes not computed from adaptee
+
+
     def copy(self, alpha=False):
-        """
-        OLD
-        ''' Deep copy wrapper, with cloned adaptee'''
-        cls = self.__class__
-        result = cls.__new__(cls)
-        result.__dict__.update(self.__dict__)
-
         '''
-        clone _adaptee
-        v2 called run_procedure()
-        Here we use Gimp.Layer.copy() directly???
-        '''
-        adaptee_clone = self._adaptee.copy()
-        setattr(result, "_adaptee", adaptee_clone)
-        """
-        from gimpfu_marshal import Marshal
-        adaptee_clone = self._adaptee.copy()
-        result =  Marshal.wrap(adaptee_clone)
+        Return copy of self.
 
-        print("Copy type: ", adaptee_clone, " into result",  result)
-        return result
+        Param "alpha" is convenience, on top of Gimp.Layer.copy()
+
+        !!! TODO alpha not used.  Code to add alpha if "alpha" param is true??
+        The docs are not clear about what the param means.
+        If it means "add alpha", should rename it should_add_alpha
+        '''
+        # delegate to adapter
+        return super().copy()
+        # If this class had any data members, we would need to copy their values also
+
+
+    # TODO inherit Item
+    def translate(self, x, y):
+        # in app: gimp_item_transform_translate(self->ID
+        # adaptee is-a Gimp.Item that has transform methods
+        self._adaptee.transform_translate(x,y)
+
 
     '''
-    def __deepcopy__(self, memo):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        memo[id(self)] = result
-        for k, v in self.__dict__.items():
-            setattr(result, k, deepcopy(v, memo))
-        return result
+    Properties.
+
+    For convenience, GimpFu makes certain attributes have property semantics.
+    I.E. get without parenthesises, and set by assignment, without calling setter() func
+
+    TODO, does Gimp GI provide this already?
     '''
 
     # Layer inherits Item
@@ -136,26 +98,3 @@ class GimpfuLayer( ) :
 
 
     #raise RuntimeError("not implemented")
-
-
-
-    # Methods and properties offered dynamically.
-    # __getattr__ is only called for methods not found on self
-
-    def __getattr__(self, name):
-        '''
-        when name is callable, return callable which is soon to be called
-        when name is data member, returns value
-        !!! This does not preclude public,direct access to _adaptee, use unwrap()
-        '''
-        return getattr(self.__dict__['_adaptee'], name)
-
-
-    def __setattr__(self, name, value):
-        if name in ('_adaptee',):
-            self.__dict__[name] = value
-        else:
-            setattr(self.__dict__['_adaptee'], name, value)
-
-    def __delattr__(self, name):
-        delattr(self.__dict__['_adaptee'], name)

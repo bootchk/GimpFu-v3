@@ -1,4 +1,7 @@
 Calling error for procedure 'plug-in-noisify':
 Procedure 'plug-in-noisify' has been called with a wrong value type for argument 'drawable' (#3). Expected GimpDrawable, got GimpLayer.
+Fixed. try_upcast
 
-passing int to pdb procedure where double expected, in v2 Python does it automatically
+passing int to pdb procedure where double expected, in v2 Python does it automatically.  Fixed.
+
+deprecated_names_map for old pdb procedures
