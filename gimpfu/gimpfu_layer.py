@@ -1,16 +1,16 @@
 
-
 import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adapter import Adapter
+# !!! Item imports Adapter
+from item import GimpfuItem
 
 
 
 
 
-class GimpfuLayer( Adapter ) :
+class GimpfuLayer( GimpfuItem ) :
 
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 
@@ -36,17 +36,16 @@ class GimpfuLayer( Adapter ) :
     They specialize methods that might exist in Gimp.
     Specializations:
     - add convenience parameters
-    - rename: old name => new or simpler name
-    - one call => many subroutines
+    - alias or rename: old name => new or simpler name
+    - encapsulate: one call => many subroutines
 
     see other examples  gimpfu_image.py
     '''
 
 
     def copy(self, alpha=False):
+        ''' Return copy of self. '''
         '''
-        Return copy of self.
-
         Param "alpha" is convenience, on top of Gimp.Layer.copy()
 
         !!! TODO alpha not used.  Code to add alpha if "alpha" param is true??
@@ -58,11 +57,7 @@ class GimpfuLayer( Adapter ) :
         # If this class had any data members, we would need to copy their values also
 
 
-    # TODO inherit Item
-    def translate(self, x, y):
-        # in app: gimp_item_transform_translate(self->ID
-        # adaptee is-a Gimp.Item that has transform methods
-        self._adaptee.transform_translate(x,y)
+
 
 
     '''
@@ -74,27 +69,10 @@ class GimpfuLayer( Adapter ) :
     TODO, does Gimp GI provide this already?
     '''
 
-    # Layer inherits Item
-    # TODO inherit ItemWrapper class in Python?
-    @property
-    def name(self):
-        print("Calling Layer.get_name(): ")
-        #print(dir(self._adaptee))
-        result = self._adaptee.get_name()
-        print("name() returns item name: ", result)
-        return result
-    @name.setter
-    def name(self, name):
-        return self._adaptee.set_name(name)
 
-
-    # class Layer
     @property
     def lock_alpha(self):
         return self._adaptee.get_lock_alpha()
     @lock_alpha.setter
     def lock_alpha(self, truth):
         return self._adaptee.set_lock_alpha(truth)
-
-
-    #raise RuntimeError("not implemented")
