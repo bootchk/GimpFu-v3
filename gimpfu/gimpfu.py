@@ -78,18 +78,15 @@ the translations are installed.
 # Plugins that import gimpfu additionally MAY use GI, but gimpfu attempts to hide GI.
 
 
-import string as _string
-import math
+# v2 exposed to authors? v3, authors must import it themselves
+# v2 import math
+
 import sys
 
 
 import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
-
-# This does not work to alias gimp???
-# then gimp type is IntrospectionModule???
-# from gi.repository import Gimp as gimp
 
 
 # v3
@@ -98,32 +95,45 @@ from gi.repository import GLib
 # for g_param_spec
 from gi.repository import GObject
 
-# import types needed for implementation of GimpFu
-from gimpfu_types import *
 
-# import enums so they are exposed to GimpFu authors
+# import private implementation
+from gimpfu_marshal import Marshal
+from gimpfu_procedure import GimpfuProcedure
+
+
+
+
+# Gimp enums exposed to GimpFu authors
 # Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
 # TODO retain old module name FBC?
 # v2 from gimpenums import *
 from gimpfu_enums import *
 
+# GimpFu enums exposed to GimpFu authors e.g. PF_INT
+# TODO this also exposes private types
+from gimpfu_types import *
+
+
+
 # TODO import gimpcolor
 
-from gimpfu_marshal import Marshal
 
-# alias Gimp.PGB as pdb
 
-# This not working, fails assert
-#pdb = GimpFu.get_pdb()
-#if pdb is None:
-#    print(Gimp.pdb_error())
-#assert pdb is not None
+'''
+alias symbols "gimp" and "pdb" to expose to GimpFu authors
+It is not as simple as:
+    pdb=Gimp.get_pdb()
+    OR from gi.repository import Gimp as gimp
+These are adapters. TODO kind of adapters
+'''
 from gimpfu_pdb import GimpfuPDB
 pdb = GimpfuPDB()
 
 from gimpfu_gimp import GimpfuGimp
 gimp = GimpfuGimp()
 
+"""
+CRUFT
 def _define_compatibility_aliases():
     '''
     alias  PDB and Gimp.
@@ -139,9 +149,11 @@ def _define_compatibility_aliases():
     #gimp = Gimp
     pdb = Gimp.get_pdb()
     assert pdb is not None
+"""
 
 
 
+# localization, i18n
 
 # Python 3 ugettext() is deprecated, use gettext() which also returns unicode
 import gettext
@@ -159,6 +171,12 @@ _ = t.gettext
 
 gettext.install("gimp30-python", Gimp.locale_directory,)
 
+# v2 defined this.  FBC, keep it in v3.
+# But most plugins that use it are probably not doing runtime localization.
+def N_(message):
+    return message
+
+
 
 '''
 # Warn v2 authors
@@ -169,150 +187,34 @@ def override_gettext_install(name, locale, **kwargs):
 gettext.install = override_gettext_install
 '''
 
-
+# v2 cruft
 #class error(RuntimeError): pass
 #class CancelError(RuntimeError): pass
 
 
-'''
-GimpFu cache of possibly many plugins registered by a single .py file.
-cache: local copy of registration with Gimp.
-After registering with Gimp, we could use Gimp's knowledge, but local cache has more information.
-Namely, PARAMS have extra information: the kind of control widget for each param.
-Dictionary of GimpFuProcedure
-'''
-_registered_plugins_ = {}
+
+gf_procedure = None
 
 
-def deriveMissingMenu(menu, label, params):
-    '''
-    if menu is not given, derive it from label
-    Ability to omit menu is deprecated, so this is FBC.
-    '''
-    need_compat_params = False
-    if menu is None and label:
-        fields = label.split("/")
-        if fields:
-            label = fields.pop()
-            menu = "/".join(fields)
-            need_compat_params = True
+def register(proc_name, blurb, help, author, copyright,
+            date, label, imagetypes,
+            params, results, function,
+            menu=None, domain=None, on_query=None, on_run=None):
+    """ GimpFu method that registers a plug-in. """
 
-            import warnings
-            #TODO proc_name undefined
-            message = ("%s: passing the full menu path for the menu label is "
-                       "deprecated, use the 'menu' parameter instead"
-                       % (proc_name))
-            warnings.warn(message, DeprecationWarning, 3)
-
-        if need_compat_params:   # v2 and plugin_type == PLUGIN:
-            file_params = [(PDB_STRING, "filename", "The name of the file", ""),
-                           (PDB_STRING, "raw-filename", "The name of the file", "")]
-
-            if menu is None:
-                pass
-            elif menu.startswith("<Load>"):
-                params[0:0] = file_params
-            elif menu.startswith("<Image>") or menu.startswith("<Save>"):
-                params.insert(0, (PDB_IMAGE, "image", "Input image", None))
-                params.insert(1, (PDB_DRAWABLE, "drawable", "Input drawable", None))
-                if menu.startswith("<Save>"):
-                    params[2:2] = file_params
-
-
-def makeProcNamePrefixCanonical(proc_name):
-    '''
-    if given name not canonical, make it so.
-
-    Canonical means having a prefix from a small set,
-    so that from the canonical name, PDB browsers know how implemented.
-
-    v2 allowed underbars, i.e. python_, extension_, plug_in_, file_ prefixes.
-    TODO FBC, transliterate _ to -
-
-    Note that prefix python-fu intends to suggest (to browsers of PDB):
-    - fu: simplified API i.e. uses GimpFu module
-    - python: language is python
-    script-fu is similar for Scheme language: simplified API
-    You can write a Python language plugin without the simplified API
-    and then it is author's duty to choose a canonically prefixed name.
-    '''
-    if (not proc_name.startswith("python-") and
-        not proc_name.startswith("extension-") and
-        not proc_name.startswith("plug-in-") and
-        not proc_name.startswith("file-") ):
-           proc_name = "python-fu-" + proc_name
-
-
-def register(proc_name, blurb, help, author, copyright, date, label,
-             imagetypes, params, results, function,
-             menu=None, domain=None, on_query=None, on_run=None):
-    """GimpFu method that registers a plug-in."""
-
-    print ('register', proc_name)
-
-    # First sanity check the data
-
-    '''
-    Since: 3.0 Gimp enforces: Identifiers for procedure names and parameter names:
-    Characters from set: '-', 'a-z', 'A-Z', '0-9'.
-    v2 allowed "_"
-    Gimp will check also.  So redundant, but catch it early.
-    '''
-    def letterCheck(str):
-        allowed = _string.ascii_letters + _string.digits + "-"
-        for ch in str:
-            if not ch in allowed:
-                return 0
-        else:
-            return 1
-
-    # TODO transliterate "_" to "-" FBC
-
-    if not letterCheck(proc_name):
-        raise Exception("procedure name contains illegal characters")
-
-    for ent in params:
-        if len(ent) < 4:
-            raise Exception( ("parameter definition must contain at least 4 "
-                          "elements (%s given: %s)" % (len(ent), ent)) )
-
-        if not isinstance(ent[0], int):
-            raise Exception("parameters must be of integral type")
-
-        if not letterCheck(ent[1]):
-            raise Exception("parameter name contains illegal characters")
-
-    for ent in results:
-        if len(ent) < 3:
-            raise Exception( ("result definition must contain at least 3 elements "
-                          "(%s given: %s)" % (len(ent), ent)))
-
-        if not isinstance(ent[0], int):
-            raise Exception("result must be of integral type")
-
-        if not letterCheck(ent[1]):
-            raise Exception("result name contains illegal characters")
-
-    # v2 plugin_type = PLUGIN
-
-    deriveMissingMenu(menu, label, params)
-
-    makeProcNamePrefixCanonical(proc_name)
-
-    # v3 plugin_type in local cache always a dummy value
-    # Gimp enums are not defined yet
-    plugin_type = 1
-
-    _registered_plugins_[proc_name] = GimpFuProcedure(blurb, help, author, copyright,
-                                       date, label, imagetypes,
-                                       plugin_type, params, results,
-                                       function, menu, domain,
-                                       on_query, on_run)
+    print("register ", proc_name)
+    # TODO put in iterable container
+    global gf_procedure
+    gf_procedure = GimpfuProcedure(proc_name, blurb, help, author, copyright,
+                            date, label, imagetypes,
+                            params, results, function,
+                            menu, domain, on_query, on_run)
 
 
 
 # TODO still needed in v3?  Not a virtual method of GimpPlugin anymore?
 def _query():
+    raise Exception("v2 method _query called.")
     for plugin in _registered_plugins_.keys():
         (blurb, help, author, copyright, date,
          label, imagetypes, plugin_type,
@@ -390,22 +292,34 @@ def _interact(procedure, stock_args, actualArgs):
     print("interact called")
 
     proc_name = procedure.get_name()
-    fu_procedure = _registered_plugins_[proc_name]
-    formal_params = fu_procedure.PARAMS
-    function = fu_procedure.FUNCTION
-    on_run = fu_procedure.ON_RUN
+    # fu_procedure = GimpfuProcedure.get_metadata(proc_name)
+    formal_params = gf_procedure.metadata.PARAMS
+    function = gf_procedure.metadata.FUNCTION
+    on_run = gf_procedure.metadata.ON_RUN
 
     wrapped_stock_args = _wrap_stock_args(stock_args)
 
     # effectively a closure, partially bound to stock_args
+    # passed to show_plugin_dialog to be executed after dialog
     def run_script(run_params):
         nonlocal wrapped_stock_args
         # TEMP attempt to get pdb into scope
         # nonlocal function
 
         print("run_script called with pdb", pdb)
-        params = wrapped_stock_args + tuple(run_params)
+
+        # TODO is this correct?
+        # Is the procedure an image consumer?
+        # If first param is image, prepend
+        # TODO add class GimpfuPlugin that hides all this magic
+        # if formal_params[0].PF_TYPE != PF_IMAGE:
+        if formal_params[0][0] == PF_IMAGE:
+            params = wrapped_stock_args + tuple(run_params)
+        else:
+             params = tuple(run_params)
+
         #TODO _set_defaults(proc_name, params)
+
         # invoke on unpacked args
         return function(*params)
 
@@ -427,11 +341,11 @@ def _interact(procedure, stock_args, actualArgs):
             print("Call on_run")
             on_run()
 
-        import gimpfu_widgets
+        import gimpfu_dialog
 
         print("Call show_plugin_dialog")
         # executes run_script if not canceled, returns tuple of run_script result
-        return gimpfu_widgets.show_plugin_dialog(procedure, actualArgs, formal_params, run_script)
+        return gimpfu_dialog.show_plugin_dialog(procedure, actualArgs, formal_params, run_script)
 
 
 def unpackActualArgs(actualArgs):
@@ -459,6 +373,7 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
     #name = actualArgs.index(0)
     print (actualArgs.length())
 
+    # To get the Python name of a Procedure method,
     # see gimp/libgimp/gimpprocedure.h, and then remove the prefix gimp_procedure_
 
     name = procedure.get_name()
@@ -468,7 +383,8 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
     # else so-called interactive mode, with GUI dialog of params
 
     print("Name is ", name)	# procedure.name)
-    func = _registered_plugins_[name].FUNCTION
+    func = gf_procedure.get_authors_function()
+
 
     # catenate standard args and special args into list
     # !!! Low level Gimp plugin procedures take first arg "run_mode", GimpFu hides it
@@ -484,7 +400,7 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
     '''
     stock_args = (image, drawable)
 
-    _define_compatibility_aliases()
+    # CRUFT? _define_compatibility_aliases()
     assert pdb is not None
     print("pdb outside", pdb)
 
@@ -624,60 +540,21 @@ def fail(msg):
     Gimp.message(msg)
     raise Exception(msg)
 
-def N_(message):
-    return message
 
 
 
 
-'''
-A class whose *instances* will have a prop attribute
-
-Class has one property of each type.
-Properties used only for their type.
-In calls to set_args_from_property
-'''
-class PropHolder (GObject.GObject):
-    # copied and hacked to remove '-' from Python GTK+ 3 website tutorial
-    __gproperties__ = {
-        "intprop": (int, # type
-                     "integer prop", # nick
-                     "A property that contains an integer", # blurb
-                     1, # min
-                     5, # max
-                     2, # default
-                     GObject.ParamFlags.READWRITE # flags
-                    ),
-    }
-
-    def __init__(self):
-        GObject.GObject.__init__(self)
-        self.int_prop = 2
-
-    def do_get_property(self, prop):
-        if prop.name == 'intprop':
-            return self.int_prop
-        else:
-            raise AttributeError('unknown property %s' % prop.name)
-
-    def do_set_property(self, prop, value):
-        if prop.name == 'intprop':
-            self.int_prop = value
-        else:
-            raise AttributeError('unknown property %s' % prop.name)
 
 
-prop_holder = PropHolder()
-print(prop_holder.props)
-print(prop_holder.props.intprop)
+
+
 
 
 
 # lkk rest is my hack trying to understand
 '''
 GimpFu is subclass of Gimp.Plugin.
-At runtime, only methods of such a subclass (or procedures called from methods)
-have access to Gimp and its PDB.
+At runtime, only methods of such a subclass have access to Gimp and its PDB.
 
 GimpFu is wrapper.
 Has no properties itself.
@@ -696,7 +573,7 @@ class GimpFu (Gimp.PlugIn):
     ## Parameters ##
     # Long form: create attribute which is dictionary of GProperty
     # class attribute ??
-    # not used
+    # not used by GimpFu
     __gproperties__ = {
         # nick, blurb, default
         "myProp": (str,
@@ -707,52 +584,17 @@ class GimpFu (Gimp.PlugIn):
     }
 
 
-    ## Private specialization methods for GimpFu
-
-    def _set_procedure_metadata(self, procedure, name):
-        '''
-        Convey local plugin metadata to Gimp
-        '''
-        procedure.set_image_types(_registered_plugins_[name].IMAGETYPES);
-        procedure.set_documentation (N_(_registered_plugins_[name].BLURB),
-                                     _registered_plugins_[name].HELP,
-                                     name)
-        procedure.set_menu_label(N_(_registered_plugins_[name].MENUITEMLABEL))
-        procedure.set_attribution(_registered_plugins_[name].AUTHOR,
-                                  _registered_plugins_[name].COPYRIGHT,
-                                  _registered_plugins_[name].DATE)
-        procedure.add_menu_path (_registered_plugins_[name].MENUPATH)
-
-
-    def _create_plugin_procedure_args(self, procedure, proc_name ):
-        '''
-        Add (i.e. declare to Gimp) args to plugin procedure
-        from formal params as recorded in local cache under proc_name
-        '''
-
-        '''
-        This implementation uses one property on self many times.
-        Requires a hack to Gimp, which otherwise refuses to add are many times from same named property.
-        '''
-        formal_params = _registered_plugins_[proc_name].PARAMS
-
-        for i in range(len(formal_params)):
-            # TODO map PF_TYPE to types known to Gimp (a smaller set)
-            # use named properties of prop_holder
-            procedure.add_argument_from_property(prop_holder, "intprop")
-
 
 
     ## GimpPlugIn virtual methods ##
     def do_query_procedures(self):
+        print("do_query_procedures")
         self.set_translation_domain("Gimp30-python",
                                     Gio.file_new_for_path(Gimp.locale_directory()))
 
-        # return all proc_names from local cache
-        #TODO this is temp hack, just any one proc_name
-        # keys() is not a list. Convert to list, then index
-        # TODO for key in _registered_plugins_:
-        return [ list(_registered_plugins_.keys())[0] ]
+        # TODO return all proc_names
+        # return [ GimpfuProcedure.get_first_proc_name(), ]
+        return [ gf_procedure.name, ]
 
 
     '''
@@ -765,29 +607,27 @@ class GimpFu (Gimp.PlugIn):
     def do_create_procedure(self, filename):
 
         # filename not otherwise used
+        # Gimp is passing filename as if there is only one procedure to be implemented in a file.
+        # and the name is "procedure" without a 's'
         print ('create procedure(s) from file: ', filename, " .py")
 
         '''
         Register with Gimp all the locally registered plugins.
         '''
-        for key in _registered_plugins_:
-           procedure = Gimp.ImageProcedure.new(self,
-                                            key,
-                                            Gimp.PDBProcType.PLUGIN,
-                                            _run, 	# wrapped plugin method
-                                            None)
-           self._set_procedure_metadata(procedure, key)
-           self._create_plugin_procedure_args(procedure, key)
+        # TODO GimpFuProcedure iterator
+        # for key in _registered_plugins_:
+
+        # TODO different plug_type LoadProcedure for loaders???
+
+        procedure = Gimp.ImageProcedure.new(self,
+                                        gf_procedure.name,
+                                        Gimp.PDBProcType.PLUGIN,
+                                        _run, 	# wrapped plugin method
+                                        None)
+        gf_procedure.convey_metadata_to_gimp(procedure)
+        gf_procedure.convey_procedure_arg_declarations_to_gimp(procedure)
 
         # TODO, we created and registered many, we return only the last one??
         # Is creating many legal to Gimp 3?
+
         return procedure
-
-
-# alias Gimp.PGB as pdb
-# This not working, fails assert
-#pdb = Gimp.get_pdb()
-#assert pdb is not None
-#pdb = GimpFu.get_pdb()
-#if pdb is None:
-#    print(Gimp.pdb_error())
