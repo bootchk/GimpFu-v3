@@ -92,8 +92,9 @@ from gi.repository import Gimp
 # v3
 from gi.repository import Gio
 from gi.repository import GLib
-# for g_param_spec
-from gi.repository import GObject
+
+# for g_param_spec and properties
+# from gi.repository import GObject
 
 
 # import private implementation
@@ -192,27 +193,60 @@ gettext.install = override_gettext_install
 #class CancelError(RuntimeError): pass
 
 
+'''
+local cache of procedures implemented in the GimpFu author's source code.
+Dictionary containing elements of  type GimpFuProcedure
+'''
+__local_registered_procedures__ = {}
 
-gf_procedure = None
 
 
+"""
+The GimpFu API:
+   - register()
+   - main()
+   - fail()
+   - pdb instance
+   - gimp instance
+"""
+
+'''
+Register locally, not with Gimp.
+
+Each GimpFu plugin author's source may contain many calls to register.
+'''
 def register(proc_name, blurb, help, author, copyright,
             date, label, imagetypes,
             params, results, function,
             menu=None, domain=None, on_query=None, on_run=None):
-    """ GimpFu method that registers a plug-in. """
+    """ GimpFu method that registers a plug-in. May be called many times from same source file."""
 
     print("register ", proc_name)
-    # TODO put in iterable container
-    global gf_procedure
+
     gf_procedure = GimpfuProcedure(proc_name, blurb, help, author, copyright,
                             date, label, imagetypes,
                             params, results, function,
                             menu, domain, on_query, on_run)
+    __local_registered_procedures__[proc_name] = gf_procedure
+
+
+def main():
+    """This should be called after registering the plug-in."""
+    # v2:   gimp.main(None, None, _query, _run)
+    print('GimpFu main called\n')
+    Gimp.main(GimpFu.__gtype__, sys.argv)
+
+
+def fail(msg):
+    """Display an error message and quit"""
+    Gimp.message(msg)
+    raise Exception(msg)
 
 
 
-# TODO still needed in v3?  Not a virtual method of GimpPlugin anymore?
+"""
+CRUFT
+# TODO still needed in v3?  Not a virtual method of Gimp.Plugin anymore?
 def _query():
     raise Exception("v2 method _query called.")
     for plugin in _registered_plugins_.keys():
@@ -250,6 +284,7 @@ def _query():
             Gimp.menu_register(plugin, menu)
         if on_query:
             on_query()
+"""
 
 '''
 TODO replace this with gimp_procedure_config
@@ -291,8 +326,12 @@ def _wrap_stock_args(stock_args):
 def _interact(procedure, stock_args, actualArgs):
     print("interact called")
 
+    # get name from instance of Gimp.Procedure
     proc_name = procedure.get_name()
-    # fu_procedure = GimpfuProcedure.get_metadata(proc_name)
+
+    # get GimpfuProcedure from container by name
+    gf_procedure = __local_registered_procedures__[proc_name]
+
     formal_params = gf_procedure.metadata.PARAMS
     function = gf_procedure.metadata.FUNCTION
     on_run = gf_procedure.metadata.ON_RUN
@@ -367,22 +406,30 @@ Now it is of C type GimpImageProcedure or Python type ImageProcedure
 !!! Args are Gimp types, not Python types
 '''
 def _run(procedure, run_mode, image, drawable, actualArgs, data):
+    ''' GimpFu wrapper of the author's "main" function, aka run_func '''
 
-    # assert type of actualArgs is Gimp.ValueArray.  Thus has non-Python methods, only GI methods.
-    print(actualArgs)
-    #name = actualArgs.index(0)
-    print (actualArgs.length())
+    '''
+    require procedure is-a Gimp.Procedure.  All args are GObjects.
+    require actualArgs is-a Gimp.ValueArray.  Thus has non-Python methods, only GI methods.
+    e.g. actualArgs.length(), NOT len(actualArgs)
+    '''
 
-    # To get the Python name of a Procedure method,
+    # To get the Python name of a Gimp.Procedure method,
     # see gimp/libgimp/gimpprocedure.h, and then remove the prefix gimp_procedure_
-
     name = procedure.get_name()
 
-    isBatch = (run_mode == Gimp.RunMode.NONINTERACTIVE)
-    ## TODO can't find enum isRunWithLastValues = (run_mode == Gimp.RunMode.RUN_WITH_LAST_VALS)
-    # else so-called interactive mode, with GUI dialog of params
+    print("_run ", name, run_mode, image, drawable, actualArgs)
 
-    print("Name is ", name)	# procedure.name)
+    # get local GimpFuProcedure
+    gf_procedure = __local_registered_procedures__[name]
+
+    isBatch = (run_mode == Gimp.RunMode.NONINTERACTIVE)
+    '''
+    Else so-called interactive mode, with GUI dialog of params.
+    Note that the v2 mode RUN_WITH_LAST_VALS is obsolete
+    since Gimp 3 persists settings, i.e. actual arg values from last invocation.
+    '''
+
     func = gf_procedure.get_authors_function()
 
 
@@ -527,18 +574,6 @@ def _run(proc_name, params):
     return res
 '''
 
-def main():
-    """This should be called after registering the plug-in."""
-    # v2
-    # gimp.main(None, None, _query, _run)
-    # v3
-    print('main called\n')
-    Gimp.main(GimpFu.__gtype__, sys.argv)
-
-def fail(msg):
-    """Display an error message and quit"""
-    Gimp.message(msg)
-    raise Exception(msg)
 
 
 
@@ -551,25 +586,33 @@ def fail(msg):
 
 
 
-# lkk rest is my hack trying to understand
+
+
 '''
-GimpFu is subclass of Gimp.Plugin.
+See header comments for type Gimp.Plugin.
+
+A plugin must define (but not instantiate) a subclass of Gimp.Plugin.
+GimpFu is a subclass of Gimp.Plugin.
 At runtime, only methods of such a subclass have access to Gimp and its PDB.
 
 GimpFu is wrapper.
 Has no properties itself.
 More generally (unwrapped) properties  represent params (sic arguments) to ultimate plugin.
 
-_run() above wraps author's "function" i.e. ultimate plugin method
+_run() above wraps author's "function" i.e. ultimate plugin method,
+which is referred to as "run_func" here and in Gimp documents.
 '''
 class GimpFu (Gimp.PlugIn):
 
+    """
+    cruft
     @classmethod
     def get_pdb(cls):
         return Gimp.get_pdb();
+    """
 
 
-
+    """
     ## Parameters ##
     # Long form: create attribute which is dictionary of GProperty
     # class attribute ??
@@ -582,52 +625,69 @@ class GimpFu (Gimp.PlugIn):
                  _("myPropDefaultValue"),
                  GObject.ParamFlags.READWRITE)
     }
-
+    """
 
 
 
     ## GimpPlugIn virtual methods ##
+    '''
+    Called at install time,
+    OR when ~/.config/GIMP/2.99/pluginrc (a cache of installed plugins) is being recreated.
+    '''
     def do_query_procedures(self):
         print("do_query_procedures")
+
+        # TODO Why set the locale again?
+        # Maybe this is a requirement documented for class Gimp.Plugin????
         self.set_translation_domain("Gimp30-python",
                                     Gio.file_new_for_path(Gimp.locale_directory()))
 
-        # TODO return all proc_names
-        # return [ GimpfuProcedure.get_first_proc_name(), ]
-        return [ gf_procedure.name, ]
+        # return list of all procedures implemented in the GimpFu plugin author's source code
+        # For testing: result =[ gf_procedure.name, ]
+        result = __local_registered_procedures__.keys()
+
+        # Ensure result is GLib.List () (an ordinary Python list suffices, and keys() returns a list)
+        return result
 
 
     '''
-    Gimp calls this back when the GimpFu plugin calls main(), which calls Gimp.main().
-    Thus it should execute AFTER the GimpFu plugin calls register().
-    Until now, the GimpFu plugin is only registered in the local cache, and not registered with Gimp.
+    "run-mode"
+    Gimp calls this back
 
-    The filename arg is name of the source file, not necessarily the same as given in register(name,...)
+    In the GimpFu source code: at a call to main(), which calls Gimp.main(), which calls back.
+    Thus in the source code AFTER the calls to GimpFu register().
+    Thus the GimpFu plugin is GimpFu register'ed in the local cache.
+    It also was registered with Gimp (at installation time.)
     '''
-    def do_create_procedure(self, filename):
+    def do_create_procedure(self, name):
 
-        # filename not otherwise used
-        # Gimp is passing filename as if there is only one procedure to be implemented in a file.
-        # and the name is "procedure" without a 's'
-        print ('create procedure(s) from file: ', filename, " .py")
+        print ('create Gimp.Procedure: ', name)
 
-        '''
-        Register with Gimp all the locally registered plugins.
-        '''
-        # TODO GimpFuProcedure iterator
-        # for key in _registered_plugins_:
+        # We need the kind of plugin, and to ensure the passed name is know to us
+        gf_procedure = __local_registered_procedures__[name]
 
         # TODO different plug_type LoadProcedure for loaders???
+        '''
+        Create subclass of Gimp.Procedure dispatching
+        on the locally determined kind i.e. by the signature of the formal args.
+        And use a different wrapper _run for each subclass.
+        '''
+        """
+        if gf_procedure.is_a_image_kind():
+            cls = Gimp.ImageProcedure
+        else:
+            cls =
+
+        """
 
         procedure = Gimp.ImageProcedure.new(self,
-                                        gf_procedure.name,
+                                        name,
                                         Gimp.PDBProcType.PLUGIN,
                                         _run, 	# wrapped plugin method
                                         None)
+
         gf_procedure.convey_metadata_to_gimp(procedure)
         gf_procedure.convey_procedure_arg_declarations_to_gimp(procedure)
 
-        # TODO, we created and registered many, we return only the last one??
-        # Is creating many legal to Gimp 3?
-
+        # ensure result is-a Gimp.Procedure
         return procedure
