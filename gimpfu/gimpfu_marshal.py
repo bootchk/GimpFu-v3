@@ -36,6 +36,8 @@ class Marshal():
         '''
         Wrap Gimp types that GimpFu wraps.
         E.G. Image => GimpfuImage
+
+        Requires gimp_object is-a Gimp object
         '''
         '''
         Invoke the internal constructor for wrapper class.
@@ -58,6 +60,25 @@ class Marshal():
             exception_str = f"GimpFu: can't wrap gimp type {gimp_type}"
             raise RuntimeError(exception_str)
         return result
+
+
+    @classmethod
+    def wrap_args(cls, args):
+        '''
+        Wraps items if they need wrapping.
+        Fundamental types do not need wrapping.
+        Returns list.
+        '''
+        print("wrap_args", args)
+        # TODO incomplete
+        result = []
+        for item in args:
+            if type(item).__name__ in ('Image', 'Layer',):
+                result.append(cls.wrap(item))
+            else:
+                result.append(item)
+        return result
+
 
 
     @classmethod

@@ -229,6 +229,8 @@ def register(proc_name, blurb, help, author, copyright,
                             menu, domain, on_query, on_run)
     __local_registered_procedures__[proc_name] = gf_procedure
 
+    # !!! Have not conveyed to Gimp yet
+
 
 def main():
     """This should be called after registering the plug-in."""
@@ -312,19 +314,11 @@ def _set_defaults(proc_name, defaults):
     gimpshelf.shelf[key] = defaults
 '''
 
-def _wrap_stock_args(stock_args):
-    '''
-    Return tuple of wrapped incoming arguments.
-    I.E. create Gimpfu wrappers for Gimp GObject's
-    '''
-    # TODO Marshal may be wrapping a Gimp.Drawable as GimpfuLayer  ???
-    return (Marshal.wrap(stock_args[0]),
-            Marshal.wrap(stock_args[1]))
 
 
 
-def _interact(procedure, stock_args, actualArgs):
-    print("interact called")
+def _interact(procedure, actual_args):
+    print("_interact called", procedure, actual_args)
 
     # get name from instance of Gimp.Procedure
     proc_name = procedure.get_name()
@@ -336,11 +330,25 @@ def _interact(procedure, stock_args, actualArgs):
     function = gf_procedure.metadata.FUNCTION
     on_run = gf_procedure.metadata.ON_RUN
 
-    wrapped_stock_args = _wrap_stock_args(stock_args)
+    wrapped_actual_args = Marshal.wrap_args(actual_args)
 
-    # effectively a closure, partially bound to stock_args
+    guiable_formal_params =  gf_procedure.guiable_formal_params
+    nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_actual_args)
+
+
+    # effectively a closure, partially bound to function, nonguiable_actual_args
     # passed to show_plugin_dialog to be executed after dialog
-    def run_script(run_params):
+    def run_script(guiable_actual_args):
+        # guiable_actual_args may have been altered by the GUI from earlier values
+        nonlocal function
+        nonlocal nonguiable_actual_args
+
+        wrapped_actual_args = nonguiable_actual_args + guiable_actual_args
+        # invoke on unpacked args
+        return function(*wrapped_actual_args)
+
+        """
+        CRUFT
         nonlocal wrapped_stock_args
         # TEMP attempt to get pdb into scope
         # nonlocal function
@@ -361,16 +369,14 @@ def _interact(procedure, stock_args, actualArgs):
 
         # invoke on unpacked args
         return function(*params)
+        """
 
-    # slice off prefix of formal param descriptions (i.e. image and drawable)
-    # leaving only descriptions of GUI-time params
-    formal_guiable_params = formal_params[len(stock_args):]
 
-    print("guiable formal params:", formal_guiable_params)
-    if len(formal_guiable_params) == 0:
-         print("no guiable parameters")
-         # Since no GUI, was_canceled always false
-         return false, run_script([])
+    if len(guiable_formal_params) == 0:
+        #Just execute, don't open dialog.
+        print("no guiable parameters")
+        # Since no GUI, was_canceled always false
+        result = (false, run_script(wrapped_actual_args))
     else:
         # create GUI from guiable formal args, let user edit actual args
 
@@ -384,12 +390,34 @@ def _interact(procedure, stock_args, actualArgs):
 
         print("Call show_plugin_dialog")
         # executes run_script if not canceled, returns tuple of run_script result
-        return gimpfu_dialog.show_plugin_dialog(procedure, actualArgs, formal_params, run_script)
+        result = gimpfu_dialog.show_plugin_dialog(procedure, guiable_actual_args, guiable_formal_params, run_script)
+        # TODO save the changed settings i.e. new defaults
+
+    return result
 
 
-def unpackActualArgs(actualArgs):
-   # actualArgs is Gimp type ValueArray
-   pass
+def _pack(actual_args, arg1=None, arg2=None):
+    '''
+    return a list [arg1, arg2, *actual_args]
+    Where:
+        actual_args is-a Gimp.ValueArray
+        arg1, arg2 are optional GObjects
+    '''
+
+    args = []
+    if arg1:
+        args.append(arg1)
+    if arg2:
+        args.append(arg2)
+
+    len = actual_args.length()   # !!! not len(actual_args)
+    for i in range(len):
+        gvalue = actual_args.index(i)
+        # Python can handle the gvalue, we don't need to convert to Python types
+        # assuming we have imported gi
+        args.append(gvalue)
+    # ensure result is-a list, but might be empty
+    return args
 
 
 
@@ -398,27 +426,68 @@ Since 3.0, signature of _run() has changed.
 Formerly, most parameters were in one tuple.
 Now the first several are mandatory and do not need to be declared when registering.
 In other words, formerly their declarations were boilerplate, repeated often for little practical use.
-Since 3.0 the parameter actualArgs only contains arguments special to given plugin instance.
+Since 3.0 the parameter actual_args only contains arguments special to given plugin instance.
 
 Also formerly the first argument was type str, name of proc.
 Now it is of C type GimpImageProcedure or Python type ImageProcedure
 
 !!! Args are Gimp types, not Python types
 '''
-def _run(procedure, run_mode, image, drawable, actualArgs, data):
+def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data):
     ''' GimpFu wrapper of the author's "main" function, aka run_func '''
 
+    print("_run_imageprocedure ", procedure, run_mode, image, drawable, actual_args)
+
     '''
+    create GimpValueArray of all args
+    !!! We  pass GimpValueArray types to lower level methods.
+    That might change when the lower level methods are fleshed out to persist values.
+    '''
+
+
+    all_args = _pack(actual_args, image, drawable)
+    """
+    cruft
+    # from gimpfu_array import GimpfuValueArray
+    # GimpfuValueArray
+    gf.prepend(image)
+    stock_args = (image, drawable)
+    all_args = stock_args +  tuple(*actual_args)
+    """
+
+    _run(procedure, run_mode, all_args, data)
+
+
+def _run_loadprocedure(procedure, run_mode, actual_args, data):
+    ''' GimpFu wrapper of the author's "main" function, aka run_func '''
+    print("_run_loadprocedure ", procedure, run_mode, actual_args)
+    all_args = _pack(actual_args)
+    _run(procedure, run_mode, all_args, data)
+
+
+def _run(procedure, run_mode, actual_args, data):
+    '''
+    Understands run_mode.
+    Different ways to invoke procedure batch, or interactive.
+
+    Hides run_mode from GimpFu authors.
+    I.E. their run_func signature does not have run_mode.
+
     require procedure is-a Gimp.Procedure.  All args are GObjects.
-    require actualArgs is-a Gimp.ValueArray.  Thus has non-Python methods, only GI methods.
-    e.g. actualArgs.length(), NOT len(actualArgs)
+    require actual_args is-a Gimp.ValueArray.  Thus has non-Python methods, only GI methods.
+    e.g. actual_args.length(), NOT len(actual_args)
     '''
+    assert isinstance(actual_args, list)
 
     # To get the Python name of a Gimp.Procedure method,
     # see gimp/libgimp/gimpprocedure.h, and then remove the prefix gimp_procedure_
     name = procedure.get_name()
 
-    print("_run ", name, run_mode, image, drawable, actualArgs)
+    print("_run ", name, run_mode, actual_args)
+    '''
+    actual_args are one-to-one with formal params.
+    actual_args may include some args that are not guiable (i.e. image, drawable)
+    '''
 
     # get local GimpFuProcedure
     gf_procedure = __local_registered_procedures__[name]
@@ -427,25 +496,11 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
     '''
     Else so-called interactive mode, with GUI dialog of params.
     Note that the v2 mode RUN_WITH_LAST_VALS is obsolete
-    since Gimp 3 persists settings, i.e. actual arg values from last invocation.
+    since Gimp 3 persists settings, i.e. actual arg values can be from last invocation.
+    If not from last invocation, they are the formal parameter defaults.
     '''
 
     func = gf_procedure.get_authors_function()
-
-
-    # catenate standard args and special args into list
-    # !!! Low level Gimp plugin procedures take first arg "run_mode", GimpFu hides it
-    # TODO finalArgs = (image, drawable) + unpackActualArgs(actualArgs)
-    # TEMP just use the first actualArgs
-    #finalArgs = (image, drawable, actualArgs.index(0))
-    # TODO this is in a mess, understand the original better.
-    '''
-    I think actualArgs could be LAST_VALS,
-    Need to pass them to batch.
-    Need to pass them to interact, which should init widgets to those values.
-    Can actualArgs be a prefix of formal parameters?
-    '''
-    stock_args = (image, drawable)
 
     # CRUFT? _define_compatibility_aliases()
     assert pdb is not None
@@ -455,7 +510,7 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
        try:
            # invoke func with unpacked args.  Since Python3, apply() gone.
            # TODO is this the correct set of args?
-           result = func(*stock_args)
+           result = func(*actual_args)
            # TODO add result values
            final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
        except:
@@ -463,7 +518,7 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
     else:
        # pass list of args
        try:
-           was_canceled, result = _interact(procedure, stock_args, actualArgs)
+           was_canceled, result = _interact(procedure, actual_args)
            if was_canceled:
                final_result = procedure.new_return_values(Gimp.PDBStatusType.CANCEL, GLib.Error())
            else:
@@ -484,51 +539,9 @@ def _run(procedure, run_mode, image, drawable, actualArgs, data):
     '''
     Gimp.displays_flush()   # !!! Gimp, not gimp
 
-
-    # assert final_result is type GimpValueArray
+    # ensure final_result is type GimpValueArray
     return final_result
 
-'''
-TODO in progress
-    if isBatch:
-        finalArgs = (run_mode, image, drawable, actualArgs)
-        return apply(func, finalArgs)
-
-    formalParams = _registered_plugins_[procedure].PARAMS
-
-    # Count actual arguments whose type is correct
-    min_args = 0
-    if len(actualArgs) > 1:
-        for i in range(1, len(actualArgs)):
-            param_type = _obj_mapping[formalParams[i - 1][0]]
-            if not isinstance(actualArgs[i], param_type):
-                break
-
-        min_args = i
-
-    if len(formalParams) > min_args:
-        start_params = actualArgs[:min_args + 1]
-
-        if run_mode == RUN_WITH_LAST_VALS:
-            default_actualArgs = _get_defaults(proc_name)
-            params = start_params + default_params[min_args:]
-        else:
-            params = start_params
-    else:
-       run_mode = RUN_NONINTERACTIVE
-
-    if run_mode == RUN_INTERACTIVE:
-        try:
-            res = _interact(proc_name, params[1:])
-        except CancelError:
-            return
-    else:
-        res = apply(func, params[1:])
-
-    Gimp.displays_flush()
-
-    return res
-'''
 
 '''
 v2
@@ -573,17 +586,6 @@ def _run(proc_name, params):
 
     return res
 '''
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -644,15 +646,20 @@ class GimpFu (Gimp.PlugIn):
 
         # return list of all procedures implemented in the GimpFu plugin author's source code
         # For testing: result =[ gf_procedure.name, ]
-        result = __local_registered_procedures__.keys()
+        keys = __local_registered_procedures__.keys()
 
-        # Ensure result is GLib.List () (an ordinary Python list suffices, and keys() returns a list)
+        # Ensure result is GLib.List () (a Python list suffices) but keys is not a list in Python 3
+        result = list(keys)
+
         return result
 
 
     '''
     "run-mode"
-    Gimp calls this back
+
+    Gimp docs says that Gimp calls this back when plugin is executed.
+    ??? But it seems to be called back at installation time also,
+    once per call of do_query_procedures.
 
     In the GimpFu source code: at a call to main(), which calls Gimp.main(), which calls back.
     Thus in the source code AFTER the calls to GimpFu register().
@@ -661,7 +668,7 @@ class GimpFu (Gimp.PlugIn):
     '''
     def do_create_procedure(self, name):
 
-        print ('create Gimp.Procedure: ', name)
+        print ('do_create_procedure: ', name)
 
         # We need the kind of plugin, and to ensure the passed name is know to us
         gf_procedure = __local_registered_procedures__[name]
@@ -672,19 +679,23 @@ class GimpFu (Gimp.PlugIn):
         on the locally determined kind i.e. by the signature of the formal args.
         And use a different wrapper _run for each subclass.
         '''
-        """
-        if gf_procedure.is_a_image_kind():
-            cls = Gimp.ImageProcedure
+
+        if gf_procedure.is_a_imageprocedure_subclass :
+            procedure = Gimp.ImageProcedure.new(self,
+                                            name,
+                                            Gimp.PDBProcType.PLUGIN,
+                                            _run_imageprocedure, 	# wrapped plugin method
+                                            None)
+        elif gf_procedure.is_a_loadprocedure_subclass :
+            procedure = Gimp.LoadProcedure.new(self,
+                                            name,
+                                            Gimp.PDBProcType.PLUGIN,
+                                            _run_loadprocedure, 	# wrapped plugin method
+                                            None)
         else:
-            cls =
-
-        """
-
-        procedure = Gimp.ImageProcedure.new(self,
-                                        name,
-                                        Gimp.PDBProcType.PLUGIN,
-                                        _run, 	# wrapped plugin method
-                                        None)
+            # TODO Better message, since this error depends on authored code
+            # TODO preflight this at registration time.
+            raise Exception("Unknown subclass of Gimp.Procedure")
 
         gf_procedure.convey_metadata_to_gimp(procedure)
         gf_procedure.convey_procedure_arg_declarations_to_gimp(procedure)

@@ -80,22 +80,84 @@ class GimpfuProcedure():
                                            on_query, on_run)
 
 
-
-
     '''
-    def get_first_proc_name():
-        # TODO class should implement iterator
-        # TODO for key in _registered_plugins_:
-        # then return a list
+    Methods that understand what parameters are guiable.
+    '''
 
-        # return one name
-        #TODO this is temp hack, just any one proc_name
-        # keys() is not a list. Convert to list, then index
+    @property
+    def guiable_formal_params(self):
+        # computable property
+        if self.is_a_imageprocedure_subclass:
+            # slice off prefix of formal param descriptions (i.e. image and drawable)
+            # leaving only descriptions of GUI-time params
+            result = self.metadata.PARAMS[2:]
+        else:
+            # is LoadProcedure
+            result = self.metadata.PARAMS
 
-        result = list(_registered_plugins_.keys())[0]
-        print("get_first_proc_name", result)
+        print("guiable_formal_params:", result)
         return result
+
+
+    def split_guiable_actual_args(self, actual_args):
+        if self.is_a_imageprocedure_subclass:
+            # slice off prefix of formal param descriptions (i.e. image and drawable)
+            # leaving only descriptions of GUI-time params
+            guiable = actual_args[2:]
+            nonguiable = actual_args[:2]
+        else:
+            # is LoadProcedure
+            guiable = actual_args
+            nonguiable = ()
+
+        return nonguiable, guiable
+
+
+
     '''
+    Methods re class of procedure.
+
+    Knows how to determine the subclass from attributes of the metadata.
+
+    Each subclass has a run_func with a different signature prefix.
+    E.G. an ImageProcedure signature must start like: (image, drawable, ...)
+
+    This is the inheritance:
+    Gimp.Procedure
+       Gimp.FileProcedure
+           Gimp.LoadProcedure
+       Gimp.ImageProcedure
+
+    '''
+
+    @property
+    def is_a_imageprocedure_subclass(self):
+        '''
+        An ImageProcedure must have signature (Image, Drawable, ...)
+        and a non-null IMAGETYPES
+        TODO could be stricter, i.e. check args prefix is image and drawable
+        '''
+        # not empty string is True
+        return self.metadata.IMAGETYPES
+
+    @property
+    def is_a_loadprocedure_subclass(self):
+        '''
+        A LoadProcedure has empty IMAGETYPEs.
+        The signature CAN be (Image, Drawable) but need not be.
+        A LoadProcedure usually installs to menu File>, but need not.
+        For example some plugins that install to menu Filter>Render
+        just create a new image.
+
+        A load procedure is always enabled in Gimp GUI (doesn't care about imagetypes)
+        and might not take an existing image, instead creating one.
+        '''
+        return not self.is_a_imageprocedure_subclass
+
+
+
+
+
 
 
     """

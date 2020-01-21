@@ -34,9 +34,16 @@ _ = t.gettext
 class EntryValueError(Exception):
     pass
 
+# FUTURE i.e. work in progress
+# TODO param actual_args of type Gimp.ValueArray.
 def show_plugin_procedure_dialog():
     '''
     Implement using Gimp.ProcedureDialog
+
+    Gimp is capable of displaying a dialog for a Gimp.Procedure.
+    It takes a ProcedureConfig.
+    Before the dialog run, ProcedureConfig contains initial values for widgets.
+    After the dialog run, ProcedureConfig contains values the user chose.
     '''
     config = procedure.create_config()
     config.begin_run(image, Gimp.RunMode.INTERACTIVE, args)  # GObject.NULL)  # image, run_mode, args
@@ -45,7 +52,7 @@ def show_plugin_procedure_dialog():
     config.end_run(GIMP_PDB_SUCCESS)
 
     '''
-    work in progress, the above is not finished
+    , the above is somewhat based on this code from despeckle
   if (run_mode == GIMP_RUN_INTERACTIVE)
     {
       if (! despeckle_dialog (procedure, G_OBJECT (config), drawable))
@@ -91,10 +98,12 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
 
 
 
-def _add_control_widgets_to_dialog(box, args, guiable_formal_params):
+def _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params):
     ''' add control widget for each formal param, returning tuple of controls'''
     '''
-    args: a Gimp type, actual args (could be defaults or last values) as specified by how we registered with Gimp
+    actual_args: is-a Gimp.ValueArray, actual_args (could be defaults or last values) as specified by how we registered with Gimp
+    FUTURE: use them to create widget's initial values
+
     guiable_formal_params: a Python type, the original formal specs from plugin author in GimpFu notation,
        but just those that should have control widgets
     '''
@@ -111,7 +120,6 @@ def _add_control_widgets_to_dialog(box, args, guiable_formal_params):
     grid = Gtk.Grid()
     grid.set_row_spacing(6)
     grid.set_column_spacing(6)
-    # GTK 3: five args (self + 4)
     box.pack_start(grid, expand=False, fill=True, padding=0)
     grid.show()
 
@@ -152,10 +160,10 @@ def _add_control_widgets_to_dialog(box, args, guiable_formal_params):
         tooltip_text = 'foo'  # TODO
         proc_name = 'bar' # TODO procedure.procedure_name()
 
-        args = _get_args_for_widget_factory(a_formal_param, widget_default_value)
+        factory_specs = _get_args_for_widget_factory(a_formal_param, widget_default_value)
 
-        print("Calling factory with args", widget_factory, args)
-        control_widget = widget_factory(*args)
+        print("Calling factory with specs", widget_factory, factory_specs)
+        control_widget = widget_factory(*factory_specs)
         # e.g. control_widget = StringEntry(widget_default_value)
         label.set_mnemonic_widget(control_widget)
         grid.attach(control_widget, 2, i, 1, 1)
@@ -192,12 +200,13 @@ spin.show()
 
 
 
-def _create_gimp_dialog(args, guiable_formal_params):
+def _create_gimp_dialog(actual_args, guiable_formal_params):
     '''
     Show plugin dialog implemented using Gimp.Dialog
 
     Returns a tuple of values or None (user canceled.)
     '''
+    print("_create_gimp_dialog", actual_args, guiable_formal_params)
 
     use_header_bar = Gtk.Settings.get_default().get_property("gtk-dialogs-use-header")
     dialog = Gimp.Dialog(use_header_bar=use_header_bar,
@@ -211,7 +220,7 @@ def _create_gimp_dialog(args, guiable_formal_params):
     dialog.get_content_area().add(box)
     box.show()
 
-    controls = _add_control_widgets_to_dialog(box, args, guiable_formal_params)
+    controls = _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params)
 
     return controls, dialog
 
@@ -223,19 +232,20 @@ def _create_gimp_dialog(args, guiable_formal_params):
 
 
 
-def show_plugin_dialog(procedure, args, guiable_formal_params, run_script):
+def show_plugin_dialog(procedure, actual_args, guiable_formal_params, run_script):
     '''
     Present GUI.
-    Returns was_canceled, tuple of result values from running plugin
+    Returns (was_canceled, tuple of result values) from running plugin
     '''
+    print("show_plugin_dialog", procedure, actual_args, guiable_formal_params, run_script)
+    #assert type(procedure.__name == )
+    #assert len(actual_args) == len(guiable_formal_params )
+    #print("after assert")
 
-    print("Count actual args", args.length() )
-    print("Count formal args", len(guiable_formal_params ) )
-
-    Gimp.ui_init('foo')
+    Gimp.ui_init('foo') # TODO procedure.name()
 
     # choice of implementation
-    controls, dialog = _create_gimp_dialog(args, guiable_formal_params)  # implemented by GimpFu in Python
+    controls, dialog = _create_gimp_dialog(actual_args, guiable_formal_params)  # implemented by GimpFu in Python
     # show_plugin_procedure_dialog() # implemented by Gimp in C
 
     # TODO transient
