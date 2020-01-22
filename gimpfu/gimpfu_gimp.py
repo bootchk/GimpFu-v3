@@ -25,6 +25,20 @@ class GimpfuGimp():
     Some methods are specialized (convenience)
 
     See gimpfu_pdb, its similar.
+
+    Typical source constructs:
+      img = gimp.Image(width, height, RGB)  invoke constructor of Gimp.Layer class, to be wrapped by GimpFu
+      gimp.context_push()                   invoking method of Gimp class
+      gimp.delete(img)                      specialized method
+      gimp.locale_directory                 ???
+
+    Note that Gimp.Layer refers to the Layer class in the Gimp namespace
+    while Gimp.context_push invokes a method of the Gimp class.
+    I.E. Gimp.Layer is NOT referring to an attribute of the Gimp class.
+
+    Constructs you might imagine, but not seen yet in the wild:
+       gimp.Layer.foo                       get attribute of the Gimp.Layer class?
+       gimp.Layer.FOO                       get an enum value defined by Gimp.Layer class?
     '''
 
 
@@ -124,7 +138,7 @@ class GimpfuGimp():
         i.e. for methods not defined in this class (non-convenience methods)
         '''
         '''
-        Require Gimp object exists.  GimpFu creates it.
+        Require 'gimp' instance of Gimp object exists.  GimpFu creates it.
         Don't check, would only discover caller is not importing gimpfu.
         '''
 
@@ -143,11 +157,11 @@ class GimpfuGimp():
         Also, we need to mangle "Image()" to "Image.new()"
         '''
 
-        print("return gimp adaptor")
         # remember state for soon-to-come call
         self.adapted_gimp_object_name = name
 
-        # return intercept function soon to be called
+        print("return gimp adaptor func")
+        # return adapter function soon to be called
         return object.__getattribute__(self, "_adaptor_func")
 
 

@@ -1,6 +1,16 @@
 
 import string   # v2 as _string to hide from authors
 
+
+import sys
+
+# Insure all warnings (deprecation and user) will be printed
+if not sys.warnoptions:
+    import warnings
+    warnings.simplefilter("default") # Change the filter in this process
+
+
+
 from gimpfu_types import *
 
 '''
@@ -9,14 +19,13 @@ Plugin author should have translated strings in their definition.
 '''
 
 '''
-GimpFu cache of possibly many plugins registered by a single .py file.
-cache: local copy of registration with Gimp.
+GimpFu keeps a local copy of what was registered with Gimp.
 After registering with Gimp, we could use Gimp's knowledge, but local cache has more information.
 Namely, PARAMS have extra information: the kind of control widget for each param.
-Dictionary of GimpFuProcedure
 '''
 '''
-_registered_plugins_ = {}
+!!! When this is called, the PDB_ enums are not defined, use PF_ enums.
+And pdb and gimp symbols are not defined.
 '''
 
 # Temp hack ???
@@ -28,16 +37,32 @@ print(prop_holder.props.intprop)
 
 
 
+
+
 class GimpfuProcedure():
     '''
     Understands and wraps Gimp procedure.
 
     GimpFu procedure is slightly different from Gimp PluginProcedure.
     This hides the differences.
-
     Differences:
-    plugin_type not required of GimpFu author
+       plugin_type not required of GimpFu author
     '''
+
+    '''
+    Responsible for sanity checking and fixups to author's declaration.
+    This is in the nature of compiling:
+       - give warnings
+       - or throw exceptions (sanity)
+    both of which printed in the console.
+    At install time!  Once registered with Gimp, no further warnings.
+    Author must delete ~/.config/.../pluginrc to see warnings again.
+    '''
+    def _deprecation(self, message):
+        ''' wrapper of warnings.warn() that fixpoints the parameters. '''
+        # stacklevel=2 means print two lines, including caller's info
+        warnings.warn(message, DeprecationWarning, stacklevel=2)
+
 
     def __init__(self,
                 proc_name, blurb, help, author, copyright,
@@ -47,37 +72,54 @@ class GimpfuProcedure():
         '''
         Takes data authored by GimpFu author.
         Which is wild, so sanity test.
-        Then massage for compatibility.
-        Then chunk data into a struct.
+        Then chunk data into self.
+        Fix self for compatibility with Gimp.
 
-        This does NOT create the procedure in Gimp PDB,
-        which happens later TODO
+        This does NOT create the procedure in Gimp PDB, which happens later.
         '''
         print ('new GimpfuProcedure', proc_name)
 
+        # May not return, throws exceptions
         self._sanity_test_registration(proc_name, params, results)
-
-        # TODO side effects on menu, params according to plugin_type
-        # TODO also derives params, rename andParameters
-        self._deriveMissingMenu(menu, label, params)
-
-        self.name = self._makeProcNamePrefixCanonical(proc_name)
 
         '''
         v2 plugin_type = PLUGIN
         v3 plugin_type in local cache always a dummy value
-        Gimp enums are not defined yet
+        Gimp enums are not defined yet.
+        Other types are EXTENSION, INTERNAL, TEMPORARY
+        but no type comes from the author
+        and the type is not used anywhere else in GimpFu,
+        so what is the purpose?
         '''
         # TODO this is a hack
         plugin_type = 1
 
+
+        self.name = self._makeProcNamePrefixCanonical(proc_name)
+
         # TODO rename to ProcedureStruct, f vs F is too subtle
-        #_registered_plugins_[proc_name]
         self.metadata = GimpFuProcedure(blurb, help, author, copyright,
                                            date, label, imagetypes,
                                            plugin_type, params, results,
                                            function, menu, domain,
                                            on_query, on_run)
+
+        '''
+        Fix author's mistakes and allow deprecated constructs.
+        Generates data into self.metadata.
+        These are in the nature of patches.
+        And hard to maintain.
+        '''
+
+        self._did_fix_menu = self._deriveMissingMenu()
+        self._deriveMissingParams()
+        '''
+        !!! When we insert image params,
+        signature registered with Gimp
+        differs from signature of run_func.
+        '''
+        self._did_insert_image_params = self._deriveMissingImageParams()
+
 
 
     '''
@@ -99,7 +141,17 @@ class GimpfuProcedure():
         return result
 
 
-    def split_guiable_actual_args(self, actual_args):
+    def split_guiable_actual_args(self, actual_args):   # list => list, list
+        ''' Split actual_args by whether they are user changeable in GUI '''
+        '''
+        Actual args are those of the plugin,
+        and passed by Gimp.
+        Only some are guiable,
+        and only some are passed to run_func
+        (when we inserted image and drawable)
+        '''
+        """
+        Cruft?
         if self.is_a_imageprocedure_subclass:
             # slice off prefix of formal param descriptions (i.e. image and drawable)
             # leaving only descriptions of GUI-time params
@@ -108,9 +160,28 @@ class GimpfuProcedure():
         else:
             # is LoadProcedure
             guiable = actual_args
-            nonguiable = ()
+            nonguiable = []
+        """
+        '''
+        !!! Signature in Gimp includes leading run_mode.
+        But GimpFu signature does not.
+        So this splits off leading image and drawable
+        '''
+        guiable = actual_args[2:]
+        nonguiable = actual_args[:2]
 
         return nonguiable, guiable
+
+
+    def join_args_to_run_args(self, nonguiable, guiable):
+        ''' Understands whether we have different signature for run_func '''
+        if self._did_insert_image_params:
+            # nonguiable args in signature of both plugin and run_func
+            result = guiable
+        else:
+            # nonguiable args in signature of plugin but not the run_func
+            result = nonguiable + guiable
+        return result
 
 
 
@@ -141,18 +212,24 @@ class GimpfuProcedure():
         return self.metadata.IMAGETYPES
 
     @property
-    def is_a_loadprocedure_subclass(self):
+    def is_a_imagelessprocedure_subclass(self):
         '''
-        A LoadProcedure has empty IMAGETYPEs.
+        A imageless procedure (Gimp.Procedure) has empty IMAGETYPEs.
         The signature CAN be (Image, Drawable) but need not be.
-        A LoadProcedure usually installs to menu File>, but need not.
-        For example some plugins that install to menu Filter>Render
-        just create a new image.
 
-        A load procedure is always enabled in Gimp GUI (doesn't care about imagetypes)
+
+
+        A imageless procedure is always enabled in Gimp GUI (doesn't care about imagetypes)
         and might not take an existing image, instead creating one.
         '''
         return not self.is_a_imageprocedure_subclass
+
+    """
+    TODO is_a_loadprocedure_subclass
+    A LoadProcedure usually installs to menu File>, but need not.
+    For example some plugins that install to menu Filter>Render
+    just create a new image.
+    """
 
 
 
@@ -191,6 +268,8 @@ class GimpfuProcedure():
         procedure.set_attribution(self.metadata.AUTHOR,
                                   self.metadata.COPYRIGHT,
                                   self.metadata.DATE)
+        # TODO apparently GIMP can declare error (see console)
+        # TODO is there are result of this call that we can check?
         procedure.add_menu_path (self.metadata.MENUPATH)
 
 
@@ -215,51 +294,129 @@ class GimpfuProcedure():
 
 
     '''
-    Private methods
-
-    Have self, but don't use it.
+    Private methods.
+    Fixups to self.
     '''
 
 
     # TODO this needs review.  Rewrite to a functional style.
     #
     # !!! Side effects on passed parameters
-    def _deriveMissingMenu(self, menu, label, params):
+    def _deriveMissingMenu(self):
         '''
         if menu is not given, derive it from label
         Ability to omit menu is deprecated, so this is FBC.
-
-        Also convenience or compatibility ??? :
-        adjust params according to plugin_type
         '''
-        need_compat_params = False
-        if menu is None and label:
-            fields = label.split("/")
-            if fields:
-                label = fields.pop()
-                menu = "/".join(fields)
-                need_compat_params = True
+        result = False
+        if self.metadata.MENUPATH is None:
+            if self.metadata.MENUITEMLABEL:
+                # label but no menu. Possible menu path in the label.
+                fields = self.metadata.MENUITEMLABEL.split("/")
+                if fields:
+                    self.metadata.MENUITEMLABEL = fields.pop()
+                    self.metadata.MENUPATH = "/".join(fields)
 
-                import warnings
-                #TODO proc_name undefined
-                message = ("%s: passing a full menu path in 'label' is "
-                           "deprecated, use the 'menu' parameter instead."
-                           % (proc_name))
-                warnings.warn(message, DeprecationWarning, 3)
+                    result = True
 
-            if need_compat_params:   # v2 and plugin_type == PLUGIN:
-                file_params = [(PDB_STRING, "filename", "The name of the file", ""),
-                               (PDB_STRING, "raw-filename", "The name of the file", "")]
+                    message = (f"{self.name}: Use the 'menu' parameter instead"
+                               f" of passing a full menu path in 'label'.")
+                    self._deprecation(message)
+                else:
+                    # 'label' is not a path, can't derive menu path
+                    message = f"{self.name}: Simple menu item 'label' without 'menu' path."
+                    # TODO will GIMP show it in the GUI in a fallback place?
+                    self._deprecation(message)
+            else:
+                # no menu and no label
+                # Normal, user intends to create plugin only callable by other plugins
+                message = (f"{self.name}: No 'menu' and no 'label'."
+                           f"Plugin will not appear in Gimp GUI.")
+                # Not really a deprecation, a UserWarning??
+                self._deprecation(message)
+        else:
+            if  self.metadata.MENUITEMLABEL:
+                # menu and label given
+                # Normal, user intends plugin appear in GUI
+                pass
+            else:
+                # menu but no label
+                # TODO Gimp will use suffix of 'menu' as 'label' ???
+                message = (f"{self.name}: Use the 'label' parameter instead"
+                           f"of passing menu item at end of 'menu'.")
+                self._deprecation(message)
+        return result
 
-                if menu is None:
-                    pass
-                elif menu.startswith("<Load>"):
-                    params[0:0] = file_params
-                elif menu.startswith("<Image>") or menu.startswith("<Save>"):
-                    params.insert(0, (PDB_IMAGE, "image", "Input image", None))
-                    params.insert(1, (PDB_DRAWABLE, "drawable", "Input drawable", None))
-                    if menu.startswith("<Save>"):
-                        params[2:2] = file_params
+
+
+
+
+    def _deriveMissingParams(self):
+        ''' FBC Add missing params according to plugin type. '''
+
+        '''
+        FBC.
+        In the distant past, an author could specify menu like <Load>
+        and not provide a label
+        and not provide the first two params,
+        in which case GimpFu inserts two params.
+        Similarly for other cases.
+        '''
+        # v2 if self._did_fix_menu and plugin_type == PLUGIN:
+        # require _deriveMissingMenu called earlier
+        if not self._did_fix_menu:
+            return
+
+        file_params = [(PF_STRING, "filename", "The name of the file", ""),
+                       (PF_STRING, "raw-filename", "The name of the file", "")]
+
+        if self.metadata.MENUPATH is None:
+            pass
+        elif self.metadata.MENUPATH.startswith("<Load>"):
+            self.metadata.PARAMS[0:0] = file_params
+            message = f"{self.name}: Fixing two file params for Load plugin"
+            self._deprecation(message)
+        elif self.metadata.MENUPATH.startswith("<Image>") or self.metadata.MENUPATH.startswith("<Save>"):
+            self.metadata.PARAMS.insert(0, (PF_IMAGE, "image", "Input image", None))
+            self.metadata.PARAMS.insert(1, (PF_DRAWABLE, "drawable", "Input drawable", None))
+            message = f"{self.name}: Fixing two image params for Image or Save plugin"
+            self._deprecation(message)
+            if self.metadata.MENUPATH.startswith("<Save>"):
+                self.metadata.PARAMS[2:2] = file_params
+                message = f"{self.name}: Fixing two file params for Save plugin"
+                self._deprecation(message)
+
+
+    def _deriveMissingImageParams(self):
+        '''
+        Some plugins declare they are <Image> plugins,
+        but don't have first two params equal to (image, drawable),
+        and have imagetype == "" (menu item enabled even if no image is open).
+        And then Gimp refuses to create procedure
+        (but does create an item in pluginrc!)
+        E.G. sphere.py
+
+        So we diverge the signature of the plugin from the signature of the run_func.
+        The GimpFu plugin author might be unaware, unless they explore,
+        or try to call the PDB procedure from another PDB procedure.
+        '''
+        result = False
+        # if missing params (never there, or not fixed by earlier patch)
+        # TODO if params are missing altogether
+        if ( self.metadata.MENUPATH.startswith("<Image>")
+            and self.metadata.PARAMS[0][0] != PF_IMAGE
+            and self.metadata.PARAMS[1][0] != PF_DRAWABLE
+            ):
+            self.metadata.PARAMS.insert(0, (PF_IMAGE, "image", "Input image", None))
+            self.metadata.PARAMS.insert(1, (PF_DRAWABLE, "drawable", "Input drawable", None))
+            message = f"{self.name}: Fixing two image params for Image plugin"
+            self._deprecation(message)
+            result = True
+        return result
+
+
+
+
+
 
 
     def _makeProcNamePrefixCanonical(self, proc_name):
@@ -285,7 +442,8 @@ class GimpfuProcedure():
             not proc_name.startswith("plug-in-") and
             not proc_name.startswith("file-") ):
                new_proc_name = "python-fu-" + proc_name
-               print("GimpFu: Warning: Procedure name canonicalized to", new_proc_name)
+               message = f"Procedure name canonicalized to {new_proc_name}"
+               self._deprecation(message)
         return new_proc_name
 
 

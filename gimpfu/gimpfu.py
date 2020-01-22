@@ -343,9 +343,12 @@ def _interact(procedure, actual_args):
         nonlocal function
         nonlocal nonguiable_actual_args
 
-        wrapped_actual_args = nonguiable_actual_args + guiable_actual_args
-        # invoke on unpacked args
-        return function(*wrapped_actual_args)
+        wrapped_run_args = gf_procedure.join_args_to_run_args(nonguiable_actual_args,  guiable_actual_args)
+        '''
+        invoke author's func on unpacked args
+        !!! author's func never has run_mode, Gimpfu hides need for it.
+        '''
+        return function(*wrapped_run_args)
 
         """
         CRUFT
@@ -424,9 +427,18 @@ def _pack(actual_args, arg1=None, arg2=None):
 '''
 Since 3.0, signature of _run() has changed.
 Formerly, most parameters were in one tuple.
-Now the first several are mandatory and do not need to be declared when registering.
-In other words, formerly their declarations were boilerplate, repeated often for little practical use.
-Since 3.0 the parameter actual_args only contains arguments special to given plugin instance.
+
+XXXNow the first several are mandatory and do not need to be declared when registering.
+XXXIn other words, formerly their declarations were boilerplate, repeated often for little practical use.
+
+Since 3.0,
+when the plugin procedure is of type Gimp.ImageProcedure
+the parameter actual_args only contains arguments special to given plugin instance,
+and the first two args (image and drawable) are passed separately.
+
+!!! The args are always as declared when procedure created.
+It is only when they are passed to the procedure that they are grouped
+in different ways (some chunked into a Gimp.ValueArray)
 
 Also formerly the first argument was type str, name of proc.
 Now it is of C type GimpImageProcedure or Python type ImageProcedure
@@ -439,12 +451,11 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
     print("_run_imageprocedure ", procedure, run_mode, image, drawable, actual_args)
 
     '''
-    create GimpValueArray of all args
+    create GimpValueArray of *most* args
     !!! We  pass GimpValueArray types to lower level methods.
     That might change when the lower level methods are fleshed out to persist values.
+    *most* means (image, drawable, *actual_args), but not run_mode!
     '''
-
-
     all_args = _pack(actual_args, image, drawable)
     """
     cruft
@@ -458,7 +469,7 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
     _run(procedure, run_mode, all_args, data)
 
 
-def _run_loadprocedure(procedure, run_mode, actual_args, data):
+def _run_imagelessprocedure(procedure, run_mode, actual_args, data):
     ''' GimpFu wrapper of the author's "main" function, aka run_func '''
     print("_run_loadprocedure ", procedure, run_mode, actual_args)
     all_args = _pack(actual_args)
@@ -680,25 +691,43 @@ class GimpFu (Gimp.PlugIn):
         And use a different wrapper _run for each subclass.
         '''
 
+        # TEMP hack, always a GimpImageProcedure
+        procedure = Gimp.ImageProcedure.new(self,
+                                name,
+                                Gimp.PDBProcType.PLUGIN,
+                                _run_imageprocedure, 	# wrapped plugin method
+                                None)
+        """
         if gf_procedure.is_a_imageprocedure_subclass :
             procedure = Gimp.ImageProcedure.new(self,
                                             name,
                                             Gimp.PDBProcType.PLUGIN,
                                             _run_imageprocedure, 	# wrapped plugin method
                                             None)
-        elif gf_procedure.is_a_loadprocedure_subclass :
-            procedure = Gimp.LoadProcedure.new(self,
+        elif gf_procedure.is_a_imagelessprocedure_subclass :
+            print("Create imageless procedure")
+            procedure = Gimp.Procedure.new(self,
                                             name,
                                             Gimp.PDBProcType.PLUGIN,
-                                            _run_loadprocedure, 	# wrapped plugin method
+                                            _run_imagelessprocedure, 	# wrapped plugin method
                                             None)
         else:
             # TODO Better message, since this error depends on authored code
             # TODO preflight this at registration time.
             raise Exception("Unknown subclass of Gimp.Procedure")
+        """
 
         gf_procedure.convey_metadata_to_gimp(procedure)
         gf_procedure.convey_procedure_arg_declarations_to_gimp(procedure)
 
         # ensure result is-a Gimp.Procedure
         return procedure
+
+"""
+elif gf_procedure.is_a_loadprocedure_subclass :
+    procedure = Gimp.LoadProcedure.new(self,
+                                    name,
+                                    Gimp.PDBProcType.PLUGIN,
+                                    _run_loadprocedure, 	# wrapped plugin method
+                                    None)
+"""
