@@ -77,49 +77,7 @@ class GimpfuPDB():
 
 
 
-    def _marshall_args(self, proc_name, *args):
-        '''
-        1. Gather many args into Gimp.ValueArray and return it.
 
-        2. Optionally prefix args with run mode
-        GimpFu feature: hide run_mode from calling author
-
-        3. Unwrap wrapped arguments so all args are GObjects
-
-        4. Hacky upcast???
-
-        5. float(args) as needed
-        '''
-
-        # TODO python-fu- ??
-        if proc_name.startswith('plug-in-'):
-            marshalled_args = Gimp.ValueArray.new(len(args)+1)
-            marshalled_args.insert(0, Gimp.RunMode.NONINTERACTIVE)  # no GUI
-            index = 1
-        else:
-            marshalled_args = Gimp.ValueArray.new(len(args))
-            index = 0
-
-
-        for x in args:
-            ## GObject.Value(GObject.TYPE_STRING, tmp))
-            ## print("marshall arg:", x )
-
-            go_arg, go_arg_type = Marshal.unwrap_arg(x)
-
-            # All args need conversion, don't assume any arg does NOT need conversion
-            # A procedure definition can have float arg in anywhere in args
-            go_arg, go_arg_type = Marshal.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
-
-            # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
-            # Must pass directly to insert()
-
-            # ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
-            # unless GObject.Value() does some sort of casting
-
-            marshalled_args.insert(index, GObject.Value(go_arg_type, go_arg))
-            index += 1
-        return marshalled_args
 
 
     def _adaptor_func(self, *args):
@@ -129,13 +87,24 @@ class GimpfuPDB():
         # !!! avoid infinite recursion
         proc_name = object.__getattribute__(self, "adapted_proc_name")
 
-        inner_result = Gimp.get_pdb().run_procedure( proc_name ,
-                                     object.__getattribute__(self, "_marshall_args")(proc_name, *args) )
+        try:
+            marshaled_args = Marshal.marshal_pdb_args(proc_name, *args)
+        except:
+            print("GimpFu: proceeding past problem with args to", proc_name)
+        else:
+            try:
+                inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
+            except:
+                print("GimpFu: proceeding past calling PDB procedure", proc_name)
+
+        # OLD object.__getattribute__(self, "_marshall_args")(proc_name, *args) )
 
         # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
         error_str = Gimp.get_pdb().get_last_error()
         if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
-            raise Exception(error_str)
+            # TODO one place to print proceeding message
+            print(">>>>GimpFu proceeeding past Gimp error:", error_str)
+            # OLD raise Exception(error_str)
 
         # TODO unmarshall result?
         # Low priority: all PDB calls have side_effects, but don't return objects?

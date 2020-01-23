@@ -162,6 +162,12 @@ class GimpfuGimp():
         # new_args = self._adapt_signature(dot_name, args)
         # result = func(*new_args)
 
+        # Call Gimp
+        '''
+         TODO but keep going if exception
+        # often the plugin is not checking errors,
+        # beneficial duto find the next error
+        '''
         result = func(*args)
         print(result)
         return result
@@ -237,7 +243,7 @@ class GimpfuGimp():
         '''
         Changed:
            name
-           signature was adapted in PyGimp v2
+           signature was adapted in PyGimp v2, also here v3
         '''
         # method is overloaded, with optional args
         if g is None:

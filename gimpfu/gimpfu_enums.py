@@ -57,6 +57,9 @@ FG_BG_RGB_MODE      = 1999
 
 GRADIENT_RADIAL     = Gimp.GradientType.RADIAL
 
+# TODO not sure this is correct
+BG_BUCKET_FILL      = Gimp.FillType.BACKGROUND
+
 
 """
 from v2 plugin/pygimp/gimpenums-types.defs, which is perl script??

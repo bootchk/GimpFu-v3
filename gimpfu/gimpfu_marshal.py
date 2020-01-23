@@ -110,6 +110,61 @@ class Marshal():
 
 
 
+    @classmethod
+    def _marshall_pdb_args(cls, proc_name, *args):
+        '''
+        Marshall args to a PDB procedure.
+
+        1. Gather many args into Gimp.ValueArray and return it.
+
+        2. Optionally prefix args with run mode
+        GimpFu feature: hide run_mode from calling author
+
+        3. Unwrap wrapped arguments so all args are GObjects
+
+        4. Hacky upcast???
+
+        5. float(args) as needed
+        '''
+
+        # TODO python-fu- ??
+        if proc_name.startswith('plug-in-'):
+            marshalled_args = Gimp.ValueArray.new(len(args)+1)
+             # no GUI, this is a call from a plugin
+            marshalled_args.insert(0, Gimp.RunMode.NONINTERACTIVE)
+            index = 1
+        else:
+            marshalled_args = Gimp.ValueArray.new(len(args))
+            index = 0
+
+
+        for x in args:
+            ## GObject.Value(GObject.TYPE_STRING, tmp))
+            ## print("marshall arg:", x )
+
+            go_arg, go_arg_type = Marshal.unwrap_arg(x)
+
+            '''
+            All args need conversion, don't assume any arg does NOT need conversion
+            A procedure definition can have float arg in anywhere in args
+
+            This will throw IndexError: if more args than formal_args (from GI introspection)
+            If less args than formal_args, Gimp will return an error when we call the PDB procedure
+            '''
+            go_arg, go_arg_type = Marshal.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
+
+            # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
+            # Must pass directly to insert()
+
+            # ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
+            # unless GObject.Value() does some sort of casting
+
+            marshalled_args.insert(index, GObject.Value(go_arg_type, go_arg))
+            index += 1
+        return marshalled_args
+
+
+
     # TODO optimize.  Get all the args at once, memoize
 
     def _get_formal_argument_type(proc_name, index):
