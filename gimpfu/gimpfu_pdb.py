@@ -6,7 +6,7 @@ from gi.repository import Gimp
 from gi.repository import GObject    # marshalling
 
 from gimpfu_marshal import Marshal
-from gimpfu_compatibility import Compat
+from gimpfu_compatibility import pdb_name_map
 
 
 class GimpfuPDB():
@@ -166,8 +166,7 @@ class GimpfuPDB():
             '''
             Handle hyphens, and deprecated names.
             '''
-            mangled_proc_name = Compat.make_compatible_proc_name(name)
-            # OLD object.__getattribute__(self, "_make_compatible_proc_name")(name)
+            mangled_proc_name = pdb_name_map[name]
 
             if Gimp.get_pdb().procedure_exists(mangled_proc_name):
                 print("return _adaptor_func for pdb.", mangled_proc_name)

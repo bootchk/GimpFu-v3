@@ -11,7 +11,6 @@ from gi.repository import GObject
 from gimpfu_image import GimpfuImage
 from gimpfu_layer import GimpfuLayer
 
-from gimpfu_compatibility import Compat
 
 
 
@@ -99,13 +98,13 @@ class Marshal():
             result_arg = arg.unwrap()
 
             # hack: up cast drawable sublclass e.g. layer to superclass drawable
-            result_arg_type = Compat.try_upcast_to_drawable(result_arg)
+            result_arg_type = cls.try_upcast_to_drawable(result_arg)
         else:
             result_arg = arg
             # arg may be unwrapped result of previous call e.g. type Gimp.Layer
             # TODO: we wrap and unwrap as needed???
             # hack that might be removed?
-            result_arg_type = Compat.try_upcast_to_drawable(result_arg)
+            result_arg_type = cls.try_upcast_to_drawable(result_arg)
         print("unwrap_arg", result_arg, result_arg_type)
         return result_arg, result_arg_type
 
@@ -203,6 +202,33 @@ class Marshal():
         # likewise for value of result_arg
         print("try_convert_to_float returns ", result_arg, result_arg_type)
         return result_arg, result_arg_type
+
+
+    '''
+    Seems like need for upcast is inherent in GObj.
+    But probably Gimp should be doing most of the upcasting,
+    so that many plugs don't need to do it.
+    '''
+    @classmethod
+    def try_upcast_to_drawable(cls, arg):
+        '''
+        When type(arg) is subclass of Gimp.Drawable,
+        and return new type Gimp.Drawable, else return original type.
+        Does not actually change type of arg.
+
+        Require arg a GObject (not wrapped)
+        '''
+        # idiom for class name
+        print("Attempt up cast type", type(arg).__name__ )
+        # Note the names are not prefixed with Gimp ???
+        if type(arg).__name__ in ("Channel", "Layer"):  # TODO more subclasses
+            result = Gimp.Drawable
+        else:
+            result = type(arg)
+        # assert result is-a type (a Gimp type, a GObject type)
+        print("upcast result:", result)
+        return result
+
 
 
     """

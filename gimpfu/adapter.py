@@ -1,4 +1,8 @@
 
+from gimpfu_compatibility import image_name_map
+
+
+
 
 
 class Adapter():
@@ -14,7 +18,7 @@ class Adapter():
 
     see comments at gimpfu_image, somewhat similar re dynamic methods
 
-    
+
     class adapter vs object adapter
        Object adapter: does not inherit Gimp.Image, but owns an instance of it
        Class adapter: multiple inheritance, e.g. GimpfuLayer inherits Gimp.Layer
@@ -39,7 +43,7 @@ class Adapter():
              # Could use public unwrap() for more generality
              return self._adaptee == other.unwrap()
          except AttributeError:
-             print("Gimpan't compare types ", type(self), type(other))
+             print("GimpFu can't compare types ", type(self), type(other))
              raise
 
 
@@ -111,11 +115,25 @@ class Adapter():
 
     def __getattr__(self, name):
         '''
-        when name is callable, return callable which is soon to be called
-        when name is data member, returns value
+        Since name not found on self (i.e. not wrapped)
+        return name found on adaptee.
+
+        When name is callable, returns a callable which is soon to be called.
+        When name is data member, returns value.
+        
         !!! This does not preclude public,direct access to _adaptee, use unwrap()
         '''
-        return getattr(self.__dict__['_adaptee'], name)
+        # assert _adaptee is a Gimp object (and a GObject)
+
+        # TODO ideally this class would not know the adaptee classes
+        # map deprecated names, dispatch on class of adaptee
+        # TODO Layer, etc.
+        if type(self.__dict__['_adaptee']).__name__ == "Image":
+            latest_name = image_name_map[name]
+        else:
+            latest_name = name
+
+        return getattr(self.__dict__['_adaptee'], latest_name)
 
 
     def __setattr__(self, name, value):

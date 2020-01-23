@@ -10,6 +10,7 @@ from gi.repository import GObject    # marshalling
 from gimpfu_image import GimpfuImage
 from gimpfu_layer import GimpfuLayer
 
+from gimpfu_compatibility import gimp_name_map
 
 
 class GimpfuGimp():
@@ -41,7 +42,7 @@ class GimpfuGimp():
        gimp.Layer.FOO                       get an enum value defined by Gimp.Layer class?
     '''
 
-
+    # TODO extract to Marshal
     def _marshall_args(self, *args):
         '''
         Gather many args into Gimp.ValueArray
@@ -94,24 +95,35 @@ class GimpfuGimp():
         # create name string of method
 
         # TODO, class_name is misnomer, not every name is a class, some are method names.
-        class_name = object.__getattribute__(self, "adapted_gimp_object_name")
+        dot_name = object.__getattribute__(self, "adapted_gimp_object_name")
 
-        # TEMP  Probably all will be wrapped
-        # dispatch on whether object has been wrapped
-        if not (class_name in ("Image", "Layer")):
-            # TODO this is not right, should be just a method call
-            # pass to Gimp constructor
-            method_name = "Gimp." + class_name + ".new"
+
+        # Is a GimpFu wrapper object?
+        if dot_name in ("Image", "Layer"):
+            '''
+            The source phrase is like "layer=gimp.Layer(foo)"
+            Construct a wrapper object of Gimp object
+            e.g. GimpfuLayer, a GimpFu classname which is a constructor.
+            Args to wrapper are in GimpFu notation.
+            Constructor will in turn call Gimp.Layer constructor.
+            '''
+            callable_name = "Gimpfu" + dot_name
+            print("Calling constructor: ", callable_name)
         else:
-            # construct a wrapper object of Gimp object
-            # e.g. GimpfuFoo, a classname which is a constructor
-            method_name = "Gimpfu" + class_name
-        print("Calling constructor: ", method_name)
+            '''
+            The source phrase is like 'gimp.context_push()'
+            I.E. a method call on the (Gimp instance? or library?)
+            Note that some method calls on the Gimp,
+            e.g. gimp.delete(foo) are wrapped and intercepted earlier.
+            '''
+            callable_name = "Gimp." + gimp_name_map[dot_name]
+
 
         # eval to get the callable function
-        func = eval(method_name)
+        func = eval(callable_name)
 
         '''
+        TODO crufty comments
         E.G.
         func = Gimp.Image.new
         func = eval("Gimp.Image.new")

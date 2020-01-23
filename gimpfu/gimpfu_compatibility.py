@@ -1,72 +1,109 @@
 
-import gi
-gi.require_version("Gimp", "3.0")
-from gi.repository import Gimp
+from collections.abc import Mapping
+
+
+'''
+Knows backward compatibility for Gimp changes.
+Gimp versions infrequently:
+    rename functions  (most often)
+    condense many functions into one
+    migrate functions from one class to another
+
+And other hacky workarounds of limitations in Gimp
+???
+'''
 
 
 
-class Compat():
+
+class GimpFuMap(Mapping):
     '''
-    Knows backward compatibility.
+    A wrapper around dictionary.
+    Read-only, wraps a static dictionary.
+    I.E. access uses dictionary syntax:  new_name = compat[name]
 
-    And other hacky workarounds of limitations in Gimp
-    ???
+    Subclasses may do additional alterations to name.
+
+    Implemented by inheriting ABC collections.Mapping,
+    which is also read-only
     '''
 
-    def make_compatible_proc_name(name):
+    def __init__(self, map):
+        # replace wrapped dict
+        self.__dict__ = map
+
+    '''
+    Implement abstract methods of Mapping
+    '''
+    def __getitem__(self, key):
         '''
-        1.  transliterate: names in PDB use hyphen for underbar
-        2.  translate deprecated names
+        CRUX:
+        If the key is not in the wrapped dictionary, return unmapped key
+        And print a warning.
         '''
-        hyphenized_name = name.replace( '_' , '-')
-
-        # see Gimp commit  233ac80d "script-fu: port all scripts to the new gimp-drawable-edit functions "
-        # 'gimp-threshold' : 'gimp-drawable-threshold',  needs param2 channel, and values in range [0.0, 1.0]
-        deprecated_names_map = {
-            "gimp-edit-fill" : "gimp-drawable-edit-fill",
-
-        }
-
-        if hyphenized_name in deprecated_names_map:
-            result = deprecated_names_map[hyphenized_name]
-            # TODO print new name
-            print("GimpFu: Warning: Translating deprecated pdb name:", hyphenized_name)
+        # TODO implement with except KeyError: would be faster?
+        if key in self.__dict__.keys():
+            # TODO use warning module
+            print("GimpFu: Warning: Translating deprecated name:", key)
+            return self.__dict__[key]
         else:
-            result = hyphenized_name
-
-        '''
-        if hyphenized_name == "gimp-edit-fill":
-            result = "gimp-drawable-edit-fill"
-        elif hyphenized_name == 'gimp-threshold':
-            print("Deprecated pdb name:", hyphenized_name)
-            result = 'gimp-drawable-threshold'
-        else:
-            result = hyphenized_name
-        '''
-
-        return result
+            return key
 
 
-    # TODO move this to marshal
+
+    def __iter__(self):
+        raise NotImplementedError("Compat iterator.")
+    def __len__(self):
+        raise NotImplementedError("Compat len()")
 
     '''
-    Seems like need for upcast is inherent in GObj.
-    But probably Gimp should be doing most of the upcasting,
-    so that many plugs don't need to do it.
+    Not required by ABC.
     '''
-    def try_upcast_to_drawable(arg):
-        '''
-        When type(arg) is subclass of Gimp.Drawable, up cast to Gimp.drawable
-        and return new type, else return original type.
+    def __repr__(self):
+        return 'GimpFuMap'
+        """
+        TODO use this snippet
+        '''echoes class, id, & reproducible representation in the REPL'''
+        return '{}, D({})'.format(super(D, self).__repr__(),
+                                  self.__dict__)
+        """
 
-        Require arg a GObject (not wrapped)
-        '''
-        # idiom for class name
-        print("Attempt up cast type", type(arg).__name__ )
-        # Note the names are not prefixed with Gimp ???
-        if type(arg).__name__ in ("Channel", "Layer"):  # TODO more subclasses
-            result = Gimp.Drawable
-        else:
-            result = type(arg)
-        print("upcast result:", result)
-        return result
+
+class GimpFuPDBMap(GimpFuMap):
+    '''
+    Specialize GimpFuMap for the Gimp PDB.
+
+    Alter all mapped names: transliterate
+    The names in the PDB use hyphens, which Python does not allow in symbols.
+    Super() will proceed to map deprecated names.
+    '''
+    def __getitem__(self, key):
+        hyphenized_key = key.replace( '_' , '-')
+        # !!! The map must use hyphenated strings
+        return super().__getitem__(hyphenized_key)
+
+
+
+
+# see Gimp commit  233ac80d "script-fu: port all scripts to the new gimp-drawable-edit functions "
+# 'gimp-threshold' : 'gimp-drawable-threshold',  needs param2 channel, and values in range [0.0, 1.0]
+
+pdb_renaming = {
+    "gimp-edit-fill" : "gimp-drawable-edit-fill",
+}
+
+gimp_renaming = {}
+
+# TODO maybe these become undo_renaming i.e. calls to Gimp.Undo.disable?
+image_renaming = {
+    'disable_undo' : "undo_disable",
+}
+
+
+'''
+One map for each Gimp object that GimpFu wraps
+'''
+pdb_name_map = GimpFuPDBMap(pdb_renaming);
+gimp_name_map = GimpFuMap(gimp_renaming);
+image_name_map = GimpFuMap(image_renaming);
+# todo layer, etc
