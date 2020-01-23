@@ -5,6 +5,14 @@ Define Python symbols for Gimp enums.
 These are aliases.
 Convenience for GimpFu plugin authors.
 
+TODO Warn about deprecated symbols.
+A deprecated symbol is used by v2 plugins
+but no longer has a corresponding Gimp enum.
+Do not warn about symbol that are now moot.
+A moot symbol is one used by v2 plugins,
+but only in GimpFu methods that are adapted.
+TODO think about this some more
+
 TODO hack, just the ones reference by clothify, not real values
 
 If nothing else, enumerate them all here.
@@ -34,13 +42,22 @@ for each
 # ImageBaseType is superset of ImageType, i.e. RGB => RGB, RGBA, etc.
 RGB = Gimp.ImageBaseType.RGB  # GRAY, INDEXED
 
-RGB_IMAGE  = Gimp.ImageType.RGB_IMAGE
+RGB_IMAGE           = Gimp.ImageType.RGB_IMAGE
 
-NORMAL_MODE = Gimp.LayerMode.NORMAL
-MULTIPLY_MODE = Gimp.LayerMode.MULTIPLY
+NORMAL_MODE         = Gimp.LayerMode.NORMAL
+MULTIPLY_MODE       = Gimp.LayerMode.MULTIPLY
 
-BACKGROUND_FILL = Gimp.FillType.BACKGROUND
-WHITE_FILL = Gimp.FillType.WHITE
+BACKGROUND_FILL     = Gimp.FillType.BACKGROUND
+WHITE_FILL          = Gimp.FillType.WHITE
+
+CHANNEL_OP_REPLACE  = Gimp.ChannelOps.REPLACE
+
+# TODO this is a don't care, because GimpFu adapts all functions that use it??
+FG_BG_RGB_MODE      = 1999
+
+GRADIENT_RADIAL     = Gimp.GradientType.RADIAL
+
+
 """
 from v2 plugin/pygimp/gimpenums-types.defs, which is perl script??
 GIMP_FOREGROUND_FILL")
