@@ -15,17 +15,16 @@ And other hacky workarounds of limitations in Gimp
 
 
 
+# See SO How would I implement a dict with Abstract Base Classes in Python?
 
 class GimpFuMap(Mapping):
     '''
-    A wrapper around dictionary.
-    Read-only, wraps a static dictionary.
-    I.E. access uses dictionary syntax:  new_name = compat[name]
+    A dictionary that returns key itself,
+    on an acces that would otherwise engender KeyError.
+    Read-only, since Mapping is.
+    Dictionary syntax:  new_name = gimpFuMap[name]
 
     Subclasses may do additional alterations to name.
-
-    Implemented by inheriting ABC collections.Mapping,
-    which is also read-only
     '''
 
     def __init__(self, map):
@@ -85,18 +84,57 @@ class GimpFuPDBMap(GimpFuMap):
 
 
 
+'''
+Maps of renamings
+
+This excludes renamings that were accompanied by signature changes.
+For those, we adapt the method elsewhere.
+TODO can we adapt signature also
+'''
+
 # see Gimp commit  233ac80d "script-fu: port all scripts to the new gimp-drawable-edit functions "
 # 'gimp-threshold' : 'gimp-drawable-threshold',  needs param2 channel, and values in range [0.0, 1.0]
 
+# !!! both left and right sides hyphenated, not underbar
 pdb_renaming = {
     "gimp-edit-fill" : "gimp-drawable-edit-fill",
+    # Rest are guesses, not tested
+    "gimp-edit-bucket-fill" : "gimp-drawable-edit-bucket-fill", # TODO # (fill_type, x, y):
+    "gimp-ellipse-select" : "gimp-image-select-ellipse",
 }
+"""
+Tested not renamed.
+gimp-selection-none
 
-gimp_renaming = {}
+
+TODO
+in scheme
+(gimp-edit-blend bl-mask BLEND-FG-BG-RGB LAYER-MODE-NORMAL
+                                     GRADIENT-LINEAR 100 20 REPEAT-NONE FALSE
+                                     FALSE 0 0 TRUE
+                                     (+ bl-x-off bl-width) 0 bl-x-off 0)
+=>
+		    (gimp-context-set-gradient-fg-bg-rgb)
+                    (gimp-drawable_edit-gradient-fill bl-mask
+						      GRADIENT-LINEAR 20
+						      FALSE 0 0
+						      TRUE
+						      (+ bl-x-off bl-width) 0
+						      bl-x-off 0)
+"""
+
+
+
+gimp_renaming = {
+    # TODO which Gimp commit changed this?  Get the rest of them.
+    "set_foreground" : "context_set_foreground",
+    # signature change also: "set_background" : "context_set_background",
+}
 
 # TODO maybe these become undo_renaming i.e. calls to Gimp.Undo.disable?
 image_renaming = {
     'disable_undo' : "undo_disable",
+    'enable_undo' : "undo_enable",
 }
 
 

@@ -63,6 +63,33 @@ class GimpfuGimp():
         return marshalled_args
 
 
+
+    """
+    If experience shows this would be helpful,
+    resurrect it.
+    For now, just wrap all methods that have signaturge changes.
+
+    def _adapt_signature(self, name, *args):
+        # HACK: more generality for adapt signatures
+        '''
+        Some funcs have args that changed in Gimp.
+
+        Returns a tuple
+        '''
+        print("_adapt_signature", name, args)
+        if name is "set_background":
+            # TODO create a color
+            # TEMP return a constant color
+            color = Gimp.RGB()
+            color.parse_name("orange", 6)
+            args = [color,]
+            result = (color,)
+        else:
+            result = args
+    """
+
+
+
     # TODO, not all names are constructors e.g. Image
     # some names are methods of Gimp e.g. Gimp.displays_flush()
     def _adaptor_func(self, *args):
@@ -119,7 +146,7 @@ class GimpfuGimp():
             callable_name = "Gimp." + gimp_name_map[dot_name]
 
 
-        # eval to get the callable function
+        # eval to get the callable
         func = eval(callable_name)
 
         '''
@@ -132,8 +159,10 @@ class GimpfuGimp():
         return GimpfuImage(*args)
         '''
 
+        # new_args = self._adapt_signature(dot_name, args)
+        # result = func(*new_args)
+
         result = func(*args)
-        #result = func(*new_args)
         print(result)
         return result
 
@@ -166,7 +195,7 @@ class GimpfuGimp():
         We can't just return attribute of Gimp object:
         "Gimp.__get_attribute__(name)" returns
         AttributeError: 'gi.repository.Gimp' object has no attribute '__get_attribute__'
-        Also, we need to mangle "Image()" to "Image.new()"
+        Also, we need to mangle "Image()"
         '''
 
         # remember state for soon-to-come call
@@ -185,7 +214,6 @@ class GimpfuGimp():
     that some plugins may require.
     '''
 
-
     def delete(self, instance):
         '''
         From PyGimp Reference:
@@ -203,3 +231,42 @@ class GimpfuGimp():
         if is on display (has a DISPLAY) i.e. if Gimp user created as opposed to just the plugin.
         '''
         print("TODO gimp.delete() called")
+
+
+    def set_background(self, r, g=None, b=None):
+        '''
+        Changed:
+           name
+           signature was adapted in PyGimp v2
+        '''
+        # method is overloaded, with optional args
+        if g is None:
+            # r is-a Gimp.Color already
+            color = r
+        else:
+            color = Gimp.RGB()
+            color.set(float(r), float(g), float(b), )
+
+        # call Gimp instead of PDB
+        Gimp.context_set_background(color)
+
+
+    # Changed in Gimp commit 233ac80d
+    def gimp_edit_blend(self, mask, blend_mode, layer_mode,
+           gradient1, gradient2, gradient3, gradient4,
+           truthity1, truthity2,
+           int1, int2,
+           truthity3,
+           x1, y1, x2, y2):
+        '''
+        One to many.
+        !!! We are calling instance of self.
+        '''
+        gimp.gimp_context_set_gradient_fg_bg_rgb()   # was blend_mode
+        # TODO should dispatch blend_mode to different context calls?
+
+        # Note discarded some args
+        gimp.gimp_drawable_edit_gradient_fill( mask,
+           gradient1, gradient3,
+           truthity2, int1, int2, truthity3,
+           x1, y1, x2, y2)
