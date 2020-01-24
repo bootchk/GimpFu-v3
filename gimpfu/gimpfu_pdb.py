@@ -93,8 +93,14 @@ class GimpfuPDB():
         # !!! avoid infinite recursion
         proc_name = object.__getattribute__(self, "adapted_proc_name")
 
+        marshaled_args = None
         try:
             marshaled_args = Marshal.marshal_pdb_args(proc_name, *args)
+        except Exception as err: # TODO catch only MarshalError ???
+            do_proceed_error(f"marshalling args to {proc_name} {err}")
+
+        if marshaled_args is not None:
+            # require marshaled_args is not None, but it could be an empty GimpValueArray
 
             # Not a try: except?
             inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
@@ -102,14 +108,13 @@ class GimpfuPDB():
             error_str = Gimp.get_pdb().get_last_error()
             if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
                 do_proceed_error(f"Gimp PDB error:, {error_str}")
-        except: # TODO catch only MarshalError ???
-            do_proceed_error(f"marshalling args to {proc_name}")
+        else:
             inner_result = None
 
         # ensure inner_result is defined
 
-        # OLD without try, proceed
-        # object.__getattribute__(self, "_marshall_args")(proc_name, *args) )
+        # This is the simplified view of what we just did, without all the error checks
+        # object.__getattribute__(self, "_marshall_args")(proc_name, *args)
 
         # TODO unmarshall result?
         # Low priority: all PDB calls have side_effects, but not all return objects?

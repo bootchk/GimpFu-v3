@@ -11,6 +11,7 @@ from gi.repository import GObject
 from gimpfu_image import GimpfuImage
 from gimpfu_layer import GimpfuLayer
 
+from gimpfu_exception import *
 
 
 
@@ -113,7 +114,7 @@ class Marshal():
 
 
     @classmethod
-    def _marshall_pdb_args(cls, proc_name, *args):
+    def marshal_pdb_args(cls, proc_name, *args):
         '''
         Marshall args to a PDB procedure.
 
@@ -151,8 +152,8 @@ class Marshal():
             All args need conversion, don't assume any arg does NOT need conversion
             A procedure definition can have float arg in anywhere in args
 
-            This will throw IndexError: if more args than formal_args (from GI introspection)
-            If less args than formal_args, Gimp will return an error when we call the PDB procedure
+            If more args than formal_args (from GI introspection), conversion will not convert.
+            If less args than formal_args, Gimp might return an error when we call the PDB procedure.
             '''
             go_arg, go_arg_type = Marshal.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
 
@@ -180,7 +181,7 @@ class Marshal():
 
         Another implementation: Gimp.get_pdb().run_procedure( proc_name , 'gimp-pdb-get-proc-argument', args)
         '''
-        # require procedure in PDB
+        # require procedure in PDB, it was checked earlier
         procedure = Gimp.get_pdb().lookup_procedure(proc_name)
         ## OLD config = procedure.create_config()
         ## assert config is type Gimp.ProcedureConfig, having properties same as args of procedure
@@ -193,32 +194,41 @@ class Marshal():
         ##config.get_values(arg_specs)
 
         # assert arg_specs is Gimp.ValueArray, sequence describing args of procedure
-        arg_spec = arg_specs[index]   # .index(index)
-        print(arg_spec)
-        # assert is-a GObject.GParamSpec or subclass thereof
-        ## OLD assert arg_spec is GObject.Value, describes arg of procedure (its GType is the arg's type)
+        # index may be out of range, GimpFu author may have provided too many args
+        try:
+            arg_spec = arg_specs[index]   # .index(index) ??
+            print(arg_spec)
+            # assert is-a GObject.GParamSpec or subclass thereof
+            ## OLD assert arg_spec is GObject.Value, describes arg of procedure (its GType is the arg's type)
 
-        '''
-        The type of the subclass of GParamSpec is enough for our purposes.
-        Besides, GParamSpec.get_default_value() doesn't work???
+            '''
+            CRUFT, some comments may be pertinent.
 
-        formal_arg_type = type(arg_spec)
-        '''
+            The type of the subclass of GParamSpec is enough for our purposes.
+            Besides, GParamSpec.get_default_value() doesn't work???
 
-        '''
-        print(dir(arg_spec)) shows that arg_spec is NOT a GParamSpec, or at least doesn't have get_default_value.
-        I suppose it is a GParam??
-        Anyway, it has __gtype__
-        '''
-        """
-        formal_default_value = arg_spec.get_default_value()
-        print(formal_default_value)
-        # ??? new to GI 2.38
-        # assert is-a GObject.GValue
+            formal_arg_type = type(arg_spec)
+            '''
 
-        formal_arg_type = formal_default_value.get_gtype()
-        """
-        formal_arg_type = arg_spec.__gtype__
+            '''
+            print(dir(arg_spec)) shows that arg_spec is NOT a GParamSpec, or at least doesn't have get_default_value.
+            I suppose it is a GParam??
+            Anyway, it has __gtype__
+            '''
+            """
+            formal_default_value = arg_spec.get_default_value()
+            print(formal_default_value)
+            # ??? new to GI 2.38
+            # assert is-a GObject.GValue
+
+            formal_arg_type = formal_default_value.get_gtype()
+            """
+            formal_arg_type = arg_spec.__gtype__
+
+        except IndexError:
+            do_proceed_error("Formal argument not found, probably too many actual args.")
+            formal_arg_type = None
+
 
         print( "get_formal_argument returns", formal_arg_type)
 
@@ -234,7 +244,7 @@ class Marshal():
         (procedure's formal parameter is type GObject.TYPE_FLOAT).
         Only converts Python int to float.
 
-        Returns actual_arg, type(actual_arg),    possibly converted
+        Returns actual_arg, type(actual_arg), possibly converted
 
         Later, GObject will convert Python types to GTypes.
         '''
@@ -247,16 +257,21 @@ class Marshal():
 
         if type(actual_arg) is int:
             formal_arg_type = Marshal._get_formal_argument_type(proc_name, index)
-            # GType has property "name"
-            print("     Formal art type ", formal_arg_type.name )
+            if formal_arg_type is not None:
+                # GType has property "name"
+                print("     Formal arg type ", formal_arg_type.name )
 
-            #if formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE :
-            if formal_arg_type.name in ('GParamFloat', 'GParamDouble'): # ParamSpec ???
-                # ??? Tell Gimpfu plugin author their code would be more clear if they used float() themselves
-                # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
-                print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")
-                result_arg = float(actual_arg)  # type conversion
-                result_arg_type = type(result_arg)  # i.e. float
+                #if formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE :
+                if formal_arg_type.name in ('GParamFloat', 'GParamDouble'): # ParamSpec ???
+                    # ??? Tell Gimpfu plugin author their code would be more clear if they used float() themselves
+                    # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
+                    print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")
+                    result_arg = float(actual_arg)  # type conversion
+                    result_arg_type = type(result_arg)  # i.e. float
+            else:
+                # Failed to get formal argument type.  Probably too many actual args.
+                # Do not convert type.
+                pass
 
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
         # likewise for value of result_arg
