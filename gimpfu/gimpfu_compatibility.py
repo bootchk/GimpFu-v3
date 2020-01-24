@@ -147,13 +147,15 @@ pdb_name_map = GimpFuPDBMap(pdb_renaming);
 gimp_name_map = GimpFuMap(gimp_renaming);
 image_name_map = GimpFuMap(image_renaming);
 layer_name_map = GimpFuMap(layer_renaming);
-# todo layer, etc
+display_name_map = GimpFuMap( {} ); # no renaming anticipated
+# todo channel, etc
 
 # maps string to GimpFuMap
-# TODO other adapted objects e.g. Channel, Display?
+# TODO other adapted objects e.g. Channel?
 map_map = {
     'Image' : image_name_map,
     'Layer' : layer_name_map,
+    'Display' : display_name_map,
 }
 
 def get_name_map_for_adaptee_class(class_name):

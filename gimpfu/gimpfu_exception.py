@@ -40,7 +40,7 @@ Or porting a v2 plugin.
 FUTURE this behaviour is configurable to raise an exception instead of proceeding.
 '''
 
-# list of lines of error message
+# cumulative error messages, possibly many lines per error
 log = []
 
 def do_proceed_error(message):
@@ -74,11 +74,15 @@ def do_proceed_error(message):
 def summarize_proceed_errors():
     ''' Return True when there were errors. '''
 
+    print("===========================")
     print("GimpFu's summary of errors.")
     print("The first error may engender subsequent errors that are spurious.")
     print("Gimpfu warnings may also appear earlier in the console.")
+    print("===========================")
     for line in log:
         print(line)
+    print("")
+
     if log :
         return True
     else :

@@ -53,6 +53,8 @@ class Marshal():
             result = GimpfuImage(None, None, None, gimp_object)
         elif gimp_type == 'Layer':
             result = GimpfuLayer(None, None, None, None, None, None, None, gimp_object)
+        elif gimp_type == 'Display':
+                result = GimpfuDisplay(gimp_object)
         #elif gimp_type == 'Channel':
         # result = GimpfuLayer(None, None, None, None, None, None, None, gimp_object)
         else:
@@ -93,7 +95,7 @@ class Marshal():
         '''
         # Unwrap wrapped types. Use idiom for class name
         # TODO other class names in list
-        if  type(arg).__name__ in ("GimpfuImage", "GimpfuLayer") :
+        if  type(arg).__name__ in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay") :
             # !!! Do not affect the original object by assigning to arg
             result_arg = arg.unwrap()
 
@@ -162,6 +164,8 @@ class Marshal():
 
             marshalled_args.insert(index, GObject.Value(go_arg_type, go_arg))
             index += 1
+
+        print("marshalled_args", marshalled_args )
         return marshalled_args
 
 

@@ -9,6 +9,9 @@ from gi.repository import GObject    # marshalling
 # import wrapper classes
 from gimpfu_image import GimpfuImage
 from gimpfu_layer import GimpfuLayer
+from gimpfu_display import GimpfuDisplay
+# TODO channel, etc.
+
 
 from gimpfu_compatibility import gimp_name_map
 from gimpfu_exception import *
@@ -126,7 +129,7 @@ class GimpfuGimp():
 
 
         # Is a GimpFu wrapper object?
-        if dot_name in ("Image", "Layer"):
+        if dot_name in ("Image", "Layer", "Display"):
             '''
             The source phrase is like "layer=gimp.Layer(foo)"
             Construct a wrapper object of Gimp object

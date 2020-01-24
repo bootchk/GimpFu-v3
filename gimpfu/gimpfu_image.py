@@ -39,7 +39,7 @@ class GimpfuImage( Adapter ) :
     # Constructor exported to Gimpfu authors
     # Called internally for existing images as GimpfuImage(None, None, None, adaptee)
     def __init__(self, width=None, height=None, image_mode=None, adaptee=None):
-        '''Initialize  GimpfuImage from attribute values OR instance of Gimp.Layer. '''
+        '''Initialize  GimpfuImage from attribute values OR instance of Gimp.Image. '''
         if width is None:
             final_adaptee = adaptee
         else:
