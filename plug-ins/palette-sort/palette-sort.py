@@ -18,7 +18,7 @@ from colorsys import rgb_to_yiq
 from textwrap import dedent
 from random import randint
 
-gettext.install("gimp20-python", gimp.locale_directory, unicode=True)
+gettext.install("gimp30-python", gimp.locale_directory)
 
 AVAILABLE_CHANNELS = (_("Red"), _("Green"), _("Blue"),
                       _("Luma (Y)"),

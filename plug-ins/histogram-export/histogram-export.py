@@ -41,7 +41,7 @@ import csv
 import gettext
 
 
-gettext.install("gimp20-python", gimp.locale_directory, unicode=True)
+gettext.install("gimp30-python", gimp.locale_directory)
 
 def histogram_export(img, drw, filename,
                      bucket_size, sample_average, output_format):
