@@ -11,7 +11,7 @@ from gimpfu_image import GimpfuImage
 from gimpfu_layer import GimpfuLayer
 
 from gimpfu_compatibility import gimp_name_map
-from gimpfu_exception import proceedError
+from gimpfu_exception import *
 
 class GimpfuGimp():
     '''
@@ -150,7 +150,7 @@ class GimpfuGimp():
             func = eval(callable_name)
         except AttributeError:
             # callable_name is not adapted by GimpFu or known to Gimp
-            proceedError(f"unknown Gimp method {callable_name}")
+            do_proceed_error(f"unknown Gimp method {callable_name}")
             result = None
         else:
             try:
@@ -168,7 +168,7 @@ class GimpfuGimp():
             except:
                 # TODO does Gimp return, or remember, an error message?
                 # TODO result is a GObject , maybe Gimp.StatusType as for PDB??
-                proceedError(f"Gimp function execution error")
+                do_proceed_error(f"Gimp function execution error")
                 result = None
 
 

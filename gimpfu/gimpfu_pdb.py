@@ -8,7 +8,7 @@ from gi.repository import GObject    # marshalling
 from gimpfu_marshal import Marshal
 from gimpfu_compatibility import pdb_name_map
 
-from gimpfu_exception import proceedError
+from gimpfu_exception import *
 
 
 
@@ -101,9 +101,9 @@ class GimpfuPDB():
             # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
             error_str = Gimp.get_pdb().get_last_error()
             if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
-                proceedError(f"Gimp PDB error:, {error_str}")
+                do_proceed_error(f"Gimp PDB error:, {error_str}")
         except: # TODO catch only MarshalError ???
-            proceedError(f"marshalling args to {proc_name}")
+            do_proceed_error(f"marshalling args to {proc_name}")
             inner_result = None
 
         # ensure inner_result is defined
@@ -152,7 +152,7 @@ class GimpfuPDB():
             else:
                 # Can proceed if we catch the forthcoming call
                 # by returning a do_nothing_intercept_func
-                proceedError(f"unknown pdb procedure {mangled_proc_name}")
+                do_proceed_error(f"unknown pdb procedure {mangled_proc_name}")
                 result = object.__getattribute__(self, "_nothing_adaptor_func")
 
             return result

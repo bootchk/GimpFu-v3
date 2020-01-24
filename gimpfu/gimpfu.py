@@ -100,6 +100,7 @@ from gi.repository import GLib
 # import private implementation
 from gimpfu_marshal import Marshal
 from gimpfu_procedure import GimpfuProcedure
+from gimpfu_exception import *
 
 
 
@@ -549,6 +550,9 @@ def _run(procedure, run_mode, actual_args, data):
     GimpFu promises to hide the need for this.
     '''
     Gimp.displays_flush()   # !!! Gimp, not gimp
+
+    if summarize_proceed_errors():
+        fail("GimpFu detected errors.  See console for a summary.")
 
     # ensure final_result is type GimpValueArray
     return final_result
