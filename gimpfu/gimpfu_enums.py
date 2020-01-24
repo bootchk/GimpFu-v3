@@ -60,6 +60,7 @@ GRADIENT_RADIAL     = Gimp.GradientType.RADIAL
 # TODO not sure this is correct
 BG_BUCKET_FILL      = Gimp.FillType.BACKGROUND
 
+REPEAT_NONE         = Gimp.RepeatMode.NONE
 
 """
 from v2 plugin/pygimp/gimpenums-types.defs, which is perl script??

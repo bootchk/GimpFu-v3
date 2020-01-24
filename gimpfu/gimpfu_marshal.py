@@ -124,10 +124,11 @@ class Marshal():
 
         4. Hacky upcast???
 
-        5. float(args) as needed
+        5. float(arg) as needed
         '''
 
-        # TODO python-fu- ??
+        # TODO python-fu- ?? What procedure names signify need run_mode?
+        # Better to introspect ??
         if proc_name.startswith('plug-in-'):
             marshalled_args = Gimp.ValueArray.new(len(args)+1)
              # no GUI, this is a call from a plugin

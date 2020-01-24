@@ -11,7 +11,7 @@ from gimpfu_image import GimpfuImage
 from gimpfu_layer import GimpfuLayer
 
 from gimpfu_compatibility import gimp_name_map
-
+from gimpfu_exception import proceedError
 
 class GimpfuGimp():
     '''
@@ -145,30 +145,34 @@ class GimpfuGimp():
             '''
             callable_name = "Gimp." + gimp_name_map[dot_name]
 
+        try:
+            # eval to get the callable
+            func = eval(callable_name)
+        except AttributeError:
+            # callable_name is not adapted by GimpFu or known to Gimp
+            proceedError(f"unknown Gimp method {callable_name}")
+            result = None
+        else:
+            try:
+                '''
+                FUTURE adapt signature
+                Now, any Gimp method that requires an adapted signature
+                is adapted by a specialized method of this class (GimpfuGimp.)
+                But certain adaptions in number could be done here?
+                # new_args = self._adapt_signature(dot_name, args)
+                # result = func(*new_args)
+                '''
 
-        # eval to get the callable
-        func = eval(callable_name)
+                # Call a Gimp function
+                result = func(*args)
+            except:
+                # TODO does Gimp return, or remember, an error message?
+                # TODO result is a GObject , maybe Gimp.StatusType as for PDB??
+                proceedError(f"Gimp function execution error")
+                result = None
 
-        '''
-        TODO crufty comments
-        E.G.
-        func = Gimp.Image.new
-        func = eval("Gimp.Image.new")
-        return func(*args)
-        return Gimp.Image.new(*args)
-        return GimpfuImage(*args)
-        '''
 
-        # new_args = self._adapt_signature(dot_name, args)
-        # result = func(*new_args)
-
-        # Call Gimp
-        '''
-         TODO but keep going if exception
-        # often the plugin is not checking errors,
-        # beneficial duto find the next error
-        '''
-        result = func(*args)
+        # ensure result is defined, even if None
         print(result)
         return result
 
@@ -177,31 +181,34 @@ class GimpfuGimp():
     # Methods and properties offered dynamically.
 
     def __getattr__(self, name):
-    # !!! not def  __getattribute__(self, name):
+        # !!! not def  __getattribute__(self, name):
+
         '''
         override of Python special method
         Adapts attribute access to become invocation on Gimp object.
         __getattr__ is only called for methods not found on self
         i.e. for methods not defined in this class (non-convenience methods)
         '''
+
         '''
         Require 'gimp' instance of Gimp object exists.  GimpFu creates it.
         Don't check, would only discover caller is not importing gimpfu.
         '''
 
-        # attribute name e.g. "Image"
+        # attribute name e.g. "Image()" or "displays_flush"
         # We don't preflight, e.g. check that it is attribute of Gimp object
 
-        # announce names that are better accessed directly on Gimp, i.e. deprecated syntax
-        if name in ("displays_flush", ):
-
-            print(f"gimp.{name} is deprecated, you should use Gimp.{name}")
+        '''
+        announce names that could be accessed without GimpFu ???
+        Every name that reaches here has not been adapted.
+        '''
+        print(f"You can use Gimp.{name} instead of gimp.{name}")
 
         '''
         We can't just return attribute of Gimp object:
         "Gimp.__get_attribute__(name)" returns
         AttributeError: 'gi.repository.Gimp' object has no attribute '__get_attribute__'
-        Also, we need to mangle "Image()"
+        Also, we need to handle constructors such as "Image()"
         '''
 
         # remember state for soon-to-come call

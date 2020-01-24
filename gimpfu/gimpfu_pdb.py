@@ -8,6 +8,9 @@ from gi.repository import GObject    # marshalling
 from gimpfu_marshal import Marshal
 from gimpfu_compatibility import pdb_name_map
 
+from gimpfu_exception import proceedError
+
+
 
 class GimpfuPDB():
     '''
@@ -77,7 +80,10 @@ class GimpfuPDB():
 
 
 
-
+    def _nothing_adaptor_func(self, *args):
+        ''' Do nothing when an unknown PDB procedure is called. '''
+        print("_nothing_adaptor_func called")
+        return None
 
 
     def _adaptor_func(self, *args):
@@ -89,25 +95,24 @@ class GimpfuPDB():
 
         try:
             marshaled_args = Marshal.marshal_pdb_args(proc_name, *args)
-        except:
-            print("GimpFu: proceeding past problem with args to", proc_name)
-        else:
-            try:
-                inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
-            except:
-                print("GimpFu: proceeding past calling PDB procedure", proc_name)
 
-        # OLD object.__getattribute__(self, "_marshall_args")(proc_name, *args) )
+            # Not a try: except?
+            inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
+            # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
+            error_str = Gimp.get_pdb().get_last_error()
+            if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
+                proceedError(f"Gimp PDB error:, {error_str}")
+        except: # TODO catch only MarshalError ???
+            proceedError(f"marshalling args to {proc_name}")
+            inner_result = None
 
-        # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
-        error_str = Gimp.get_pdb().get_last_error()
-        if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
-            # TODO one place to print proceeding message
-            print(">>>>GimpFu proceeeding past Gimp error:", error_str)
-            # OLD raise Exception(error_str)
+        # ensure inner_result is defined
+
+        # OLD without try, proceed
+        # object.__getattribute__(self, "_marshall_args")(proc_name, *args) )
 
         # TODO unmarshall result?
-        # Low priority: all PDB calls have side_effects, but don't return objects?
+        # Low priority: all PDB calls have side_effects, but not all return objects?
         return inner_result
 
 
@@ -116,6 +121,7 @@ class GimpfuPDB():
     def  __getattribute__(self, name):
         '''
         Adapts attribute access to become invocation of PDB procedure.
+        Returns an adapter_func
 
         Override of Python special method.
         The more common purpose of such override is to compute the attribute,
@@ -127,14 +133,14 @@ class GimpfuPDB():
         which calls Gimp.main() to create PDB and establish GimpFu type is GimpPlugin
         '''
         if Gimp.get_pdb() is None:
+            # Severe error in GimpFu code, or GimpFu author did not call main()
+            # Cannot proceed.
             raise Exception("Gimpfu: pdb accessed before calling main()")
         else:
             # TODO leave some calls unadapted, direct to PDB
             # ??? e.g. run_procedure ???, recursion ???
 
-            '''
-            Handle hyphens, and deprecated names.
-            '''
+            # Map hyphens, and deprecated names.
             mangled_proc_name = pdb_name_map[name]
 
             if Gimp.get_pdb().procedure_exists(mangled_proc_name):
@@ -142,10 +148,14 @@ class GimpfuPDB():
                 # remember state for soon-to-come call
                 self.adapted_proc_name = mangled_proc_name
                 # return intercept function soon to be called
-                return object.__getattribute__(self, "_adaptor_func")
+                result = object.__getattribute__(self, "_adaptor_func")
             else:
-                exception_string = f"GimpFu: unknown pdb procedure {mangled_proc_name}"
-                raise Exception( exception_string )
+                # Can proceed if we catch the forthcoming call
+                # by returning a do_nothing_intercept_func
+                proceedError(f"unknown pdb procedure {mangled_proc_name}")
+                result = object.__getattribute__(self, "_nothing_adaptor_func")
+
+            return result
 
             # OLD
             # will raise AttributeError for names that are not defined by GimpPDB

@@ -1,5 +1,6 @@
 
-from gimpfu_compatibility import image_name_map
+from gimpfu_compatibility import get_name_map_for_adaptee_class
+# WAS image_name_map
 
 
 
@@ -120,7 +121,7 @@ class Adapter():
 
         When name is callable, returns a callable which is soon to be called.
         When name is data member, returns value.
-        
+
         !!! This does not preclude public,direct access to _adaptee, use unwrap()
         '''
         # assert _adaptee is a Gimp object (and a GObject)
@@ -128,10 +129,11 @@ class Adapter():
         # TODO ideally this class would not know the adaptee classes
         # map deprecated names, dispatch on class of adaptee
         # TODO Layer, etc.
-        if type(self.__dict__['_adaptee']).__name__ == "Image":
-            latest_name = image_name_map[name]
-        else:
-            latest_name = name
+        adapted_class_name = type(self.__dict__['_adaptee']).__name__
+        name_map = get_name_map_for_adaptee_class(adapted_class_name)
+        latest_name = name_map[name]
+        # ensure latest_name == name OR latest_name has been adapted
+        # KeyError means need add class_name to map_map in gimpfu_compatibility, etc.
 
         return getattr(self.__dict__['_adaptee'], latest_name)
 

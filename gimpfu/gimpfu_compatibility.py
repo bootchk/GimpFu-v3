@@ -20,7 +20,7 @@ And other hacky workarounds of limitations in Gimp
 class GimpFuMap(Mapping):
     '''
     A dictionary that returns key itself,
-    on an acces that would otherwise engender KeyError.
+    on an access that would otherwise engender KeyError.
     Read-only, since Mapping is.
     Dictionary syntax:  new_name = gimpFuMap[name]
 
@@ -74,7 +74,7 @@ class GimpFuPDBMap(GimpFuMap):
 
     Alter all mapped names: transliterate
     The names in the PDB use hyphens, which Python does not allow in symbols.
-    Super() will proceed to map deprecated names.
+    Super() will then map deprecated names.
     '''
     def __getitem__(self, key):
         hyphenized_key = key.replace( '_' , '-')
@@ -136,6 +136,8 @@ image_renaming = {
     'disable_undo' : "undo_disable",
     'enable_undo' : "undo_enable",
 }
+layer_renaming = {
+}
 
 
 '''
@@ -144,4 +146,20 @@ One map for each Gimp object that GimpFu wraps
 pdb_name_map = GimpFuPDBMap(pdb_renaming);
 gimp_name_map = GimpFuMap(gimp_renaming);
 image_name_map = GimpFuMap(image_renaming);
+layer_name_map = GimpFuMap(layer_renaming);
 # todo layer, etc
+
+# maps string to GimpFuMap
+# TODO other adapted objects e.g. Channel, Display?
+map_map = {
+    'Image' : image_name_map,
+    'Layer' : layer_name_map,
+}
+
+def get_name_map_for_adaptee_class(class_name):
+    ''' Return GimpFuMap for class_name. '''
+    '''
+    Throws KeyError if class_name is not adapted.
+    When you develop an adapter, add class_name to map_map
+    '''
+    return map_map[class_name]
