@@ -428,12 +428,9 @@ containers:
       source: /work/plug-ins/
       path: /work/.home/.config/GIMP/2.99/plug-ins
 
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test2/test2.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test3/test3.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/clothify/clothify.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/shadow_bevel/shadow_bevel.py
-    - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/sphere/sphere.py
+    # make test plugins executable, Gimp requires it
+    # e.g. - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
+    - !Sh find /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' +
 
     # rebuild container if test plugin source (in /work i.e. project directory ) changes
     - !Depends plug-ins
@@ -447,12 +444,9 @@ containers:
     - !Copy
       source: /work/gimpfu
       path:  /usr/local/lib/gimp/2.99/python
-
-
-
     # TODO use include-regex expression in Copy
 
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+    # - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
 
     environ:
       HOME: /work/.home
