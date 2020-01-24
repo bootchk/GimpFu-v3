@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+
 
 #   Foreground Extraction Benchmark
 #   Copyright 2005  Sven Neumann <sven@gimp.org>

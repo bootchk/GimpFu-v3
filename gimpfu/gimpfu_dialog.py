@@ -82,7 +82,7 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
         args = [widget_default_value, "%s - %s" % (proc_name, tooltip_text)]
     elif formal_param.PF_TYPE in (PF_INT, PF_STRING, PF_BOOL ):
         args = [widget_default_value]
-    elif formal_param.PF_TYPE in (PF_SLIDER, ):
+    elif formal_param.PF_TYPE in (PF_SLIDER, PF_FLOAT):
         # Hack, we are using FloatEntry, should use Slider???
         args = [widget_default_value,]
     elif formal_param.PF_TYPE in (PF_COLOR, ):
@@ -531,6 +531,7 @@ _edit_map = {
         PF_STRING      : StringEntry,
         PF_BOOL        : ToggleEntry,
         PF_TOGGLE      : ToggleEntry,
+        PF_FLOAT       : FloatEntry,
         PF_SLIDER      : FloatEntry,
         PF_RADIO       : RadioEntry,
         PF_COLOR       : OmittedEntry,

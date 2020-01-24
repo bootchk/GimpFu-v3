@@ -1,5 +1,4 @@
-#!/usr/bin/env python2
-#coding: utf-8
+
 
 #
 # This program is free software: you can redistribute it and/or modify
@@ -50,7 +49,7 @@ def histogram_export(img, drw, filename,
         new_img = pdb.gimp_image_duplicate(img)
         drw = pdb.gimp_image_merge_visible_layers(new_img, CLIP_TO_IMAGE)
     # TODO: grey images, alpha and non alpha images.
-    channels_txt = ["Value"] 
+    channels_txt = ["Value"]
     channels_gimp = [HISTOGRAM_VALUE]
     if drw.is_rgb:
         channels_txt += ["Red", "Green", "Blue"]
