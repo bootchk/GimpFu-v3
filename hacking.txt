@@ -23,6 +23,8 @@ The v2 code:
 see the Gimp repository say for v2.10
 in the plug-ins/pygimp directory
 
+
+
 Other Requirements
 
 v2 allowed "tdrawable.width" i.e.
@@ -32,6 +34,15 @@ i.e. incoming args are Gimp types, and properties of those are not accessible us
 v2 allowed passing ints where Gimp procedure expected float
 v3 requires author to float(arg)
 We could fix that when marshalling args via introspection of procedure args spec param_specs
+
+
+Obsoleted
+
+tiles and pixel_rgn
+pixel_rgn => gegl buffer anyway
+
+
+
 
 
 New features

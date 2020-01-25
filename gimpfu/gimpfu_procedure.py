@@ -11,7 +11,9 @@ if not sys.warnoptions:
 
 
 
-from gimpfu_types import *
+from gimpfu_types import *  # GimpFuProcedure only?
+
+from gimpfu_exception import  do_proceed_error
 
 '''
 Nothing translatable here.
@@ -456,17 +458,19 @@ class GimpfuProcedure():
         v2 allowed "_"
         Gimp will check also.  So redundant, but catch it early.
         '''
-        def letterCheck(str):
-            allowed = string.ascii_letters + string.digits + "-"
+        proc_name_allowed = string.ascii_letters + string.digits + "-"
+        param_name_allowed = string.ascii_letters + string.digits + "-_"
+
+        def letterCheck(str, allowed):
             for ch in str:
                 if not ch in allowed:
-                    return 0
+                    return False
             else:
-                return 1
+                return True
 
         # TODO transliterate "_" to "-" FBC
 
-        if not letterCheck(proc_name):
+        if not letterCheck(proc_name, proc_name_allowed):
             raise Exception("procedure name contains illegal characters")
 
         for ent in params:
@@ -479,8 +483,10 @@ class GimpfuProcedure():
                 exception_str = f"Plugin parameter type {ent[0]} not a valid PF_ enum"
                 raise Exception(exception_str)
 
-            if not letterCheck(ent[1]):
-                raise Exception("parameter name contains illegal characters")
+            if not letterCheck(ent[1], param_name_allowed):
+                # Not fatal since we don't use it, args are a sequence, not by keyword
+                # But Gimp may yet complain.
+                do_proceed_error(f"parameter name '{ent[1]}'' contains illegal characters")
 
         for ent in results:
             if len(ent) < 3:
@@ -490,5 +496,6 @@ class GimpfuProcedure():
             if not isinstance(ent[0], int):
                 raise Exception("result must be of integral type")
 
-            if not letterCheck(ent[1]):
-                raise Exception("result name contains illegal characters")
+            if not letterCheck(ent[1], param_name_allowed):
+                # not fatal unless we use it?
+                do_proceed_error(f"result name '{ent[1]}' contains illegal characters")

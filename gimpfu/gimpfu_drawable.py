@@ -36,6 +36,15 @@ class GimpfuDrawable( GimpfuItem ) :
     '''
 
 
+
+    @property
+    def height(self):
+        return self._adaptee.height()
+
+    @property
+    def width(self):
+        return self._adaptee.width()
+
     @property
     def mask_bounds(self):
         #print("Calling Foo.get_name(): ")
