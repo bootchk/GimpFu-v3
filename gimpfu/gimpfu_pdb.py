@@ -116,9 +116,9 @@ class GimpfuPDB():
         # This is the simplified view of what we just did, without all the error checks
         # object.__getattribute__(self, "_marshall_args")(proc_name, *args)
 
-        # TODO unmarshall result?
-        # Low priority: all PDB calls have side_effects, but not all return objects?
-        return inner_result
+
+        # Most PDB calls have side_effects on image, but few return values?
+        return Marshal.unmarshal_pdb_result(inner_result)
 
 
 

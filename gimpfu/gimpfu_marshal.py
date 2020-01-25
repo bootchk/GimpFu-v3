@@ -170,6 +170,18 @@ class Marshal():
         return marshalled_args
 
 
+    def unmarshal_pdb_result(values):
+        ''' Convert GimpValueArray to Python tuple '''
+        if values:
+            # Remember, values is-a Gimp.ValueArray, not have Pythonic methods
+            result = []
+            for index in range(0, values.length()):
+                value = values.index(index)
+                result.append(value)
+        else:
+            result = None
+        return result
+
 
     # TODO optimize.  Get all the args at once, memoize
 
