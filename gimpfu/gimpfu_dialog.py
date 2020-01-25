@@ -80,8 +80,11 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
         # TODO need keyword 'title'?
         # args = [widget_default_value, title= "%s - %s" % (proc_name, tooltip_text)]
         # args = [widget_default_value, "%s - %s" % (proc_name, tooltip_text)]
-        # TEMP: widget is omitted
-        args = [widget_default_value,]
+        # TEMP: widget is omitted, use default defined by author
+
+        # TODO this should work, but its not
+        # args = [widget_default_value,]
+        args = ["/tmp/lkkfoopluginout"]
     elif formal_param.PF_TYPE in (PF_INT, PF_STRING, PF_BOOL ):
         args = [widget_default_value]
     elif formal_param.PF_TYPE in (PF_SLIDER, PF_FLOAT):

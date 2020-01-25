@@ -84,7 +84,7 @@ Vagga:
     - you can pull nightly changes to Gimp and the command will rebuild Gimp automatically.
 
 
-Getting started
+Getting started developing GimpFu
 ===============
 
     install Vagga from its website
@@ -110,6 +110,20 @@ it uses the plugins and gimpfu source
 that the vagga.yaml script puts into the container itself,
 in the locations that a Gimp build would install plugins and gimpfu.)
 
+If you change the text of a test plugin,
+you need to rm project/.home/.config/GIMP/2.99/plug-ins.rc
+which is where GIMP caches plugin specifications.
+When you do that, GIMP will reread from the standard paths for plugins,
+and RE-register all the plugins it finds.
+If you don't, you will see the plugin in the GIMP GUI
+with the old specifications, i.e.
+at the old menu, or with old parameters, or with the old run_func, etc.
+
+
+
+More about developing in a vagga container
+==========================================
+
 Vagga leaves versioned containers which will fill your disk drive.
 Occasionally you will need to:
 >vagga _clean --unused
@@ -120,7 +134,7 @@ Dragging it to the trash doesn't help free up space.
 
 
 Before you begin creating a dev environment,
-clone the Gimp reposistory into /gimp in the project directory.
+clone the Gimp repository into /gimp in the project directory.
 Since the build scripts copy from there into the container.
 So that the container builds Gimp from a local possibly hacked copy.
 I have one minor hack in my Gimp clone to support Gimpfu.
