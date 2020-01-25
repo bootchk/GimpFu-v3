@@ -72,18 +72,19 @@ def do_proceed_error(message):
 
 
 def summarize_proceed_errors():
-    ''' Return True when there were errors. '''
+    ''' Print the log of errors that we continued past. '''
+    ''' Returns whether exist errors. '''
 
-    print("===========================")
-    print("GimpFu's summary of errors.")
-    print("The first error may engender subsequent errors that are spurious.")
-    print("Gimpfu warnings may also appear earlier in the console.")
-    print("===========================")
-    for line in log:
-        print(line)
-    print("")
-
-    if log :
-        return True
-    else :
-        return False
+    if not log:
+        result = False
+    else:
+        print("===========================")
+        print("GimpFu's summary of errors.")
+        print("The first error may engender subsequent errors that are spurious.")
+        print("Gimpfu warnings may also appear earlier in the console.")
+        print("===========================")
+        for line in log:
+            print(line)
+        print("")
+        result = True
+    return result
