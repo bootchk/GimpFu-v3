@@ -3,14 +3,14 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-# !!! Item imports Adapter
-from item import GimpfuItem
+# !!! Drawable imports Item imports Adapter
+from gimpfu_drawable import GimpfuDrawable
 
 
 
 
 
-class GimpfuLayer( GimpfuItem ) :
+class GimpfuLayer( GimpfuDrawable ) :
 
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 
