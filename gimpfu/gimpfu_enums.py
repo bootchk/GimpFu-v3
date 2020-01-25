@@ -62,6 +62,29 @@ BG_BUCKET_FILL      = Gimp.FillType.BACKGROUND
 
 REPEAT_NONE         = Gimp.RepeatMode.NONE
 
+'''
+Hack.
+Iterate over dir(enum type)
+Use any upper case attributes as constants
+define into the current namespace
+by exec()'ing appropriate statement string
+'''
+# Gimp.DodgeBurnType
+foo = Gimp.HistogramChannel
+print(foo)
+print(dir(foo))
+for attribute in dir(foo):
+    if attribute.isupper():
+        statement = "HISTOGRAM_" + attribute + " = Gimp.HistogramChannel." + attribute
+        print(statement)
+        exec(statement)
+
+
+#for bar in foo:
+#for bar in foo.props:
+#for bar in foo.list_properties():
+#    print(bar)
+
 """
 from v2 plugin/pygimp/gimpenums-types.defs, which is perl script??
 GIMP_FOREGROUND_FILL")

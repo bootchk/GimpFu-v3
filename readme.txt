@@ -92,14 +92,23 @@ Getting started
     clone this repository
     cd to the clone
     clone gimp repository into this repository (see below)
-    >vagga --use-env DISPLAY gimpRunGUI
+    >vagga --use-env DISPLAY gimpTestGUI
 
 The last command will take a long time (the first time you run it.)
 Ultimately, it will run Gimp from within the container.
-And a test.py GimpFu plugin is installed in the container (Gimp menu Somewhere/test.)
+And test GimpFu plugins and the Gimpfu source are installed in the container's home
+(project/.home/.config/GIMP/2.99/plug-ins)
+and PYTHONPATH is set to find them.
+(That way, the container starts easily, but Gimp finds the local plugins and gimpfu
+before finding what is installed by the Gimp build.)
 
 Then you can hack at the .py files in your clone and rerun the last commmand.
-It will take a minute or so to restart (not ideal, probably there is a better way.)
+It will take seconds to restart.
+
+(Alternatively, if you run gimpRunGUI,
+it uses the plugins and gimpfu source
+that the vagga.yaml script puts into the container itself,
+in the locations that a Gimp build would install plugins and gimpfu.)
 
 Vagga leaves versioned containers which will fill your disk drive.
 Occasionally you will need to:
