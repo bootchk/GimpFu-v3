@@ -349,7 +349,8 @@ def _interact(procedure, actual_args):
         invoke author's func on unpacked args
         !!! author's func never has run_mode, Gimpfu hides need for it.
         '''
-        return function(*wrapped_run_args)
+        result = function(*wrapped_run_args)
+        return result
 
         """
         CRUFT

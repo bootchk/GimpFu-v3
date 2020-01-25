@@ -212,7 +212,7 @@ register(
         "James Henstridge (translated from C plugin)",
         "James Henstridge",
         "1997-1999",
-        "_Whirl and Pinch...",
+        "_Whirl n Pinch v3...",
         "RGB*, GRAY*",
         [
             (PF_IMAGE, "image", "Input image", None),

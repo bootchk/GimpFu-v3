@@ -352,6 +352,10 @@ containers:
         make -j4
         make install
 
+    # rm the old pygimp that the gimp build still installs
+    # Gimp will put it in the PYTHONPATH, we don't want to find its contents
+    - !EmptyDir /usr/local/lib/gimp/2.99/python
+
     # remove DNS file that vagga will recreate after build
     - !Sh "rm /etc/resolv.conf"
 
@@ -546,6 +550,38 @@ commands:
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
       export NO_AT_BRIDGE=1
+
+      /usr/local/bin/gimp-2.99
+
+  # work in progress: quicker startup
+  gimpTestGUI: !Command
+    description: Run gimp GUI in gimpDev container, with user's plugins in home
+    container:  gimpAMDev
+    run: |
+      export HOME=/work/.home
+      echo "HOME" $HOME
+      export GIMP_PREFIX="/usr/local"
+      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
+      echo $LD_LIBRARY_PATH
+      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
+      echo $XDG_DATA_DIRS
+      export PATH="/usr/local/bin:$PATH"
+      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu"
+      echo "GEGL_PATH" $GEGL_PATH
+      which gegl
+      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
+      export NO_AT_BRIDGE=1
+
+      echo "Copying test plugins"
+      cp -r /work/plug-ins /work/.home/.config/GIMP/2.99/plug-ins
+
+      echo "Copying gimpfu source"
+      cp -r /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
+
+      echo "Altering PYTHONPATH to point to local plug-ins"
+      export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
+      echo $PYTHONPATH
 
       /usr/local/bin/gimp-2.99
 

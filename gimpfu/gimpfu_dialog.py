@@ -124,8 +124,8 @@ def _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params):
     grid.show()
 
     # assert leading 2 boilerplate params image and drawable hacked off earlier?
-    # TODO hacked to 2
-    for i in range(2, len(guiable_formal_params)):
+    # TODO hacked to (2,
+    for i in range(0, len(guiable_formal_params)):
         print("Create control, index: ", i)
         # unpack tuple into namedtuple
         a_formal_param = GimpFuFormalParam(*guiable_formal_params[i])

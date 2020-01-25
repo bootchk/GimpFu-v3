@@ -108,3 +108,11 @@ mail list "pdb.gimp_get_item_by_id(), or ids and layers and layer groups"
 In Python, a "layer" is a reference to a data structure (in C terminology, a pointer to a struct).
 One of the fields is the layer's ID number.
 The PDB only deals with these ID numbers, and PyGimp doesn't provide a direct way to handle IDs.
+
+
+Frequent Bugs
+
+If you omit to adapt a property of a GimpFu class (say Layer.mask_bounds)
+then it engenders TypeError.
+The attribute resolves to a type funcInfo object on Gimp.Layer,
+while GimpFu expects it to have a more ordinary type, such as tuple or int.
