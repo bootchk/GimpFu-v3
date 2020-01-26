@@ -71,12 +71,12 @@ by exec()'ing appropriate statement string
 '''
 # Gimp.DodgeBurnType
 foo = Gimp.HistogramChannel
-print(foo)
-print(dir(foo))
+#print(foo)
+#print(dir(foo))
 for attribute in dir(foo):
     if attribute.isupper():
         statement = "HISTOGRAM_" + attribute + " = Gimp.HistogramChannel." + attribute
-        print(statement)
+        #print(statement)
         exec(statement)
 
 
