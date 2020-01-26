@@ -354,7 +354,9 @@ containers:
 
     # rm the old pygimp that the gimp build still installs
     # Gimp will put it in the PYTHONPATH, we don't want to find its contents
-    - !EmptyDir /usr/local/lib/gimp/2.99/python
+    # EmptyDir is not correct, it keeps the directory empty is all child containers
+    # - !EmptyDir /usr/local/lib/gimp/2.99/python
+    - !Sh "rm /usr/local/lib/gimp/2.99/python/*"
 
     # remove DNS file that vagga will recreate after build
     - !Sh "rm /etc/resolv.conf"

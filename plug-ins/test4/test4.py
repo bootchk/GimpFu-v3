@@ -6,7 +6,7 @@ that:
 
 from gimpfu import *
 
-def plugin_func(image, drawable, arg, arg2):
+def plugin_func(image, drawable):
       print("plugin_func called")
 
       foo = drawable.bar

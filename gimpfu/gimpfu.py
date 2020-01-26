@@ -543,7 +543,7 @@ def _run(procedure, run_mode, actual_args, data):
            According to GLib docs, should be a warning, since this is not recoverable.
            But it might be GimpFu plugin author programming code (e.g. invalid PARAMS)
            '''
-           print("Exception opening plugin dialog: {0}".format(err))
+           do_proceed_error(f"Exception opening plugin dialog: {err}")
            final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
 
     '''
