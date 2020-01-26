@@ -113,6 +113,12 @@ class Marshal():
 
 
 
+
+    '''
+    PDB marshal, unmarshal
+    '''
+    
+
     @classmethod
     def marshal_pdb_args(cls, proc_name, *args):
         '''
@@ -171,16 +177,20 @@ class Marshal():
 
 
     def unmarshal_pdb_result(values):
-        ''' Convert GimpValueArray to Python tuple '''
+        ''' Convert GimpValueArray to Python list '''
+        # caller should have previously checked that values is not a Gimp.PDBStatusType.FAIL
         if values:
-            # Remember, values is-a Gimp.ValueArray, not have Pythonic methods
+            # Remember, values is-a Gimp.ValueArray, not has Pythonic methods
             result = []
             for index in range(0, values.length()):
                 value = values.index(index)
                 result.append(value)
         else:
             result = None
+        print("unmarshal_pdb_result", result)
         return result
+
+
 
 
     # TODO optimize.  Get all the args at once, memoize

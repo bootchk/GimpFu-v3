@@ -93,11 +93,11 @@ class GimpfuPDB():
         # !!! avoid infinite recursion
         proc_name = object.__getattribute__(self, "adapted_proc_name")
 
-        marshaled_args = None
         try:
             marshaled_args = Marshal.marshal_pdb_args(proc_name, *args)
         except Exception as err: # TODO catch only MarshalError ???
             do_proceed_error(f"marshalling args to {proc_name} {err}")
+            marshaled_args = None
 
         if marshaled_args is not None:
             # require marshaled_args is not None, but it could be an empty GimpValueArray
@@ -107,18 +107,19 @@ class GimpfuPDB():
             # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
             error_str = Gimp.get_pdb().get_last_error()
             if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
-                do_proceed_error(f"Gimp PDB error:, {error_str}")
+                do_proceed_error(f"Gimp PDB execution error:, {error_str}")
+                result = None
+            else:
+                result = Marshal.unmarshal_pdb_result(inner_result)
         else:
-            inner_result = None
-
-        # ensure inner_result is defined
+            result = None
 
         # This is the simplified view of what we just did, without all the error checks
         # object.__getattribute__(self, "_marshall_args")(proc_name, *args)
 
-
         # Most PDB calls have side_effects on image, but few return values?
-        return Marshal.unmarshal_pdb_result(inner_result)
+        # ensure result is defined and (is-a list OR None)
+        return result
 
 
 

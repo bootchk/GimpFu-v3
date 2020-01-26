@@ -72,8 +72,18 @@ def do_proceed_error(message):
 
 
 def summarize_proceed_errors():
-    ''' Print the log of errors that we continued past. '''
-    ''' Returns whether exist errors. '''
+    '''
+    Print the log of errors that we continued past.
+
+    Returns whether exist errors.
+
+    In general, GimpFu calls this if the plugin finishes,
+    but GimpFu does NOT call this if the plugin ends
+    with an exception (that is NOT turned into a ProceedError.)
+    Such an exception may be:
+      - in ordinary (not GimpFu-related) Python code written by the plugin author
+      - in GimpFu code, written by GimpFu author.
+    '''
 
     if not log:
         result = False
