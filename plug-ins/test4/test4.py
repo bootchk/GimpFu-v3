@@ -12,7 +12,7 @@ def plugin_func(image, drawable, arg, arg2):
       foo = drawable.bar
 
 register(
-      "test_missing_drawable_attribute",
+      "test-missing-drawable-attribute",
       "blurb",
       "help message",
       "author",

@@ -381,7 +381,7 @@ def _interact(procedure, actual_args):
         #Just execute, don't open dialog.
         print("no guiable parameters")
         # Since no GUI, was_canceled always false
-        result = (false, run_script(wrapped_actual_args))
+        result = (False, run_script(wrapped_actual_args))
     else:
         # create GUI from guiable formal args, let user edit actual args
 
