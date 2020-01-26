@@ -63,13 +63,18 @@ def histogram_export(img, drw, filename,
         writer.writerow(["Range start"] + channels_txt)
 
         # FIXME: Will need a specialized 'range' for FP color numbers
+        # lkk I hacked this to get floats.  See the original
+        # lkk May not be correct, I have limited understanding
         for start_range in range(0, 256, int(bucket_size)):
             row = [start_range]
+            float_start_range = float(start_range/255)  # [0.0,1.0]
+            float_end_range = min(float_start_range + bucket_size, 1.0)
+            # lkk was min(start_range + bucket_size, 255)
             for channel in channels_gimp:
                 result = pdb.gimp_histogram(
                              drw, channel,
-                             start_range,
-                             min(start_range + bucket_size, 255)
+                             float_start_range,
+                             float_end_range
                             )
                 if output_format == "pixel count":
                     count = result[4]

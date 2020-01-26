@@ -100,7 +100,7 @@ class Marshal():
             # !!! Do not affect the original object by assigning to arg
             result_arg = arg.unwrap()
 
-            # hack: up cast drawable sublclass e.g. layer to superclass drawable
+            # hack: upcast drawable sublclass e.g. layer to superclass drawable
             result_arg_type = cls.try_upcast_to_drawable(result_arg)
         else:
             result_arg = arg
@@ -117,7 +117,7 @@ class Marshal():
     '''
     PDB marshal, unmarshal
     '''
-    
+
 
     @classmethod
     def marshal_pdb_args(cls, proc_name, *args):
@@ -316,7 +316,7 @@ class Marshal():
         Require arg a GObject (not wrapped)
         '''
         # idiom for class name
-        print("Attempt up cast type", type(arg).__name__ )
+        print("Attempt upcast type", type(arg).__name__ )
         # Note the names are not prefixed with Gimp ???
         if type(arg).__name__ in ("Channel", "Layer"):  # TODO more subclasses
             result = Gimp.Drawable
