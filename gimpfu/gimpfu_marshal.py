@@ -30,6 +30,39 @@ class Marshal():
     Each wrapper also knows how to create a wrapper for a new'd Gimp GObject
     '''
 
+
+
+    '''
+    Gimp breaks out image and drawable from other args.
+    Reverse that.
+    And convert type Gimp.ValueArray to type "list of GValue"
+    '''
+    def prefix_image_drawable_to_run_args(actual_args, image=None, drawable=None):
+        '''
+        return a list [image, drawable, *actual_args]
+        Where:
+            actual_args is-a Gimp.ValueArray
+            image, drawable are optional GObjects
+        '''
+
+        args = []
+        if image:
+            args.append(image)
+        if drawable:
+            args.append(drawable)
+
+        len = actual_args.length()   # !!! not len(actual_args)
+        for i in range(len):
+            gvalue = actual_args.index(i)
+            # Python can handle the gvalue, we don't need to convert to Python types
+            # assuming we have imported gi
+            args.append(gvalue)
+        # ensure result is-a list, but might be empty
+        return args
+
+
+
+
     # TODO doesn't need to be classmethod
     @classmethod
     def wrap(cls, gimp_object):
@@ -100,7 +133,7 @@ class Marshal():
             # !!! Do not affect the original object by assigning to arg
             result_arg = arg.unwrap()
 
-            # hack: upcast drawable sublclass e.g. layer to superclass drawable
+            # hack: upcast  sublclass e.g. layer to superclass drawable
             result_arg_type = cls.try_upcast_to_drawable(result_arg)
         else:
             result_arg = arg
@@ -192,6 +225,13 @@ class Marshal():
 
 
 
+
+    '''
+    Type conversions.
+
+    GimpFu converts Python ints to floats on behalf of Gimp.
+    GimpFu converts Layer to Drawable where Gimp is uneccessarily demanding.
+    '''
 
     # TODO optimize.  Get all the args at once, memoize
 

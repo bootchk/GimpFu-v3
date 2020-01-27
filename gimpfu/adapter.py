@@ -126,16 +126,32 @@ class Adapter():
         '''
         # assert _adaptee is a Gimp object (and a GObject)
 
-        # TODO ideally this class would not know the adaptee classes
-        # map deprecated names, dispatch on class of adaptee
-        # TODO Layer, etc.
         adapted_class_name = type(self.__dict__['_adaptee']).__name__
         name_map = get_name_map_for_adaptee_class(adapted_class_name)
         latest_name = name_map[name]
         # ensure latest_name == name OR latest_name has been adapted
         # KeyError means need add class_name to map_map in gimpfu_compatibility, etc.
 
-        return getattr(self.__dict__['_adaptee'], latest_name)
+        '''
+        !!! Returning an object of type functionInfo ?? on the adaptee.
+        If the author does not subsequently call it,
+        it is probably an error, since the Gimp adaptee has no property attributes.
+        We can't check here whether the result will be called.
+        We can check later when passing args to Gimp: none should be of type functionInfo
+        since Gimp rarely passes function pointers,
+        especially not to the PDB.
+
+        Possibly this could be a missing convenience function in GimpFu implementation,
+        which DOES provide properties.
+        Especially since GimpFu often provides convenience functions with the same symbol
+        as the underlying callable on the adaptee.
+        e.g. "foo = drawable.is_alpha"
+        is_alpha is a callable on adaptee Drawable,
+        but GimpFu provides convenience property "is_alpha"
+        '''
+        result = getattr(self.__dict__['_adaptee'], latest_name)
+        print("__getattr__ result", result)
+        return result
 
 
     def __setattr__(self, name, value):

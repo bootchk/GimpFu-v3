@@ -210,12 +210,14 @@ The GimpFu API:
    - pdb instance
    - gimp instance
 """
+# TODO should warn() be in the API?  gimp.message will already work.
 
 '''
 Register locally, not with Gimp.
 
 Each GimpFu plugin author's source may contain many calls to register.
 '''
+# A primary phrase in GimpFu language
 def register(proc_name, blurb, help, author, copyright,
             date, label, imagetypes,
             params, results, function,
@@ -233,6 +235,7 @@ def register(proc_name, blurb, help, author, copyright,
     # !!! Have not conveyed to Gimp yet
 
 
+# A primary phrase in GimpFu language
 def main():
     """This should be called after registering the plug-in."""
     # v2:   gimp.main(None, None, _query, _run)
@@ -240,6 +243,7 @@ def main():
     Gimp.main(GimpFu.__gtype__, sys.argv)
 
 
+# A primary phrase in GimpFu language
 def fail(msg):
     """Display an error message and quit"""
     Gimp.message(msg)
@@ -316,9 +320,39 @@ def _set_defaults(proc_name, defaults):
 '''
 
 
+def _try_run_func(proc_name, function, args):
+    '''
+    Run the plugin's run_func with args, catching exceptions.
+    Show dialog on exception.
+    Return result of run_func
+    '''
+    try:
+        result = function(*args)
+    except:
+        # Show dialog here, or pass exception string back to Gimp???
+        import gimpfu_dialog
+
+        # TODO this needs image
+        # gimpfu_dialog.show_error_dialog(proc_name, image)
+        print(">>>>>>>>>>>TODO error dialog??")
+        exc_str, exc_only_str = gimpfu_dialog._create_exception_str()
+        print(exc_str, exc_only_str)
+        result = None
+        # TODO either pass exc_str back so Gimp shows in dialog,
+        # or reraise so Gimp shows a generic "plugin failed" dialog
+        # or show our own dialog above
+        raise
+    return result
+
 
 
 def _interact(procedure, actual_args):
+    '''
+    Show GUI when guiable args, then execute run_func.
+    Progress will show in Gimp window, not dialog window.
+
+    Return (was_canceled, (results of run_func or None))
+    '''
     print("_interact called", procedure, actual_args)
 
     # get name from instance of Gimp.Procedure
@@ -332,10 +366,12 @@ def _interact(procedure, actual_args):
     on_run = gf_procedure.metadata.ON_RUN
 
     wrapped_actual_args = Marshal.wrap_args(actual_args)
+    guiable_formal_params =  gf_procedure.guiable_formal_params
 
+    """
+    CRUFT from implementation where dialog executed run_script
     guiable_formal_params =  gf_procedure.guiable_formal_params
     nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_actual_args)
-
 
     # effectively a closure, partially bound to function, nonguiable_actual_args
     # passed to show_plugin_dialog to be executed after dialog
@@ -344,44 +380,23 @@ def _interact(procedure, actual_args):
         nonlocal function
         nonlocal nonguiable_actual_args
 
-        wrapped_run_args = gf_procedure.join_args_to_run_args(nonguiable_actual_args,  guiable_actual_args)
+        wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args,  guiable_actual_args)
+        print("wrapped_run_args", wrapped_run_args)
         '''
         invoke author's func on unpacked args
         !!! author's func never has run_mode, Gimpfu hides need for it.
         '''
         result = function(*wrapped_run_args)
         return result
+    """
 
-        """
-        CRUFT
-        nonlocal wrapped_stock_args
-        # TEMP attempt to get pdb into scope
-        # nonlocal function
-
-        print("run_script called with pdb", pdb)
-
-        # TODO is this correct?
-        # Is the procedure an image consumer?
-        # If first param is image, prepend
-        # TODO add class GimpfuPlugin that hides all this magic
-        # if formal_params[0].PF_TYPE != PF_IMAGE:
-        if formal_params[0][0] == PF_IMAGE:
-            params = wrapped_stock_args + tuple(run_params)
-        else:
-             params = tuple(run_params)
-
-        #TODO _set_defaults(proc_name, params)
-
-        # invoke on unpacked args
-        return function(*params)
-        """
 
 
     if len(guiable_formal_params) == 0:
         #Just execute, don't open dialog.
         print("no guiable parameters")
-        # Since no GUI, was_canceled always false
-        result = (False, run_script(wrapped_actual_args))
+        was_canceled = False
+        result = _try_run_func(proc_name, function, wrapped_actual_args)
     else:
         # create GUI from guiable formal args, let user edit actual args
 
@@ -394,35 +409,35 @@ def _interact(procedure, actual_args):
         import gimpfu_dialog
 
         print("Call show_plugin_dialog")
+        '''
+        v2
         # executes run_script if not canceled, returns tuple of run_script result
-        result = gimpfu_dialog.show_plugin_dialog(procedure, guiable_actual_args, guiable_formal_params, run_script)
-        # TODO save the changed settings i.e. new defaults
+        was_canceled, result = gimpfu_dialog.show_plugin_dialog(
+            procedure,
+            guiable_actual_args,
+            guiable_formal_params, run_script)
+        '''
+        nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_actual_args)
 
-    return result
+        was_canceled, guied_args = gimpfu_dialog.show_plugin_dialog(
+            procedure,
+            guiable_actual_args,
+            guiable_formal_params)
+        if not was_canceled :
+            # TODO save the changed settings i.e. new defaults
 
-# TODO move to Marshal
-def _pack(actual_args, arg1=None, arg2=None):
-    '''
-    return a list [arg1, arg2, *actual_args]
-    Where:
-        actual_args is-a Gimp.ValueArray
-        arg1, arg2 are optional GObjects
-    '''
+            # update incoming guiable args with guied args
+            wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args, guied_args)
 
-    args = []
-    if arg1:
-        args.append(arg1)
-    if arg2:
-        args.append(arg2)
+            result = _try_run_func(proc_name, function, wrapped_actual_args)
+        else:
+            # Don't save any gui changes to args
+            result = None
+            pass
 
-    len = actual_args.length()   # !!! not len(actual_args)
-    for i in range(len):
-        gvalue = actual_args.index(i)
-        # Python can handle the gvalue, we don't need to convert to Python types
-        # assuming we have imported gi
-        args.append(gvalue)
-    # ensure result is-a list, but might be empty
-    return args
+    return was_canceled, result
+
+
 
 
 
@@ -451,6 +466,7 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
     ''' GimpFu wrapper of the author's "main" function, aka run_func '''
 
     print("_run_imageprocedure ", procedure, run_mode, image, drawable, actual_args)
+    print("_run_imageprocedure count actual_args", actual_args.length())
 
     '''
     create GimpValueArray of *most* args
@@ -458,15 +474,7 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
     That might change when the lower level methods are fleshed out to persist values.
     *most* means (image, drawable, *actual_args), but not run_mode!
     '''
-    all_args = _pack(actual_args, image, drawable)
-    """
-    cruft
-    # from gimpfu_array import GimpfuValueArray
-    # GimpfuValueArray
-    gf.prepend(image)
-    stock_args = (image, drawable)
-    all_args = stock_args +  tuple(*actual_args)
-    """
+    all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, image, drawable)
 
     _run(procedure, run_mode, all_args, data)
 
@@ -474,7 +482,7 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
 def _run_imagelessprocedure(procedure, run_mode, actual_args, data):
     ''' GimpFu wrapper of the author's "main" function, aka run_func '''
     print("_run_loadprocedure ", procedure, run_mode, actual_args)
-    all_args = _pack(actual_args)
+    all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, )
     _run(procedure, run_mode, all_args, data)
 
 
@@ -515,10 +523,6 @@ def _run(procedure, run_mode, actual_args, data):
 
     func = gf_procedure.get_authors_function()
 
-    # CRUFT? _define_compatibility_aliases()
-    assert pdb is not None
-    print("pdb outside", pdb)
-
     if isBatch:
        try:
            # invoke func with unpacked args.  Since Python3, apply() gone.
@@ -530,13 +534,24 @@ def _run(procedure, run_mode, actual_args, data):
            final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
     else:
        # pass list of args
+
+       '''
+       Not enclosed in try:except: since then you don't get a good traceback.
+       Any exceptions in showing a dialog are hard programming errors.
+       Any exception in executing the run_func should be shown to user,
+       either by calling our own dialog or by calling a Gimp.ErrorDialog (not exist)
+       or by passing the exception string back to Gimp.
+       '''
+       was_canceled, result = _interact(procedure, actual_args)
+       if was_canceled:
+           final_result = procedure.new_return_values(Gimp.PDBStatusType.CANCEL, GLib.Error())
+       else:
+           # TODO add result values to Gimp  procedure.add_return_value ....
+           # trigger Gimp create all return values from this status and prior add_return_value
+           final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
+       """
+       OLD above was enclosed in try
        try:
-           was_canceled, result = _interact(procedure, actual_args)
-           if was_canceled:
-               final_result = procedure.new_return_values(Gimp.PDBStatusType.CANCEL, GLib.Error())
-           else:
-               # TODO add result values to Gimp  procedure.add_result ....
-               final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
        except Exception as err:
            '''
            Probably GimpFu module programming error (e.g. bad calls to GTK)
@@ -545,6 +560,7 @@ def _run(procedure, run_mode, actual_args, data):
            '''
            do_proceed_error(f"Exception opening plugin dialog: {err}")
            final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
+       """
 
     '''
     Make any alterations to user created images visible.
@@ -723,7 +739,10 @@ class GimpFu (Gimp.PlugIn):
         """
 
         gf_procedure.convey_metadata_to_gimp(procedure)
-        gf_procedure.convey_procedure_arg_declarations_to_gimp(procedure)
+        # ImageProcedure: first two formal args are implicit to Gimp, explicit to GimpFu
+        gf_procedure.convey_procedure_arg_declarations_to_gimp(
+            procedure,
+            count_omitted_leading_args=2)
 
         # ensure result is-a Gimp.Procedure
         return procedure

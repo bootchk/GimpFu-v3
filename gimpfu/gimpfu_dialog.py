@@ -18,7 +18,7 @@ from gi.repository import Gimp
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from gimpfu_types import *
+from gimpfu_types import *  # PF_ enum
 
 from gimpfu_widgets import *
 
@@ -205,13 +205,13 @@ spin.show()
 
 
 
-def _create_gimp_dialog(actual_args, guiable_formal_params):
+def _create_gimp_dialog(guiable_actual_args, guiable_formal_params):
     '''
     Show plugin dialog implemented using Gimp.Dialog
 
     Returns a tuple of values or None (user canceled.)
     '''
-    print("_create_gimp_dialog", actual_args, guiable_formal_params)
+    print("_create_gimp_dialog", guiable_actual_args, guiable_formal_params)
 
     use_header_bar = Gtk.Settings.get_default().get_property("gtk-dialogs-use-header")
     dialog = Gimp.Dialog(use_header_bar=use_header_bar,
@@ -225,7 +225,7 @@ def _create_gimp_dialog(actual_args, guiable_formal_params):
     dialog.get_content_area().add(box)
     box.show()
 
-    controls = _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params)
+    controls = _add_control_widgets_to_dialog(box, guiable_actual_args, guiable_formal_params)
 
     return controls, dialog
 
@@ -237,27 +237,35 @@ def _create_gimp_dialog(actual_args, guiable_formal_params):
 
 
 
-def show_plugin_dialog(procedure, actual_args, guiable_formal_params, run_script):
+'''
+v2 this took a run_script and called it, returning its results.
+I presume so that the dialog would stay up with its progress bar.
+
+v3 returns control_values and caller must invoke result=run_func(control_values)
+Progress is still shown, but in the image's display window's progress bar.
+'''
+def show_plugin_dialog(procedure, guiable_actual_args, guiable_formal_params):
     '''
     Present GUI.
     Returns (was_canceled, tuple of result values) from running plugin
     '''
-    print("show_plugin_dialog", procedure, actual_args, guiable_formal_params, run_script)
+    print("show_plugin_dialog", procedure, guiable_actual_args, guiable_formal_params)
     #assert type(procedure.__name == )
-    #assert len(actual_args) == len(guiable_formal_params )
+    #assert len(guiable_actual_args) == len(guiable_formal_params )
     #print("after assert")
 
     Gimp.ui_init('foo') # TODO procedure.name()
 
     # choice of implementation
-    controls, dialog = _create_gimp_dialog(actual_args, guiable_formal_params)  # implemented by GimpFu in Python
+    controls, dialog = _create_gimp_dialog(guiable_actual_args, guiable_formal_params)  # implemented by GimpFu in Python
     # show_plugin_procedure_dialog() # implemented by Gimp in C
 
     # TODO transient
 
     # Cancellation is not an error or exception, but part of result
     # if was_canceled is True, result_values is tuple of unknown contents
-    result_values = []
+    # else result_values are the user edited args (values from controls)
+    control_values = []
     was_canceled = False
 
     '''
@@ -266,7 +274,7 @@ def show_plugin_dialog(procedure, actual_args, guiable_formal_params, run_script
     Plugin func executes with dialog still shown, having progress bar.
     '''
     def response(dialog, id):
-        nonlocal result_values
+        nonlocal control_values
         nonlocal was_canceled
         nonlocal controls
         nonlocal procedure
@@ -277,39 +285,26 @@ def show_plugin_dialog(procedure, actual_args, guiable_formal_params, run_script
             # TODO shouldn't Cancel remain true
             #dlg.set_response_sensitive(Gtk.ResponseType.CANCEL, False)
 
+            # clear, because prior response might have aborted with partial control_values
+            control_values = []
+
             try:
-                result_values = []
-                control_values = []
                 for control in controls:
                     control_values.append(control.get_value())
             except EntryValueError:
-                # Modal dialog whose parent is dialog
+                # Modal dialog whose parent is plugin dialog
                 # Note control has value from for loop
                 warning_dialog(dialog, _("Invalid input for '%s'") % control.desc)
-                # dialog stays up, waiting for user to fix or cancel??
-            else:
-                # control values valid
+                # abort response, dialog stays up, waiting for user to fix or cancel??
+            else:   # executed when try succeeds
+                # assert control values valid
                 was_canceled = False
-                try:
-                    # execute plugin with user inputs
-                    # not cancelable?  In Gimp future, plugins should connect to a signal for cancel.
-                    # TODO run_script is in caller
-                    result_values = run_script(control_values)
-                    '''
-                except CancelError:
-                    pass
-                    '''
-                except Exception:
-                    dialog.set_response_sensitive(Gtk.ResponseType.CANCEL, True)
-                    error_dialog(dialog, procedure.get_name())
-                    raise
-                    # ??? continuation ???
-                else:
-                    # result values from execution are valid
-                    Gtk.main_quit()
+                Gtk.main_quit()
+                # caller will execute run_func with control_values
 
         elif id == Gtk.ResponseType.CANCEL:
             was_canceled = True
+            control_values = []
             Gtk.main_quit()
 
         else:
@@ -322,7 +317,8 @@ def show_plugin_dialog(procedure, actual_args, guiable_formal_params, run_script
     Gtk.main()
     dialog.destroy()
 
-    return was_canceled, result_values
+    # OLD return was_canceled, result_values
+    return was_canceled, control_values
 
 
 
@@ -459,6 +455,7 @@ def show_plugin_dialog(procedure, actual_args, guiable_formal_params, run_script
         raise CancelError
 '''
 
+# TODO this should just call Gimp.message ??
 def warning_dialog(parent, primary, secondary=None):
     dlg = Gtk.MessageDialog(parent, Gtk.DIALOG_DESTROY_WITH_PARENT,
                                     Gtk.MESSAGE_WARNING, Gtk.BUTTONS_CLOSE,
@@ -469,8 +466,9 @@ def warning_dialog(parent, primary, secondary=None):
     dlg.destroy()
 
 
-def error_dialog(parent, proc_name):
-    ''' Display error dialog containing Python trace for latest exception '''
+def _create_exception_str():
+    ''' Create two strings from latest exception.'''
+
     import sys, traceback
 
     exc_str = exc_only_str = _("Missing exception information")
@@ -481,6 +479,19 @@ def error_dialog(parent, proc_name):
         exc_only_str = "".join(traceback.format_exception_only(etype, value))
     finally:
         etype = value = tb = None
+
+    return exc_str, exc_only_str
+
+'''
+# TODO:
+Preferable to pass the exception string all the way back to Gimp
+as the result of the execution?
+TODO not tested
+'''
+def _create_error_dialog(proc_name, parent):
+    ''' Return error dialog containing Python trace for latest exception '''
+
+    exc_str, exc_only_str =  _create_exception_str()
 
     title = _("An error occurred running %s") % proc_name
     dlg = Gtk.MessageDialog(parent, 0, # TODO Gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -524,10 +535,25 @@ def error_dialog(parent, proc_name):
 
     def response(widget, id):
         widget.destroy()
+        Gtk.main_quit()
 
     dlg.connect("response", response)
     dlg.set_resizable(True)
-    dlg.show()
+    return dlg
+
+
+# v3 exported.  v2 private
+def show_error_dialog(proc_name, image):
+    ''' Display error dialog, parented to main Gimp window. '''
+    # !!! GTK is not running.
+    Gimp.ui_init('foo') # TODO procedure.name()
+    parent = Gimp.ui_get_display_window(image)
+    error_dialog = _create_error_dialog(parent, proc_name)
+    error_dialog.show()
+    # Enter event loop, does not return until user chooses OK
+    Gtk.main()
+    # TODO who destroys, error_dialog.destroy()
+
 
 
 # Map PF_ enum to Widget class

@@ -169,14 +169,15 @@ class GimpfuProcedure():
         But GimpFu signature does not.
         So this splits off leading image and drawable
         '''
-        guiable = actual_args[2:]
         nonguiable = actual_args[:2]
+        guiable    = actual_args[2:]
 
         return nonguiable, guiable
 
 
-    def join_args_to_run_args(self, nonguiable, guiable):
-        ''' Understands whether we have different signature for run_func '''
+    def join_nonguiable_to_guiable_args(self, nonguiable, guiable):
+        '''
+        Understands whether we have different signature for run_func '''
         if self._did_insert_image_params:
             # nonguiable args in signature of both plugin and run_func
             result = guiable
@@ -275,7 +276,7 @@ class GimpfuProcedure():
         procedure.add_menu_path (self.metadata.MENUPATH)
 
 
-    def convey_procedure_arg_declarations_to_gimp(self, procedure):
+    def convey_procedure_arg_declarations_to_gimp(self, procedure, count_omitted_leading_args):
         '''
         Convey  to Gimp a declaration of args to the procedure.
         From formal params as recorded in local cache under proc_name
@@ -287,7 +288,7 @@ class GimpfuProcedure():
         '''
         formal_params = self.metadata.PARAMS
 
-        for i in range(len(formal_params)):
+        for i in range(count_omitted_leading_args, len(formal_params)):
             # TODO map PF_TYPE to types known to Gimp (a smaller set)
             # use named properties of prop_holder
             procedure.add_argument_from_property(prop_holder, "intprop")
