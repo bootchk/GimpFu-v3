@@ -121,7 +121,7 @@ class Marshal():
         # result = GimpfuLayer(None, None, None, None, None, None, None, gimp_object)
         else:
             exception_str = f"GimpFu: can't wrap gimp type {gimp_type}"
-            raise RuntimeError(exception_str)
+            do_proceed_error(exception_str)
         return result
 
 
@@ -234,7 +234,7 @@ class Marshal():
             go_arg, go_arg_type = Marshal.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
 
             if cls.is_function(go_arg):
-                raise RuntimeError("Passing function as argument to PDB.")
+                do_proceed_error("Passing function as argument to PDB.")
 
 
             # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
@@ -243,7 +243,15 @@ class Marshal():
             # ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
             # unless GObject.Value() does some sort of casting
 
-            marshalled_args.insert(index, GObject.Value(go_arg_type, go_arg))
+            '''
+            This exception is not caused by plugin author, usually GimpFu programming error.
+            Usually "Must be a GObject.GType, not a type"
+            '''
+            try:
+                marshalled_args.insert(index, GObject.Value(go_arg_type, go_arg))
+            except Exception as err:
+                do_proceed_error(f"Exception marshalling arg {x} to pdb, {err}")
+
             index += 1
 
         print("marshalled_args", marshalled_args )
@@ -251,16 +259,35 @@ class Marshal():
 
 
     def unmarshal_pdb_result(values):
-        ''' Convert GimpValueArray to Python list '''
+        ''' Convert result of a pdb call to Python objects '''
+
+        '''
+        values is-a GimpValueArray
+        First element is a PDBStatusType, discard it.
+        If count remaining elements > 1, return a list,
+        else return the one remaining element.
+
+        For all returned objects, wrap as necessary.
+        '''
+
         # caller should have previously checked that values is not a Gimp.PDBStatusType.FAIL
         if values:
             # Remember, values is-a Gimp.ValueArray, not has Pythonic methods
-            result = []
-            for index in range(0, values.length()):
+            result_list = []
+            # start at 1 to discard status
+            for index in range(1, values.length()):
                 value = values.index(index)
-                result.append(value)
+                result_list.append(value)
+            # unpack list of one element
+            if len(result_list) is 1:
+                result = result_list[0]
+            else:
+                result = result_list
         else:
             result = None
+
+        # ensure result is None or result is list or result is one object
+        # TODO ensure wrapped?
         print("unmarshal_pdb_result", result)
         return result
 
