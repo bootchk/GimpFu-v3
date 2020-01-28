@@ -39,6 +39,45 @@ for each
 '''
 
 
+def get_enum_name(enum):
+    ''' Return name of a Gimp enum type. '''
+    '''
+    e.g. short_name is 'MergeType', long_name is 'Gimp.MergeType'
+    '''
+    short_name = enum.__name__
+    # Qualify with Gimp namespace
+    long_name = "Gimp." + short_name
+    print("Enum name: ", long_name)
+    return long_name
+
+
+def define_symbols_for_enum(enum):
+    '''
+    Define into the GimpFu Python global namespace:
+    all the constants defined by enum.
+    Require enum is a Gimp type.
+    enum is-a class.  type(enum) == 'type'
+    '''
+    '''
+    Example:
+    enum is Gimp.HistogramChannel
+    Statements:
+        global CLIP_TO_IMAGE
+        CLIP_TO_IMAGE = Gimp.MergeType.CLIP_TO_IMAGE
+
+    More mangling is done for certain enums.
+    '''
+    #print(enum, type(enum))
+    enum_class_name = get_enum_name(enum)
+    for attribute in dir(enum):
+        if attribute.isupper():
+            defining_statement = attribute + " = " + enum_class_name + "." + attribute
+            print(defining_statement)
+            # Second argument insures definition goes into global namespace
+            # See Python docs for exec()
+            exec(defining_statement, globals())
+
+
 # ImageBaseType is superset of ImageType, i.e. RGB => RGB, RGBA, etc.
 RGB = Gimp.ImageBaseType.RGB  # GRAY, INDEXED
 
@@ -78,6 +117,8 @@ for attribute in dir(foo):
         statement = "HISTOGRAM_" + attribute + " = Gimp.HistogramChannel." + attribute
         #print(statement)
         exec(statement)
+
+define_symbols_for_enum(Gimp.MergeType)
 
 
 #for bar in foo:

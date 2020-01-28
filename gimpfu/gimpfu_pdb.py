@@ -96,7 +96,7 @@ class GimpfuPDB():
         try:
             marshaled_args = Marshal.marshal_pdb_args(proc_name, *args)
         except Exception as err: # TODO catch only MarshalError ???
-            do_proceed_error(f"marshalling args to {proc_name} {err}")
+            do_proceed_error(f"marshalling args to pdb.{proc_name} {err}")
             marshaled_args = None
 
         if marshaled_args is not None:
