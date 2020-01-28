@@ -453,6 +453,7 @@ containers:
     # TODO use include-regex expression in Copy
 
     # - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+    # - !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
 
     environ:
       HOME: /work/.home

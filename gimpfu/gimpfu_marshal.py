@@ -15,6 +15,7 @@ from gimpfu_exception import *
 
 
 
+
 class Marshal():
     '''
     Knows how to wrap and unwrap Gimp GObjects.
@@ -26,6 +27,7 @@ class Marshal():
     In that case, this hides the need to:
       - upcast (GObject frequently requires explicit upcast)
       - convert (Python will convert int to float), but GimpFu must do that for args to Gimp
+      - check for certain errors (wrapping a FunctionInfo)
 
     Each wrapper also knows how to create a wrapper for a new'd Gimp GObject
     '''
@@ -61,6 +63,32 @@ class Marshal():
         return args
 
 
+
+    @classmethod
+    def is_function(cls, item):
+        ''' Is the item a gi.FunctionInfo? '''
+        '''
+        Which means an error earlier in the author's source:
+        accessing an attribute of adaptee as a property instead of a callable.
+        Such an error is sometimes caught earlier by Python
+        when author dereferenced the attribute
+        (e.g. when used as an int, but not when used as a bool)
+        but when first dereference is when passing to PDB, we catch it.
+        '''
+        return type(item).__name__ in ('gi.FunctionInfo')
+
+
+    '''
+    Keep these in correspondence with each other,
+    and with wrap() and unwrap() dispatch.
+    '''
+    @classmethod
+    def is_gimpfu_wrappable(cls, item):
+        return type(item).__name__ in ('Image', 'Layer', 'Display')
+
+    @classmethod
+    def is_gimpfu_unwrappable(cls, item):
+        return type(item).__name__ in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay")
 
 
     # TODO doesn't need to be classmethod
@@ -100,20 +128,27 @@ class Marshal():
     @classmethod
     def wrap_args(cls, args):
         '''
-        Wraps items if they need wrapping.
-        Fundamental types do not need wrapping.
+        args is a sequence of unwrapped objects (GObjects from Gimp) and fundamental types,
+        (typically received from Gimp calling the plugin.)
+        Wraps items that are not fundamental.
         Returns list.
         '''
         print("wrap_args", args)
         # TODO incomplete
         result = []
         for item in args:
-            if type(item).__name__ in ('Image', 'Layer',):
+            if cls.is_gimpfu_wrappable(item):
                 result.append(cls.wrap(item))
-            else:
+            else:   # fundamental
                 result.append(item)
         return result
 
+    '''
+    TODO this smells bad.
+    There is no unwrap_args method???
+    Yet?? Shouldn't we be unwrapping args to Gimp methods?
+    See below: unwrap_pdb_args.
+    '''
 
 
     @classmethod
@@ -129,7 +164,7 @@ class Marshal():
         '''
         # Unwrap wrapped types. Use idiom for class name
         # TODO other class names in list
-        if  type(arg).__name__ in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay") :
+        if  cls.is_gimpfu_unwrappable(arg) :
             # !!! Do not affect the original object by assigning to arg
             result_arg = arg.unwrap()
 
@@ -164,9 +199,11 @@ class Marshal():
 
         3. Unwrap wrapped arguments so all args are GObjects
 
-        4. Hacky upcast???
+        4. Hacky upcast to Drawable ???
 
         5. float(arg) as needed
+
+        6. Check error FunctionInfo
         '''
 
         # TODO python-fu- ?? What procedure names signify need run_mode?
@@ -188,13 +225,17 @@ class Marshal():
             go_arg, go_arg_type = Marshal.unwrap_arg(x)
 
             '''
-            All args need conversion, don't assume any arg does NOT need conversion
-            A procedure definition can have float arg in anywhere in args
+            Don't assume any arg does NOT need conversion:
+            a procedure can declare any arg of type float
 
             If more args than formal_args (from GI introspection), conversion will not convert.
             If less args than formal_args, Gimp might return an error when we call the PDB procedure.
             '''
             go_arg, go_arg_type = Marshal.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
+
+            if cls.is_function(go_arg):
+                raise RuntimeError("Passing function as argument to PDB.")
+
 
             # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
             # Must pass directly to insert()

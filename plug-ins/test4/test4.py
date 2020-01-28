@@ -20,13 +20,14 @@ def plugin_func(image, drawable):
   """
 
   '''
-  Access an attribute of adaptee as property
+  Access an attribute of adaptee as property (improperly)
   (when has_alpha had not been adapted yet)
   Expect:  gi.FunctionInfo(has_alpha)
   '''
   foo = drawable.has_alpha
   # TODO this is not working: assert isinstance(foo, gi.FunctionInfo)
   print(foo)
+  print("Type of adaptee attribute:", type(foo))
 
   '''
   Access an attribute of adaptee as callable.
