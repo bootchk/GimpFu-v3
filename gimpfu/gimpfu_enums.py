@@ -121,6 +121,7 @@ define_symbols_for_enum(Gimp.LayerMode, suffix='_MODE')
 #NORMAL_MODE         = Gimp.LayerMode.NORMAL
 #MULTIPLY_MODE       = Gimp.LayerMode.MULTIPLY
 define_symbols_for_enum(Gimp.FillType, suffix='_FILL')
+# TODO some wild plugins refer to e.g. FILL_TRANSPARENT, with a prefix
 #BACKGROUND_FILL     = Gimp.FillType.BACKGROUND
 #WHITE_FILL          = Gimp.FillType.WHITE
 define_symbols_for_enum(Gimp.ChannelOps, prefix='CHANNEL_OP_')
