@@ -51,7 +51,7 @@ def get_enum_name(enum):
     return long_name
 
 
-def define_symbols_for_enum(enum):
+def define_symbols_for_enum(enum, prefix="", suffix=""):
     '''
     Define into the GimpFu Python global namespace:
     all the constants defined by enum.
@@ -65,44 +65,36 @@ def define_symbols_for_enum(enum):
         global CLIP_TO_IMAGE
         CLIP_TO_IMAGE = Gimp.MergeType.CLIP_TO_IMAGE
 
-    More mangling is done for certain enums.
+    More mangling is done for certain enums:
+    Prepend with prefix, or suffend with suffix, where not None.
+    Prefix and suffix FBC.
+    Note there was not much consistency in v2: some prefixed, some suffixed.
     '''
     #print(enum, type(enum))
     enum_class_name = get_enum_name(enum)
     for attribute in dir(enum):
         if attribute.isupper():
-            defining_statement = attribute + " = " + enum_class_name + "." + attribute
+            defining_statement = prefix + attribute + suffix + " = " + enum_class_name + "." + attribute
             print(defining_statement)
             # Second argument insures definition goes into global namespace
             # See Python docs for exec()
             exec(defining_statement, globals())
 
 
-# ImageBaseType is superset of ImageType, i.e. RGB => RGB, RGBA, etc.
-RGB = Gimp.ImageBaseType.RGB  # GRAY, INDEXED
-
-RGB_IMAGE           = Gimp.ImageType.RGB_IMAGE
-
-NORMAL_MODE         = Gimp.LayerMode.NORMAL
-MULTIPLY_MODE       = Gimp.LayerMode.MULTIPLY
-
-BACKGROUND_FILL     = Gimp.FillType.BACKGROUND
-WHITE_FILL          = Gimp.FillType.WHITE
-
-CHANNEL_OP_REPLACE  = Gimp.ChannelOps.REPLACE
+'''
+Exceptions to the rules
+'''
 
 # TODO this is a don't care, because GimpFu adapts all functions that use it??
 FG_BG_RGB_MODE      = 1999
 
-GRADIENT_RADIAL     = Gimp.GradientType.RADIAL
-
 # TODO not sure this is correct
 BG_BUCKET_FILL      = Gimp.FillType.BACKGROUND
 
-REPEAT_NONE         = Gimp.RepeatMode.NONE
 
+"""
 '''
-Hack.
+Cruft
 Iterate over dir(enum type)
 Use any upper case attributes as constants
 define into the current namespace
@@ -117,14 +109,40 @@ for attribute in dir(foo):
         statement = "HISTOGRAM_" + attribute + " = Gimp.HistogramChannel." + attribute
         #print(statement)
         exec(statement)
+"""
 
 define_symbols_for_enum(Gimp.MergeType)
+# ImageBaseType is superset of ImageType, i.e. RGB => RGB, RGBA, etc.
+define_symbols_for_enum(Gimp.ImageBaseType)
+#RGB                 = Gimp.ImageBaseType.RGB  # GRAY, INDEXED
+define_symbols_for_enum(Gimp.ImageType)
+#RGB_IMAGE           = Gimp.ImageType.RGB_IMAGE
+define_symbols_for_enum(Gimp.LayerMode, suffix='_MODE')
+#NORMAL_MODE         = Gimp.LayerMode.NORMAL
+#MULTIPLY_MODE       = Gimp.LayerMode.MULTIPLY
+define_symbols_for_enum(Gimp.FillType, suffix='_FILL')
+#BACKGROUND_FILL     = Gimp.FillType.BACKGROUND
+#WHITE_FILL          = Gimp.FillType.WHITE
+define_symbols_for_enum(Gimp.ChannelOps, prefix='CHANNEL_OP_')
+#CHANNEL_OP_REPLACE  = Gimp.ChannelOps.REPLACE
+define_symbols_for_enum(Gimp.GradientType, prefix='GRADIENT_')
+#GRADIENT_RADIAL     = Gimp.GradientType.RADIAL
+define_symbols_for_enum(Gimp.RepeatMode, prefix='REPEAT_')
+#REPEAT_NONE         = Gimp.RepeatMode.NONE
+define_symbols_for_enum(Gimp.HistogramChannel, prefix='HISTOGRAM_')
+#HISTOGRAM_VALUE      = Gimp.HistogramChannel.Value
 
 
+
+# Cruft exploring how to get enum names from properties of enum class
 #for bar in foo:
 #for bar in foo.props:
 #for bar in foo.list_properties():
 #    print(bar)
+
+
+
+# Rest is WIP
 
 """
 from v2 plugin/pygimp/gimpenums-types.defs, which is perl script??
