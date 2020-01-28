@@ -365,13 +365,13 @@ def _interact(procedure, actual_args):
     function = gf_procedure.metadata.FUNCTION
     on_run = gf_procedure.metadata.ON_RUN
 
-    wrapped_actual_args = Marshal.wrap_args(actual_args)
+    wrapped_in_actual_args = Marshal.wrap_args(actual_args)
     guiable_formal_params =  gf_procedure.guiable_formal_params
 
     """
     CRUFT from implementation where dialog executed run_script
     guiable_formal_params =  gf_procedure.guiable_formal_params
-    nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_actual_args)
+    nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_in_actual_args)
 
     # effectively a closure, partially bound to function, nonguiable_actual_args
     # passed to show_plugin_dialog to be executed after dialog
@@ -396,7 +396,8 @@ def _interact(procedure, actual_args):
         #Just execute, don't open dialog.
         print("no guiable parameters")
         was_canceled = False
-        result = _try_run_func(proc_name, function, wrapped_actual_args)
+        # !!! no gui can change in args
+        result = _try_run_func(proc_name, function, wrapped_in_actual_args)
     else:
         # create GUI from guiable formal args, let user edit actual args
 
@@ -417,7 +418,7 @@ def _interact(procedure, actual_args):
             guiable_actual_args,
             guiable_formal_params, run_script)
         '''
-        nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_actual_args)
+        nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_in_actual_args)
 
         was_canceled, guied_args = gimpfu_dialog.show_plugin_dialog(
             procedure,
@@ -428,8 +429,10 @@ def _interact(procedure, actual_args):
 
             # update incoming guiable args with guied args
             wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args, guied_args)
+            print("Wrapped args to run_func", wrapped_run_args )
 
-            result = _try_run_func(proc_name, function, wrapped_actual_args)
+            # !!! with args modified since passed in
+            result = _try_run_func(proc_name, function, wrapped_run_args)
         else:
             # Don't save any gui changes to args
             result = None

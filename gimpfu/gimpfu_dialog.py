@@ -74,9 +74,15 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
     print("_get_args_for_widget_factory", formal_param, widget_default_value)
     # This is a switch statement on  PF_TYPE
     # Since data comes from GimpFu author, don't trust it
-    if formal_param.PF_TYPE in ( PF_RADIO, ):
+    pf_type = formal_param.PF_TYPE
+
+    # Warn deprectated
+    if pf_type == PF_COLOUR:
+        print("Deprecated PF_COLOUR")
+
+    if pf_type in ( PF_RADIO, ):
         args = [widget_default_value, formal_param.EXTRAS]
-    elif formal_param.PF_TYPE in (PF_FILE, PF_FILENAME):
+    elif pf_type in (PF_FILE, PF_FILENAME):
         # TODO need keyword 'title'?
         # args = [widget_default_value, title= "%s - %s" % (proc_name, tooltip_text)]
         # args = [widget_default_value, "%s - %s" % (proc_name, tooltip_text)]
@@ -85,19 +91,21 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
         # TODO this should work, but its not
         # args = [widget_default_value,]
         args = ["/tmp/lkkfoopluginout"]
-    elif formal_param.PF_TYPE in (PF_INT, PF_STRING, PF_BOOL ):
+    elif pf_type in (PF_INT, PF_STRING, PF_BOOL ):
         args = [widget_default_value]
-    elif formal_param.PF_TYPE in (PF_SLIDER, PF_FLOAT):
+    elif pf_type in (PF_SLIDER, PF_FLOAT):
         # Hack, we are using FloatEntry, should use Slider???
         args = [widget_default_value,]
-    elif formal_param.PF_TYPE in (PF_COLOR, ):
+    elif pf_type in (PF_COLOR, PF_COLOUR):
         # Omitted, use a constant color
         color = Gimp.RGB()
         color.parse_name("orange", 6)
         args = [color,]
     else:
         # PF_SPINNER,, PF_OPTION
-        raise RuntimeError("Unhandled PF_ widget type.")
+        if pf_type == PF_COLOUR:
+            print("Deprecated PF_COLOUR")
+        raise RuntimeError(f"Unhandled PF_ widget type {pf_type}.")
 
     return args
 
@@ -317,7 +325,7 @@ def show_plugin_dialog(procedure, guiable_actual_args, guiable_formal_params):
     Gtk.main()
     dialog.destroy()
 
-    # OLD return was_canceled, result_values
+    print("Dialog returns", control_values)
     return was_canceled, control_values
 
 
@@ -568,6 +576,7 @@ _edit_map = {
         # For omitted, subsequently, GimpFu uses the default value
         # which should be sane
         PF_COLOR       : OmittedEntry,
+        PF_COLOUR      : OmittedEntry,
         PF_FILE        : OmittedEntry,
         PF_FILENAME       : OmittedEntry,
         }

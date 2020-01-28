@@ -93,18 +93,19 @@ class GimpfuGimp():
 
 
 
-    # TODO, not all names are constructors e.g. Image
-    # some names are methods of Gimp e.g. Gimp.displays_flush()
+
     def _adaptor_func(self, *args):
         '''
-        run a Gimp constructor method "new"
-        for class whose name was used like "gimp.Name()"
-        e.g. like call to a class name (as a constructor)
-        where class is an attribute of gimp
+        Call a callable attribute.
+        Python just __getattr__'d the attribute <foo>
+        and is now calling it with args <bar>.
+        From a phrase like "gimp.<foo>(<bar>)"
 
-        Because C++ syntax for creation is Foo.new() whereas Python syntax is Foo()
+        Becomes:
+         - a call to a GimpFu adapter constructor GimpFu<foo>(<bar>)
+         - OR a call to a Gimp method Gimp.<foo>(<bar>)
         '''
-        print ("gimp adaptor called, args", args)
+        print ("gimp adaptor called, args:", *args)
 
         # test
 
@@ -128,7 +129,8 @@ class GimpfuGimp():
         dot_name = object.__getattribute__(self, "adapted_gimp_object_name")
 
 
-        # Is a GimpFu wrapper object?
+        # Is attribute a Gimp object that should be wrapped?
+        # TODO Marshal.is_wrappable_name(dot_name)
         if dot_name in ("Image", "Layer", "Display"):
             '''
             The source phrase is like "layer=gimp.Layer(foo)"
@@ -141,6 +143,7 @@ class GimpfuGimp():
             print("Calling constructor: ", callable_name)
         else:
             '''
+            The attribute is a Gimp function.
             The source phrase is like 'gimp.context_push()'
             I.E. a method call on the (Gimp instance? or library?)
             Note that some method calls on the Gimp,
@@ -171,12 +174,17 @@ class GimpfuGimp():
                 # result = func(*new_args)
                 '''
 
-                # Call a Gimp function
+                # Call callable (could be in Gimp, or GimpFu)
                 result = func(*args)
             except:
-                # TODO does Gimp return, or remember, an error message?
-                # TODO result is a GObject , maybe Gimp.StatusType as for PDB??
-                do_proceed_error(f"Gimp function execution error")
+                '''
+                Callable is in Gimp, or in GimpFu-then-Gimp.
+
+                TODO does Gimp return, or remember, an error message?
+                TODO result is a GObject , maybe Gimp.StatusType as for PDB??
+                TODO assert result is None or is_wrapper
+                '''
+                do_proceed_error(f"Error executing {callable_name}")
                 result = None
 
 
