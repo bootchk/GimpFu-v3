@@ -36,7 +36,9 @@ class GimpfuDrawable( GimpfuItem ) :
     '''
 
 
-
+    '''
+    Simple adaption of callable to property, without renaming.
+    '''
     @property
     def height(self):
         return self._adaptee.height()
@@ -44,6 +46,17 @@ class GimpfuDrawable( GimpfuItem ) :
     @property
     def width(self):
         return self._adaptee.width()
+
+    @property
+    def has_alpha(self):
+        return self._adaptee.has_alpha()
+
+    @property
+    def is_rgb(self):
+        return self._adaptee.is_rgb()
+
+
+
 
     @property
     def mask_bounds(self):
