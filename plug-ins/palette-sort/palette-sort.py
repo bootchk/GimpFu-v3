@@ -326,7 +326,7 @@ register(
     "João S. O. Bueno, Carol Spears, David Gowers",
     "João S. O. Bueno, Carol Spears, David Gowers",
     "2006-2014",
-    N_("_Sort Palette..."),
+    N_("_Sort Palette v3..."),
     "",
     [
         (PF_PALETTE, "palette",  _("Palette"), ""),

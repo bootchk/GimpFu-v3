@@ -99,7 +99,8 @@ Gimp model Changes
 
 The model of Channel in Gimp v3 is expanded from v2.
 
-Some procedures, like gimp-threshold have been replaced (gimp-drawable-threshol) and require a new "channel" parameter.
+Some procedures, like gimp-threshold have been replaced (gimp-drawable-threshold)
+ and require a new "channel" parameter.
 
 ?????
 
@@ -112,15 +113,20 @@ For example, it is usually named "timg"
 TODO this was fixed.
 
 
+TODO this was fixed
 The attributes of Gimpfu objects cannot be accessed using property notation.
-
 timg.width => timg.width()
+
+
 
 TODO maybe this can change
 
 The pdb object cannot be accessed using index notation:
-
 pdb['gimp-edit-fill']()    =>    pdb.gimp-edit-fill()
+
+
+Certain constants are deprecated:
+FILL_TRANSPARENT => TRANSPARENT_FILL
 
 
 

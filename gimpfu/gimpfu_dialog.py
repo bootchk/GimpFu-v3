@@ -91,7 +91,7 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
         # TODO this should work, but its not
         # args = [widget_default_value,]
         args = ["/tmp/lkkfoopluginout"]
-    elif pf_type in (PF_INT, PF_STRING, PF_BOOL ):
+    elif pf_type in (PF_INT, PF_STRING, PF_BOOL, PF_OPTION ):
         args = [widget_default_value]
     elif pf_type in (PF_SLIDER, PF_FLOAT):
         # Hack, we are using FloatEntry, should use Slider???
@@ -101,6 +101,10 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
         color = Gimp.RGB()
         color.parse_name("orange", 6)
         args = [color,]
+    elif pf_type in (PF_PALETTE,):
+        # TODO hack, should not even be a control
+        # Omitted, use None
+        args = [None,]
     else:
         # PF_SPINNER,, PF_OPTION
         if pf_type == PF_COLOUR:
@@ -573,10 +577,17 @@ _edit_map = {
         PF_FLOAT       : FloatEntry,
         PF_SLIDER      : FloatEntry,
         PF_RADIO       : RadioEntry,
-        # For omitted, subsequently, GimpFu uses the default value
+        # For omitted, subsequently GimpFu uses the default value
         # which should be sane
         PF_COLOR       : OmittedEntry,
         PF_COLOUR      : OmittedEntry,
         PF_FILE        : OmittedEntry,
-        PF_FILENAME       : OmittedEntry,
+        PF_FILENAME    : OmittedEntry,
+        PF_DIRNAME     : OmittedEntry,
+        PF_OPTION      : OmittedEntry,
+        # TODO Also omitted for now
+        # formerly gimpui.palette_selector
+        # Now I think palette is a parameter, but should not have a control?
+        # since the currently selected palette in palette dialog is passed?
+        PF_PALETTE     : OmittedEntry,
         }
