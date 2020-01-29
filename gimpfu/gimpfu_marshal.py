@@ -65,8 +65,8 @@ class Marshal():
 
 
     @classmethod
-    def is_function(cls, item):
-        ''' Is the item a gi.FunctionInfo? '''
+    def is_function(cls, instance):
+        ''' Is the instance a gi.FunctionInfo? '''
         '''
         Which means an error earlier in the author's source:
         accessing an attribute of adaptee as a property instead of a callable.
@@ -75,7 +75,7 @@ class Marshal():
         (e.g. when used as an int, but not when used as a bool)
         but when first dereference is when passing to PDB, we catch it.
         '''
-        return type(item).__name__ in ('gi.FunctionInfo')
+        return type(instance).__name__ in ('gi.FunctionInfo')
 
 
     '''
@@ -83,12 +83,16 @@ class Marshal():
     and with wrap() and unwrap() dispatch.
     '''
     @classmethod
-    def is_gimpfu_wrappable(cls, item):
-        return type(item).__name__ in ('Image', 'Layer', 'Display')
+    def is_gimpfu_wrappable_name(cls, name):
+        return name in ('Image', 'Layer', 'Display')
 
     @classmethod
-    def is_gimpfu_unwrappable(cls, item):
-        return type(item).__name__ in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay")
+    def is_gimpfu_wrappable(cls, instance):
+        return cls.is_gimpfu_wrappable_name(type(instance).__name__ )
+
+    @classmethod
+    def is_gimpfu_unwrappable(cls, instance):
+        return type(instance).__name__ in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay")
 
 
     # TODO doesn't need to be classmethod
@@ -130,17 +134,17 @@ class Marshal():
         '''
         args is a sequence of unwrapped objects (GObjects from Gimp) and fundamental types,
         (typically received from Gimp calling the plugin.)
-        Wraps items that are not fundamental.
+        Wraps instances that are not fundamental.
         Returns list.
         '''
         print("wrap_args", args)
         # TODO incomplete
         result = []
-        for item in args:
-            if cls.is_gimpfu_wrappable(item):
-                result.append(cls.wrap(item))
+        for instance in args:
+            if cls.is_gimpfu_wrappable(instance):
+                result.append(cls.wrap(instance))
             else:   # fundamental
-                result.append(item)
+                result.append(instance)
         return result
 
     '''
@@ -183,14 +187,26 @@ class Marshal():
 
 
     '''
-    PDB marshal, unmarshal
+    Gimp  marshal and unmarshal.
+    For Gimp. , Gimp.Layer. , etc. method calls
+
+    This will be very similar (extracted from?) PDB marsha
+
+    marshal_gimp_args, unmarshal_gimp_results
     '''
 
+    # TODO:
+
+
+
+    '''
+    PDB marshal, unmarshal
+    '''
 
     @classmethod
     def marshal_pdb_args(cls, proc_name, *args):
         '''
-        Marshall args to a PDB procedure.
+        Marshal args to a PDB procedure.
 
         1. Gather many args into Gimp.ValueArray and return it.
 
@@ -220,7 +236,7 @@ class Marshal():
 
         for x in args:
             ## GObject.Value(GObject.TYPE_STRING, tmp))
-            ## print("marshall arg:", x )
+            ## print("marshal arg:", x )
 
             go_arg, go_arg_type = Marshal.unwrap_arg(x)
 

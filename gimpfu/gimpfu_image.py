@@ -62,6 +62,7 @@ class GimpfuImage( Adapter ) :
     # Methods we specialize
 
 
+    # Special: allow optional args
     def insert_layer(self, layer, parent=None, position=-1):
         print("insert_layer called")
 

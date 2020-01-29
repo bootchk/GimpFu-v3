@@ -13,6 +13,7 @@ from gimpfu_display import GimpfuDisplay
 # TODO channel, etc.
 
 
+from gimpfu_marshal import Marshal
 from gimpfu_compatibility import gimp_name_map
 from gimpfu_exception import *
 
@@ -46,6 +47,8 @@ class GimpfuGimp():
     '''
 
     # TODO extract to Marshal
+    # TODO: and call it
+    """
     def _marshall_args(self, *args):
         '''
         Gather many args into Gimp.ValueArray
@@ -64,7 +67,7 @@ class GimpfuGimp():
             marshalled_args.insert(index, GObject.Value(type(x), x))
             index += 1
         return marshalled_args
-
+    """
 
 
     """
@@ -129,9 +132,9 @@ class GimpfuGimp():
         dot_name = object.__getattribute__(self, "adapted_gimp_object_name")
 
 
-        # Is attribute a Gimp object that should be wrapped?
-        # TODO Marshal.is_wrappable_name(dot_name)
-        if dot_name in ("Image", "Layer", "Display"):
+        # Is attribute a Gimp class name (a constructor) whose result should be wrapped?
+        # E.G. Layer
+        if Marshal.is_gimpfu_wrappable_name(dot_name):
             '''
             The source phrase is like "layer=gimp.Layer(foo)"
             Construct a wrapper object of Gimp object
@@ -144,12 +147,13 @@ class GimpfuGimp():
         else:
             '''
             The attribute is a Gimp function.
-            The source phrase is like 'gimp.context_push()'
+            The source phrase is like 'gimp.context_push(*args)'
             I.E. a method call on the (Gimp instance? or library?)
             Note that some method calls on the Gimp,
             e.g. gimp.delete(foo) are wrapped and intercepted earlier.
             '''
             callable_name = "Gimp." + gimp_name_map[dot_name]
+            # TODO unmarshal_args
 
         try:
             # eval to get the callable
@@ -164,6 +168,7 @@ class GimpfuGimp():
             do_proceed_error(f"error getting {callable_name}:{err}")
             result = None
         else:
+            # assert Callable is in Gimp, or in GimpFu<Foo>-then-Gimp.
             try:
                 '''
                 FUTURE adapt signature
@@ -173,13 +178,10 @@ class GimpfuGimp():
                 # new_args = self._adapt_signature(dot_name, args)
                 # result = func(*new_args)
                 '''
-
                 # Call callable (could be in Gimp, or GimpFu)
                 result = func(*args)
             except:
                 '''
-                Callable is in Gimp, or in GimpFu-then-Gimp.
-
                 TODO does Gimp return, or remember, an error message?
                 TODO result is a GObject , maybe Gimp.StatusType as for PDB??
                 TODO assert result is None or is_wrapper

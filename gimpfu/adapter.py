@@ -109,6 +109,10 @@ class Adapter():
 
 
 
+    # TODO work in progress
+    def _adaptor_func(self, *args):
+        pass
+
 
 
     # Methods and properties offered dynamically.
@@ -116,11 +120,16 @@ class Adapter():
 
     def __getattr__(self, name):
         '''
-        Since name not found on self (i.e. not wrapped)
-        return name found on adaptee.
+        Since name not found on self (i.e. not wrapped) return name found on adaptee.
 
-        When name is callable, returns a callable which is soon to be called.
-        When name is data member, returns value.
+        When name is callable: returns a callable.
+        Which source code will soon call using "()" notation.
+
+        When name is data member:
+        Ordinary Python source would return value.
+        !!! adaptee has no property semantics.
+        So any source that attempts this ( "name" without "()" )
+        is an error in the source code (in the GimpFu language.)
 
         !!! This does not preclude public,direct access to _adaptee, use unwrap()
         '''
@@ -154,7 +163,10 @@ class Adapter():
         return result
 
 
+
+
     def __setattr__(self, name, value):
+        # TODO Exception: Gimp has no properties that can be set without call syntax
         if name in ('_adaptee',):
             self.__dict__[name] = value
         else:
