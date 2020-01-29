@@ -2,7 +2,7 @@
 from gimpfu_compatibility import get_name_map_for_adaptee_class
 # WAS image_name_map
 
-
+from adapted_call_sequencer import AdaptedCallSequencer
 
 
 
@@ -121,6 +121,8 @@ class Adapter():
         # Not sure why we need to use object.__...
         result = object.__getattribute__(self, "_adaptee_callable")(*args)
 
+        AdaptedCallSequencer.end_call()
+
         # TODO marshal result
         return result
 
@@ -180,6 +182,9 @@ class Adapter():
         # Not sure why we must use object, but fails otherwise
         object.__setattr__(self, "_adaptee_callable", adaptee_callable)
 
+        # Record original name from author's source
+        AdaptedCallSequencer.start_call(name)
+        
         '''
         We don't just return the callable,
         because we need to wrap the args,
