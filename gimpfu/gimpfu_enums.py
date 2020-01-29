@@ -131,7 +131,9 @@ define_symbols_for_enum(Gimp.GradientType, prefix='GRADIENT_')
 define_symbols_for_enum(Gimp.RepeatMode, prefix='REPEAT_')
 #REPEAT_NONE         = Gimp.RepeatMode.NONE
 define_symbols_for_enum(Gimp.HistogramChannel, prefix='HISTOGRAM_')
-#HISTOGRAM_VALUE      = Gimp.HistogramChannel.Value
+#HISTOGRAM_VALUE      = Gimp.HistogramChannel.VALUE
+define_symbols_for_enum(Gimp.MaskApplyMode, prefix='MASK_')
+#MASK_APPLY           = Gimp.MaskApplyMode.APPLY
 
 
 
