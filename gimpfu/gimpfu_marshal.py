@@ -45,6 +45,7 @@ class Marshal():
         Where:
             actual_args is-a Gimp.ValueArray
             image, drawable are optional GObjects
+        !!! Returns a list, not a Gimp.ValueArray
         '''
 
         args = []

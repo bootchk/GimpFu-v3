@@ -22,7 +22,11 @@ def code_eval(code):
     if code == '-':
         import sys
         code = sys.stdin
-    exec code in globals()
+
+    # lkk v2.  Python 2 syntax
+    # exec code in globals()
+    # lkk v3
+    exec(code, globals())
 
 register(
         "python-fu-eval",

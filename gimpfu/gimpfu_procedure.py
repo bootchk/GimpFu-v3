@@ -218,15 +218,13 @@ class GimpfuProcedure():
     def is_a_imagelessprocedure_subclass(self):
         '''
         A imageless procedure (Gimp.Procedure) has empty IMAGETYPEs.
-        The signature CAN be (Image, Drawable) but need not be.
-
-
+        The signature CAN be (Image, Drawable)? but usually is not.
 
         A imageless procedure is always enabled in Gimp GUI (doesn't care about imagetypes)
         and might not take an existing image, instead creating one.
         '''
-        return not self.is_a_imageprocedure_subclass
-
+        result = (self.metadata.IMAGETYPES is None) or (self.metadata.IMAGETYPES == "")
+        return result
     """
     TODO is_a_loadprocedure_subclass
     A LoadProcedure usually installs to menu File>, but need not.
@@ -276,7 +274,10 @@ class GimpfuProcedure():
         procedure.add_menu_path (self.metadata.MENUPATH)
 
 
-    def convey_procedure_arg_declarations_to_gimp(self, procedure, count_omitted_leading_args):
+    def convey_procedure_arg_declarations_to_gimp(self,
+        procedure,
+        count_omitted_leading_args=0,
+        prefix_with_run_mode=False):
         '''
         Convey  to Gimp a declaration of args to the procedure.
         From formal params as recorded in local cache under proc_name
@@ -287,6 +288,11 @@ class GimpfuProcedure():
         Requires a hack to Gimp, which otherwise refuses to add are many times from same named property.
         '''
         formal_params = self.metadata.PARAMS
+
+        if prefix_with_run_mode :
+            pass
+            # WIP
+            # procedure.add_argument_from_property(prop_holder, "intprop")
 
         for i in range(count_omitted_leading_args, len(formal_params)):
             # TODO map PF_TYPE to types known to Gimp (a smaller set)

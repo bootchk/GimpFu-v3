@@ -93,8 +93,9 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GLib
 
+
 # for g_param_spec and properties
-# from gi.repository import GObject
+from gi.repository import GObject
 
 
 # import private implementation
@@ -484,8 +485,8 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
 
 def _run_imagelessprocedure(procedure, run_mode, actual_args, data):
     ''' GimpFu wrapper of the author's "main" function, aka run_func '''
-    print("_run_loadprocedure ", procedure, run_mode, actual_args)
-    all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, )
+    print("_run_imagelessprocedure ", procedure, run_mode, actual_args)
+    all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, image=None, drawable=None)
     _run(procedure, run_mode, all_args, data)
 
 
@@ -639,13 +640,15 @@ More generally (unwrapped) properties  represent params (sic arguments) to ultim
 _run() above wraps author's "function" i.e. ultimate plugin method,
 which is referred to as "run_func" here and in Gimp documents.
 '''
+
 class GimpFu (Gimp.PlugIn):
 
     """
-    cruft
-    @classmethod
-    def get_pdb(cls):
-        return Gimp.get_pdb();
+    ??? This breaks the comment strings.
+
+    @GObject.Property(type=Gimp.RunMode,
+                      default=Gimp.RunMode.NONINTERACTIVE,
+                      nick="Run mode", blurb="The run mode")
     """
 
 
@@ -653,13 +656,14 @@ class GimpFu (Gimp.PlugIn):
     ## Parameters ##
     # Long form: create attribute which is dictionary of GProperty
     # class attribute ??
-    # not used by GimpFu
+    #
+
     __gproperties__ = {
         # nick, blurb, default
-        "myProp": (str,
-                 _("myPropNick"),
-                 _("myPropBlurb"),
-                 _("myPropDefaultValue"),
+        "Run mode": (Gimp.RunMode,
+                 _("Run mode"),
+                 _("Run mode"),
+                 _("Gimp.RunMode.NONINTERACTIVE"),
                  GObject.ParamFlags.READWRITE)
     }
     """
@@ -715,6 +719,7 @@ class GimpFu (Gimp.PlugIn):
         And use a different wrapper _run for each subclass.
         '''
 
+        """
         # TEMP hack, always a GimpImageProcedure
         procedure = Gimp.ImageProcedure.new(self,
                                 name,
@@ -722,30 +727,38 @@ class GimpFu (Gimp.PlugIn):
                                 _run_imageprocedure, 	# wrapped plugin method
                                 None)
         """
-        if gf_procedure.is_a_imageprocedure_subclass :
-            procedure = Gimp.ImageProcedure.new(self,
-                                            name,
-                                            Gimp.PDBProcType.PLUGIN,
-                                            _run_imageprocedure, 	# wrapped plugin method
-                                            None)
-        elif gf_procedure.is_a_imagelessprocedure_subclass :
+
+        if gf_procedure.is_a_imagelessprocedure_subclass :
             print("Create imageless procedure")
             procedure = Gimp.Procedure.new(self,
                                             name,
                                             Gimp.PDBProcType.PLUGIN,
                                             _run_imagelessprocedure, 	# wrapped plugin method
                                             None)
+            gf_procedure.convey_metadata_to_gimp(procedure)
+            # Procedure: convey all args
+            procedure.add_argument_from_property(self, "Run mode")
+            gf_procedure.convey_procedure_arg_declarations_to_gimp(
+                procedure,
+                count_omitted_leading_args=0)
+        else:
+            # ImageProcedure
+            procedure = Gimp.ImageProcedure.new(self,
+                                            name,
+                                            Gimp.PDBProcType.PLUGIN,
+                                            _run_imageprocedure, 	# wrapped plugin method
+                                            None)
+            gf_procedure.convey_metadata_to_gimp(procedure)
+            # ImageProcedure: first two formal args are implicit to Gimp, explicit to GimpFu
+            gf_procedure.convey_procedure_arg_declarations_to_gimp(
+                procedure,
+                count_omitted_leading_args=2)
+        """
         else:
             # TODO Better message, since this error depends on authored code
             # TODO preflight this at registration time.
             raise Exception("Unknown subclass of Gimp.Procedure")
         """
-
-        gf_procedure.convey_metadata_to_gimp(procedure)
-        # ImageProcedure: first two formal args are implicit to Gimp, explicit to GimpFu
-        gf_procedure.convey_procedure_arg_declarations_to_gimp(
-            procedure,
-            count_omitted_leading_args=2)
 
         # ensure result is-a Gimp.Procedure
         return procedure

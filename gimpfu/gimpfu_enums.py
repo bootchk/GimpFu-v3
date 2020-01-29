@@ -75,7 +75,7 @@ def define_symbols_for_enum(enum, prefix="", suffix=""):
     for attribute in dir(enum):
         if attribute.isupper():
             defining_statement = prefix + attribute + suffix + " = " + enum_class_name + "." + attribute
-            print(defining_statement)
+            #print(defining_statement)
             # Second argument insures definition goes into global namespace
             # See Python docs for exec()
             exec(defining_statement, globals())
