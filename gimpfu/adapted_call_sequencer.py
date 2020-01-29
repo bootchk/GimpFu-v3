@@ -14,6 +14,9 @@ class AdaptedCallSequencer():
     and probably assigned to a variable,
     and that is probably not what a GimpFu plugin author intends.
 
+    This also catches the case where GimpFu promised (in the docs)
+    to adapt a Gimp method but didn't implement.
+
     Adapters bracket their adapted calls with start(), end().
 
     This is only for calls to Gimp objects (adaptees) adapted by

@@ -117,3 +117,9 @@ class GimpfuImage( Adapter ) :
     def active_layer(self, layer):
         # TODO:
         raise RuntimeError("not implemented")
+
+    @property
+    def base_type(self):
+        # Delegate to Gimp.Image
+        # Result is fundamental type (enum int)
+        return self._adaptee.base_type()
