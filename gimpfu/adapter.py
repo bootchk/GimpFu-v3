@@ -28,6 +28,7 @@ class Adapter():
 
     def __init__(self, adaptee):
         self._adaptee = adaptee
+        self._adaptee_callable = None
 
 
     def __eq__(self, other):
@@ -109,9 +110,19 @@ class Adapter():
 
 
 
-    # TODO work in progress
+
     def _adaptor_func(self, *args):
-        pass
+        print("Adaptor._adaptor_func called, args:", *args)
+        #
+
+        # TODO marshal args
+
+        # call the callable
+        # Not sure why we need to use object.__...
+        result = object.__getattribute__(self, "_adaptee_callable")(*args)
+
+        # TODO marshal result
+        return result
 
 
 
@@ -142,7 +153,7 @@ class Adapter():
         # KeyError means need add class_name to map_map in gimpfu_compatibility, etc.
 
         '''
-        !!! Returning an object of type functionInfo ?? on the adaptee.
+        !!! Getting an object of type functionInfo ?? on the adaptee.
         If the author does not subsequently call it,
         it is probably an error, since the Gimp adaptee has no property attributes.
         We can't check here whether the result will be called.
@@ -158,9 +169,29 @@ class Adapter():
         is_alpha is a callable on adaptee Drawable,
         but GimpFu provides convenience property "is_alpha"
         '''
-        result = getattr(self.__dict__['_adaptee'], latest_name)
+
+        '''
+        getattr() is builtin (not special method) that gets arg1's attribute named arg2
+        Here arg1 is the adaptee.
+        '''
+        adaptee_callable = getattr(self.__dict__['_adaptee'], latest_name)
+        print("Adaptor.adaptee_callable:", adaptee_callable)
+
+        # Not sure why we must use object, but fails otherwise
+        object.__setattr__(self, "_adaptee_callable", adaptee_callable)
+
+        '''
+        We don't just return the callable,
+        because we need to wrap the args,
+        So return an interceptor func.
+        '''
+        return self._adaptor_func
+
+        """
+        OLD just return the callable
         print("__getattr__ result", result)
         return result
+        """
 
 
 

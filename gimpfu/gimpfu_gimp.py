@@ -128,9 +128,7 @@ class GimpfuGimp():
 
         # create name string of method
 
-        # TODO, class_name is misnomer, not every name is a class, some are method names.
         dot_name = object.__getattribute__(self, "adapted_gimp_object_name")
-
 
         # Is attribute a Gimp class name (a constructor) whose result should be wrapped?
         # E.G. Layer
