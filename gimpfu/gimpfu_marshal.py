@@ -442,7 +442,16 @@ class Marshal():
         # idiom for class name
         print("Attempt upcast type", type(arg).__name__ )
         # Note the names are not prefixed with Gimp ???
-        if type(arg).__name__ in ("Channel", "Layer"):  # TODO more subclasses
+        # These taken from "GIMP App Ref Manual>Class Hierarchy"
+        if type(arg).__name__ in (
+            "Layer",
+               "GroupLayer",
+               "TextLayer"
+            "Channel",
+               "LayerMask",
+               "Selection",
+             "Vectors"
+            ):
             result = Gimp.Drawable
         else:
             result = type(arg)
