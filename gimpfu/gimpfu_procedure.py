@@ -407,7 +407,14 @@ class GimpfuProcedure():
         So we diverge the signature of the plugin from the signature of the run_func.
         The GimpFu plugin author might be unaware, unless they explore,
         or try to call the PDB procedure from another PDB procedure.
+
+        TODO after we are done, the count of args to run_func
+        and the count of formal parameters (PARAMS) should be the same.
+        Can we count the formal parameters of run_func?
         '''
+        if not self.metadata.MENUPATH:
+            return
+
         result = False
         # if missing params (never there, or not fixed by earlier patch)
         # TODO if params are missing altogether
