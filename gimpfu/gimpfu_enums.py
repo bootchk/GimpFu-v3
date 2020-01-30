@@ -47,7 +47,7 @@ def get_enum_name(enum):
     short_name = enum.__name__
     # Qualify with Gimp namespace
     long_name = "Gimp." + short_name
-    print("Enum name: ", long_name)
+    # print("Enum name: ", long_name)
     return long_name
 
 
@@ -111,6 +111,7 @@ for attribute in dir(foo):
         exec(statement)
 """
 
+print("gimpenums defining enums...")
 define_symbols_for_enum(Gimp.MergeType)
 # ImageBaseType is superset of ImageType, i.e. RGB => RGB, RGBA, etc.
 define_symbols_for_enum(Gimp.ImageBaseType)

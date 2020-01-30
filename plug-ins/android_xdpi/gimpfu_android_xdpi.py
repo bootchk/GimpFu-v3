@@ -20,7 +20,7 @@ Installation:
     - Restart Gimp
     - Run script via Filters/Android/Write Android XDPIs...
 '''
-
+print("Start interpret ")
 import gimpfu
 import gimp
 import os

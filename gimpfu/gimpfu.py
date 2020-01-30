@@ -225,7 +225,7 @@ def register(proc_name, blurb, help, author, copyright,
             menu=None, domain=None, on_query=None, on_run=None):
     """ GimpFu method that registers a plug-in. May be called many times from same source file."""
 
-    print("register ", proc_name)
+    print("Gimpfu: register ", proc_name)
 
     gf_procedure = GimpfuProcedure(proc_name, blurb, help, author, copyright,
                             date, label, imagetypes,

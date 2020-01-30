@@ -554,7 +554,7 @@ commands:
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
       export NO_AT_BRIDGE=1
 
-      /usr/local/bin/gimp-2.99
+      /usr/local/bin/gimp-2.99 --verbose
 
   # work in progress: quicker startup
   gimpTestGUI: !Command
@@ -586,7 +586,7 @@ commands:
       export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
       echo $PYTHONPATH
 
-      /usr/local/bin/gimp-2.99
+      /usr/local/bin/gimp-2.99 --verbose
 
 
   gimpListPlugins: !Command

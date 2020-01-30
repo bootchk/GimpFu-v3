@@ -18,6 +18,8 @@
 
 from gimpfu import *
 
+print("after import")   # lkk v3
+
 def code_eval(code):
     if code == '-':
         import sys
@@ -28,6 +30,7 @@ def code_eval(code):
     # lkk v3
     exec(code, globals())
 
+print("calling register")   # lkk v3
 register(
         "python-fu-eval",
         "Evaluate Python code",
@@ -43,4 +46,5 @@ register(
         [],
         code_eval)
 
+print("calling main")   # lkk v3
 main()

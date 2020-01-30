@@ -34,7 +34,7 @@ And pdb and gimp symbols are not defined.
 from prop_holder import PropHolder
 
 prop_holder = PropHolder()
-print(prop_holder.props)
+print("prop_holder", prop_holder.props)
 print(prop_holder.props.intprop)
 
 
@@ -84,6 +84,10 @@ class GimpfuProcedure():
         # May not return, throws exceptions
         self._sanity_test_registration(proc_name, params, results)
 
+        label = self._substitute_empty_string_for_none(label, "label")
+        imagetypes = self._substitute_empty_string_for_none(imagetypes, "imagetypes")
+        menu = self._substitute_empty_string_for_none(menu, "menupath")
+
         '''
         v2 plugin_type = PLUGIN
         v3 plugin_type in local cache always a dummy value
@@ -93,7 +97,7 @@ class GimpfuProcedure():
         and the type is not used anywhere else in GimpFu,
         so what is the purpose?
         '''
-        # TODO this is a hack
+        # TODO a hack, Gimpfu never use plugin_type?
         plugin_type = 1
 
 
@@ -260,8 +264,8 @@ class GimpfuProcedure():
 
         procedure is-a Gimp.PluginProcedure
         '''
-        # WAS _registered_plugins_[name]
         procedure.set_image_types(self.metadata.IMAGETYPES);
+
         procedure.set_documentation (self.metadata.BLURB,
                                      self.metadata.HELP,
                                      self.name)
@@ -461,6 +465,16 @@ class GimpfuProcedure():
                message = f"Procedure name canonicalized to {new_proc_name}"
                self._deprecation(message)
         return new_proc_name
+
+
+
+    def _substitute_empty_string_for_none(self, arg, argname):
+        if arg is None:
+            print(f"Deprecated: Registered {argname} should be empty string, not None")
+            result = ""
+        else:
+            result = arg
+        return result
 
 
     def _sanity_test_registration(self, proc_name, params, results):
