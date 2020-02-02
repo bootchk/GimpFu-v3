@@ -2,22 +2,35 @@
 A test Gimp plugin
 that:
 - has two parameters
-- prints the parameters to console
+
+Exercises properties of image
 '''
 
 from gimpfu import *
 
 def plugin_func(image, drawable, arg, arg2):
       print("plugin_func called args: ", arg, ",", arg2)
+      print("Plugin called, type(image):", type(image))
+      print("Plugin called, dir(image) is:", dir(image))
+
+      # Image.width
+      # Not implemented yet, but should be
+      # print("width:", image.width)
+      # Image.base_type
+      print("base_type:", image.base_type)
+      # Image.filename
+      print("Getting filename...")
+      print("filename:", image.filename)
+      #etc
 
 register(
-      "argsTwo",
+      "testProperties",
       "blurb",
       "help message",
       "author",
       "copyright",
       "year",
-      "ArgsTwo",
+      "Exercise image.prop...",
       "*",
       [
           (PF_IMAGE, "image", "Input image", None),

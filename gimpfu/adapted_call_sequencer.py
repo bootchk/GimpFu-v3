@@ -43,7 +43,9 @@ class AdaptedCallSequencer():
     def start_call(cls, callable_name):
         if cls.started_call :
             # TODO proceed?
-            raise RuntimeError(f"Can't access as property Gimp symbol: {cls.started_call}")
+            # Print name author is calling now, what name author accessed previously (and did not call)
+            print("Currently calling", callable_name)
+            raise RuntimeError(f"Calling: {callable_name}, but previous attempt to access as property: {cls.started_call}")
         else:
             cls.started_call = callable_name
 

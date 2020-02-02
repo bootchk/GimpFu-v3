@@ -176,15 +176,39 @@ class Adapter():
         getattr() is builtin (not special method) that gets arg1's attribute named arg2
         Here arg1 is the adaptee.
         '''
-        adaptee_callable = getattr(self.__dict__['_adaptee'], latest_name)
+        try:
+            adaptee_callable = getattr(self.__dict__['_adaptee'], latest_name)
+        except AttributeError:
+            print("attribute error in Adapter.__getattr__, names:", name, latest_name)
+            print("type(self)")
+            print(type(self))
+            print("self.__dir__")
+            print(self.__dir__)
+            print("dir(type(self))")
+            print(dir(type(self)))
+            print("dir(self)")
+            print(dir(self))
+            raise
+
+        '''
+        FUTURE catch AttributeError and mangle the name in a canonical way
+        to get the Gimp name.
+        That would not work for Python properties
+        (say 'foo=img.filename' => 'foo.img.get_filename()')
+        because the source phrase has no parens,
+        and we can't turn this attribute access into a call??
+        '''
+
+
         print("Adaptor.adaptee_callable:", adaptee_callable)
 
         # Not sure why we must use object, but fails otherwise
         object.__setattr__(self, "_adaptee_callable", adaptee_callable)
 
-        # Record original name from author's source
+        # Record original name from author's source (in author's namespace), not latest_name (in Gimp namespace)
+        # This throws if another call was started.
         AdaptedCallSequencer.start_call(name)
-        
+
         '''
         We don't just return the callable,
         because we need to wrap the args,

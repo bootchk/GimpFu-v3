@@ -5,7 +5,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 from adapter import Adapter
-
+from gimpfu_property import GimpfuProperty, GimpfuProperty2
 
 '''
 
@@ -45,7 +45,25 @@ class GimpfuImage( Adapter ) :
         else:
             # Gimp constructor named "new"
             final_adaptee = Gimp.Image.new(width, height, image_mode)
+
+        # super is Adaper, and it stores adaptee
         super().__init__(final_adaptee)
+
+        # TODO WIP
+        #self.filename = GimpfuProperty(final_adaptee, "filename")
+
+        # self.filename = None is not correct, because self.filename is a property of each instance
+
+    def adaptee(self):
+        ''' Getter for private _adaptee '''
+        # Handled by super Adaptor
+        result = self._adaptee
+        print("adaptee getter returns:", result)
+        return result
+
+
+
+    filename = GimpfuProperty2("filename")
 
     '''
     WIP
@@ -106,20 +124,32 @@ class GimpfuImage( Adapter ) :
 
     # No layers setter
 
+    # TODO all these properties are rote changes to name i.e. prefix with get_
+    # Do this at runtime, or code generate?
 
     @property
     def active_layer(self):
         # Delegate to Gimp.Image
         # TODO wrap result or lazy wrap
         return self._adaptee.get_active_layer()
-
     @active_layer.setter
     def active_layer(self, layer):
         # TODO:
         raise RuntimeError("not implemented")
+
 
     @property
     def base_type(self):
         # Delegate to Gimp.Image
         # Result is fundamental type (enum int)
         return self._adaptee.base_type()
+
+    """
+    @property
+    def filename(self):
+        return self._adaptee.get_filename()
+
+    @filename.setter
+    def filename(self, name):
+        raise AttributeError("read only")
+    """
