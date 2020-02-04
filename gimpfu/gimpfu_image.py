@@ -33,11 +33,17 @@ Some are unique to PyGimp, not present in Gimp.Image. (augment)
 
 class GimpfuImage( Adapter ) :
 
+    # class variables needed by Adapter
+    # TODO
+    DynamicWriteableAdaptedProperties = ('filename', 'instance_nameRW' )
+    DynamicReadOnlyAdaptedProperties = ('othernameRO', )
+
     '''
+    Constructor exported to Gimpfu authors.
+    Called internally for existing images as GimpfuImage(None, None, None, adaptee)
+
     See SO "How to overload __init__ method based on argument type?"
     '''
-    # Constructor exported to Gimpfu authors
-    # Called internally for existing images as GimpfuImage(None, None, None, adaptee)
     def __init__(self, width=None, height=None, image_mode=None, adaptee=None):
         '''Initialize  GimpfuImage from attribute values OR instance of Gimp.Image. '''
         if width is None:
@@ -63,7 +69,7 @@ class GimpfuImage( Adapter ) :
 
 
 
-    filename = GimpfuProperty2("filename")
+    # OLD filename = GimpfuProperty2("filename")
 
     '''
     WIP
@@ -143,13 +149,3 @@ class GimpfuImage( Adapter ) :
         # Delegate to Gimp.Image
         # Result is fundamental type (enum int)
         return self._adaptee.base_type()
-
-    """
-    @property
-    def filename(self):
-        return self._adaptee.get_filename()
-
-    @filename.setter
-    def filename(self, name):
-        raise AttributeError("read only")
-    """

@@ -12,6 +12,9 @@ from gimpfu_drawable import GimpfuDrawable
 
 class GimpfuLayer( GimpfuDrawable ) :
 
+    DynamicWriteableAdaptedProperties = ('mode', 'name' )
+    DynamicReadOnlyAdaptedProperties = ('othernameRO', )
+
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 
         if img is not None:
@@ -46,7 +49,7 @@ class GimpfuLayer( GimpfuDrawable ) :
     def copy(self, alpha=False):
         ''' Return copy of self. '''
         '''
-        Param "alpha" is convenience, on top of Gimp.Layer.copy()
+        FBC Param "alpha" is convenience, on top of Gimp.Layer.copy()
 
         !!! TODO alpha not used.  Code to add alpha if "alpha" param is true??
         The docs are not clear about what the param means.
@@ -64,15 +67,21 @@ class GimpfuLayer( GimpfuDrawable ) :
     Properties.
 
     For convenience, GimpFu makes certain attributes have property semantics.
-    I.E. get without parenthesises, and set by assignment, without calling setter() func
+    I.E. get without parenthesises, and set by assignment, without calling setter() func.
 
-    TODO, does Gimp GI provide this already?
+    Properties that are canonically (with get_foo, and set_foo) implemented by Adaptee Gimp.Layer
+    are handled aby Adaptor.
+
+    TODO, does Gimp GI provide properties?
     '''
 
 
+    """
+    OLD
     @property
     def lock_alpha(self):
         return self._adaptee.get_lock_alpha()
     @lock_alpha.setter
     def lock_alpha(self, truth):
         return self._adaptee.set_lock_alpha(truth)
+    """
