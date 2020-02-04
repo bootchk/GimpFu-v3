@@ -11,9 +11,23 @@ if not sys.warnoptions:
 
 
 
-from gimpfu_types import *  # GimpFuProcedure only?
+from gimpfu_enums import *  # PF_ enums
 
 from gimpfu_exception import  do_proceed_error
+
+
+
+from collections import namedtuple
+
+# v3 _registered_plugins_ is a dictionary of namedtuple
+GimpFuProcedure = namedtuple("GimpFuProcedure", [ 'BLURB', 'HELP', 'AUTHOR', 'COPYRIGHT',
+   'DATE', 'MENUITEMLABEL', 'IMAGETYPES', 'PLUGIN_TYPE',
+   'PARAMS', 'RESULTS', 'FUNCTION', 'MENUPATH', 'DOMAIN', 'ON_QUERY', 'ON_RUN' ])
+
+GimpFuFormalParam = namedtuple("GimpFuFormalParam",
+    [ 'PF_TYPE', 'LABEL', 'DESC', 'DEFAULT_VALUE', 'EXTRAS' ],
+    defaults = [None])  # EXTRAS defaults to None.  Python 3.7
+
 
 '''
 Nothing translatable here.

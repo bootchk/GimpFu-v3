@@ -18,11 +18,6 @@ from gi.repository import Gimp  # only for locale?
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-# CRUFT
-#from collections import namedtuple
-# from gimpfu_types import *
-#from gi.repository import GObject
-
 
 import gettext
 t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)

@@ -108,13 +108,12 @@ from gimpfu_exception import *
 
 # Gimp enums exposed to GimpFu authors
 # Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
-# TODO retain old module name FBC?
+# Name "gimpenums" retained for FBC
 # v2 from gimpenums import *
-from gimpfu_enums import *
+from gimpenums import *
 
 # GimpFu enums exposed to GimpFu authors e.g. PF_INT
-# TODO this also exposes private types
-from gimpfu_types import *
+from gimpfu_enums import *
 
 
 

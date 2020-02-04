@@ -113,9 +113,9 @@ class Adapter():
 
          # Marshall knows how to wrap self in AdaptedAdaptee, e.g. GimpfuLayer
          if is_test:
-             from .mock.marshal import Marshal
+             from mock.marshal import Marshal
          else:
-             from .adaption.marshal import Marshal
+             from adaption.marshal import Marshal
 
          '''
          clone _adaptee

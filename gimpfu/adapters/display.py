@@ -2,14 +2,13 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-# !!! Item imports Adapter
-from item import GimpfuItem
+from adaption.adapter import Adapter
 
 from gimpfu_exception import *
 
 
 
-class GimpfuDisplay( GimpfuItem ) :
+class GimpfuDisplay( Adapter ) :
 
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 

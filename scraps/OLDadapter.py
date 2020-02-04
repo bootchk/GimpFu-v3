@@ -1,5 +1,5 @@
 
-from ..adaption.compatibility import get_name_map_for_adaptee_class
+from adaption.compatibility import get_name_map_for_adaptee_class
 
 from adapted_call_sequencer import AdaptedCallSequencer
 

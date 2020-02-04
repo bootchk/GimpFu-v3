@@ -18,7 +18,8 @@ from gi.repository import Gimp
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from gimpfu_types import *  # PF_ enum
+from gimpfu_enums import *  # PF_ enum
+from gimpfu_procedure import GimpFuFormalParam
 
 from gui.widgets import *
 

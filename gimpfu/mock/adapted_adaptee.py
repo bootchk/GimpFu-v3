@@ -1,7 +1,7 @@
 
 
 # testing using a non-mocked adapter
-from ..gimpfu.adapter import Adapter
+from gimpfu.adapter import Adapter
 # from ~/vaggaGimp/gimpfu/adapter import Adapter
 
 

@@ -13,8 +13,8 @@ from adapters.display import GimpfuDisplay
 # TODO channel, etc.
 
 
-from ..adaption.marshal import Marshal
-from ..adaption.compatibility import gimp_name_map
+from adaption.marshal import Marshal
+from adaption.compatibility import gimp_name_map
 
 from gimpfu_exception import *
 

@@ -5,8 +5,8 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 from gi.repository import GObject    # marshalling
 
-from ..adaption.marshal import Marshal
-from ..adaption.compatibility import pdb_name_map
+from adaption.marshal import Marshal
+from adaption.compatibility import pdb_name_map
 
 from gimpfu_exception import *
 
