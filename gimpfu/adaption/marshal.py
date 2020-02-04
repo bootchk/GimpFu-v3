@@ -8,8 +8,8 @@ from gi.repository import GObject
 
 
 # import wrapper classes
-from gimpfu_image import GimpfuImage
-from gimpfu_layer import GimpfuLayer
+from adapters.image import GimpfuImage
+from adapters.layer import GimpfuLayer
 
 from gimpfu_exception import *
 

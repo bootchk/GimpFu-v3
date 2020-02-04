@@ -73,8 +73,8 @@ gimpfu_pdb
 Provide the aliases "gimp" and "pdb" which GimpFu has always promised,
 more or less to Gimp and Gimp.pdb
 
-gimpfu_image
-gimpfu_layer
+adapters.image
+adapters.layer
 etc.
 
 Wrappers which provide additional convenience methods provided by GimpFu v2.

@@ -1,5 +1,5 @@
 
-from gimpfu_compatibility import get_name_map_for_adaptee_class
+from ..adaption.compatibility import get_name_map_for_adaptee_class
 
 from adapted_call_sequencer import AdaptedCallSequencer
 
@@ -16,7 +16,7 @@ class Adapter():
     Using the "object adapter" version of the pattern.
     Whereby Adapter owns an instance of Adaptee (composition.)
 
-    see comments at gimpfu_image, somewhat similar re dynamic methods
+    see comments at adapters.image, somewhat similar re dynamic methods
 
 
     class adapter vs object adapter

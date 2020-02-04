@@ -4,7 +4,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 
-from item import GimpfuItem
+from adapters.item import GimpfuItem
 
 
 

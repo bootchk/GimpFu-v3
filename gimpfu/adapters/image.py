@@ -4,7 +4,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adapter import Adapter
+from ..adapter import Adapter
 from gimpfu_property import GimpfuProperty, GimpfuProperty2
 
 '''
@@ -104,7 +104,7 @@ class GimpfuImage( Adapter ) :
     @property
     def layers(self):
         # avoid circular import, import when needed
-        from gimpfu_marshal import Marshal
+        from ..adaption.marshal import Marshal
 
         '''
         Override:

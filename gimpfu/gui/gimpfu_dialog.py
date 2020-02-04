@@ -20,7 +20,7 @@ from gi.repository import Gtk
 
 from gimpfu_types import *  # PF_ enum
 
-from gimpfu_widgets import *
+from gui.widgets import *
 
 import gettext
 t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)

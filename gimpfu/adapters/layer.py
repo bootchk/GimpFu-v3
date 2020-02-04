@@ -3,8 +3,8 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-# !!! Drawable imports Item imports Adapter
-from gimpfu_drawable import GimpfuDrawable
+# !!! Layer => Drawable => Item => Adapter
+from adapters.drawable import GimpfuDrawable
 
 
 
@@ -12,7 +12,7 @@ from gimpfu_drawable import GimpfuDrawable
 
 class GimpfuLayer( GimpfuDrawable ) :
 
-    DynamicWriteableAdaptedProperties = ('mode', 'name' )
+    DynamicWriteableAdaptedProperties = ('mode', 'name', 'lock_alpha' )
     DynamicReadOnlyAdaptedProperties = ('othernameRO', )
 
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
@@ -42,7 +42,7 @@ class GimpfuLayer( GimpfuDrawable ) :
     - alias or rename: old name => new or simpler name
     - encapsulate: one call => many subroutines
 
-    see other examples  gimpfu_image.py
+    see other examples  adapters.image.py
     '''
 
 

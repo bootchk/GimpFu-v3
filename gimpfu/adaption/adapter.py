@@ -28,7 +28,7 @@ Note that an Adapted class can adapt methods that become calls on Adaptee.
 Methods that the Adapted class adapts (specializes.)
 The calls that the Adaptor class adapts are generally adapted.
 
-see comments at gimpfu_image, somewhat similar re dynamic methods
+see comments at adapters.image, somewhat similar re dynamic methods
 
 Using the "object adapter" version of the pattern.
 Whereby Adapter owns an instance of Adaptee (composition.)
@@ -115,7 +115,7 @@ class Adapter():
          if is_test:
              from .mock.marshal import Marshal
          else:
-             from gimpfu_marshal import Marshal
+             from .adaption.marshal import Marshal
 
          '''
          clone _adaptee

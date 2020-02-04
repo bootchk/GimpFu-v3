@@ -7,14 +7,15 @@ from gi.repository import GObject    # marshalling
 
 
 # import wrapper classes
-from gimpfu_image import GimpfuImage
-from gimpfu_layer import GimpfuLayer
-from gimpfu_display import GimpfuDisplay
+from adapters.image import GimpfuImage
+from adapters.layer import GimpfuLayer
+from adapters.display import GimpfuDisplay
 # TODO channel, etc.
 
 
-from gimpfu_marshal import Marshal
-from gimpfu_compatibility import gimp_name_map
+from ..adaption.marshal import Marshal
+from ..adaption.compatibility import gimp_name_map
+
 from gimpfu_exception import *
 
 class GimpfuGimp():

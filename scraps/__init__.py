@@ -9,8 +9,8 @@ __all__ = ["gimpfu",        # defines register(), and establishes Gimp.Plugin
            "gimpfu_pdb",    # defines symbol "pdb"
            "gimpfu_gimp",   # defines symbol "gimp"
            "gimpfu_enums",  # defines convenience symbols for Gimp enums
-           "gimpfu_image",  # defines convenience classes (could be imported separately)
-           "gimpfu_layer",
+           "adapters.image",  # defines convenience classes (could be imported separately)
+           "adapters.layer",
            "gimpfu_types",  # The rest support the above
            "gimpfu_widgets",
            "gimpfu_maps",

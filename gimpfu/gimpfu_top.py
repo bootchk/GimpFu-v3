@@ -99,7 +99,7 @@ from gi.repository import GObject
 
 
 # import private implementation
-from gimpfu_marshal import Marshal
+from adaption.marshal import Marshal
 from gimpfu_procedure import GimpfuProcedure
 from gimpfu_exception import *
 
@@ -129,10 +129,10 @@ It is not as simple as:
     OR from gi.repository import Gimp as gimp
 These are adapters. TODO kind of adapters
 '''
-from gimpfu_pdb import GimpfuPDB
+from aliases.pdb import GimpfuPDB
 pdb = GimpfuPDB()
 
-from gimpfu_gimp import GimpfuGimp
+from aliases.gimp import GimpfuGimp
 gimp = GimpfuGimp()
 
 """
@@ -331,12 +331,12 @@ def _try_run_func(proc_name, function, args):
         result = function(*args)
     except:
         # Show dialog here, or pass exception string back to Gimp???
-        import gimpfu_dialog
+        import gui.dialog
 
         # TODO this needs image
         # gimpfu_dialog.show_error_dialog(proc_name, image)
         print(">>>>>>>>>>>TODO error dialog??")
-        exc_str, exc_only_str = gimpfu_dialog._create_exception_str()
+        exc_str, exc_only_str = gui.dialog._create_exception_str()
         print(exc_str, exc_only_str)
         result = None
         # TODO either pass exc_str back so Gimp shows in dialog,
@@ -408,7 +408,7 @@ def _interact(procedure, actual_args):
             print("Call on_run")
             on_run()
 
-        import gimpfu_dialog
+        import gui.dialog
 
         print("Call show_plugin_dialog")
         '''
@@ -421,7 +421,7 @@ def _interact(procedure, actual_args):
         '''
         nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_in_actual_args)
 
-        was_canceled, guied_args = gimpfu_dialog.show_plugin_dialog(
+        was_canceled, guied_args = gui.dialog.show_plugin_dialog(
             procedure,
             guiable_actual_args,
             guiable_formal_params)

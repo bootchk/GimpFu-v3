@@ -576,6 +576,9 @@ commands:
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
       export NO_AT_BRIDGE=1
 
+      echo "Removing old plugins and gimpfu source"
+      rm -rf /work/.home/.config/GIMP/2.99/plug-ins/*
+
       echo "Copying test plugins"
       cp -r /work/plug-ins /work/.home/.config/GIMP/2.99/plug-ins
 
