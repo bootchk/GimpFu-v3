@@ -10,6 +10,7 @@ from gi.repository import GObject
 # import wrapper classes
 from adapters.image import GimpfuImage
 from adapters.layer import GimpfuLayer
+from adapters.vector import GimpfuVectors
 
 from gimpfu_exception import *
 
@@ -81,11 +82,15 @@ class Marshal():
 
     '''
     Keep these in correspondence with each other,
-    and with wrap() and unwrap() dispatch.
+    and with wrap() dispatch.
+    (unwrap is in the adapter)
+    I.E. to add a wrapper Foo:
+     - add Foo.py in adapters/
+     - add literals like 'Foo' in three places in this file.
     '''
     @classmethod
     def is_gimpfu_wrappable_name(cls, name):
-        return name in ('Image', 'Layer', 'Display')
+        return name in ('Image', 'Layer', 'Display', 'Vectors')
 
     @classmethod
     def is_gimpfu_wrappable(cls, instance):
@@ -93,7 +98,7 @@ class Marshal():
 
     @classmethod
     def is_gimpfu_unwrappable(cls, instance):
-        return type(instance).__name__ in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay")
+        return type(instance).__name__ in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay", "GimpfuVectors")
 
 
     # TODO doesn't need to be classmethod
@@ -117,11 +122,13 @@ class Marshal():
         # This is a switch statement, default is an error
         gimp_type = type(gimp_object).__name__    # idiom for class name
         if  gimp_type == 'Image':
-            result = GimpfuImage(None, None, None, gimp_object)
+            result = GimpfuImage(adaptee=gimp_object)
         elif gimp_type == 'Layer':
-            result = GimpfuLayer(None, None, None, None, None, None, None, gimp_object)
+            result = GimpfuLayer(adaptee=gimp_object)
         elif gimp_type == 'Display':
-                result = GimpfuDisplay(gimp_object)
+            result = GimpfuDisplay(adaptee=gimp_object)
+        elif gimp_type == 'Vectors':
+            result = GimpfuVectors(adaptee=gimp_object)
         #elif gimp_type == 'Channel':
         # result = GimpfuLayer(None, None, None, None, None, None, None, gimp_object)
         else:
@@ -129,6 +136,13 @@ class Marshal():
             do_proceed_error(exception_str)
         return result
 
+
+
+    '''
+    args
+    '''
+
+    # TODO args is misnomer:  more genernally a list
 
     @classmethod
     def wrap_args(cls, args):

@@ -44,6 +44,7 @@ TODO enumerate errors it detects
 class Adapter():
 
     def __init__(self, adaptee):
+        # TODO assert adaptee is a wrappable Gimp type
         self._adaptee = adaptee
         self._adaptee_callable = None
 
@@ -180,6 +181,11 @@ class Adapter():
     def _eval_statement_on_adaptee(self, adaptee, name, get_or_set, setting_value=None):
         assert get_or_set in ("get", "set")
 
+        # FUTURE rather than trust that DynamicReadOnlyAdaptedProperties is correct,
+        # preflight get_name on dictionary of adaptee
+        # So we can use a more specific error than AttributeError, e.g. "is not a *property* name"
+
+
         # Method on adaptee is like "[get,set]_name"
         # Method on adaptee is a callable having no arguments
         # eval occurs in current context, so formal args are in scope
@@ -236,7 +242,7 @@ class Adapter():
         elif self._is_dynamic_readable_property_name(name):
             result = self._get_dynamic_property_value(name)
         else:
-            raise AttributeError(f"Name {name} is not an attribute of {self.adaptee_class_name}")
+            raise AttributeError(f"Name: {name} is not an attribute of: {self.adaptee_class_name}")
         # assert result is a value, or the callable adapter_func
         return result
 

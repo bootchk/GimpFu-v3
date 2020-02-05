@@ -105,6 +105,22 @@ Some procedures, like gimp-threshold have been replaced (gimp-drawable-threshold
 ?????
 
 
+Gimp Menu Path Names
+--------------------
+
+A plugin declares a MenuItem name and a MenuPath name
+
+Gimp says:
+<Image>", "<Layers>", "<Channels>", "<Vectors>", "<Colormap>", "<Brushes>",
+"<Dynamics>", "<MyPaintBrushes>", "<Gradients>", "<Palettes>", "<Patterns>", "<ToolPresets>", "<Fonts>" or "<Buffers>"
+
+But <Filters> also works.  And <Filters/Foo>
+
+Note that e.g. Layers is not the "Layer" menu in the menubar, but the popup menu in Gimp's "Layers" dockable dialog.
+Use RMB to popup the menu.
+
+
+
 Miscellaneous changes
 ---------------------
 

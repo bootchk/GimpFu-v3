@@ -513,7 +513,7 @@ class GimpfuProcedure():
         # TODO transliterate "_" to "-" FBC
 
         if not letterCheck(proc_name, proc_name_allowed):
-            raise Exception("procedure name contains illegal characters")
+            raise Exception(f"Procedure name: {proc_name} contains illegal characters: _ ?")
 
         for ent in params:
             if len(ent) < 4:

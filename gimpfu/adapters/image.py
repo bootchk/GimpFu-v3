@@ -42,7 +42,12 @@ class GimpfuImage( Adapter ) :
 
     # class variables needed by Adapter
     # TODO
-    DynamicWriteableAdaptedProperties = ('filename', 'instance_nameRW' )
+    '''
+    Notes:
+    filename is NOT a canonical property of Image, at least in v3
+    TODO active_layer should be
+    '''
+    DynamicWriteableAdaptedProperties = ( 'instance_nameRW', )
     DynamicReadOnlyAdaptedProperties = ('othernameRO', )
 
     '''
@@ -137,9 +142,20 @@ class GimpfuImage( Adapter ) :
 
     # No layers setter
 
+    @property
+    def vectors(self):
+        # avoid circular import, import when needed
+        from adaption.marshal import Marshal
+
+        unwrapped_list = self._adaptee.get_vectors()
+        result_list = Marshal.wrap_args(unwrapped_list)
+        return result_list
+
+
     # TODO all these properties are rote changes to name i.e. prefix with get_
     # Do this at runtime, or code generate?
 
+    # TODO this is canonical, move to DynamicReadOnlyAdaptedProperties
     @property
     def active_layer(self):
         # Delegate to Gimp.Image
@@ -156,3 +172,14 @@ class GimpfuImage( Adapter ) :
         # Delegate to Gimp.Image
         # Result is fundamental type (enum int)
         return self._adaptee.base_type()
+
+    @property
+    def filename(self):
+        '''
+        Really the path.
+        Returns None if image not loaded from file, or not saved.
+        '''
+        file = self._adaptee.get_file()
+        # assert file is-a Gio.File
+        result = file.get_path()
+        return result
