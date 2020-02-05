@@ -10,6 +10,8 @@ from gi.repository import GObject
 from adaption.wrappable import *
 
 # import wrapper classes
+# These inherit Adapter which wants to use Marshal, avoid circular import
+# in Adapter by selectively import Marshal
 from adapters.image import GimpfuImage
 from adapters.layer import GimpfuLayer
 from adapters.vector import GimpfuVectors
@@ -70,7 +72,15 @@ class Marshal():
 
 
 
+    '''
+    wrap and unwrap
 
+    These are generic: not special to an wrapper type.
+
+    See wrapper class, i.e. AdaptedAdaptee e.g. GimpfuLayer.
+    Wrapper class also have a unwrap() method specialized to the class.
+    Wrapper class also has a constructor that effectively wraps.
+    '''
 
 
 
@@ -99,6 +109,7 @@ class Marshal():
         else:
             exception_str = f"GimpFu: can't wrap gimp type {gimp_type_name}"
             do_proceed_error(exception_str)
+        return result
 
         """
         OLD
@@ -119,15 +130,98 @@ class Marshal():
             exception_str = f"GimpFu: can't wrap gimp type {gimp_type}"
             do_proceed_error(exception_str)
         """
+
+
+    @classmethod
+    def unwrap_arg(cls, arg):
+        '''
+        Unwrap any GimpFu wrapped types to Gimp types
+        E.G. GimpfuImage => Gimp.Image
+        For primitive Python types and GTypes, idempotent, returns given arg unaltered.
+
+        Only fundamental Python types and Gimp types (not GimpfuFoo wrapper TYPE_STRING)
+        can be passed to Gimp.
+        '''
+        # Unwrap wrapped types.
+        if  is_gimpfu_unwrappable(arg) :
+            # !!! Do not affect the original object by assigning to arg
+            result_arg = arg.unwrap()
+        else:
+            # arg is already Gimp type, or a fundamental type
+            result_arg = arg
+        print("unwrap_arg:", result_arg)
+        return result_arg
+
+
+
+    '''
+    unwrap to a GParamSpec
+    '''
+
+    def unwrap_arg_to_param(cls, arg):
+        '''
+        Unwrap any wrapped.
+        Returns a tuple: (unwrapped arg, type of unwrapped arg)
+        For use as arg to PDB, which requires ParamSpec tuple.
+
+        Only fundamental Python types and GTypes can be GObject.value()ed,
+        which is what Gimp does with ParamSpec
+        '''
+
+        # TODO, possible optimization if arg is already unwrapped, or lazy?
+        result_arg = unwrap_arg(arg)
+
+        # hack: upcast  subclass e.g. layer to superclass drawable
+        # hack that might be removed if Gimp was not wrongly stringent
+
+        # TODO optimize, getting type is simpler when is fundamental
+        # We could retain that the arg is fundamental during unwrapping
+        result_arg_type = cls.try_upcast_to_drawable(result_arg)
+
+        print("unwrap_arg_to_param", result_arg, result_arg_type)
+        return result_arg, result_arg_type
+
+    '''
+    '''
+    def try_wrap(cls, instance):
+        ''' Wrap a single instance if it is wrappable, else the arg. '''
+        if is_gimpfu_unwrappable(instance):
+            result = cls.wrap_arg(instance)
+        else:   # fundamental
+            result = instance
+        return result
+
+
+    def wrap_adaptee_results(cls, args):
+        '''
+        Wrap result of calls to adaptee.
+
+        args may be an iterable e.g. a tuple or list?
+        Result is iterable if args is.
+        Result is a list if args is?
+        '''
+        try:
+            iterator = iter(args)
+        except TypeError:
+            # not iterable
+            result = try_wrap(args)
+        else:
+            # iterable
+            result = []
+            for instance in args:
+                result.append(try_wrap(instance))
         return result
 
 
 
-    '''
-    args
-    '''
 
-    # TODO args is misnomer:  more genernally a list
+
+    '''
+    wrap and unwrap list of things
+    !!! note the 's'
+    Generally the list is incoming or outgoing arguments.
+    But distinct from arguments to the pdb, which are tuples.
+    '''
 
     @classmethod
     def wrap_args(cls, args):
@@ -138,7 +232,6 @@ class Marshal():
         Returns list.
         '''
         print("wrap_args", args)
-        # TODO incomplete
         result = []
         for instance in args:
             if is_gimpfu_wrappable(instance):
@@ -147,41 +240,25 @@ class Marshal():
                 result.append(instance)
         return result
 
-    '''
-    TODO this smells bad.
-    There is no unwrap_args method???
-    Yet?? Shouldn't we be unwrapping args to Gimp methods?
-    See below: unwrap_pdb_args.
-    '''
-
 
     @classmethod
-    def unwrap_arg(cls, arg):
+    def unwrap_args(cls, args):
         '''
-        Unwrap any GimpFu wrapped types to Gimp types
-        E.G. GimpfuImage => Gimp.Image
-        For primitive Python types and GTypes, idempotent, returns given arg unaltered.
-
-        Returns unwrapped arg, type of unwrapped arg
-
-        Only primitive Python types and GTypes can be GObject.value()ed
+        args is a sequence of possibly wrapped objects (class GimpfuFoo)
+        or fundamental types.
+        Unwrap instances that are wrapped.
+        Returns list.
         '''
-        # Unwrap wrapped types. Use idiom for class name
-        # TODO other class names in list
-        if  is_gimpfu_unwrappable(arg) :
-            # !!! Do not affect the original object by assigning to arg
-            result_arg = arg.unwrap()
+        print("unwrap_args", args)
+        result = []
+        for instance in args:
+            if is_gimpfu_unwrappable(instance):
+                result.append(cls.unwrap_arg(instance))
+            else:   # fundamental
+                result.append(instance)
+        return result
 
-            # hack: upcast  sublclass e.g. layer to superclass drawable
-            result_arg_type = cls.try_upcast_to_drawable(result_arg)
-        else:
-            result_arg = arg
-            # arg may be unwrapped result of previous call e.g. type Gimp.Layer
-            # TODO: we wrap and unwrap as needed???
-            # hack that might be removed?
-            result_arg_type = cls.try_upcast_to_drawable(result_arg)
-        print("unwrap_arg", result_arg, result_arg_type)
-        return result_arg, result_arg_type
+
 
 
 
@@ -194,8 +271,6 @@ class Marshal():
 
     marshal_gimp_args, unmarshal_gimp_results
     '''
-
-    # TODO:
 
 
 
@@ -238,7 +313,7 @@ class Marshal():
             ## GObject.Value(GObject.TYPE_STRING, tmp))
             ## print("marshal arg:", x )
 
-            go_arg, go_arg_type = Marshal.unwrap_arg(x)
+            go_arg, go_arg_type = Marshal.unwrap_arg_to_param(x)
 
             '''
             Don't assume any arg does NOT need conversion:

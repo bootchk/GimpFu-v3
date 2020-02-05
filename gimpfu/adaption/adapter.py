@@ -3,8 +3,9 @@
 is_test = False
 
 
-
 # !!! Can't import Marshal yet, circular
+# See below, import Marshal selectively
+
 from adaption.wrappable import *
 
 
@@ -148,19 +149,19 @@ class Adapter():
         ''' intercepts calls to previously accessed attribute '''
 
         print("Adapter._adapter_func called, args:", *args)
+        from adaption.marshal import Marshal
 
         # arg could be a wrapped type, convert to unwrapped type i.e. foreign type
-        print("marshal args")
-        # TODO
+        unwrapped_args = Marshal.unwrap_args(args)
 
         # call the callable
-        # Not sure why we need to use object.__...
-        result = object.__getattribute__(self, "_adaptee_callable")(*args)
+        # TODO Not sure why we need to use object.__...
+        unwrapped_result = object.__getattribute__(self, "_adaptee_callable")(*unwrapped_args)
 
         # result could be a foreign type, convert to wrapped type, etc.
-        print("unmarshal args")
-        # TODO
+        result = Marshal.wrap_adaptee_results(unwrapped_result)
 
+        # assert result is-a list of wrapped
         return result
 
 
