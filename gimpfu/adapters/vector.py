@@ -47,7 +47,8 @@ class GimpfuVectors( GimpfuDrawable ) :
 
     # copy is inherited
 
-
+    def to_selection(self):
+        raise RuntimeError("Obsolete: use image.select_item()")
 
 
     '''

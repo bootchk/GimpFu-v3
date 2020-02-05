@@ -227,13 +227,22 @@ class Adapter():
     def __getattr__(self, name):
         print("Adapter.__getattr__", name)
 
+        """
+        TODO this fails sometimes, on the second call i.e. Vectors.name works, but not Vectors.to_selection()
+        It is just for preflight anyway, wait for error to pop up later???
+        Feb 2020 lkk
         '''
         require self is AdaptedAdaptee i.e. defines class variable that lists properties
         i.e. implements virtual properties of ABC AdaptedAdaptee.
         Use this idiom to avoid infinite recursion.
         '''
-        assert object.__getattribute__(self, 'DynamicReadOnlyAdaptedProperties')
-        assert object.__getattribute__(self, 'DynamicWriteableAdaptedProperties')
+        msg = f"Missing DynamicReadOnly... in Adapter for {self.adaptee_class_name} "
+        print(type(self).__name__)
+        print(dir(self))
+        assert object.__getattribute__(self, 'DynamicReadOnlyAdaptedProperties'), msg
+        msg = f"Missing DynamicWriteable... in Adapter for {self.adaptee_class_name} "
+        assert object.__getattribute__(self, 'DynamicWriteableAdaptedProperties'), msg
+        """
 
         adaptee = self.__dict__['_adaptee']
 

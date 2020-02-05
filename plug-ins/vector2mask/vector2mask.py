@@ -32,21 +32,23 @@
 from gimpfu import *
 
 def plugin_vector2mask(image, drawable):
-	#create list of existing vectors for the active image
-	vectors_list = image.vectors
-	# loop the list to see if any path has the same name as the active layer
-	for v in vectors_list:
-		if(drawable.name == v.name):
-			#if found - check if the layer already have mask and destroy it if true
-			if (drawable.mask != None):
-				drawable.remove_mask(1) # 1 - removes mask, 0 - applies it
-			v.to_selection()
-			# optional feather selection by 2, comment out the line below to disable it
-			pdb.plug_in_gauss_rle2(image,image.selection,2.0,2.0)
-			# 4 - creates mask from selection
-			drawable.add_mask(drawable.create_mask(4))
-			pdb.gimp_selection_none(image)
-	return
+    #create list of existing vectors for the active image
+    vectors_list = image.vectors
+    # loop the list to see if any path has the same name as the active layer
+    for v in vectors_list:
+        if(drawable.name == v.name):
+            #if found - check if the layer already have mask and destroy it if true
+            if (drawable.mask != None):
+                drawable.remove_mask(1) # 1 - removes mask, 0 - applies it
+            #lkk obsolete
+            # v.to_selection()
+            image.select_item( CHANNEL_OP_REPLACE, v)
+            # optional feather selection by 2, comment out the line below to disable it
+            pdb.plug_in_gauss_rle2(image,image.selection,2.0,2.0)
+            # 4 - creates mask from selection
+            drawable.add_mask(drawable.create_mask(4))
+            pdb.gimp_selection_none(image)
+    return
 
 # lkk in procname: _ => -
 register(

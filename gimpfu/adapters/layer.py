@@ -13,7 +13,7 @@ from adapters.drawable import GimpfuDrawable
 class GimpfuLayer( GimpfuDrawable ) :
 
     DynamicWriteableAdaptedProperties = ('mode', 'name', 'lock_alpha' )
-    DynamicReadOnlyAdaptedProperties = ('othernameRO', )
+    DynamicReadOnlyAdaptedProperties = ('mask', )
 
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 
