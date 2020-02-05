@@ -7,6 +7,8 @@ from gi.repository import Gimp
 from gi.repository import GObject
 
 
+from adaption.wrappable import *
+
 # import wrapper classes
 from adapters.image import GimpfuImage
 from adapters.layer import GimpfuLayer
@@ -66,49 +68,20 @@ class Marshal():
 
 
 
-    @classmethod
-    def is_function(cls, instance):
-        ''' Is the instance a gi.FunctionInfo? '''
-        '''
-        Which means an error earlier in the author's source:
-        accessing an attribute of adaptee as a property instead of a callable.
-        Such an error is sometimes caught earlier by Python
-        when author dereferenced the attribute
-        (e.g. when used as an int, but not when used as a bool)
-        but when first dereference is when passing to PDB, we catch it.
-        '''
-        return type(instance).__name__ in ('gi.FunctionInfo')
 
 
-    '''
-    Keep these in correspondence with each other,
-    and with wrap() dispatch.
-    (unwrap is in the adapter)
-    I.E. to add a wrapper Foo:
-     - add Foo.py in adapters/
-     - add literals like 'Foo' in three places in this file.
-    '''
-    @classmethod
-    def is_gimpfu_wrappable_name(cls, name):
-        return name in ('Image', 'Layer', 'Display', 'Vectors')
 
-    @classmethod
-    def is_gimpfu_wrappable(cls, instance):
-        return cls.is_gimpfu_wrappable_name(type(instance).__name__ )
 
-    @classmethod
-    def is_gimpfu_unwrappable(cls, instance):
-        return type(instance).__name__ in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay", "GimpfuVectors")
 
 
     # TODO doesn't need to be classmethod
     @classmethod
-    def wrap(cls, gimp_object):
+    def wrap(cls, gimp_instance):
         '''
         Wrap Gimp types that GimpFu wraps.
         E.G. Image => GimpfuImage
 
-        Requires gimp_object is-a Gimp object
+        Requires gimp_instance is-a Gimp object
         '''
         '''
         Invoke the internal constructor for wrapper class.
@@ -116,24 +89,36 @@ class Marshal():
         the Nones mean we don't know attributes of adaptee,
         but the adaptee has and knows its attributes.
         '''
-        print("Wrap ", gimp_object)
+        print("Wrap ", gimp_instance)
 
+        if is_gimpfu_wrappable(gimp_instance):
+            gimp_type_name = get_gimp_type_name(gimp_instance)
+            statement = 'Gimpfu' + gimp_type_name + '(adaptee=gimp_instance)'
+            # e.g. statement  'GimpfuImage(adaptee=gimp_instance)'
+            result = eval(statement)
+        else:
+            exception_str = f"GimpFu: can't wrap gimp type {gimp_type_name}"
+            do_proceed_error(exception_str)
+
+        """
+        OLD
         # Dispatch on gimp type
         # This is a switch statement, default is an error
-        gimp_type = type(gimp_object).__name__    # idiom for class name
+        gimp_type = type(gimp_instance).__name__    # idiom for class name
         if  gimp_type == 'Image':
-            result = GimpfuImage(adaptee=gimp_object)
+            result = GimpfuImage(adaptee=gimp_instance)
         elif gimp_type == 'Layer':
-            result = GimpfuLayer(adaptee=gimp_object)
+            result = GimpfuLayer(adaptee=gimp_instance)
         elif gimp_type == 'Display':
-            result = GimpfuDisplay(adaptee=gimp_object)
+            result = GimpfuDisplay(adaptee=gimp_instance)
         elif gimp_type == 'Vectors':
-            result = GimpfuVectors(adaptee=gimp_object)
+            result = GimpfuVectors(adaptee=gimp_instance)
         #elif gimp_type == 'Channel':
-        # result = GimpfuLayer(None, None, None, None, None, None, None, gimp_object)
+        # result = GimpfuLayer(None, None, None, None, None, None, None, gimp_instance)
         else:
             exception_str = f"GimpFu: can't wrap gimp type {gimp_type}"
             do_proceed_error(exception_str)
+        """
         return result
 
 
@@ -156,7 +141,7 @@ class Marshal():
         # TODO incomplete
         result = []
         for instance in args:
-            if cls.is_gimpfu_wrappable(instance):
+            if is_gimpfu_wrappable(instance):
                 result.append(cls.wrap(instance))
             else:   # fundamental
                 result.append(instance)
@@ -183,7 +168,7 @@ class Marshal():
         '''
         # Unwrap wrapped types. Use idiom for class name
         # TODO other class names in list
-        if  cls.is_gimpfu_unwrappable(arg) :
+        if  is_gimpfu_unwrappable(arg) :
             # !!! Do not affect the original object by assigning to arg
             result_arg = arg.unwrap()
 
@@ -264,7 +249,7 @@ class Marshal():
             '''
             go_arg, go_arg_type = Marshal.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
 
-            if cls.is_function(go_arg):
+            if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")
 
 
@@ -456,17 +441,7 @@ class Marshal():
         '''
         # idiom for class name
         print("Attempt upcast type", type(arg).__name__ )
-        # Note the names are not prefixed with Gimp ???
-        # These taken from "GIMP App Ref Manual>Class Hierarchy"
-        if type(arg).__name__ in (
-            "Layer",
-               "GroupLayer",
-               "TextLayer"
-            "Channel",
-               "LayerMask",
-               "Selection",
-             "Vectors"
-            ):
+        if is_subclass_of_drawable(arg):
             result = Gimp.Drawable
         else:
             result = type(arg)

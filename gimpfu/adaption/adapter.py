@@ -2,7 +2,11 @@
 #is_test = True
 is_test = False
 
+
+
 # !!! Can't import Marshal yet, circular
+from adaption.wrappable import *
+
 
 '''
 Adapter component of the Wrapper/Adapter pattern.
@@ -44,7 +48,7 @@ TODO enumerate errors it detects
 class Adapter():
 
     def __init__(self, adaptee):
-        # TODO assert adaptee is a wrappable Gimp type
+        assert is_gimpfu_wrappable(adaptee)
         self._adaptee = adaptee
         self._adaptee_callable = None
 
