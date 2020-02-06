@@ -135,6 +135,9 @@ define_symbols_for_enum(Gimp.HistogramChannel, prefix='HISTOGRAM_')
 #HISTOGRAM_VALUE      = Gimp.HistogramChannel.VALUE
 define_symbols_for_enum(Gimp.MaskApplyMode, prefix='MASK_')
 #MASK_APPLY           = Gimp.MaskApplyMode.APPLY
+# New to v3
+define_symbols_for_enum(Gimp.AddMaskType, prefix='ADD_MASK_')
+# ADD_MASK_SELECTION = Gimp.AddMaskType.SELECTION
 
 
 

@@ -46,7 +46,11 @@ def plugin_vector2mask(image, drawable):
             # optional feather selection by 2, comment out the line below to disable it
             pdb.plug_in_gauss_rle2(image,image.selection,2.0,2.0)
             # 4 - creates mask from selection
-            drawable.add_mask(drawable.create_mask(4))
+            # lkk 4=> ADD_MASK_SELECTION
+            # lkk break into two statements
+            # drawable.add_mask(drawable.create_mask(4))
+            mask = drawable.create_mask(ADD_MASK_SELECTION)
+            drawable.add_mask(mask)
             pdb.gimp_selection_none(image)
     return
 

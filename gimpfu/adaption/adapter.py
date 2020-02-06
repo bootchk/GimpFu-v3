@@ -16,7 +16,7 @@ An Adapted object inherits this class.
 (Adapted and Adaptee are metaclasses, no instance is-a Adapted or Adaptee.)
 
 Collaborators:
-    Marshall:  args to and from Adaptee must be marshalled (wrapped and unwrapped)
+    Marshal:  args to and from Adaptee must be marshalled (wrapped and unwrapped)
 
 Responsibilities:
     delegate a subset of attributes accesses on Adapted to Adaptee
@@ -117,7 +117,7 @@ class Adapter():
 
          # require Adaptee implements copy()
 
-         # Marshall knows how to wrap self in AdaptedAdaptee, e.g. GimpfuLayer
+         # Marshal knows how to wrap self in AdaptedAdaptee, e.g. GimpfuLayer
          if is_test:
              from mock.marshal import Marshal
          else:

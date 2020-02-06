@@ -48,7 +48,7 @@ class GimpfuImage( Adapter ) :
     TODO active_layer should be
     '''
     DynamicWriteableAdaptedProperties = ( 'instance_nameRW', )
-    DynamicReadOnlyAdaptedProperties = ('othernameRO', )
+    DynamicReadOnlyAdaptedProperties = ('selection', )
 
     '''
     Constructor exported to Gimpfu authors.
