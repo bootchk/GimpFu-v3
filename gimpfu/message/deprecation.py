@@ -16,6 +16,8 @@ class Deprecation():
 
     Many occur at registration time.
     FUTURE save them, and print them at run-time also
+
+    FUTURE set procedure name in state, to be prepended to messages
     '''
 
     log = []
