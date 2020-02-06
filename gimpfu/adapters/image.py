@@ -183,3 +183,11 @@ class GimpfuImage( Adapter ) :
         # assert file is-a Gio.File
         result = file.get_path()
         return result
+
+    # TODO make these Dynamic also, but they don't have a get_
+    @property
+    def width(self):
+        return self._adaptee.width()
+    @property
+    def height(self):
+        return self._adaptee.height()

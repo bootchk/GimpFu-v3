@@ -1,7 +1,6 @@
 
 import string   # v2 as _string to hide from authors
 
-
 import sys
 
 # Insure all warnings (deprecation and user) will be printed
@@ -15,18 +14,12 @@ from gimpfu_enums import *  # PF_ enums
 
 from gimpfu_exception import  do_proceed_error
 
+from procedure.metadata import GimpfuProcedureMetadata
+from procedure.formal_param import GimpfuFormalParam
 
 
-from collections import namedtuple
 
-# v3 _registered_plugins_ is a dictionary of namedtuple
-GimpFuProcedure = namedtuple("GimpFuProcedure", [ 'BLURB', 'HELP', 'AUTHOR', 'COPYRIGHT',
-   'DATE', 'MENUITEMLABEL', 'IMAGETYPES', 'PLUGIN_TYPE',
-   'PARAMS', 'RESULTS', 'FUNCTION', 'MENUPATH', 'DOMAIN', 'ON_QUERY', 'ON_RUN' ])
 
-GimpFuFormalParam = namedtuple("GimpFuFormalParam",
-    [ 'PF_TYPE', 'LABEL', 'DESC', 'DEFAULT_VALUE', 'EXTRAS' ],
-    defaults = [None])  # EXTRAS defaults to None.  Python 3.7
 
 
 '''
@@ -63,6 +56,7 @@ class GimpfuProcedure():
     This hides the differences.
     Differences:
        plugin_type not required of GimpFu author
+       FBC fixes Author use of deprecated
     '''
 
     '''
@@ -78,6 +72,14 @@ class GimpfuProcedure():
         ''' wrapper of warnings.warn() that fixpoints the parameters. '''
         # stacklevel=2 means print two lines, including caller's info
         warnings.warn(message, DeprecationWarning, stacklevel=2)
+
+
+    # Constant class data
+    file_params = [GimpfuFormalParam(PF_STRING, "filename", "The name of the file", ""),
+                   GimpfuFormalParam(PF_STRING, "raw-filename", "The name of the file", "")]
+    image_param = GimpfuFormalParam(PF_IMAGE, "image", "Input image", None)
+    drawable_param = GimpfuFormalParam(PF_DRAWABLE, "drawable", "Input drawable", None)
+
 
 
     def __init__(self,
@@ -117,8 +119,7 @@ class GimpfuProcedure():
 
         self.name = self._makeProcNamePrefixCanonical(proc_name)
 
-        # TODO rename to ProcedureStruct, f vs F is too subtle
-        self.metadata = GimpFuProcedure(blurb, help, author, copyright,
+        self.metadata = GimpfuProcedureMetadata(blurb, help, author, copyright,
                                            date, label, imagetypes,
                                            plugin_type, params, results,
                                            function, menu, domain,
@@ -335,7 +336,7 @@ class GimpfuProcedure():
         Ability to omit menu is deprecated, so this is FBC.
         '''
         result = False
-        if self.metadata.MENUPATH is None:
+        if not self.metadata.MENUPATH:
             if self.metadata.MENUITEMLABEL:
                 # label but no menu. Possible menu path in the label.
                 fields = self.metadata.MENUITEMLABEL.split("/")
@@ -393,18 +394,18 @@ class GimpfuProcedure():
         if not self._did_fix_menu:
             return
 
-        file_params = [(PF_STRING, "filename", "The name of the file", ""),
-                       (PF_STRING, "raw-filename", "The name of the file", "")]
+
 
         if self.metadata.MENUPATH is None:
             pass
         elif self.metadata.MENUPATH.startswith("<Load>"):
-            self.metadata.PARAMS[0:0] = file_params
+            # insert into slice
+            self.metadata.PARAMS[0:0] = GimpfuFormalParam.file_params
             message = f"{self.name}: Fixing two file params for Load plugin"
             self._deprecation(message)
         elif self.metadata.MENUPATH.startswith("<Image>") or self.metadata.MENUPATH.startswith("<Save>"):
-            self.metadata.PARAMS.insert(0, (PF_IMAGE, "image", "Input image", None))
-            self.metadata.PARAMS.insert(1, (PF_DRAWABLE, "drawable", "Input drawable", None))
+            self.metadata.PARAMS.insert(0, GimpfuProcedure.image_param)
+            self.metadata.PARAMS.insert(1, GimpfuProcedure.drawable_param)
             message = f"{self.name}: Fixing two image params for Image or Save plugin"
             self._deprecation(message)
             if self.metadata.MENUPATH.startswith("<Save>"):
@@ -437,11 +438,11 @@ class GimpfuProcedure():
         # if missing params (never there, or not fixed by earlier patch)
         # TODO if params are missing altogether
         if ( self.metadata.MENUPATH.startswith("<Image>")
-            and self.metadata.PARAMS[0][0] != PF_IMAGE
-            and self.metadata.PARAMS[1][0] != PF_DRAWABLE
+            and self.metadata.PARAMS[0].PF_TYPE != PF_IMAGE
+            and self.metadata.PARAMS[1].PF_TYPE != PF_DRAWABLE
             ):
-            self.metadata.PARAMS.insert(0, (PF_IMAGE, "image", "Input image", None))
-            self.metadata.PARAMS.insert(1, (PF_DRAWABLE, "drawable", "Input drawable", None))
+            self.metadata.PARAMS.insert(0,GimpfuProcedure.image_param)
+            self.metadata.PARAMS.insert(1, GimpfuProcedure.drawable_param)
             message = f"{self.name}: Fixing two image params for Image plugin"
             self._deprecation(message)
             result = True
@@ -528,6 +529,7 @@ class GimpfuProcedure():
             if not letterCheck(ent[1], param_name_allowed):
                 # Not fatal since we don't use it, args are a sequence, not by keyword
                 # But Gimp may yet complain.
+                # TODO transliterate space to underbar
                 do_proceed_error(f"parameter name '{ent[1]}'' contains illegal characters")
 
         for ent in results:

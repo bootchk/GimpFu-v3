@@ -100,7 +100,7 @@ from gi.repository import GObject
 
 # import private implementation
 from adaption.marshal import Marshal
-from gimpfu_procedure import GimpfuProcedure
+from procedure.procedure import GimpfuProcedure
 from gimpfu_exception import *
 
 

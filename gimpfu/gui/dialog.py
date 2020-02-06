@@ -19,7 +19,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 from gimpfu_enums import *  # PF_ enum
-from gimpfu_procedure import GimpFuFormalParam
+#from procedure.formal_param import GimpfuFormalParam
 
 from gui.widgets import *
 
@@ -145,8 +145,7 @@ def _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params):
     # TODO hacked to (2,
     for i in range(0, len(guiable_formal_params)):
         print("Create control, index: ", i)
-        # unpack tuple into namedtuple
-        a_formal_param = GimpFuFormalParam(*guiable_formal_params[i])
+        a_formal_param = guiable_formal_params[i]
 
         # Grid left hand side is LABEL
         label = Gtk.Label(a_formal_param.LABEL)
