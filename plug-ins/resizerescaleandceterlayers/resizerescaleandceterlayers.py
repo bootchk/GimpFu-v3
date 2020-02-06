@@ -16,7 +16,7 @@ def resizerescaleandcenterlayers(img,drw):
     	y = (img.height - layers[n].height)/2
     	layers[n].set_offsets(x,y)
 
-# lkk add menupath
+
 register(
         "ResizeRescaleCenterLayers",
         "Rescale differents layers and center them in a resize image",

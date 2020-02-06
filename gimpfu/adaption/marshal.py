@@ -232,10 +232,13 @@ class Marshal():
     @staticmethod
     def wrap_args(args):
         '''
-        args is a sequence of unwrapped objects (GObjects from Gimp) and fundamental types,
-        (typically received from Gimp calling the plugin.)
+        args is a sequence of unwrapped objects (GObjects from Gimp) and fundamental types.
         Wraps instances that are not fundamental.
         Returns list.
+
+        Typically args are:
+        - from Gimp calling back the plugin.
+        - from the plugin calling Gimp
         '''
         print("wrap_args", args)
         result = []

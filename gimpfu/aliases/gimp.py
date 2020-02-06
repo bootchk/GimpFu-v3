@@ -14,7 +14,7 @@ from adapters.display import GimpfuDisplay
 from adapters.vectors import GimpfuVectors
 # TODO channel, etc.
 
-
+from adaption.marshal import Marshal
 from adaption.wrappable import *
 from adaption.compatibility import gimp_name_map
 
@@ -302,3 +302,9 @@ class GimpfuGimp():
            gradient1, gradient3,
            truthity2, int1, int2, truthity3,
            x1, y1, x2, y2)
+
+    # Name change in Gimp v3?
+    def image_list(self):
+       list = Gimp.list_images()
+       result = Marshal.wrap_args(list)
+       return result
