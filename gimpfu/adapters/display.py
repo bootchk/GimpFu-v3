@@ -4,7 +4,7 @@ from gi.repository import Gimp
 
 from adaption.adapter import Adapter
 
-from gimpfu_exception import *
+from message.proceed_error import *
 
 
 

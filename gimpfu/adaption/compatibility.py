@@ -2,6 +2,9 @@
 from collections.abc import Mapping
 
 
+from message.deprecation import Deprecation
+
+
 '''
 Knows backward compatibility for Gimp changes.
 Gimp versions infrequently:
@@ -42,8 +45,7 @@ class GimpFuMap(Mapping):
         '''
         # TODO implement with except KeyError: would be faster?
         if key in self.__dict__.keys():
-            # TODO use warning module
-            print("GimpFu: Warning: Translating deprecated name:", key)
+            Deprecation.say(f"Deprecated name: {key}")
             return self.__dict__[key]
         else:
             return key

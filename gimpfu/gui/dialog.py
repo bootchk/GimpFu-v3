@@ -8,7 +8,6 @@ Not well known that such support is on the roadmap.
 
 '''
 
-from collections import namedtuple
 
 import gi
 
@@ -19,9 +18,10 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 from gimpfu_enums import *  # PF_ enum
-#from procedure.formal_param import GimpfuFormalParam
 
 from gui.widgets import *
+
+from message.deprecation import Deprecation
 
 import gettext
 t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
@@ -77,9 +77,9 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
     # Since data comes from GimpFu author, don't trust it
     pf_type = formal_param.PF_TYPE
 
-    # Warn deprectated
+
     if pf_type == PF_COLOUR:
-        print("Deprecated PF_COLOUR")
+        Deprecation.say("Use PF_COLOR instead of PF_COLOUR")
 
     if pf_type in ( PF_RADIO, ):
         args = [widget_default_value, formal_param.EXTRAS]
@@ -109,7 +109,7 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
     else:
         # PF_SPINNER,, PF_OPTION
         if pf_type == PF_COLOUR:
-            print("Deprecated PF_COLOUR")
+            Deprecation.say("Deprecated PF_COLOUR")
         raise RuntimeError(f"Unhandled PF_ widget type {pf_type}.")
 
     return args

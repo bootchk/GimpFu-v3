@@ -1,25 +1,14 @@
 
 import string   # v2 as _string to hide from authors
 
-import sys
-
-# Insure all warnings (deprecation and user) will be printed
-if not sys.warnoptions:
-    import warnings
-    warnings.simplefilter("default") # Change the filter in this process
-
-
 
 from gimpfu_enums import *  # PF_ enums
 
-from gimpfu_exception import  do_proceed_error
+from message.proceed_error import  do_proceed_error
+from message.deprecation import Deprecation
 
 from procedure.metadata import GimpfuProcedureMetadata
 from procedure.formal_param import GimpfuFormalParam
-
-
-
-
 
 
 '''
@@ -68,10 +57,7 @@ class GimpfuProcedure():
     At install time!  Once registered with Gimp, no further warnings.
     Author must delete ~/.config/.../pluginrc to see warnings again.
     '''
-    def _deprecation(self, message):
-        ''' wrapper of warnings.warn() that fixpoints the parameters. '''
-        # stacklevel=2 means print two lines, including caller's info
-        warnings.warn(message, DeprecationWarning, stacklevel=2)
+
 
 
     # Constant class data
@@ -348,19 +334,19 @@ class GimpfuProcedure():
 
                     message = (f"{self.name}: Use the 'menu' parameter instead"
                                f" of passing a full menu path in 'label'.")
-                    self._deprecation(message)
+                    Deprecation.say(message)
                 else:
                     # 'label' is not a path, can't derive menu path
                     message = f"{self.name}: Simple menu item 'label' without 'menu' path."
                     # TODO will GIMP show it in the GUI in a fallback place?
-                    self._deprecation(message)
+                    Deprecation.say(message)
             else:
                 # no menu and no label
                 # Normal, user intends to create plugin only callable by other plugins
                 message = (f"{self.name}: No 'menu' and no 'label'."
                            f"Plugin will not appear in Gimp GUI.")
-                # Not really a deprecation, a UserWarning??
-                self._deprecation(message)
+                # TODO Not really a deprecation, a UserWarning??
+                Deprecation.say(message)
         else:
             if  self.metadata.MENUITEMLABEL:
                 # menu and label given
@@ -371,7 +357,7 @@ class GimpfuProcedure():
                 # TODO Gimp will use suffix of 'menu' as 'label' ???
                 message = (f"{self.name}: Use the 'label' parameter instead"
                            f"of passing menu item at end of 'menu'.")
-                self._deprecation(message)
+                Deprecation.say(message)
         return result
 
 
@@ -402,16 +388,16 @@ class GimpfuProcedure():
             # insert into slice
             self.metadata.PARAMS[0:0] = GimpfuFormalParam.file_params
             message = f"{self.name}: Fixing two file params for Load plugin"
-            self._deprecation(message)
+            Deprecation.say(message)
         elif self.metadata.MENUPATH.startswith("<Image>") or self.metadata.MENUPATH.startswith("<Save>"):
             self.metadata.PARAMS.insert(0, GimpfuProcedure.image_param)
             self.metadata.PARAMS.insert(1, GimpfuProcedure.drawable_param)
             message = f"{self.name}: Fixing two image params for Image or Save plugin"
-            self._deprecation(message)
+            Deprecation.say(message)
             if self.metadata.MENUPATH.startswith("<Save>"):
                 self.metadata.PARAMS[2:2] = file_params
                 message = f"{self.name}: Fixing two file params for Save plugin"
-                self._deprecation(message)
+                Deprecation.say(message)
 
 
     def _deriveMissingImageParams(self):
@@ -444,7 +430,7 @@ class GimpfuProcedure():
             self.metadata.PARAMS.insert(0,GimpfuProcedure.image_param)
             self.metadata.PARAMS.insert(1, GimpfuProcedure.drawable_param)
             message = f"{self.name}: Fixing two image params for Image plugin"
-            self._deprecation(message)
+            Deprecation.say(message)
             result = True
         return result
 
@@ -478,14 +464,14 @@ class GimpfuProcedure():
             not proc_name.startswith("file-") ):
                new_proc_name = "python-fu-" + proc_name
                message = f"Procedure name canonicalized to {new_proc_name}"
-               self._deprecation(message)
+               Deprecation.say(message)
         return new_proc_name
 
 
 
     def _substitute_empty_string_for_none(self, arg, argname):
         if arg is None:
-            print(f"Deprecated: Registered {argname} should be empty string, not None")
+            Deprecation.say(f"Deprecated: Registered {argname} should be empty string, not None")
             result = ""
         else:
             result = arg

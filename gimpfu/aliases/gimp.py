@@ -18,7 +18,7 @@ from adaption.marshal import Marshal
 from adaption.wrappable import *
 from adaption.compatibility import gimp_name_map
 
-from gimpfu_exception import *
+from message.proceed_error import *
 
 class GimpfuGimp():
     '''

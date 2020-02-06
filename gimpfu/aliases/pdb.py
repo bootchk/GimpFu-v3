@@ -8,7 +8,7 @@ from gi.repository import GObject    # marshalling
 from adaption.marshal import Marshal
 from adaption.compatibility import pdb_name_map
 
-from gimpfu_exception import *
+from message.proceed_error import *
 
 
 

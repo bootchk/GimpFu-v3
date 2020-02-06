@@ -101,9 +101,9 @@ from gi.repository import GObject
 # import private implementation
 from adaption.marshal import Marshal
 from procedure.procedure import GimpfuProcedure
-from gimpfu_exception import *
+from message.proceed_error import *
 
-
+from message.deprecation import Deprecation
 
 
 # Gimp enums exposed to GimpFu authors
@@ -570,6 +570,11 @@ def _run(procedure, run_mode, actual_args, data):
     GimpFu promises to hide the need for this.
     '''
     Gimp.displays_flush()   # !!! Gimp, not gimp
+
+    if Deprecation.summarize():
+        # TODO make this go to the status bar, not a dialog
+        # Gimp.message("See console for deprecations.")
+        pass
 
     if summarize_proceed_errors():
         fail("GimpFu detected errors.  See console for a summary.")

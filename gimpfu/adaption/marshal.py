@@ -16,7 +16,7 @@ from adapters.image import GimpfuImage
 from adapters.layer import GimpfuLayer
 from adapters.vectors import GimpfuVectors
 
-from gimpfu_exception import *
+from message.proceed_error import *
 
 
 
