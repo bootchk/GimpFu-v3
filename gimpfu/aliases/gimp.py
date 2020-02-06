@@ -6,14 +6,16 @@ from gi.repository import Gimp
 from gi.repository import GObject    # marshalling
 
 
-# import wrapper classes
+# import wrapper classes because we call their constructors
+# in phrases like gimp.Layer
 from adapters.image import GimpfuImage
 from adapters.layer import GimpfuLayer
 from adapters.display import GimpfuDisplay
+from adapters.vectors import GimpfuVectors
 # TODO channel, etc.
 
 
-from adaption.marshal import Marshal
+from adaption.wrappable import *
 from adaption.compatibility import gimp_name_map
 
 from gimpfu_exception import *
@@ -133,7 +135,7 @@ class GimpfuGimp():
 
         # Is attribute a Gimp class name (a constructor) whose result should be wrapped?
         # E.G. Layer
-        if Marshal.is_gimpfu_wrappable_name(dot_name):
+        if is_gimpfu_wrappable_name(dot_name):
             '''
             The source phrase is like "layer=gimp.Layer(foo)"
             Construct a wrapper object of Gimp object

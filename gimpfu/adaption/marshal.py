@@ -14,7 +14,7 @@ from adaption.types import Types
 # in Adapter by selectively import Marshal
 from adapters.image import GimpfuImage
 from adapters.layer import GimpfuLayer
-from adapters.vector import GimpfuVectors
+from adapters.vectors import GimpfuVectors
 
 from gimpfu_exception import *
 
