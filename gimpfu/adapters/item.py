@@ -50,6 +50,11 @@ class GimpfuItem( Adapter ) :
     Properties
     '''
 
+    def ID(self):
+        # !!! id is property of Item
+        return self._adaptee.id
+
+
     """
     OLD now Dynamic
     @property

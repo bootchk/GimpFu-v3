@@ -116,13 +116,17 @@ def get_sort_keys_func(layers_meta):
 def nest_layers(d, layers, layers_meta):
     logger.debug('nest_layers()')
     logger.debug('dict: %s' % str(d))
-    sort_keys_func = get_sort_keys_func(layers_meta)
-    d_keys = d.keys()
-    d_keys.sort(key=sort_keys_func)
+    # lkk Python 3 dict_keys has no sort
+    #sort_keys_func = get_sort_keys_func(layers_meta)
+    #d_keys = d.keys()
+    #d_keys.sort(key=sort_keys_func)
+    d_keys = sorted(d)
     logger.debug(d_keys)
     for key in reversed(d_keys):
         #verify this key still exists since the dict can be chaged within this loop
-        if not d.has_key(key):
+        # lkk Python3
+        #if not d.has_key(key):
+        if not key in d:
             continue
         val = d[key]
         #logger.debug('key: %s, val: %s' % (key, str(val)))
@@ -274,8 +278,6 @@ plugin_func(gimp.image_list()[0], gimp.image_list()[0], True, False, export_imag
         layer_order.append(layer.name)
         #maybe parasites could be used instead, but I can't find any documentation on what the flags are
         layers_meta[layer.name] = {}
-        # lkk
-        print(layer.offsets)
         layers_meta[layer.name]['x'], layers_meta[layer.name]['y'] = layer.offsets
         layers_meta[layer.name]['x2'] = layers_meta[layer.name]['x'] + layer.width
         layers_meta[layer.name]['y2'] = layers_meta[layer.name]['y'] + layer.height
@@ -304,7 +306,9 @@ plugin_func(gimp.image_list()[0], gimp.image_list()[0], True, False, export_imag
             add_progress(1)
             gimp.progress_init('psd2html: Saving %s' % image_path)
             if export_images:
-                pdb.gimp_file_save(image, layer, image_path, image_path, run_mode=1)
+                # lkk change order
+                #pdb.gimp_file_save(image, layer, image_path, image_path, run_mode=1)
+                pdb.gimp_file_save(1, image, layer, image_path, image_path)
             add_progress(2)
         else:
             add_progress(3)

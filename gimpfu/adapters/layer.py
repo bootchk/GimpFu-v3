@@ -14,7 +14,7 @@ class GimpfuLayer( GimpfuDrawable ) :
 
     @classmethod
     def DynamicWriteableAdaptedProperties(cls):
-        return ('mode', 'lock_alpha' ) + super().DynamicWriteableAdaptedProperties()
+        return ('mode', 'lock_alpha', 'opacity' ) + super().DynamicWriteableAdaptedProperties()
 
     @classmethod
     def DynamicReadOnlyAdaptedProperties(cls):
@@ -27,7 +27,7 @@ class GimpfuLayer( GimpfuDrawable ) :
     '''
     Notes on properties:
     name inherited from item
-    mask is a layer mask, has remove_mask() but not set_mask() but some set_<foo>_mask ???
+    mask is a layer mask, has remove_mask() but not set_mask() but some set_<foo>_mask() ???
     '''
 
 
