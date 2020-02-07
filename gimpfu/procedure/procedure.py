@@ -38,20 +38,14 @@ class GimpfuProcedure():
     This hides the differences.
     Differences:
        plugin_type not required of GimpFu author
-       FBC fixes Author use of deprecated
-    '''
+       certain procedure parameters not required of GimpFu author
+       FBC fixes Author use of deprecated stuff
 
+    Also understands:
+     - what parameters are guiable.
+     - how to convey to Gimp the specs for a procedure
+     - types of procedure
     '''
-    Responsible for sanity checking and fixups to author's declaration.
-    This is in the nature of compiling:
-       - give warnings
-       - or throw exceptions (sanity)
-    both of which printed in the console.
-    At install time!  Once registered with Gimp, no further warnings.
-    Author must delete ~/.config/.../pluginrc to see warnings again.
-    '''
-
-
 
 
 

@@ -225,18 +225,27 @@ class Adapter():
     __getattr and __setattr that adapt attributes: delegate to adaptee
     '''
 
+    '''
+    !!! See the Python docs for __getattr__.
+    Especially note that this is called when a property getter for an inheriting class
+    fails and raises a first AttributeError.
+    That first AttributeError is masked by the AttributeError raised below.
+    So for this AttributeException, check:
+    1) in Gimpfu code, a property <name> in the inheriting class accesses valid attributes
+    2) OR in the Gimp API <name> is an attribute of the class <adaptee_class_name>
+    '''
+
     def __getattr__(self, name):
         print("Adapter.__getattr__", name)
 
+        '''
+        Instance is AdaptedAdaptee (it inherits Adapter).
+        Require class of instance implements virtual properties of ABC AdaptedAdaptee:
+        i.e. defines class variables Dynamic... that list properties
+        '''
+
+        ''
         """
-        TODO this fails sometimes, on the second call i.e. Vectors.name works, but not Vectors.to_selection()
-        It is just for preflight anyway, wait for error to pop up later???
-        Feb 2020 lkk
-        '''
-        require self is AdaptedAdaptee i.e. defines class variable that lists properties
-        i.e. implements virtual properties of ABC AdaptedAdaptee.
-        Use this idiom to avoid infinite recursion.
-        '''
         msg = f"Missing DynamicReadOnly... in Adapter for {self.adaptee_class_name} "
         print(type(self).__name__)
         print(dir(self))
@@ -256,7 +265,9 @@ class Adapter():
         elif self._is_dynamic_readable_property_name(name):
             result = self._get_dynamic_property_value(name)
         else:
-            raise AttributeError(f"Name: {name} is not an attribute of: {self.adaptee_class_name}")
+            msg = ( f"Name: {name} is not an attr of: {self.adaptee_class_name}"
+                    f" OR error in property: {name} of: {type(self).__name__} ")
+            raise AttributeError(msg)
         # assert result is a value, or the callable adapter_func
         return result
 

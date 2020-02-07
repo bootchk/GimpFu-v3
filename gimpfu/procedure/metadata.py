@@ -12,7 +12,15 @@ from gimpfu_enums import *  # PF_ enums
 # v3 _registered_plugins_ is a dictionary of GimpfuProcedureMetadata
 
 class GimpfuProcedureMetadata():
-
+    '''
+    Responsible for sanity checking and fixups to author's declaration.
+    This is in the nature of compiling:
+       - give warnings
+       - or throw exceptions (sanity)
+    both of which printed in the console.
+    At install time!  Once registered with Gimp, no further warnings.
+    Author must delete ~/.config/.../pluginrc to see warnings again.
+    '''
 
     '''
     Constant class data

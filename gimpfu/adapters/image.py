@@ -173,16 +173,23 @@ class GimpfuImage( Adapter ) :
         # Result is fundamental type (enum int)
         return self._adaptee.base_type()
 
+    """
+    !!! This is not correct, since get_file() can return None.
+    file = self._adaptee.get_file()
+    # assert file is-a Gio.File
+    result = file.get_path()
+    """
     @property
     def filename(self):
         '''
+        Result is-a string.
         Really the path.
-        Returns None if image not loaded from file, or not saved.
+        Returns "Untitled" if image not loaded from file, or not saved.
         '''
-        file = self._adaptee.get_file()
-        # assert file is-a Gio.File
-        result = file.get_path()
+        # print("GimpfuImage.filename get called")
+        result = self._adaptee.get_name()
         return result
+
 
     # TODO make these Dynamic also, but they don't have a get_
     @property
