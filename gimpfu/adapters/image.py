@@ -183,7 +183,7 @@ class GimpfuImage( Adapter ) :
     def filename(self):
         '''
         Result is-a string.
-        Really the path.
+        Really a path.
         Returns "Untitled" if image not loaded from file, or not saved.
         '''
         # print("GimpfuImage.filename get called")

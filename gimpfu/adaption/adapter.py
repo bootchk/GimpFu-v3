@@ -7,6 +7,7 @@ is_test = False
 # See below, import Marshal selectively
 
 from adaption.wrappable import *
+from adaption.adapted_property import AdaptedProperty
 
 
 '''
@@ -17,6 +18,7 @@ An Adapted object inherits this class.
 
 Collaborators:
     Marshal:  args to and from Adaptee must be marshalled (wrapped and unwrapped)
+    AdaptedProperty: accesses to properties of Adaptee, defined by AdaptedAdaptee
 
 Responsibilities:
     delegate a subset of attributes accesses on Adapted to Adaptee
@@ -165,59 +167,6 @@ class Adapter():
         return result
 
 
-    def _is_dynamic_writeable_property_name(self, name):
-        # raises AttributeError if DynamicWriteableAdaptedProperties not defined by AdaptedAdaptee
-        delegated_property_names = getattr(self, 'DynamicWriteableAdaptedProperties')
-        # ensure delegated_property_names is not None, but could be empty
-        return name in delegated_property_names
-
-    def _is_dynamic_readonly_property_name(self, name):
-        # raises AttributeError if DynamicWriteableAdaptedProperties not defined by AdaptedAdaptee
-        delegated_property_names = getattr(self, 'DynamicReadOnlyAdaptedProperties')
-        # ensure delegated_property_names is not None, but could be empty
-        return name in delegated_property_names
-
-    def _is_dynamic_readable_property_name(self, name):
-        return self._is_dynamic_readonly_property_name(name) or self._is_dynamic_writeable_property_name(name)
-
-
-
-
-    def _eval_statement_on_adaptee(self, adaptee, name, get_or_set, setting_value=None):
-        assert get_or_set in ("get", "set")
-
-        # FUTURE rather than trust that DynamicReadOnlyAdaptedProperties is correct,
-        # preflight get_name on dictionary of adaptee
-        # So we can use a more specific error than AttributeError, e.g. "is not a *property* name"
-
-
-        # Method on adaptee is like "[get,set]_name"
-        # Method on adaptee is a callable having no arguments
-        # eval occurs in current context, so formal args are in scope
-        print("Adapter: form statement")
-        if get_or_set == 'set':
-            # set statement is a call with arg
-            statement = 'adaptee.set_' + name + '(setting_value)'
-        else:
-            # get statement is a call without arg
-            statement = 'adaptee.get_' + name + '()'
-        print("AdaptedProperty statement:", statement)
-        result = eval(statement)
-        print("AdaptedProperty eval result:", result)
-        return result
-
-
-    def _get_dynamic_property_value(self, name):
-        ''' Call method of adaptee to get a property value. '''
-        adaptee = self.__dict__['_adaptee']
-        return self._eval_statement_on_adaptee(adaptee, name, 'get')
-
-    def _set_dynamic_property_value(self, name, value):
-        ''' Call a method of adaptee to set a property value. '''
-        adaptee = self.__dict__['_adaptee']
-        return self._eval_statement_on_adaptee(adaptee, name, 'set', value)
-
-
 
 
 
@@ -254,16 +203,19 @@ class Adapter():
         assert object.__getattribute__(self, 'DynamicWriteableAdaptedProperties'), msg
         """
 
+        # avoid infinite recursion
         adaptee = self.__dict__['_adaptee']
 
         # Is name a callable defined by adaptee?
         if hasattr(adaptee, name):
+
             adaptee_callable = getattr(self.__dict__['_adaptee'], name)
             # Prepare for subsequent call
+            # avoid infinite recursion
             object.__setattr__(self, "_adaptee_callable", adaptee_callable)
             result = self._adapter_func
-        elif self._is_dynamic_readable_property_name(name):
-            result = self._get_dynamic_property_value(name)
+        elif AdaptedProperty.is_dynamic_readable_property_name(self, name):
+            result = AdaptedProperty.get(adaptee, name)
         else:
             msg = ( f"Name: {name} is not an attr of: {self.adaptee_class_name}"
                     f" OR error in property: {name} of: {type(self).__name__} ")
@@ -288,15 +240,16 @@ class Adapter():
         to attributes of an instance of Adapted(Adapter).
         '''
 
+        # avoid calling __getattr__
         adaptee = self.__dict__['_adaptee']
 
         # Is name defined by adaptee?
         if hasattr(adaptee, name):
             # Adaptee's have no assignable attributes, only callables ????
             raise AttributeError(f"Name {name} on {self.adaptee_class_name} is not assignable, only callable.")
-        elif self._is_dynamic_writeable_property_name(name):
-            result = self._set_dynamic_property_value(name, value)
-        elif self._is_dynamic_readonly_property_name(name):
+        elif AdaptedProperty.is_dynamic_writeable_property_name(self, name):
+            result = AdaptedProperty.set(adaptee, name, value)
+        elif AdaptedProperty.is_dynamic_readonly_property_name(self, name):
             raise AttributeError(f"Attempt to assign to readonly attribute '{name}'")
         else:
             '''
