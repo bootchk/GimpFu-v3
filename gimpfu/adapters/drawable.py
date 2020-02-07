@@ -20,6 +20,12 @@ class GimpfuDrawable( GimpfuItem ) :
     Attributes common to subclasses Layer, Channel, Vectors.  See wrappable.py
     '''
 
+    '''
+    Notes on properties:
+    offsets() is on Drawable but set_offset() is on Layer
+    Is specially adapted below.
+    '''
+
     @classmethod
     def DynamicWriteableAdaptedProperties(cls):
         return ('mode', 'name', 'lock_alpha' ) + super().DynamicWriteableAdaptedProperties()
@@ -30,7 +36,7 @@ class GimpfuDrawable( GimpfuItem ) :
 
     @classmethod
     def DynamicTrueAdaptedProperties(cls):
-        return ('height', 'width', 'has_alpha', 'is_rgb') + super().DynamicTrueAdaptedProperties()
+        return ('height', 'width', 'has_alpha', 'is_rgb', ) + super().DynamicTrueAdaptedProperties()
 
 
 
@@ -86,3 +92,12 @@ class GimpfuDrawable( GimpfuItem ) :
         print(f"mask_bounds() returns {result}")
         return result
     # no setter
+
+
+    # special: returns extra result: True
+    @property
+    def offsets(self):
+        offsets = self._adaptee.offsets()
+        # slice off leading True
+        result = offsets[1:]
+        return result
