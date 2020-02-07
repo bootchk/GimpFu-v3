@@ -17,7 +17,7 @@ In other words, private to GimpFu
 
 class GimpfuDrawable( GimpfuItem ) :
     '''
-    Attributes common to subclasses Layer and Channel
+    Attributes common to subclasses Layer, Channel, Vectors.  See wrappable.py
     '''
 
     @classmethod
@@ -26,7 +26,7 @@ class GimpfuDrawable( GimpfuItem ) :
 
     @classmethod
     def DynamicReadOnlyAdaptedProperties(cls):
-        return ('mask') + super().DynamicReadOnlyAdaptedProperties()
+        return () + super().DynamicReadOnlyAdaptedProperties()
 
     @classmethod
     def DynamicTrueAdaptedProperties(cls):

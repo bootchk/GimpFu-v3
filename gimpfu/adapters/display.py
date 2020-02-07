@@ -10,6 +10,8 @@ from message.proceed_error import *
 
 class GimpfuDisplay( Adapter ) :
 
+    # TODO properties?
+
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 
         if img is not None:

@@ -11,8 +11,24 @@ from adapters.drawable import GimpfuDrawable
 
 class GimpfuVectors( GimpfuDrawable ) :
 
-    DynamicWriteableAdaptedProperties = ('name',  )
-    DynamicReadOnlyAdaptedProperties = ( )
+    '''
+    Notes on properties:
+    name inherited
+    '''
+    @classmethod
+    def DynamicWriteableAdaptedProperties(cls):
+        return () + super().DynamicWriteableAdaptedProperties()
+
+    @classmethod
+    def DynamicReadOnlyAdaptedProperties(cls):
+        return () + super().DynamicReadOnlyAdaptedProperties()
+
+    @classmethod
+    def DynamicTrueAdaptedProperties(cls):
+        return () + super().DynamicTrueAdaptedProperties()
+
+
+
 
     def __init__(self, img=None, adaptee=None):
 

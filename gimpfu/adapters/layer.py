@@ -18,7 +18,7 @@ class GimpfuLayer( GimpfuDrawable ) :
 
     @classmethod
     def DynamicReadOnlyAdaptedProperties(cls):
-        return ('mask') + super().DynamicReadOnlyAdaptedProperties()
+        return ('mask', ) + super().DynamicReadOnlyAdaptedProperties()
 
     @classmethod
     def DynamicTrueAdaptedTrueProperties(cls):
@@ -27,6 +27,7 @@ class GimpfuLayer( GimpfuDrawable ) :
     '''
     Notes on properties:
     name inherited from item
+    mask is a layer mask, has remove_mask() but not set_mask() but some set_<foo>_mask ???
     '''
 
 
