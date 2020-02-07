@@ -10,35 +10,45 @@ from adapters.item import GimpfuItem
 
 '''
 Not instantiable by itself, only inheritable.
-No GimpFu plugin author should/can use "Item.foo"
+No Author should/can use "d = gimp.Drawable" or "a = Drawable.foo"
 In other words, private to GimpFu
 '''
 
 
 class GimpfuDrawable( GimpfuItem ) :
     '''
-    GimpFu convenience methods.
-    E.G. alias Gimp methods, etc.
-
     Attributes common to subclasses Layer and Channel
     '''
+
+    @classmethod
+    def DynamicWriteableAdaptedProperties(cls):
+        return ('mode', 'name', 'lock_alpha' ) + super().DynamicWriteableAdaptedProperties()
+
+    @classmethod
+    def DynamicReadOnlyAdaptedProperties(cls):
+        return ('mask') + super().DynamicReadOnlyAdaptedProperties()
+
+    @classmethod
+    def DynamicTrueAdaptedProperties(cls):
+        return ('height', 'width', 'has_alpha', 'is_rgb') + super().DynamicTrueAdaptedProperties()
+
+
 
 
     '''
     methods
     '''
 
-
-
-
     '''
-    Properties
+    properties
     '''
 
 
     '''
     Simple adaption of callable to property, without renaming.
     '''
+    """
+    OLD now Dynamic
     @property
     def height(self):
         return self._adaptee.height()
@@ -54,10 +64,10 @@ class GimpfuDrawable( GimpfuItem ) :
     @property
     def is_rgb(self):
         return self._adaptee.is_rgb()
+    """
 
 
-
-
+    # special: adapt return values
     @property
     def mask_bounds(self):
         #print("Calling Foo.get_name(): ")

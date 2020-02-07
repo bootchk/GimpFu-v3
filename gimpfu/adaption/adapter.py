@@ -190,7 +190,7 @@ class Adapter():
         '''
         Instance is AdaptedAdaptee (it inherits Adapter).
         Require class of instance implements virtual properties of ABC AdaptedAdaptee:
-        i.e. defines class variables Dynamic... that list properties
+        i.e. defines class attributes Dynamic... that list properties
         '''
 
         ''
@@ -206,9 +206,14 @@ class Adapter():
         # avoid infinite recursion
         adaptee = self.__dict__['_adaptee']
 
-        # Is name a callable defined by adaptee?
-        if hasattr(adaptee, name):
-
+        '''
+        Order is important:
+        Only use a name as a callable after
+        we determine that we are not adapting it as a true property.
+        '''
+        if AdaptedProperty.is_dynamic_true_property_name(self, name):
+            result = AdaptedProperty.read(adaptee, name)
+        elif AdaptedProperty.is_callable_name_on_instance(adaptee, name):
             adaptee_callable = getattr(self.__dict__['_adaptee'], name)
             # Prepare for subsequent call
             # avoid infinite recursion
@@ -217,6 +222,12 @@ class Adapter():
         elif AdaptedProperty.is_dynamic_readable_property_name(self, name):
             result = AdaptedProperty.get(adaptee, name)
         else:
+            '''
+            This error is hard to decipher.
+            Not only name that is not an attribute,
+            but possibly a programming error or runtime error
+            in an implemented property of an AdaptedAdaptee class.
+            '''
             msg = ( f"Name: {name} is not an attr of: {self.adaptee_class_name}"
                     f" OR error in property: {name} of: {type(self).__name__} ")
             raise AttributeError(msg)
@@ -226,7 +237,10 @@ class Adapter():
 
 
     def __setattr__(self, name, value):
-        ''' Attempt to assign to name. '''
+        '''
+        Attempt by Author to assign to name.
+        I.E. source phrase like "name = bar"
+        '''
 
         '''
         Special case: implementation of Adapter assigns to the few attributes of itself.
@@ -243,9 +257,14 @@ class Adapter():
         # avoid calling __getattr__
         adaptee = self.__dict__['_adaptee']
 
-        # Is name defined by adaptee?
-        if hasattr(adaptee, name):
-            # Adaptee's have no assignable attributes, only callables ????
+        '''
+        DynamicTrueAdaptedProperties are not settable
+        since adaptee only defines a getter i.e. <name>().
+        If adaptee defines <name>() and set_<name>()
+        Gimpfu must adapt specially, outside of this mechanism.
+        '''
+        if AdaptedProperty.is_callable_name_on_instance(adaptee, name):
+            # Adaptee's are Gimp objects, which have no assignable attributes, only callables ????
             raise AttributeError(f"Name {name} on {self.adaptee_class_name} is not assignable, only callable.")
         elif AdaptedProperty.is_dynamic_writeable_property_name(self, name):
             result = AdaptedProperty.set(adaptee, name, value)

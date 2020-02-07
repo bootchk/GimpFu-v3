@@ -40,15 +40,24 @@ Some are unique to PyGimp, not present in Gimp.Image. (augment)
 
 class GimpfuImage( Adapter ) :
 
-    # class variables needed by Adapter
-    # TODO
+    # classmethods needed by Adapter
     '''
     Notes:
     filename is NOT a canonical property of Image, at least in v3
     TODO active_layer should be
     '''
-    DynamicWriteableAdaptedProperties = ( 'instance_nameRW', )
-    DynamicReadOnlyAdaptedProperties = ('selection', )
+    @classmethod
+    def DynamicWriteableAdaptedProperties(cls):
+        return ( )
+
+    @classmethod
+    def DynamicReadOnlyAdaptedProperties(cls):
+        return ('selection', )
+
+    @classmethod
+    def DynamicTrueAdaptedProperties(cls):
+        return ('width', 'height')
+
 
     '''
     Constructor exported to Gimpfu authors.
@@ -62,6 +71,7 @@ class GimpfuImage( Adapter ) :
             final_adaptee = adaptee
         else:
             # Gimp constructor named "new"
+            print("Calling Gimp.Image.new with width", width)
             final_adaptee = Gimp.Image.new(width, height, image_mode)
 
         # super is Adaper, and it stores adaptee
@@ -71,6 +81,7 @@ class GimpfuImage( Adapter ) :
         #self.filename = GimpfuProperty(final_adaptee, "filename")
 
         # self.filename = None is not correct, because self.filename is a property of each instance
+
 
     def adaptee(self):
         ''' Getter for private _adaptee '''
@@ -191,10 +202,11 @@ class GimpfuImage( Adapter ) :
         return result
 
 
-    # TODO make these Dynamic also, but they don't have a get_
+    """
     @property
     def width(self):
         return self._adaptee.width()
     @property
     def height(self):
         return self._adaptee.height()
+    """

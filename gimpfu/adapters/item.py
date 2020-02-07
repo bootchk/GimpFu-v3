@@ -22,13 +22,26 @@ class GimpfuItem( Adapter ) :
     Attributes common to Drawable and Vector
     '''
 
+    @classmethod
+    def DynamicWriteableAdaptedProperties(cls):
+        # !!! return ('name') is not a tuple, use tuple('name') or ('name',)
+        return tuple( 'name' )
+
+    @classmethod
+    def DynamicReadOnlyAdaptedProperties(cls):
+        return ()
+
+    @classmethod
+    def DynamicTrueAdaptedProperties(cls):
+        return ()
+
 
     '''
     methods
     '''
 
+    # special: alias
     def translate(self, x, y):
-        # alias
         # assert adaptee is-a Gimp.Item that has transform methods
         self._adaptee.transform_translate(x,y)
 
@@ -37,7 +50,8 @@ class GimpfuItem( Adapter ) :
     Properties
     '''
 
-
+    """
+    OLD now Dynamic
     @property
     def name(self):
         print("Calling Foo.get_name(): ")
@@ -48,3 +62,4 @@ class GimpfuItem( Adapter ) :
     @name.setter
     def name(self, name):
         return self._adaptee.set_name(name)
+    """

@@ -12,8 +12,23 @@ from adapters.drawable import GimpfuDrawable
 
 class GimpfuLayer( GimpfuDrawable ) :
 
-    DynamicWriteableAdaptedProperties = ('mode', 'name', 'lock_alpha' )
-    DynamicReadOnlyAdaptedProperties = ('mask', )
+    @classmethod
+    def DynamicWriteableAdaptedProperties(cls):
+        return ('mode', 'lock_alpha' ) + super().DynamicWriteableAdaptedProperties()
+
+    @classmethod
+    def DynamicReadOnlyAdaptedProperties(cls):
+        return ('mask') + super().DynamicReadOnlyAdaptedProperties()
+
+    @classmethod
+    def DynamicTrueAdaptedTrueProperties(cls):
+        return () + super().DynamicTrueAdaptedProperties()
+
+    '''
+    Notes on properties:
+    name inherited from item
+    '''
+
 
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 
