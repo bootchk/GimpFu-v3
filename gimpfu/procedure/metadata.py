@@ -99,6 +99,27 @@ class GimpfuProcedureMetadata():
         self.did_insert_image_params = self._deriveMissingImageParams()
 
 
+    @classmethod
+    def fix_underbar(cls, proc_name):
+        new_proc_name = proc_name.replace( '_' , '-')
+        if (new_proc_name != proc_name):
+            Deprecation.say("Underbar in procedure name.")
+        return new_proc_name
+
+    @classmethod
+    def canonicalize_prefix(cls, proc_name):
+        if (not proc_name.startswith("python-") and
+            not proc_name.startswith("extension-") and
+            not proc_name.startswith("plug-in-") and
+            not proc_name.startswith("file-") ):
+               result = "python-fu-" + proc_name
+               message = f"Procedure name canonicalized to {result}"
+               Deprecation.say(message)
+        else:
+           result = proc_name
+        return result
+
+
     '''
     public: metadata knows how to fix procedure name
     '''
@@ -121,22 +142,12 @@ class GimpfuProcedureMetadata():
         '''
 
         # FBC.  Gimp v3 does not allow underbar
-        new_proc_name = proc_name.replace( '_' , '-')
-        if (proc_name != proc_name):
-            Deprecation.say("Underbar not allowed in procedure name.")
-
-        if (not proc_name.startswith("python-") and
-            not proc_name.startswith("extension-") and
-            not proc_name.startswith("plug-in-") and
-            not proc_name.startswith("file-") ):
-               new_proc_name = "python-fu-" + proc_name
-               message = f"Procedure name canonicalized to {new_proc_name}"
-               Deprecation.say(message)
-
-        if not GimpfuProcedureMetadata.letterCheck(new_proc_name, GimpfuProcedureMetadata.proc_name_allowed):
-            raise Exception(f"Procedure name: {proc_name} contains illegal characters: _ ?")
-
-        return new_proc_name
+        proc_name = GimpfuProcedureMetadata.fix_underbar(proc_name)
+        proc_name = GimpfuProcedureMetadata.canonicalize_prefix(proc_name)
+        if not GimpfuProcedureMetadata.letterCheck(proc_name, GimpfuProcedureMetadata.proc_name_allowed):
+            raise Exception(f"Procedure name: {proc_name} contains illegal characters.")
+        print(f"Procedure name: {proc_name}")
+        return proc_name
 
 
 

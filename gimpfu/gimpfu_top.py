@@ -230,7 +230,8 @@ def register(proc_name, blurb, help, author, copyright,
                             date, label, imagetypes,
                             params, results, function,
                             menu, domain, on_query, on_run)
-    __local_registered_procedures__[proc_name] = gf_procedure
+    # register under its possibly fixed name, not the given name
+    __local_registered_procedures__[gf_procedure.name] = gf_procedure
 
     # !!! Have not conveyed to Gimp yet
 
