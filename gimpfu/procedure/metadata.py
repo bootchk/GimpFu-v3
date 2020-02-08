@@ -258,6 +258,7 @@ class GimpfuProcedureMetadata():
                 self.PARAMS[2:2] = file_params
                 message = f" Fixing two file params for Save plugin"
                 Deprecation.say(message)
+        #print(self.PARAMS)
 
 
     def _deriveMissingImageParams(self):

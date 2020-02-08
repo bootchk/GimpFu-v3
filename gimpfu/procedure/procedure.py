@@ -20,11 +20,11 @@ And pdb and gimp symbols are not defined.
 '''
 
 # Temp hack ???
-from prop_holder import PropHolder
+from procedure.prop_holder import PropHolder
 
 prop_holder = PropHolder()
-print("prop_holder", prop_holder.props)
-print(prop_holder.props.intprop)
+print("prop_holder.props", prop_holder.props)
+print("prop_holder.props.IntProp:", prop_holder.props.IntProp)
 
 
 
@@ -233,6 +233,11 @@ class GimpfuProcedure():
         procedure.add_menu_path (self.metadata.MENUPATH)
 
 
+
+    def convey_runmode_arg_declaration_to_gimp(self, procedure):
+        procedure.add_argument_from_property(prop_holder, "RunmodeProp")
+
+
     def convey_procedure_arg_declarations_to_gimp(self,
         procedure,
         count_omitted_leading_args=0,
@@ -256,4 +261,4 @@ class GimpfuProcedure():
         for i in range(count_omitted_leading_args, len(formal_params)):
             # TODO map PF_TYPE to types known to Gimp (a smaller set)
             # use named properties of prop_holder
-            procedure.add_argument_from_property(prop_holder, "intprop")
+            procedure.add_argument_from_property(prop_holder, "IntProp")

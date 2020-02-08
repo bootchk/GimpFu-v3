@@ -648,32 +648,7 @@ which is referred to as "run_func" here and in Gimp documents.
 
 class GimpFu (Gimp.PlugIn):
 
-    """
-    ??? This breaks the comment strings.
-
-    @GObject.Property(type=Gimp.RunMode,
-                      default=Gimp.RunMode.NONINTERACTIVE,
-                      nick="Run mode", blurb="The run mode")
-    """
-
-
-    """
-    ## Parameters ##
-    # Long form: create attribute which is dictionary of GProperty
-    # class attribute ??
-    #
-
-    __gproperties__ = {
-        # nick, blurb, default
-        "Run mode": (Gimp.RunMode,
-                 _("Run mode"),
-                 _("Run mode"),
-                 _("Gimp.RunMode.NONINTERACTIVE"),
-                 GObject.ParamFlags.READWRITE)
-    }
-    """
-
-
+    # See prop_holder.py for GProperty stuff
 
     ## GimpPlugIn virtual methods ##
     '''
@@ -741,8 +716,8 @@ class GimpFu (Gimp.PlugIn):
                                             _run_imagelessprocedure, 	# wrapped plugin method
                                             None)
             gf_procedure.convey_metadata_to_gimp(procedure)
-            # Procedure: convey all args
-            procedure.add_argument_from_property(self, "Run mode")
+
+            gf_procedure.convey_runmode_arg_declaration_to_gimp(procedure)
             gf_procedure.convey_procedure_arg_declarations_to_gimp(
                 procedure,
                 count_omitted_leading_args=0)
@@ -754,7 +729,14 @@ class GimpFu (Gimp.PlugIn):
                                             _run_imageprocedure, 	# wrapped plugin method
                                             None)
             gf_procedure.convey_metadata_to_gimp(procedure)
-            # ImageProcedure: first two formal args are implicit to Gimp, explicit to GimpFu
+            '''
+            ImageProcedure:
+            Gimpfu does not tell Gimp about first two formal args (Gimp knows already)
+            Gimpfu does not tell Gimp about run_mode (Gimp knows already that parameter exists)
+            run_func takes img, drw as first two params
+            Gimp passes run_mode, image, drawable, otherArgArray to Gimpfu when run() callback is called.
+            Gimpfu massages image, drawable, otherArgArray into args to run_func
+            '''
             gf_procedure.convey_procedure_arg_declarations_to_gimp(
                 procedure,
                 count_omitted_leading_args=2)
