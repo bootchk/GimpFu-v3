@@ -370,6 +370,7 @@ class Marshal():
 
         For all returned objects, wrap as necessary.
         '''
+        print("PDB status result is:", values.index(0))
 
         # caller should have previously checked that values is not a Gimp.PDBStatusType.FAIL
         if values:

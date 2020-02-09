@@ -119,6 +119,7 @@ class GimpfuPDB():
 
         # Most PDB calls have side_effects on image, but few return values?
         # ensure result is defined and (is-a list OR None)
+        print(f"Return from pdb call to: {proc_name}, result:", result)
         return result
 
 
