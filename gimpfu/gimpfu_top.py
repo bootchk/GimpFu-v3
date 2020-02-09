@@ -483,9 +483,14 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
     _run(procedure, run_mode, all_args, data)
 
 
-def _run_imagelessprocedure(procedure, run_mode, actual_args, data):
+#def _run_imagelessprocedure(procedure, run_mode, actual_args, data):
+#def _run_imagelessprocedure(procedure, run_mode, actual_args):
+def _run_imagelessprocedure(procedure, actual_args, data):
     ''' GimpFu wrapper of the author's "main" function, aka run_func '''
-    print("_run_imagelessprocedure ", procedure, run_mode, actual_args)
+    print("_run_imagelessprocedure ", procedure, actual_args)
+    for arg in actual_args:
+        print("\n", arg)
+    #run_mode = Gimp.RunMode.INTERACTIVE
     all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, image=None, drawable=None)
     _run(procedure, run_mode, all_args, data)
 
@@ -731,11 +736,11 @@ class GimpFu (Gimp.PlugIn):
             gf_procedure.convey_metadata_to_gimp(procedure)
             '''
             ImageProcedure:
+            Gimpfu does not tell Gimp about run_mode (Gimp knows already that parameter exists) ???
             Gimpfu does not tell Gimp about first two formal args (Gimp knows already)
-            Gimpfu does not tell Gimp about run_mode (Gimp knows already that parameter exists)
             run_func takes img, drw as first two params
             Gimp passes run_mode, image, drawable, otherArgArray to Gimpfu when run() callback is called.
-            Gimpfu massages image, drawable, otherArgArray into args to run_func
+            Gimpfu massages image, drawable, otherArgArray (but not run_mode) into args to run_func
             '''
             gf_procedure.convey_procedure_arg_declarations_to_gimp(
                 procedure,
