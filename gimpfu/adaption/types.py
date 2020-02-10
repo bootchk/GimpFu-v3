@@ -156,6 +156,21 @@ class Types():
 
 
 
+    @staticmethod
+    def convert_gimpvaluearray_to_list_of_gvalue(array):
+        ''' Convert type of array from  to from *GimpValueArray*, to *list of GValue*. '''
+
+        list_of_gvalue = []
+        len = array.length()   # !!! not len(actual_args)
+        for i in range(len):
+            gvalue = array.index(i)
+            # Not convert elements from GValue to Python types
+            list_of_gvalue.append(gvalue)
+
+        # ensure is list of elements of type GValue, possibly empty
+        return list_of_gvalue
+
+
     """
     Cruft: more than necessary, but keep it, it documents how to use GTypes
 

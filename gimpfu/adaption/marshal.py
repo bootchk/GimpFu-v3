@@ -53,23 +53,19 @@ class Marshal():
         Where:
             actual_args is-a Gimp.ValueArray
             image, drawable are optional GObjects
-        !!! Returns a list, not a Gimp.ValueArray
+        !!! Returns Python list, not a Gimp.ValueArray
         '''
 
-        args = []
-        if image:
-            args.append(image)
-        if drawable:
-            args.append(drawable)
+        args_list = Types.convert_gimpvaluearray_to_list_of_gvalue(actual_args)
 
-        len = actual_args.length()   # !!! not len(actual_args)
-        for i in range(len):
-            gvalue = actual_args.index(i)
-            # Python can handle the gvalue, we don't need to convert to Python types
-            # assuming we have imported gi
-            args.append(gvalue)
+        # Prepend to Python list
+        if drawable:
+            args_list.insert(0, drawable)
+        if image:
+            args_list.insert(0,image)
+
         # ensure result is-a list, but might be empty
-        return args
+        return args_list
 
 
 

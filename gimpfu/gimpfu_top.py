@@ -446,8 +446,10 @@ def _interact(procedure, actual_args):
 
 
 '''
-Since 3.0, signature of _run() has changed.
-Formerly, most parameters were in one tuple.
+Since 3.0, changed the signature of _run():
+- parameters not in one tuple
+- type of 'procedure' parameter is GimpImageProcedure, not str.
+v2, most parameters were in one tuple.
 
 XXXNow the first several are mandatory and do not need to be declared when registering.
 XXXIn other words, formerly their declarations were boilerplate, repeated often for little practical use.
@@ -473,8 +475,8 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
     print("_run_imageprocedure count actual_args", actual_args.length())
 
     '''
-    create GimpValueArray of *most* args
-    !!! We  pass GimpValueArray types to lower level methods.
+    Create GimpValueArray of *most* args.
+    !!! We  pass GimpValueArray of Gimp types to lower level methods.
     That might change when the lower level methods are fleshed out to persist values.
     *most* means (image, drawable, *actual_args), but not run_mode!
     '''
