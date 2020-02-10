@@ -104,6 +104,7 @@ class GimpfuPDB():
 
             # Not a try: except?
             inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
+
             # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
             error_str = Gimp.get_pdb().get_last_error()
             if error_str != 'success':   # ??? GIMP_PDB_SUCCESS

@@ -371,13 +371,19 @@ class Marshal():
         # caller should have previously checked that values is not a Gimp.PDBStatusType.FAIL
         if values:
             # Remember, values is-a Gimp.ValueArray, not has Pythonic methods
-            result_list = []
-            # start at 1 to discard status
-            for index in range(1, values.length()):
-                value = values.index(index)
-                result_list.append(value)
+            result_list = Types.convert_gimpvaluearray_to_list_of_gvalue(values)
+
+            # discard status by slicing
+            result_list = result_list[1:]
+
+            # Recursively convert type of elements to Python types
+            result_list = Types.convert_list_elements_to_python_types(result_list)
+
             # unpack list of one element
+            # TODO is this always the correct thing to do?
+            # Some procedure signatures may return a list of one?
             if len(result_list) is 1:
+                print("Unpacking single element list.")
                 result = result_list[0]
             else:
                 result = result_list

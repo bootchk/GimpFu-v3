@@ -306,5 +306,6 @@ class GimpfuGimp():
     # Name change in Gimp v3?
     def image_list(self):
        list = Gimp.list_images()
+       # assert typeof(list) is Python list
        result = Marshal.wrap_args(list)
        return result

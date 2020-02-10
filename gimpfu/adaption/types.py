@@ -171,6 +171,43 @@ class Types():
         return list_of_gvalue
 
 
+    @staticmethod
+    def convert_list_elements_to_python_types(a_list):
+        ''' Walk (recursive descent) converting elements to Python types. '''
+        '''
+        Only certain Gimp types need conversion: Gimp.StringArray => list(str)
+        Elements that are fundamental (GTypes, but not complex)
+        do not need conversion.
+        Also assume that Gimp never returns a deep tree of Arrays inside Arrays,
+        except for Gimp.ValueArray containing Gimp.StringArray
+        '''
+        # This is converting, but not wrapping?
+        result = [Types.try_convert_string_array_to_list_of_str(item) for item in a_list]
+        # TODO this does not descend enough
+        # Can we assert that Gimp never returns deep trees?
+
+        print(result)
+        return result
+
+
+
+    @staticmethod
+    def try_convert_string_array_to_list_of_str(item):
+        ''' Try convert item from to list(str). Returns item, possibly converted.'''
+        if isinstance(item, Gimp.StringArray):
+            # Gimp.StringArray has fields, not methods
+            print("StringArray length", item.length)
+            # print("StringArray data", array.data)
+            # 0xa0 in first byte, unicode decode error?
+            print("Convert StringArray to list(str)")
+            result = []
+            result.append("foo")    # TEMP
+            print("convert string result:", result)
+        else:
+            result = item
+        return result
+
+
     """
     Cruft: more than necessary, but keep it, it documents how to use GTypes
 
