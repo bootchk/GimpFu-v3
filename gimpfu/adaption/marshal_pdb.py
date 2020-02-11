@@ -92,14 +92,13 @@ class MarshalPDB():
             if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")
 
-            '''
-            This exception is not caused by plugin author, usually GimpFu programming error.
-            Usually "Must be a GObject.GType, not a type"
-            '''
+            # May throw but proceed with a bogus gvalue
+            gvalue = Types.new_gvalue(go_arg_type, go_arg)
+
             try:
-                marshalled_args.insert(index, Types.new_gvalue(go_arg_type, go_arg))
+                marshalled_args.insert(index, gvalue)
             except Exception as err:
-                do_proceed_error(f"Exception marshalling arg {x} to pdb, {err}")
+                do_proceed_error(f"Exception inserting {gvalue}, index {index}, to pdb, {err}")
                 # ??? After this exception, often get: LibGimpBase-CRITICAL **: ...
                 # gimp_value_array_insert: assertion 'index <= value_array->n_values' failed
                 # The PDB procedure call is usually going to fail anyway.

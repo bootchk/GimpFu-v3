@@ -7,6 +7,7 @@ from gi.repository import GObject    # GObject type constants
 
 from adaption.wrappable import *    # is_subclass_of_drawable
 
+from message.proceed_error import *
 
 
 
@@ -101,7 +102,20 @@ class Types():
     def new_gvalue(gvalue_type, value):
         ''' Returns GValue'''
         # assert gvalue_type is a GObject type constant like GObject.TYPE_STRING
-        return GObject.Value(gvalue_type, value)
+        '''
+        An exception is usually not caused by plugin author, usually GimpFu programming error.
+        Usually "Must be a GObject.GType, not a type"
+        '''
+        try:
+            result = GObject.Value(gvalue_type, value)
+        except Exception as err:
+            do_proceed_error(f"Exception creating GValue for {gvalue_type}, {value}, err {err}")
+            # Return some bogus value so can proceed
+            result = GObject.Value( GObject.TYPE_INT, 1 )
+            # TODO would this work??
+            # result = GObject.Value( GObject.TYPE_NONE, None )
+        return result
+
 
 
     '''
@@ -206,17 +220,23 @@ class Types():
         formal_arg_type = Types._get_formal_argument_type(proc_name, index)
         should_be_drawable = Types.is_drawable_type(formal_arg_type)
 
+        result = arg # result is unaltered arg except for cases below
+
         if should_be_drawable:
             if is_subclass_of_drawable(arg):
                 result_type = Gimp.Drawable
                 did_convert = True
             elif arg == -1:
                 # v2 allowed -1 as arg for optional drawables
+                # # !!! Alter arg given by Author
+                result = None
                 result_type = Gimp.Drawable
                 did_convert = True
             elif arg is None:
-                arg = -1
-                # Gimp wants -1 or GType.NULL ?????
+                # TODO migrate to create_nonetype_drawable or create_none_for_type(type)
+                # Gimp wants GValue( Gimp.Drawable, None), apparently
+                # This does not work: result = -1
+                # But we can upcast NoneType, None is in every type???
                 result_type = Gimp.Drawable
                 did_convert = True
             else:
@@ -228,8 +248,8 @@ class Types():
             did_convert = False
 
         # assert result_type is-a type (a Gimp type, a GObject type)
-        print("upcast result:", result_type)
-        return arg, result_type, did_convert
+        print(f"upcast result: {result}, {result_type}")
+        return result, result_type, did_convert
 
 
 

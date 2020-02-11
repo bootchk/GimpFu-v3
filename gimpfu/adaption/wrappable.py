@@ -51,6 +51,7 @@ def is_wrapped_function(instance):
 def is_subclass_of_drawable(instance):
     # Note the names are not prefixed with Gimp ???
     # These taken from "GIMP App Ref Manual>Class Hierarchy"
+    # !!! Technically, NoneType is a subclass of every type?? But we don't want that here.
     return  get_gimp_type_name(instance) in (
         "Layer",
            "GroupLayer",
