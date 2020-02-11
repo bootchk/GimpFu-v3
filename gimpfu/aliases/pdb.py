@@ -5,7 +5,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 from gi.repository import GObject    # marshalling
 
-from adaption.marshal import Marshal
+from adaption.marshal_pdb import MarshalPDB
 from adaption.compatibility import pdb_name_map
 
 from message.proceed_error import *
@@ -94,7 +94,7 @@ class GimpfuPDB():
         proc_name = object.__getattribute__(self, "adapted_proc_name")
 
         try:
-            marshaled_args = Marshal.marshal_pdb_args(proc_name, *args)
+            marshaled_args = MarshalPDB.marshal_args(proc_name, *args)
         except Exception as err: # TODO catch only MarshalError ???
             do_proceed_error(f"marshalling args to pdb.{proc_name} {err}")
             marshaled_args = None
@@ -111,7 +111,7 @@ class GimpfuPDB():
                 do_proceed_error(f"Gimp PDB execution error:, {error_str}")
                 result = None
             else:
-                result = Marshal.unmarshal_pdb_result(inner_result)
+                result = MarshalPDB.unmarshal_results(inner_result)
         else:
             result = None
 
