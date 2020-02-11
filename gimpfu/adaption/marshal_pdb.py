@@ -20,6 +20,13 @@ class MarshalPDB():
     I.E. more specialized than ordinary Marshal
     '''
 
+    """
+    @staticmethod
+    def marshal_args(proc_name, *args):
+    """
+
+
+
     @staticmethod
     def marshal_args(proc_name, *args):
         '''
@@ -34,6 +41,7 @@ class MarshalPDB():
         6. Check error FunctionInfo
         '''
 
+        # TODO extract method
         # TODO python-fu- ?? What procedure names signify need run_mode?
         # Better to introspect ??
         if proc_name.startswith('plug-in-'):
@@ -57,7 +65,15 @@ class MarshalPDB():
 
             If more args than formal_args (from GI introspection), conversion will not convert.
             If less args than formal_args, Gimp might return an error when we call the PDB procedure.
+
             '''
+            # hack: upcast  subclass e.g. layer to superclass drawable
+            # hack that might be removed if Gimp was not wrongly stringent
+
+            # TODO optimize, getting type is simpler when is fundamental
+            # We could retain that the arg is fundamental during unwrapping
+            go_arg_type = Types.try_upcast_to_drawable(go_arg)
+
             go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
 
             go_arg, go_arg_type = Types.try_convert_to_null(proc_name, go_arg, go_arg_type, index)
@@ -138,13 +154,7 @@ class MarshalPDB():
 
         # TODO, possible optimization if arg is already unwrapped, or lazy?
         result_arg = Marshal.unwrap(arg)
-
-        # hack: upcast  subclass e.g. layer to superclass drawable
-        # hack that might be removed if Gimp was not wrongly stringent
-
-        # TODO optimize, getting type is simpler when is fundamental
-        # We could retain that the arg is fundamental during unwrapping
-        result_arg_type = Types.try_upcast_to_drawable(result_arg)
+        result_arg_type = type(result_arg)
 
         print("_unwrap_to_param", result_arg, result_arg_type)
         return result_arg, result_arg_type
