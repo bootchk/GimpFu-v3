@@ -283,22 +283,18 @@ class Marshal():
     PDB marshal, unmarshal
     '''
 
+
     @staticmethod
     def marshal_pdb_args(proc_name, *args):
         '''
         Marshal args to a PDB procedure.
 
         1. Gather many args into Gimp.ValueArray and return it.
-
         2. Optionally prefix args with run mode
         GimpFu feature: hide run_mode from calling author
-
         3. Unwrap wrapped arguments so all args are GObjects
-
         4. Hacky upcast to Drawable ???
-
         5. float(arg) as needed
-
         6. Check error FunctionInfo
         '''
 
@@ -329,6 +325,8 @@ class Marshal():
             '''
             go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
 
+            go_arg, go_arg_type = Types.try_convert_to_null(proc_name, go_arg, go_arg_type, index)
+
             if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")
 
@@ -347,6 +345,9 @@ class Marshal():
                 marshalled_args.insert(index, GObject.Value(go_arg_type, go_arg))
             except Exception as err:
                 do_proceed_error(f"Exception marshalling arg {x} to pdb, {err}")
+                # ??? After this exception, often get: LibGimpBase-CRITICAL **: ...
+                # gimp_value_array_insert: assertion 'index <= value_array->n_values' failed
+                # The PDB procedure call is usually going to fail anyway.
 
             index += 1
 

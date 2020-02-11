@@ -3,6 +3,8 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
+from gi.repository import GObject    # GObject type constants
+
 from adaption.wrappable import *    # is_subclass_of_drawable
 
 
@@ -85,6 +87,20 @@ class Types():
         # assert type of formal_arg_type is GObject.GType
         ## OLD assert formal_arg_type has python type like GParamSpec<Enum>
         return formal_arg_type
+
+
+    @staticmethod
+    def try_convert_to_null(proc_name, actual_arg, actual_arg_type, index):
+        '''
+        When actual arg is None, convert to GValue that represents None
+        '''
+        result_arg = actual_arg
+        result_arg_type = actual_arg_type
+        if actual_arg is None:
+            result_arg = -1     # Somewhat arbitrary
+            result_arg_type = GObject.TYPE_INT
+        print("try_convert_to_null returns ", result_arg, result_arg_type)
+        return result_arg, result_arg_type
 
 
     @staticmethod
@@ -200,6 +216,9 @@ class Types():
             # print("StringArray data", array.data)
             # 0xa0 in first byte, unicode decode error?
             print("Convert StringArray to list(str)")
+            # print(type(item.data)) get utf-8 decode error
+            # print(item.data.length()) get same errors
+            # print(item.data.decode('latin-1').encode('utf-8')) also fails
             result = []
             result.append("foo")    # TEMP
             print("convert string result:", result)

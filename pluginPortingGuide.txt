@@ -4,7 +4,10 @@ Porting PyGimp Plugins to Gimp 3 and Python 3
 
 About
 
-This document is for plugin authors.
+This document is for authors of Gimp plugin who want to use GimpFu.
+When this document says "you" or "author" it means the person writing
+a plugin for Gimp using the Python language and importing the gimpfu package.
+
 It describes the changes you must make to plugin source
 so the plugin will run in Gimp 3.
 
@@ -119,6 +122,30 @@ But <Filters> also works.  And <Filters/Foo>
 Note that e.g. Layers is not the "Layer" menu in the menubar, but the popup menu in Gimp's "Layers" dockable dialog.
 Use RMB to popup the menu.
 
+
+PDB
+---
+
+In v2, PDB procedures often accepted -1 for optional parameters,
+and Python authors could use None for the parameter.
+
+In v3, PDB procedures now say to use NULL for optional parameters.
+
+
+GimpFu packaging
+----------------
+
+How GimpFu is packaged is irrelevant to most authors,
+but some authors, may want to know to aid in their debugging.
+
+In v2, gimpfu was many .py files in the same directory, each file a Python module.
+
+In v3, GimpFu is a package, a directory with a __init__.py file, and submodules.
+The top directory is in PYTHONPATH when Gimp runs a plugin.
+
+You can import a specific submodule using absolute paths like:
+from gui.dialog import *
+This refers to .../plug-ins/gimpfu/gui/dialog.py
 
 
 Miscellaneous changes

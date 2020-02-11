@@ -92,7 +92,7 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
         # TODO this should work, but its not
         # args = [widget_default_value,]
         args = ["/tmp/lkkfoopluginout"]
-    elif pf_type in (PF_INT, PF_STRING, PF_BOOL, PF_OPTION ):
+    elif pf_type in (PF_INT, PF_STRING, PF_BOOL, PF_OPTION, PF_FONT, PF_TEXT ):
         args = [widget_default_value]
     elif pf_type in (PF_SLIDER, PF_FLOAT):
         # Hack, we are using FloatEntry, should use Slider???
@@ -577,6 +577,8 @@ _edit_map = {
         PF_FLOAT       : FloatEntry,
         PF_SLIDER      : FloatEntry,
         PF_RADIO       : RadioEntry,
+        PF_FONT        : StringEntry,
+        PF_TEXT        : StringEntry,
         # For omitted, subsequently GimpFu uses the default value
         # which should be sane
         PF_COLOR       : OmittedEntry,
