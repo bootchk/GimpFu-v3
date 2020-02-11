@@ -134,8 +134,12 @@ class Marshal():
 
 
     @staticmethod
-    def _unwrap_arg(arg):
+    def unwrap(arg):
         '''
+        Knows how to unwrap any type,
+        i.e. knows which are wrapped types versus fundamental types,
+        and unwraps only wrapped types.
+
         Unwrap any GimpFu wrapped types to Gimp types
         E.G. GimpfuImage => Gimp.Image
         For primitive Python types and GTypes, idempotent, returns given arg unaltered.
@@ -154,35 +158,6 @@ class Marshal():
         print("unwrap_arg:", result_arg)
         return result_arg
 
-
-
-    '''
-    unwrap to a GParamSpec
-    '''
-
-    @staticmethod
-    def _unwrap_arg_to_param(arg):
-        '''
-        Unwrap any wrapped.
-        Returns a tuple: (unwrapped arg, type of unwrapped arg)
-        For use as arg to PDB, which requires ParamSpec tuple.
-
-        Only fundamental Python types and GTypes can be GObject.value()ed,
-        which is what Gimp does with ParamSpec
-        '''
-
-        # TODO, possible optimization if arg is already unwrapped, or lazy?
-        result_arg = Marshal._unwrap_arg(arg)
-
-        # hack: upcast  subclass e.g. layer to superclass drawable
-        # hack that might be removed if Gimp was not wrongly stringent
-
-        # TODO optimize, getting type is simpler when is fundamental
-        # We could retain that the arg is fundamental during unwrapping
-        result_arg_type = Types.try_upcast_to_drawable(result_arg)
-
-        print("_unwrap_arg_to_param", result_arg, result_arg_type)
-        return result_arg, result_arg_type
 
     '''
     '''
@@ -261,7 +236,7 @@ class Marshal():
         result = []
         for instance in args:
             if is_gimpfu_unwrappable(instance):
-                result.append(Marshal._unwrap_arg(instance))
+                result.append(Marshal.unwrap(instance))
             else:   # fundamental
                 result.append(instance)
         return result

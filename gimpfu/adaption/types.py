@@ -89,6 +89,22 @@ class Types():
         return formal_arg_type
 
 
+
+    '''
+    !!! Can't assign GValue to python object: foo = GObject.Value(Gimp.Image, x) ???
+    Must pass directly to Gimp.ValueArray.insert() ???
+
+    ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
+    I suppose GObject.Value() can't know all the types, is generic.
+    '''
+    @staticmethod
+    def new_gvalue(gvalue_type, value):
+        ''' Returns GValue'''
+        # assert gvalue_type is a GObject type constant like GObject.TYPE_STRING
+        return GObject.Value(gvalue_type, value)
+
+
+
     @staticmethod
     def try_convert_to_null(proc_name, actual_arg, actual_arg_type, index):
         '''

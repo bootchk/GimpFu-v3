@@ -3,9 +3,6 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-# TODO make this module the only one that imports GObject
-from gi.repository import GObject
-
 
 from adaption.wrappable import *
 from adaption.marshal import Marshal
@@ -50,10 +47,9 @@ class MarshalPDB():
 
 
         for x in args:
-            ## GObject.Value(GObject.TYPE_STRING, tmp))
             ## print("marshal arg:", x )
 
-            go_arg, go_arg_type = Marshal._unwrap_arg_to_param(x)
+            go_arg, go_arg_type = MarshalPDB._unwrap_to_param(x)
 
             '''
             Don't assume any arg does NOT need conversion:
@@ -69,20 +65,12 @@ class MarshalPDB():
             if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")
 
-
-            # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
-            # Must pass directly to insert()
-
-            # ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
-            # unless GObject.Value() does some sort of casting
-
             '''
             This exception is not caused by plugin author, usually GimpFu programming error.
             Usually "Must be a GObject.GType, not a type"
             '''
             try:
-                # TODO move GValue constructor to Types
-                marshalled_args.insert(index, GObject.Value(go_arg_type, go_arg))
+                marshalled_args.insert(index, Types.new_gvalue(go_arg_type, go_arg))
             except Exception as err:
                 do_proceed_error(f"Exception marshalling arg {x} to pdb, {err}")
                 # ??? After this exception, often get: LibGimpBase-CRITICAL **: ...
@@ -135,3 +123,28 @@ class MarshalPDB():
         # TODO ensure wrapped?
         print("unmarshal_pdb_result", result)
         return result
+
+
+
+    @staticmethod
+    def _unwrap_to_param(arg):
+        '''
+        Returns a tuple: (unwrapped arg, type of unwrapped arg)
+        For use as arg to PDB, which requires ParamSpec tuple.
+
+        Only fundamental Python types and GTypes can be GObject.value()ed,
+        which is what Gimp does with ParamSpec
+        '''
+
+        # TODO, possible optimization if arg is already unwrapped, or lazy?
+        result_arg = Marshal.unwrap(arg)
+
+        # hack: upcast  subclass e.g. layer to superclass drawable
+        # hack that might be removed if Gimp was not wrongly stringent
+
+        # TODO optimize, getting type is simpler when is fundamental
+        # We could retain that the arg is fundamental during unwrapping
+        result_arg_type = Types.try_upcast_to_drawable(result_arg)
+
+        print("_unwrap_to_param", result_arg, result_arg_type)
+        return result_arg, result_arg_type
