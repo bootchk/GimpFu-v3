@@ -104,6 +104,31 @@ class Types():
         return GObject.Value(gvalue_type, value)
 
 
+    '''
+    formal_arg_type is like GimpParamDrawable.
+    formal_arg_type is-a GType
+    GType has property "name" which is the short name
+
+    !!! GObject type names are like GParamDouble
+    but Gimp GObject type names are like GimpParamDrawable
+    *G* versus *Gimp*
+
+    !!! Not formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE
+    '''
+    @staticmethod
+    def is_float_type(formal_arg_type):
+        # use the short name
+        return formal_arg_type.name in ('GParamFloat', 'GParamDouble')
+
+    @staticmethod
+    def is_drawable_type(formal_arg_type):
+        # use the short name
+        result = formal_arg_type.name in ('GimpParamDrawable', )
+        print(f"is_drawable_type formal arg name: {formal_arg_type.name} ")
+        return result
+
+
+
 
     @staticmethod
     def try_convert_to_null(proc_name, actual_arg, actual_arg_type, index):
@@ -141,11 +166,8 @@ class Types():
         if type(actual_arg) is int:
             formal_arg_type = Types._get_formal_argument_type(proc_name, index)
             if formal_arg_type is not None:
-                # GType has property "name"
                 print("     Formal arg type ", formal_arg_type.name )
-
-                #if formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE :
-                if formal_arg_type.name in ('GParamFloat', 'GParamDouble'): # ParamSpec ???
+                if Types.is_float_type(formal_arg_type):
                     # ??? Tell Gimpfu plugin author their code would be more clear if they used float() themselves
                     # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
                     print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")
@@ -168,28 +190,46 @@ class Types():
     so that many plugs don't need to do it.
     '''
     @staticmethod
-    def try_upcast_to_drawable(arg):
+    def try_upcast_to_drawable(proc_name, arg, arg_type, index):
         '''
-        When type(arg) is subclass of Gimp.Drawable,
+        When type(arg) is subclass of Gimp.Drawable
         and return new type Gimp.Drawable, else return original type.
         Does not actually change type of arg.
 
-        Require arg a GObject (not wrapped)
+        Require arg a GObject (not wrapped).
+        Require proc_name a PDB procedure name.
         '''
         # idiom for class name
-        print("Attempt upcast type", type(arg).__name__ )
+        print("Attempt upcast type to drawable", type(arg).__name__ )
 
-        # TODO check formal arg type    formal_arg_type = Types._get_formal_argument_type(proc_name, index)
+        should_be_drawable = False
+        formal_arg_type = Types._get_formal_argument_type(proc_name, index)
+        should_be_drawable = Types.is_drawable_type(formal_arg_type)
 
-        if is_subclass_of_drawable(arg):
-            result_type = Gimp.Drawable
-            did_convert = True
+        if should_be_drawable:
+            if is_subclass_of_drawable(arg):
+                result_type = Gimp.Drawable
+                did_convert = True
+            elif arg == -1:
+                # v2 allowed -1 as arg for optional drawables
+                result_type = Gimp.Drawable
+                did_convert = True
+            elif arg is None:
+                arg = -1
+                # Gimp wants -1 or GType.NULL ?????
+                result_type = Gimp.Drawable
+                did_convert = True
+            else:
+                do_proceed_error(f"Require arg type is Drawable, but is {arg_type} and not convertable.")
+                result_type = arg_type
+                did_convert = False
         else:
-            result_type = type(arg)
+            result_type = arg_type
             did_convert = False
+
         # assert result_type is-a type (a Gimp type, a GObject type)
         print("upcast result:", result_type)
-        return result_type, did_convert
+        return arg, result_type, did_convert
 
 
 

@@ -37,7 +37,7 @@ class MarshalPDB():
 
         # TODO do only one conversion if
 
-        go_arg_type, did_convert = Types.try_upcast_to_drawable(go_arg)
+        go_arg, go_arg_type, did_convert = Types.try_upcast_to_drawable(proc_name, go_arg, go_arg_type, index)
 
         if not did_convert:
             go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
