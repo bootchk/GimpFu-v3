@@ -178,13 +178,18 @@ class Types():
         '''
         # idiom for class name
         print("Attempt upcast type", type(arg).__name__ )
+
+        # TODO check formal arg type    formal_arg_type = Types._get_formal_argument_type(proc_name, index)
+
         if is_subclass_of_drawable(arg):
-            result = Gimp.Drawable
+            result_type = Gimp.Drawable
+            did_convert = True
         else:
-            result = type(arg)
-        # assert result is-a type (a Gimp type, a GObject type)
-        print("upcast result:", result)
-        return result
+            result_type = type(arg)
+            did_convert = False
+        # assert result_type is-a type (a Gimp type, a GObject type)
+        print("upcast result:", result_type)
+        return result_type, did_convert
 
 
 

@@ -20,10 +20,34 @@ class MarshalPDB():
     I.E. more specialized than ordinary Marshal
     '''
 
-    """
+
     @staticmethod
-    def marshal_args(proc_name, *args):
-    """
+    def try_type_conversions(proc_name, go_arg, go_arg_type, index):
+        '''
+        Attempt type conversions.
+
+        Don't assume any arg does NOT need conversion:
+        a procedure can declare any arg of type float
+        '''
+        # hack: upcast  subclass e.g. layer to superclass drawable
+        # hack that might be removed if Gimp was not wrongly stringent
+
+        # TODO optimize, getting type is simpler when is fundamental
+        # We could retain that the arg is fundamental during unwrapping
+
+        # TODO do only one conversion if
+
+        go_arg_type, did_convert = Types.try_upcast_to_drawable(go_arg)
+
+        if not did_convert:
+            go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
+
+        # TODO is this necessary? I think it is only drawable that gets passed None
+        #go_arg, go_arg_type = Types.try_convert_to_null(proc_name, go_arg, go_arg_type, index)
+
+        return go_arg, go_arg_type
+
+
 
 
 
@@ -54,29 +78,16 @@ class MarshalPDB():
             index = 0
 
 
+        '''
+        If more args than formal_args (from GI introspection), conversion will not convert.
+        If less args than formal_args, Gimp might return an error when we call the PDB procedure.
+        '''
         for x in args:
             ## print("marshal arg:", x )
 
             go_arg, go_arg_type = MarshalPDB._unwrap_to_param(x)
 
-            '''
-            Don't assume any arg does NOT need conversion:
-            a procedure can declare any arg of type float
-
-            If more args than formal_args (from GI introspection), conversion will not convert.
-            If less args than formal_args, Gimp might return an error when we call the PDB procedure.
-
-            '''
-            # hack: upcast  subclass e.g. layer to superclass drawable
-            # hack that might be removed if Gimp was not wrongly stringent
-
-            # TODO optimize, getting type is simpler when is fundamental
-            # We could retain that the arg is fundamental during unwrapping
-            go_arg_type = Types.try_upcast_to_drawable(go_arg)
-
-            go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
-
-            go_arg, go_arg_type = Types.try_convert_to_null(proc_name, go_arg, go_arg_type, index)
+            go_arg, go_arg_type = MarshalPDB.try_type_conversions(proc_name, go_arg, go_arg_type, index)
 
             if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")
