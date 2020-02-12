@@ -592,7 +592,7 @@ commands:
       export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
       echo $PYTHONPATH
 
-      export G_MESSAGES_DEBUG=all
+      # export G_MESSAGES_DEBUG=all
 
       /usr/local/bin/gimp-2.99 --verbose --no-data
 

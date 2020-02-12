@@ -5,7 +5,7 @@ from gi.repository import Gimp
 
 from gi.repository import GObject    # GObject type constants
 
-from adaption.wrappable import *    # is_subclass_of_drawable
+from adaption.wrappable import *    # is_subclass_of_type
 
 from message.proceed_error import *
 
@@ -20,7 +20,10 @@ class Types():
     Collaborates with Marshal.
 
     GimpFu converts Python ints to floats on behalf of Gimp.
-    GimpFu converts Layer to Drawable where Gimp is uneccessarily demanding.
+
+    GimpFu upcasts e.g. Layer to Drawable where Gimp is uneccessarily demanding.
+    GimpFu upcasts None to e.g. Layer when passed as actual arg.
+    GimpFu upcasts -1 to e.g. Layer when passed as actual arg.
     '''
 
     # TODO optimize.  Get all the args at once, memoize
@@ -125,7 +128,7 @@ class Types():
 
     !!! GObject type names are like GParamDouble
     but Gimp GObject type names are like GimpParamDrawable
-    *G* versus *Gimp*
+    !!! *G* versus *Gimp*
 
     !!! Not formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE
     '''
@@ -134,6 +137,8 @@ class Types():
         # use the short name
         return formal_arg_type.name in ('GParamFloat', 'GParamDouble')
 
+
+    # TODO rename is_drawable_formal_type
     @staticmethod
     def is_drawable_type(formal_arg_type):
         # use the short name
@@ -142,6 +147,16 @@ class Types():
         return result
 
 
+    @staticmethod
+    def is_formal_type_equal_type(formal_type, actual_type):
+        # !!! GType.name versus PythonType.__name__
+        formal_type_name = formal_type.name
+        actual_type_name = actual_type.__name__
+
+        mangled_formal_type_name = formal_type_name.replace('GimpParam', '')
+        result = mangled_formal_type_name == actual_type_name
+        print(f"{result}    formal {formal_type_name} == actual {actual_type_name}")
+        return result
 
 
     @staticmethod
@@ -190,7 +205,7 @@ class Types():
             else:
                 # Failed to get formal argument type.  Probably too many actual args.
                 # Do not convert type.
-                pass
+                do_proceed_error(f"Failed to get formal argument type for index: {index}.")
 
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
         # likewise for value of result_arg
@@ -204,52 +219,62 @@ class Types():
     so that many plugs don't need to do it.
     '''
     @staticmethod
-    def try_upcast_to_drawable(proc_name, arg, arg_type, index):
+    def try_upcast_to_type(proc_name, arg, arg_type, index, cast_to_type):
         '''
-        When type(arg) is subclass of Gimp.Drawable
-        and return new type Gimp.Drawable, else return original type.
-        Does not actually change type of arg.
+        When type(arg) is subclass of cast_to_type
+        and proc_name expects arg of cast_to_type at index,
+        return cast_to_type, else return original type.
+        Does not actually change type of arg i.e. no conversion, just casting.
 
         Require arg a GObject (not wrapped).
         Require proc_name a PDB procedure name.
         '''
-        # idiom for class name
-        print("Attempt upcast type to drawable", type(arg).__name__ )
+        # assert type is like Gimp.Drawable, cast_to_type has name like Drawable
 
-        should_be_drawable = False
+        print(f"Attempt upcast type: {get_type_name(arg)} to : {cast_to_type.__name__}")
+
         formal_arg_type = Types._get_formal_argument_type(proc_name, index)
-        should_be_drawable = Types.is_drawable_type(formal_arg_type)
+        # TODO exception index out of range
+
+        should_upcast = Types.is_formal_type_equal_type(formal_arg_type, cast_to_type)
 
         result = arg # result is unaltered arg except for cases below
 
-        if should_be_drawable:
-            if is_subclass_of_drawable(arg):
-                result_type = Gimp.Drawable
-                did_convert = True
+        if should_upcast:
+            if is_subclass_of_type(arg, cast_to_type):
+                result_type = cast_to_type
+                did_upcast = True
             elif arg == -1:
                 # v2 allowed -1 as arg for optional drawables
                 # # !!! Alter arg given by Author
                 result = None
-                result_type = Gimp.Drawable
-                did_convert = True
+                result_type = cast_to_type
+                did_upcast = True
             elif arg is None:
                 # TODO migrate to create_nonetype_drawable or create_none_for_type(type)
                 # Gimp wants GValue( Gimp.Drawable, None), apparently
                 # This does not work: result = -1
                 # But we can upcast NoneType, None is in every type???
-                result_type = Gimp.Drawable
-                did_convert = True
+                result_type = cast_to_type
+                did_upcast = True
             else:
-                do_proceed_error(f"Require arg type is Drawable, but is {arg_type} and not convertable.")
+                # Note case Drawable == Drawable will get here, but Author cannot create instance of Drawable.
+                do_proceed_error(f"Require arg type: {formal_arg_type} , but got {arg_type} not castable.")
                 result_type = arg_type
-                did_convert = False
+                did_upcast = False
         else:
             result_type = arg_type
-            did_convert = False
+            did_upcast = False
 
         # assert result_type is-a type (a Gimp type, a GObject type)
         print(f"upcast result: {result}, {result_type}")
-        return result, result_type, did_convert
+        return result, result_type, did_upcast
+
+
+
+    @staticmethod
+    def try_upcast_to_drawable(proc_name, arg, arg_type, index):
+        return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Drawable)
 
 
 

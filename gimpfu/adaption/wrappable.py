@@ -8,6 +8,13 @@ Knows:
     which Gimp types are subclasses of Drawable
 '''
 
+
+# Python idiom for string name of a type
+# Gimp.Drawable returns a type, but its name is type.__name__
+def get_type_name(instance):
+    return type(instance).__name__
+
+
 '''
 Keep these in correspondence with each other,
 and with wrap() dispatch.
@@ -15,26 +22,27 @@ and with wrap() dispatch.
 I.E. to add a wrapper Foo:
  - add Foo.py in adapters/
  - add literals like 'Foo' in three places in this file.
+
+wrap is symmetrical with unwrap.
+We wrap Drawable, Item, etc. but the Author cannot create instances,
+only instance of subclasses.
 '''
-
-
-
 def is_gimpfu_wrappable_name(name):
     return name in ('Image', 'Layer', 'Display', 'Vectors')
 
-
-def get_gimp_type_name(instance):
-    return type(instance).__name__
-
-
-def is_gimpfu_wrappable(instance):
-    return is_gimpfu_wrappable_name(get_gimp_type_name(instance))
-
-
 def is_gimpfu_unwrappable( instance):
-    return type(instance).__name__ in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay", "GimpfuVectors")
+    return get_type_name(instance) in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay", "GimpfuVectors")
 
 
+
+# TODO rename is_instance_gimpfu_wrappable
+def is_gimpfu_wrappable(instance):
+    return is_gimpfu_wrappable_name(get_type_name(instance))
+
+
+
+
+# TODO rename is_function
 def is_wrapped_function(instance):
     ''' Is the instance a gi.FunctionInfo? '''
     '''
@@ -48,16 +56,33 @@ def is_wrapped_function(instance):
     return type(instance).__name__ in ('gi.FunctionInfo')
 
 
-def is_subclass_of_drawable(instance):
-    # Note the names are not prefixed with Gimp ???
-    # These taken from "GIMP App Ref Manual>Class Hierarchy"
-    # !!! Technically, NoneType is a subclass of every type?? But we don't want that here.
-    return  get_gimp_type_name(instance) in (
-        "Layer",
-           "GroupLayer",
-           "TextLayer"
-        "Channel",
-           "LayerMask",
-           "Selection",
-         "Vectors"
-        )
+'''
+Taken from "GIMP App Ref Manual>Class Hierarchy"
+Note the names are not prefixed with "Gimp."
+
+Technically, NoneType is a subclass of every type.
+But we don't want that here, we deal with it elsewhere.
+'''
+DrawableTypeNames = (
+    "Layer",
+       "GroupLayer",
+       "TextLayer"
+    "Channel",
+       "LayerMask",
+       "Selection",
+)
+
+
+ItemTypeNames = (
+    "Drawable",
+    "Vectors"
+)
+
+def is_subclass_of_type(instance, super_type):
+    if super_type == Gimp.Drawable:
+        result =  get_type_name(instance) in DrawableTypeNames
+    elif super_type == Gimp.Item:
+        type_name = get_type_name(instance)
+        result = type_name in ItemTypeNames or type_name in DrawableTypeNames
+    print(f"is_subclass_of_type returns {result}")
+    return result

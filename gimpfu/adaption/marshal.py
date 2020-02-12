@@ -104,7 +104,7 @@ class Marshal():
         print("Wrap ", gimp_instance)
 
         if is_gimpfu_wrappable(gimp_instance):
-            gimp_type_name = get_gimp_type_name(gimp_instance)
+            gimp_type_name = get_type_name(gimp_instance)
             statement = 'Gimpfu' + gimp_type_name + '(adaptee=gimp_instance)'
             # e.g. statement  'GimpfuImage(adaptee=gimp_instance)'
             result = eval(statement)
