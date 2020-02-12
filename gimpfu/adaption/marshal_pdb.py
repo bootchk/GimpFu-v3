@@ -134,6 +134,8 @@ class MarshalPDB():
             # Recursively convert type of elements to Python types
             result_list = Types.convert_list_elements_to_python_types(result_list)
 
+            result_list = Marshal.wrap_adaptee_results(result_list)
+
             # unpack list of one element
             # TODO is this always the correct thing to do?
             # Some procedure signatures may return a list of one?

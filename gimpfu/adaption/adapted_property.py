@@ -76,7 +76,9 @@ class AdaptedProperty():
     def is_dynamic_true_property_name(cls, instance, name):
         ''' Is <name> accessed like <name>() ? '''
         delegated_property_names = instance.DynamicTrueAdaptedProperties()
-        return name in delegated_property_names
+        result = name in delegated_property_names
+        print(f"is_dynamic_true_property_name: {result} for name: {name} on instance: {instance}")
+        return result
 
 
 
@@ -91,10 +93,15 @@ class AdaptedProperty():
     !!! This does not mean that the callable has arguments.
     When the callable does not have args i.e. <name>(void)
     it is indistinguishable from what we might adapt as a property.
+
+    !!! This is too weak.
+    We should retrieve the attr and check that it is a gi.FunctionInfo,
+    else the attribute is not a callable.
+    Gimp and GI does have properties that are not callables?
     '''
     @classmethod
     def is_callable_name_on_instance(cls, instance, name):
-        ''' Is <name> accessed like <name>() ? '''
+        ''' Is <name> an attribute on instance, accessed like <name>() ? '''
         return hasattr(instance, name)
 
 

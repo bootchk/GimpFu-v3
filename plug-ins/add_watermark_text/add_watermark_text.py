@@ -29,7 +29,10 @@ def add_watermark_text(img, drawable, text, points, antialias, letter_spacing, f
 
     layer_margins = 5
     x = layer_margins #left
-    y = img.height - text_layer.height - layer_margins #bottom
+    # lkk rearrange for testing
+    y = img.height - layer_margins
+    y = y - text_layer.height
+    # y = img.height - text_layer.height - layer_margins #bottom
 
     pdb.gimp_text_layer_set_color(text_layer, color)
     pdb.gimp_text_layer_set_text(text_layer, text)

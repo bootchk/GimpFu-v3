@@ -89,10 +89,11 @@ class Marshal():
     @staticmethod
     def wrap(gimp_instance):
         '''
-        Wrap Gimp types that GimpFu wraps.
+        Wrap an instance from Gimp.
         E.G. Image => GimpfuImage
 
-        Requires gimp_instance is-a Gimp object
+        Requires gimp_instance is-a Gimp object that should be wrapped,
+        else exception.
         '''
         '''
         Invoke the internal constructor for wrapper class.
@@ -176,20 +177,18 @@ class Marshal():
         '''
         Wrap result of calls to adaptee.
 
-        args may be an iterable e.g. a tuple or list?
-        Result is iterable if args is.
-        Result is a list if args is?
+        args is an iterable e.g. a tuple or list or a single value.
+        Result is iterable list if args is iterable,
+        else result is a single value.
         '''
         try:
-            iterator = iter(args)
+            unused_iterator = iter(args)
         except TypeError:
             # not iterable
             result = Marshal._try_wrap(args)
         else:
             # iterable
-            result = []
-            for instance in args:
-                result.append( Marshal._try_wrap(instance))
+            result = [Marshal._try_wrap(item) for item in args]
         return result
 
 

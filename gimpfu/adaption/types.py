@@ -268,24 +268,29 @@ class Types():
         return list_of_gvalue
 
 
+
+    '''
+    Only certain Gimp types need conversion.
+    E.G. Gimp.StringArray => list(str).
+    PyGObject handles fundamental simple types, lists, and array?
+    TODO why isn't a Gimp.StringArray returned as a GSList that PyGobject handles?
+
+    Also assume that Gimp never returns a deep tree of Arrays inside Arrays,
+    except for Gimp.ValueArray containing Gimp.StringArray.
+    This does not descend enough, only one level.
+    '''
     @staticmethod
     def convert_list_elements_to_python_types(a_list):
         ''' Walk (recursive descent) converting elements to Python types. '''
-        '''
-        Only certain Gimp types need conversion: Gimp.StringArray => list(str)
-        Elements that are fundamental (GTypes, but not complex)
-        do not need conversion.
-        Also assume that Gimp never returns a deep tree of Arrays inside Arrays,
-        except for Gimp.ValueArray containing Gimp.StringArray
-        '''
-        # This is converting, but not wrapping?
+        ''' !!! This is converting, but not wrapping. '''
         result = [Types.try_convert_string_array_to_list_of_str(item) for item in a_list]
-        # TODO this does not descend enough
-        # Can we assert that Gimp never returns deep trees?
-
         print(result)
         return result
 
+
+    '''
+    See Marshal.wrap_adaptee_results() to wrap elements of list.
+    '''
 
 
     @staticmethod
