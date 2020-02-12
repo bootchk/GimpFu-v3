@@ -276,6 +276,10 @@ class Types():
     def try_upcast_to_drawable(proc_name, arg, arg_type, index):
         return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Drawable)
 
+    @staticmethod
+    def try_upcast_to_item(proc_name, arg, arg_type, index):
+        return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Item)
+
 
 
     @staticmethod

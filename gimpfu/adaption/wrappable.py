@@ -12,8 +12,10 @@ Knows:
 # Python idiom for string name of a type
 # Gimp.Drawable returns a type, but its name is type.__name__
 def get_type_name(instance):
-    return type(instance).__name__
+    return get_name_of_type(type(instance))
 
+def get_name_of_type(a_type):
+    return a_type.__name__
 
 '''
 Keep these in correspondence with each other,
@@ -79,10 +81,12 @@ ItemTypeNames = (
 )
 
 def is_subclass_of_type(instance, super_type):
-    if super_type == Gimp.Drawable:
+    # assert super_type is a Python type, having .__name__
+    super_type_name = get_name_of_type(super_type)
+    if  super_type_name == 'Drawable':
         result =  get_type_name(instance) in DrawableTypeNames
-    elif super_type == Gimp.Item:
+    elif super_type_name == 'Item':
         type_name = get_type_name(instance)
         result = type_name in ItemTypeNames or type_name in DrawableTypeNames
-    print(f"is_subclass_of_type returns {result}")
+    print(f"is_subclass_of_type {super_type_name} returns {result}")
     return result
