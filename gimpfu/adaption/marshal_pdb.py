@@ -43,7 +43,12 @@ class MarshalPDB():
         if not did_convert:
             go_arg, go_arg_type, did_convert = Types.try_upcast_to_item(proc_name, go_arg, go_arg_type, index)
         if not did_convert:
-            go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
+            go_arg, go_arg_type, did_convert = Types.try_upcast_to_layer(proc_name, go_arg, go_arg_type, index)
+        if not did_convert:
+            go_arg, go_arg_type = Types.try_usual_python_conversion(proc_name, go_arg, go_arg_type, index)
+        #    go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
+        #if not did_convert:
+        #    go_arg, go_arg_type = Types.try_convert_to_str(proc_name, go_arg, go_arg_type, index)
 
         # !!! We don't upcast deprecated constant TRUE to G_TYPE_BOOLEAN
 
@@ -92,7 +97,10 @@ class MarshalPDB():
 
             go_arg, go_arg_type = MarshalPDB._unwrap_to_param(x)
 
-            go_arg, go_arg_type = MarshalPDB._try_type_conversions(proc_name, go_arg, go_arg_type, index)
+            try:
+                go_arg, go_arg_type = MarshalPDB._try_type_conversions(proc_name, go_arg, go_arg_type, index)
+            except Exception as err:
+                do_proceed_error(f"Exception in type conversion of: {go_arg}, type: {go_arg_type}, index: {index}")
 
             if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")

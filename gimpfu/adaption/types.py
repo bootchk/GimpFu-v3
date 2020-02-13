@@ -137,6 +137,9 @@ class Types():
         # use the short name
         return formal_arg_type.name in ('GParamFloat', 'GParamDouble')
 
+    def is_str_type(formal_arg_type):
+        return formal_arg_type.name in ('GParamString', )
+
 
     # TODO rename is_drawable_formal_type
     @staticmethod
@@ -173,6 +176,67 @@ class Types():
         return result_arg, result_arg_type
 
 
+    """
+    @staticmethod
+    def try_convert_to_str(proc_name, actual_arg, actual_arg_type, index):
+        return try_usual_python_conversion(proc_name, actual_arg, actual_arg_type, index, "str")
+
+    @staticmethod
+    def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
+        return try_usual_python_conversion(proc_name, actual_arg, actual_arg_type, index, "float")
+    """
+
+    @staticmethod
+    def try_usual_python_conversion(proc_name, actual_arg, actual_arg_type, index):
+        '''
+        Perform the usual automatic Python conversion from int to (str, float).
+
+        Return converted actual arg to an other type if is type int
+        and PDB procedure wants the other type.
+        (procedure's formal parameter type in (GObject.TYPE_FLOAT, TYPE_STRING).
+
+        Returns actual_arg, type(actual_arg), possibly converted.
+        !!! Note that the caller must ensure that the original variable is not converted,
+        only the variable being passed to Gimp.
+
+        GObject also converts Python fundamental types to GTypes as they are passed to Gimp.
+        '''
+        # require type(actual_arg_type) is Python type or a GType
+
+        result_arg = actual_arg
+        result_arg_type = actual_arg_type
+
+        print("Actual arg type:", type(actual_arg))
+
+        if type(actual_arg) is int:
+            formal_arg_type = Types._get_formal_argument_type(proc_name, index)
+            if formal_arg_type is not None:
+                print("     Formal arg type ", formal_arg_type.name )
+                if Types.is_float_type(formal_arg_type):
+                    # ??? Tell Gimpfu plugin author their code would be more clear if they used float() themselves
+                    # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
+                    # TODO make this a warning or a suggest
+                    print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")
+                    result_arg = float(actual_arg)  # type conversion
+                    result_arg_type = type(result_arg)  # i.e. float
+                elif Types.is_str_type(formal_arg_type):
+                    print("GimpFu: Suggest: converting int to str.  Your code might be clearer if you use explicit conversions.")
+                    result_arg = str(actual_arg)  # type conversion
+                    result_arg_type = type(result_arg)
+                # else arg is int but procedure wants int, or a type that has no conversion
+                # TODO warn now that type is int but procedure wants another type
+            else:
+                # Probably too many actual args.
+                # Do not convert type.
+                do_proceed_error(f"Failed to get formal argument type for index: {index}.")
+        # else not a usual Python conversion from int
+
+        # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
+        # likewise for value of result_arg
+        print("try_usual_python_conversion returns ", result_arg, result_arg_type)
+        return result_arg, result_arg_type
+
+    """
     @staticmethod
     def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
         '''
@@ -211,7 +275,7 @@ class Types():
         # likewise for value of result_arg
         print("try_convert_to_float returns ", result_arg, result_arg_type)
         return result_arg, result_arg_type
-
+    """
 
     '''
     Seems like need for upcast is inherent in GObj.
@@ -231,7 +295,7 @@ class Types():
         '''
         # assert type is like Gimp.Drawable, cast_to_type has name like Drawable
 
-        print(f"Attempt upcast type: {get_type_name(arg)} to : {cast_to_type.__name__}")
+        print(f"Attempt upcast arg:{arg} from type: {get_type_name(arg)} to : {cast_to_type.__name__}")
 
         formal_arg_type = Types._get_formal_argument_type(proc_name, index)
         # TODO exception index out of range
@@ -271,7 +335,7 @@ class Types():
         return result, result_type, did_upcast
 
 
-
+    # TODO replace this with data driven single procedure
     @staticmethod
     def try_upcast_to_drawable(proc_name, arg, arg_type, index):
         return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Drawable)
@@ -279,6 +343,10 @@ class Types():
     @staticmethod
     def try_upcast_to_item(proc_name, arg, arg_type, index):
         return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Item)
+
+    @staticmethod
+    def try_upcast_to_layer(proc_name, arg, arg_type, index):
+        return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Layer)
 
 
 

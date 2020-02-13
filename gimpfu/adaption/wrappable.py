@@ -61,9 +61,6 @@ def is_wrapped_function(instance):
 '''
 Taken from "GIMP App Ref Manual>Class Hierarchy"
 Note the names are not prefixed with "Gimp."
-
-Technically, NoneType is a subclass of every type.
-But we don't want that here, we deal with it elsewhere.
 '''
 DrawableTypeNames = (
     "Layer",
@@ -82,13 +79,18 @@ ItemTypeNames = (
     "Vectors"
 )
 
+'''
+Technically, NoneType is a subclass of every type.
+But we don't want that here, we deal with it elsewhere.
+'''
 def is_subclass_of_type(instance, super_type):
     # assert super_type is a Python type, having .__name__
+    result = False
     super_type_name = get_name_of_type(super_type)
+    instance_type_name = get_type_name(instance)
     if  super_type_name == 'Drawable':
-        result =  get_type_name(instance) in DrawableTypeNames
+        result =  instance_type_name in DrawableTypeNames
     elif super_type_name == 'Item':
-        type_name = get_type_name(instance)
-        result = type_name in ItemTypeNames or type_name in DrawableTypeNames
-    print(f"is_subclass_of_type {super_type_name} returns {result}")
+        result = instance_type_name in ItemTypeNames or type_name in DrawableTypeNames
+    print(f"is_subclass_of_type ( {instance_type_name}, {super_type_name}) returns {result}")
     return result
