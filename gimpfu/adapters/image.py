@@ -57,7 +57,7 @@ class GimpfuImage( Adapter ) :
     # True: name of getter() func is same as name of property
     @classmethod
     def DynamicTrueAdaptedProperties(cls):
-        return ('width', 'height')
+        return ('width', 'height', 'base_type')
 
 
 
