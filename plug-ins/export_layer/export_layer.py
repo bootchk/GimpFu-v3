@@ -23,7 +23,8 @@ def scale_down_layer(layer, max_dimension):
         if new_height > max_dimension and perspective > 0:
             new_height = max_dimension
             new_width = int(new_height / perspective)
-        pdb.gimp_layer_scale(layer, new_height, new_width, TRUE)
+        # lkk TRUE => True
+        pdb.gimp_layer_scale(layer, new_height, new_width, True)
 
 # lkk added drawable arg
 def create_scaled_layer_from_visible(img, drawable, max_dimension = 1200):

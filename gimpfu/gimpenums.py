@@ -173,7 +173,10 @@ GIMP_BUCKET_FILL_FG,      /*< desc="FG color fill" >*/
 '''
 
 
-# TRUE and FALSE still deprecatated, not obsolete
+# TODO this should be obsolete
+# TRUE and FALSE still deprecated, not obsolete
+# !!! But this also requires upcast to G_TYPE_BOOLEAN in Marshal and Types
+
 # start verbatim from v2
 
 # This is from pygtk/gtk/__init__.py

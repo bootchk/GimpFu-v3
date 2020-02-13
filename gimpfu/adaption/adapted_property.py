@@ -1,5 +1,8 @@
 
 
+
+
+
 class AdaptedProperty():
     '''
     Understands how to dynamically adapt properties.
@@ -143,14 +146,18 @@ class AdaptedProperty():
     @classmethod
     def get(cls, adaptee, method_name ):
         ''' Call method_name of adaptee to get a property value. '''
+        # TODO unmarshal
         return cls._eval_statement_on_adaptee(adaptee, method_name, prefix = 'get_')
 
     @classmethod
     def set(cls, adaptee, method_name, value):
         ''' Call method_name of adaptee to set a property value. '''
-        return cls._eval_statement_on_adaptee(adaptee, method_name, prefix = 'set_', setting_value = value)
+        from adaption.marshal import Marshal
+        unwrapped_value = Marshal.unwrap(value)
+        return cls._eval_statement_on_adaptee(adaptee, method_name, prefix = 'set_', setting_value = unwrapped_value)
 
     @classmethod
     def read(cls, adaptee, method_name ):
         ''' Call method_name of adaptee to get a property value. '''
+        # TODO unmarshal
         return cls._eval_statement_on_adaptee(adaptee, method_name, prefix = '')

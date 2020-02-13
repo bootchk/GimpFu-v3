@@ -40,6 +40,7 @@ Examples:
 
     except ValueError, e:    =>      except ValueError as e:
 
+
 Standard module API
 ===================
 
@@ -59,6 +60,8 @@ Some modules are obsolete in PyGimp 3 :
     gimpshelf
     gimpui
     gimpcolor (TODO ???)
+
+
 
 gimpshelf
 =========
@@ -85,6 +88,7 @@ For example see gimp/plugins/goat-exercises/goat-exercise-py3.py
 2) In a few cases, you might have used gimpshelf module for other purposes.
 
 You will need to use GI as above, or find some other mechanism for persisting.
+
 
 gimpui
 ======
@@ -123,13 +127,37 @@ Note that e.g. Layers is not the "Layer" menu in the menubar, but the popup menu
 Use RMB to popup the menu.
 
 
+Enums
+-----
+
+GimpFu v2 and v3 define enums to be used with Gimp.
+They are all caps, e.g. FILL_TRANSPARENT.
+
+Their spelling does not always correspond to the spelling used in the Gimp API.
+For example, Gimp defines BACKGROUND but GimpFu defines BACKGROUND_FILL.
+New code should use the Gimp enums instead of the enums defined by GimpFu.
+For example, use Gimp.FillType.BACKGROUND.
+
+GimpFu v2 defined deprectated enums TRUE and FALSE for use with Gimp.
+GimpFu v3 does not, they are obsolete, use True and False instead.
+
+A few enums defined by GimpFu v2 are still defined by v3, but only for backward compatibility,
+that is they are deprecated and new code should not use them.
+E.g. Instead of BG_BUCKET_FILL, use BACKROUND_FILL
+
+
 PDB
 ---
 
 In v2, PDB procedures often accepted -1 for optional parameters,
 and Python authors could use None for the parameter.
 
-In v3, PDB procedures now say to use NULL for optional parameters.
+GimpFu v3 still supports that.
+Use of -1 is deprecated, meaning not recommended for new code.
+Use None instead.
+
+PDB procedure docs say to use NULL for optional parameters, but that is for the C language.
+In Python, use None.
 
 
 GimpFu packaging

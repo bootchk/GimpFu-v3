@@ -35,13 +35,15 @@ class MarshalPDB():
         # TODO optimize, getting type is simpler when is fundamental
         # We could retain that the arg is fundamental during unwrapping
 
-        # TODO do only one conversion if
+
 
         go_arg, go_arg_type, did_convert = Types.try_upcast_to_drawable(proc_name, go_arg, go_arg_type, index)
-        go_arg, go_arg_type, did_convert = Types.try_upcast_to_item(proc_name, go_arg, go_arg_type, index)
-
+        if not did_convert:
+            go_arg, go_arg_type, did_convert = Types.try_upcast_to_item(proc_name, go_arg, go_arg_type, index)
         if not did_convert:
             go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
+
+        # !!! We don't upcast deprecated constant TRUE to G_TYPE_BOOLEAN
 
         # TODO is this necessary? I think it is only drawable that gets passed None
         #go_arg, go_arg_type = Types.try_convert_to_null(proc_name, go_arg, go_arg_type, index)

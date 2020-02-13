@@ -43,17 +43,16 @@ class GimpfuImage( Adapter ) :
     classmethods needed by Adapter
 
     Notes:
-    filename is NOT a canonical property of Image, at least in Gimp v3
-    TODO active_layer should be
+    filename is NOT canonical property of Image, in Gimp v3.  See get_name()
     '''
     @classmethod
     def DynamicWriteableAdaptedProperties(cls):
-        return ( )
+        return ( 'active_layer', )
 
     # Name of getter() func is property name prefixed with 'get_'
     @classmethod
     def DynamicReadOnlyAdaptedProperties(cls):
-        return ('selection', 'active_layer' )
+        return ('selection',  )
 
     # True: name of getter() func is same as name of property
     @classmethod
