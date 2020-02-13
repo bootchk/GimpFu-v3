@@ -137,8 +137,9 @@ class Marshal():
     @staticmethod
     def unwrap(arg):
         '''
-        Knows how to unwrap any type,
-        i.e. knows which are wrapped types versus fundamental types,
+        Unwrap a single instance. Returns adaptee or a fundamental type.
+
+        Knows which are wrapped types versus fundamental types,
         and unwraps only wrapped types.
 
         Unwrap any GimpFu wrapped types to Gimp types
@@ -156,8 +157,17 @@ class Marshal():
         else:
             # arg is already Gimp type, or a fundamental type
             result_arg = arg
-        print("unwrap_arg:", result_arg)
+        print("unwrap result:", result_arg)
         return result_arg
+
+
+    '''
+    TODO Do we need this?
+    Knows how to unwrap a variable which is a container (list) or single instance
+    If arg is a list, result is a list.
+    '''
+
+
 
 
     '''
@@ -177,18 +187,23 @@ class Marshal():
         '''
         Wrap result of calls to adaptee.
 
-        args is an iterable e.g. a tuple or list or a single value.
-        Result is iterable list if args is iterable,
-        else result is a single value.
+        args can be an iterable container e.g. a tuple or list or a non-iterable fundamental type.
+        Result is iterable list if args is iterable, a non-iterable if args is not iterable.
+        Except: strings are iterable but also fundamental.
         '''
         try:
             unused_iterator = iter(args)
         except TypeError:
-            # not iterable
+            # not iterable, but not necessarily fundamental
             result = Marshal._try_wrap(args)
         else:
-            # iterable
-            result = [Marshal._try_wrap(item) for item in args]
+            # iterable, but could be a string
+            if isinstance(args, str):
+                # No need to unwrap
+                result = args
+            else:
+                # is container, return container of unwrapped
+                result = [Marshal._try_wrap(item) for item in args]
         return result
 
 

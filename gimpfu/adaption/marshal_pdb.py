@@ -22,9 +22,11 @@ class MarshalPDB():
 
 
     @staticmethod
-    def try_type_conversions(proc_name, go_arg, go_arg_type, index):
+    def _try_type_conversions(proc_name, go_arg, go_arg_type, index):
         '''
-        Attempt type conversions.
+        Attempt type conversions and upcast when passing to Gimp procedures.
+        Conversion: changes Python type of fundamental types, i.e. int to float
+        Upcast: not change any type, just return superclass type that Gimp wants.
 
         Don't assume any arg does NOT need conversion:
         a procedure can declare any arg of type float
@@ -90,7 +92,7 @@ class MarshalPDB():
 
             go_arg, go_arg_type = MarshalPDB._unwrap_to_param(x)
 
-            go_arg, go_arg_type = MarshalPDB.try_type_conversions(proc_name, go_arg, go_arg_type, index)
+            go_arg, go_arg_type = MarshalPDB._try_type_conversions(proc_name, go_arg, go_arg_type, index)
 
             if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")

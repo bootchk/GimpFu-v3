@@ -52,7 +52,7 @@ class GimpfuImage( Adapter ) :
     # Name of getter() func is property name prefixed with 'get_'
     @classmethod
     def DynamicReadOnlyAdaptedProperties(cls):
-        return ('selection',  )
+        return ('selection',  'layers', )
 
     # True: name of getter() func is same as name of property
     @classmethod
@@ -136,6 +136,8 @@ class GimpfuImage( Adapter ) :
     Properties
     '''
 
+    """
+    OLD Cruft
     # Reason: marshal to wrap result
     @property
     def layers(self):
@@ -163,10 +165,9 @@ class GimpfuImage( Adapter ) :
             result_list.append(Marshal.wrap(layer))
         print("layers property returns ", result_list)
         return result_list
+    """
 
-
-    # No layers setter
-
+    # TODO can be a property now
     @property
     def vectors(self):
         # avoid circular import, import when needed

@@ -146,8 +146,11 @@ class AdaptedProperty():
     @classmethod
     def get(cls, adaptee, method_name ):
         ''' Call method_name of adaptee to get a property value. '''
-        # TODO unmarshal
-        return cls._eval_statement_on_adaptee(adaptee, method_name, prefix = 'get_')
+        unwrapped_result = cls._eval_statement_on_adaptee(adaptee, method_name, prefix = 'get_')
+        # !!! result can be a container of wrappable types.  Usually a fundamental type.
+        from adaption.marshal import Marshal
+        result = Marshal.wrap_adaptee_results(unwrapped_result)
+        return result
 
     @classmethod
     def set(cls, adaptee, method_name, value):
@@ -159,5 +162,5 @@ class AdaptedProperty():
     @classmethod
     def read(cls, adaptee, method_name ):
         ''' Call method_name of adaptee to get a property value. '''
-        # TODO unmarshal
+        # TODO marshal
         return cls._eval_statement_on_adaptee(adaptee, method_name, prefix = '')
