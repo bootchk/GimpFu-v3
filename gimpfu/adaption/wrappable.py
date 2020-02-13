@@ -74,7 +74,9 @@ DrawableTypeNames = (
        "Selection",
 )
 
-
+# Authors cannot instantiate Drawable so it does not need to be here
+# Authors cannot instantiate Item.
+# Drawable and Item are virtual base classes.
 ItemTypeNames = (
     "Drawable",
     "Vectors"

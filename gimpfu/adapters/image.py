@@ -4,10 +4,6 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-# from adaption import adapter
-#from adaption import adapter
-#from adapter import Adapter
-#from adaption.adapter import Adapter
 
 # absolute from SYSPATH that points to top of gimpfu package
 from adaption.adapter import Adapter
@@ -23,6 +19,8 @@ I.E. an attribute of gimp instance (see gimpfu_gimp.py.)
 
 In PyGimp v2, similar concept implemented by pygimp-image.c
 Since v3, implemented in Python using GI.
+
+FBC all specialized methods here should match the implementation in pygimp-image.c v2.
 
 Method kinds:
 Most have an identical signature method in Gimp.Image. (delegated)
@@ -40,23 +38,29 @@ Some are unique to PyGimp, not present in Gimp.Image. (augment)
 
 class GimpfuImage( Adapter ) :
 
-    # classmethods needed by Adapter
+
     '''
+    classmethods needed by Adapter
+
     Notes:
-    filename is NOT a canonical property of Image, at least in v3
+    filename is NOT a canonical property of Image, at least in Gimp v3
     TODO active_layer should be
     '''
     @classmethod
     def DynamicWriteableAdaptedProperties(cls):
         return ( )
 
+    # Name of getter() func is property name prefixed with 'get_'
     @classmethod
     def DynamicReadOnlyAdaptedProperties(cls):
-        return ('selection', )
+        return ('selection', 'active_layer' )
 
+    # True: name of getter() func is same as name of property
     @classmethod
     def DynamicTrueAdaptedProperties(cls):
         return ('width', 'height')
+
+
 
 
     '''
@@ -77,12 +81,9 @@ class GimpfuImage( Adapter ) :
         # super is Adaper, and it stores adaptee
         super().__init__(final_adaptee)
 
-        # TODO WIP
-        #self.filename = GimpfuProperty(final_adaptee, "filename")
-
-        # self.filename = None is not correct, because self.filename is a property of each instance
 
 
+    # TODO Not needed ??
     def adaptee(self):
         ''' Getter for private _adaptee '''
         # Handled by super Adaptor
@@ -92,7 +93,6 @@ class GimpfuImage( Adapter ) :
 
 
 
-    # OLD filename = GimpfuProperty2("filename")
 
     '''
     WIP
@@ -106,24 +106,38 @@ class GimpfuImage( Adapter ) :
     '''
 
 
-    # Methods we specialize
+    '''
+    Specialized methods and properties.
+    Reason we must specialize is the comment ahead of each property
+    '''
 
 
-    # Special: allow optional args
+    # Methods
+
+
+    # Reason: allow optional args
     def insert_layer(self, layer, parent=None, position=-1):
         print("insert_layer called")
 
-        # Note that first arg to Gimp comes from self
+        # Note that first arg "image" to Gimp comes from self
         success = self._adaptee.insert_layer(layer.unwrap(), parent, position)
         if not success:
             raise Exception("Failed insert_layer")
 
+    # Reason: allow optional args, rename
+    def add_layer(self, layer, parent=None, position=-1):
+        print("add_layer called")
+        success = self._adaptee.insert_layer(layer.unwrap(), parent, position)
+        if not success:
+            raise Exception("Failed add_layer")
 
 
-    # Properties we specialize
-    # In fact GI Gimp does not have property semantics?
 
+    '''
+    Properties
+    '''
 
+    # Reason: marshal to wrap result
     @property
     def layers(self):
         # avoid circular import, import when needed
@@ -151,6 +165,7 @@ class GimpfuImage( Adapter ) :
         print("layers property returns ", result_list)
         return result_list
 
+
     # No layers setter
 
     @property
@@ -166,7 +181,8 @@ class GimpfuImage( Adapter ) :
     # TODO all these properties are rote changes to name i.e. prefix with get_
     # Do this at runtime, or code generate?
 
-    # TODO this is canonical, move to DynamicReadOnlyAdaptedProperties
+    """
+    CRUFT moved to DynamicReadOnlyAdaptedProperties
     @property
     def active_layer(self):
         # Delegate to Gimp.Image
@@ -183,6 +199,8 @@ class GimpfuImage( Adapter ) :
         # Delegate to Gimp.Image
         # Result is fundamental type (enum int)
         return self._adaptee.base_type()
+    """
+
 
     """
     !!! This is not correct, since get_file() can return None.
@@ -193,20 +211,10 @@ class GimpfuImage( Adapter ) :
     @property
     def filename(self):
         '''
-        Result is-a string.
-        Really a path.
+        Returns string that is path to file the image was saved to.
         Returns "Untitled" if image not loaded from file, or not saved.
         '''
         # print("GimpfuImage.filename get called")
+        # sic Image.get_name returns a filepath
         result = self._adaptee.get_name()
         return result
-
-
-    """
-    @property
-    def width(self):
-        return self._adaptee.width()
-    @property
-    def height(self):
-        return self._adaptee.height()
-    """
