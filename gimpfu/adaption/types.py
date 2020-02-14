@@ -7,6 +7,8 @@ from gi.repository import GObject    # GObject type constants
 
 from adaption.wrappable import *    # is_subclass_of_type
 
+from adapters.color import GimpfuColor
+
 from message.proceed_error import *
 
 
@@ -112,7 +114,7 @@ class Types():
         try:
             result = GObject.Value(gvalue_type, value)
         except Exception as err:
-            do_proceed_error(f"Exception creating GValue for {gvalue_type}, {value}, err {err}")
+            do_proceed_error(f"Creating GValue for type: {gvalue_type}, value: {value}, err: {err}")
             # Return some bogus value so can proceed
             result = GObject.Value( GObject.TYPE_INT, 1 )
             # TODO would this work??
@@ -378,7 +380,14 @@ class Types():
         result, result_type, did_upcast = Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.RGB)
         if did_upcast:
             # also convert
-            print(">>>>>>>>>>>>>>>>>>>>>>convert to color")
+            try:
+                wrapped_result = GimpfuColor(a_tuple=result)
+                result = wrapped_result.unwrap()
+                # !!! caller expects GObject i.e. unwrapped
+                # assert result_type is-a GType
+            except Exception as err:
+                do_proceed_error(f"Converting to color: {err}")
+            #print(type(result))
         return result, result_type, did_upcast
 
 

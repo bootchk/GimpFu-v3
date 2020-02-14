@@ -40,7 +40,7 @@ class GimpfuItem( Adapter ) :
     methods
     '''
 
-    # special: alias
+    # Reason: alias
     def translate(self, x, y):
         # assert adaptee is-a Gimp.Item that has transform methods
         self._adaptee.transform_translate(x,y)
@@ -50,6 +50,7 @@ class GimpfuItem( Adapter ) :
     Properties
     '''
 
+    # Reason:alies, upper case to lower case
     def ID(self):
         # !!! id is property of Item
         return self._adaptee.id

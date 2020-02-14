@@ -59,7 +59,7 @@ Obsolete PyGimp Modules
 Some modules are obsolete in PyGimp 3 :
     gimpshelf
     gimpui
-    gimpcolor (TODO ???)
+    gimpcolor
 
 
 
@@ -99,6 +99,20 @@ and needed GTK widgets provided by Gimp (in libgimpui), such as a color picker w
 You will need to recode to use GI to the Gimp objects that implement GUI,
 for example Gimp.TODO
 
+
+gimpcolor
+=========
+
+The gimpcolor module let you define and manipulate colors in colorspaces.
+Most plugins do not use it.
+The gimpcolor module is obsolete.
+
+Both in v2 and v3 you can use 3-tuples and strings as colors.
+However, in v3, you can only use such colors as arguments to the PDB (alias 'pdb'),
+not the Gimp library (alias 'gimp'.)
+For example:
+   gimp.set_foreground((0,255,0)) => pdb.gimp_set_foreground((0,255,0))
+   ( OR gimp_context_set_foreground(), the v3 name.)
 
 
 Gimp model Changes

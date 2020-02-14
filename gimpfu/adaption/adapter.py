@@ -51,9 +51,11 @@ TODO enumerate errors it detects
 class Adapter():
 
     def __init__(self, adaptee):
-        assert is_gimpfu_wrappable(adaptee)
-        self._adaptee = adaptee
-        self._adaptee_callable = None
+        if is_gimpfu_wrappable(adaptee):
+            self._adaptee = adaptee
+            self._adaptee_callable = None
+        else:
+            raise Exception(f"Not wrappable: {adaptee}")
 
 
     def __repr__(self):

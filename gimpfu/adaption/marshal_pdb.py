@@ -98,6 +98,8 @@ class MarshalPDB():
             ## print("marshal arg:", x )
 
             go_arg, go_arg_type = MarshalPDB._unwrap_to_param(x)
+            # assert are GObject types, i.e. fundamental or Boxed
+            # We may yet convert some fundamental types (tuples) to Boxed (Gimp.RGB)
 
             try:
                 go_arg, go_arg_type = MarshalPDB._try_type_conversions(proc_name, go_arg, go_arg_type, index)

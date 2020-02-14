@@ -18,7 +18,7 @@ def get_name_of_type(a_type):
     return a_type.__name__
 
 '''
-Keep these in correspondence with each other,
+!!! Keep these in correspondence with each other,
 and with wrap() dispatch.
 (unwrap is in the adapter)
 I.E. to add a wrapper Foo:
@@ -30,10 +30,10 @@ We wrap Drawable, Item, etc. but the Author cannot create instances,
 only instance of subclasses.
 '''
 def is_gimpfu_wrappable_name(name):
-    return name in ('Image', 'Layer', 'Display', 'Vectors')
+    return name in ('Image', 'Layer', 'Display', 'Vectors', 'RGB')
 
 def is_gimpfu_unwrappable( instance):
-    return get_type_name(instance) in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay", "GimpfuVectors")
+    return get_type_name(instance) in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay", "GimpfuVectors", "GimpfuColor")
 
 
 
@@ -96,7 +96,7 @@ This has these purposes:
 - to handle Gimp overly strict about parameter types, it wrongly does not allow a subclass
 (Gimp doesn't seem to understand its own class hierarchy)
 - to handle None passed (again, Gimp complains)
-- to allow a hack from tuple to color
+- to allow conversion from tuple, str to color
 
 Technically, NoneType is a subclass of every type.
 But we don't want that here, we deal with it elsewhere.
