@@ -348,6 +348,14 @@ class Types():
     def try_upcast_to_layer(proc_name, arg, arg_type, index):
         return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Layer)
 
+    @staticmethod
+    def try_upcast_to_color(proc_name, arg, arg_type, index):
+        result, result_type, did_upcast = Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.RGB)
+        if did_upcast:
+            # also convert
+            print(">>>>>>>>>>>>>>>>>>>>>>convert to color")
+        return result, result_type, did_upcast
+
 
 
     @staticmethod

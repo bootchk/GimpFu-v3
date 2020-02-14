@@ -26,7 +26,9 @@ def python_drawcols(timg, tdrawable, rowSize=10, columnSize=10, fontname="Arial"
         # CHANNEL-OP-ADD (0), CHANNEL-OP-SUBTRACT (1), CHANNEL-OP-REPLACE (2), CHANNEL-OP-INTERSECT (3)
         pdb.gimp_image_select_rectangle(timg, CHANNEL_OP_REPLACE, verCounter, 0, columnSize, height)
         color = colors[colorIndex]
-        gimp.set_foreground(color)
+        # lkk change to pdb
+        # gimp.set_foreground(color)
+        pdb.gimp_context_set_foreground(color)
         pdb.gimp_edit_fill(tdrawable, FOREGROUND_FILL)
 
         # text

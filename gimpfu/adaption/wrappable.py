@@ -79,16 +79,27 @@ ItemTypeNames = (
     "Vectors"
 )
 
+
+'''
+This has these purposes:
+- to handle Gimp overly strict about parameter types, it wrongly does not allow a subclass
+(Gimp doesn't seem to understand its own class hierarchy)
+- to handle None passed (again, Gimp complains)
+- to allow a hack from tuple to color
 '''
 Technically, NoneType is a subclass of every type.
 But we don't want that here, we deal with it elsewhere.
+
+Strict subclassness: a class is NOT a subclass of itself.
 '''
 def is_subclass_of_type(instance, super_type):
     # assert super_type is a Python type, having .__name__
     result = False
     super_type_name = get_name_of_type(super_type)
     instance_type_name = get_type_name(instance)
-    if  super_type_name == 'Drawable':
+    if super_type_name == instance_type_name:
+        result = False    # class is NOT subclass of itself
+    elif  super_type_name == 'Drawable':
         result =  instance_type_name in DrawableTypeNames
     elif super_type_name == 'Item':
         result = instance_type_name in ItemTypeNames or type_name in DrawableTypeNames

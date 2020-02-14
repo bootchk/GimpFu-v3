@@ -45,6 +45,8 @@ class MarshalPDB():
         if not did_convert:
             go_arg, go_arg_type, did_convert = Types.try_upcast_to_layer(proc_name, go_arg, go_arg_type, index)
         if not did_convert:
+            go_arg, go_arg_type, did_convert = Types.try_upcast_to_color(proc_name, go_arg, go_arg_type, index)
+        if not did_convert:
             go_arg, go_arg_type = Types.try_usual_python_conversion(proc_name, go_arg, go_arg_type, index)
         #    go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
         #if not did_convert:
