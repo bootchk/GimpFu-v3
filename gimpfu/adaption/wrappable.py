@@ -81,12 +81,23 @@ ItemTypeNames = (
 
 
 '''
+Instances of 3-tuples and strings
+can be considered subclasses of RGB,
+since conversion is possible.
+'''
+ColorTypeNames = (
+    "tuple",
+    "str"
+)
+
+
+'''
 This has these purposes:
 - to handle Gimp overly strict about parameter types, it wrongly does not allow a subclass
 (Gimp doesn't seem to understand its own class hierarchy)
 - to handle None passed (again, Gimp complains)
 - to allow a hack from tuple to color
-'''
+
 Technically, NoneType is a subclass of every type.
 But we don't want that here, we deal with it elsewhere.
 
@@ -103,5 +114,7 @@ def is_subclass_of_type(instance, super_type):
         result =  instance_type_name in DrawableTypeNames
     elif super_type_name == 'Item':
         result = instance_type_name in ItemTypeNames or type_name in DrawableTypeNames
+    elif super_type_name == 'RGB':
+        result = instance_type_name in ColorTypeNames
     print(f"is_subclass_of_type ( {instance_type_name}, {super_type_name}) returns {result}")
     return result

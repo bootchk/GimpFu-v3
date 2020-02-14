@@ -56,6 +56,10 @@ class Adapter():
         self._adaptee_callable = None
 
 
+    def __repr__(self):
+        return f"<{self.__class__} of {self.adaptee_class_name}>"
+
+
     '''
     Expose adaptee and its class_name.
     '''

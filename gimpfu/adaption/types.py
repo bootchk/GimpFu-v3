@@ -277,6 +277,33 @@ class Types():
         return result_arg, result_arg_type
     """
 
+
+    '''
+    Upcast or convert when
+    formal_arg_type equals cast_to_type
+    and instance_type is not already cast_to_type
+    E.G.
+    Layer, Drawable, Drawable => True
+    Layer, Layer, Layer => False
+    Layer, Drawable, Item => False
+    tuple, RGB, RGB => True
+
+    Note that Layer is-a Drawable is-a Item
+    and we may call this with (Layer, Drawable, Item)
+    but we don't upcast since the procedure wants Drawable
+    '''
+    @staticmethod
+    def _should_upcast_or_convert(instance_type, formal_arg_type, cast_to_type):
+        result = (
+                (instance_type != cast_to_type)
+            and Types.is_formal_type_equal_type(formal_arg_type, cast_to_type)
+            )
+        print(f"_should_upcast_or_convert: {result}")
+        return result
+
+
+
+
     '''
     Seems like need for upcast is inherent in GObj.
     But probably Gimp should be doing most of the upcasting,
@@ -300,17 +327,15 @@ class Types():
         formal_arg_type = Types._get_formal_argument_type(proc_name, index)
         # TODO exception index out of range
 
-        should_upcast = Types.is_formal_type_equal_type(formal_arg_type, cast_to_type)
+        result = arg     # result is arg except for conversions below
 
-        result = arg # result is unaltered arg except for cases below
-
-        if should_upcast:
+        if Types._should_upcast_or_convert(arg_type, formal_arg_type, cast_to_type):
             if is_subclass_of_type(arg, cast_to_type):
                 result_type = cast_to_type
                 did_upcast = True
             elif arg == -1:
                 # v2 allowed -1 as arg for optional drawables
-                # # !!! Alter arg given by Author
+                # # !!! convert arg given by Author
                 result = None
                 result_type = cast_to_type
                 did_upcast = True

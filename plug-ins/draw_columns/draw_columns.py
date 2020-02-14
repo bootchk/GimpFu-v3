@@ -6,7 +6,8 @@ Created on 11/04/2012
 
 from gimpfu import *
 
-def python_drawcols(timg, tdrawable, rowSize=10, columnSize=10, fontname="Arial", fontsize=8, unit=3, textPos=20):
+# lkk default column size 1000
+def python_drawcols(timg, tdrawable, rowSize=10, columnSize=1000, fontname="Arial", fontsize=8, unit=3, textPos=20):
     gimp.context_push()
     timg.undo_group_start()
 
@@ -37,7 +38,8 @@ def python_drawcols(timg, tdrawable, rowSize=10, columnSize=10, fontname="Arial"
             textColor = (255,255,255)
         if (color == (255,255,255)):
             textColor = (0,0,0)
-        gimp.set_foreground(textColor)
+        #gimp.set_foreground(textColor)
+        pdb.gimp_context_set_foreground(color)
         layer = pdb.gimp_text_layer_new(timg, verCounter, fontname, fontsize, unit)
 
 
@@ -73,7 +75,7 @@ register(
         "RGB*, GRAY*",
         [
                 (PF_INT, "row_size", "Size of row in color", 10),
-                (PF_INT, "column_size", "Size of column in color", 10),
+                (PF_INT, "column_size", "Size of column in color", 1000),
                 (PF_FONT, "font", "font", "Arial"),
                 (PF_INT, "font_size", "Font size", 8),
                 (PF_INT, "unit_size", "Unit", 3),
