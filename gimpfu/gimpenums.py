@@ -138,6 +138,8 @@ define_symbols_for_enum(Gimp.MaskApplyMode, prefix='MASK_')
 # New to v3
 define_symbols_for_enum(Gimp.AddMaskType, prefix='ADD_MASK_')
 # ADD_MASK_SELECTION = Gimp.AddMaskType.SELECTION
+define_symbols_for_enum(Gimp.SizeType)
+# PIXELS = Gimp.SizeType.PIXELS,     POINTS
 
 
 

@@ -593,8 +593,9 @@ commands:
       echo $PYTHONPATH
 
       # export G_MESSAGES_DEBUG=all
+      # /usr/local/bin/gimp-2.99 --verbose --no-data
 
-      /usr/local/bin/gimp-2.99 --verbose --no-data
+      /usr/local/bin/gimp-2.99 --verbose
 
 
   gimpListPlugins: !Command

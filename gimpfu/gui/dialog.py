@@ -94,7 +94,7 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
         args = ["/tmp/lkkfoopluginout"]
     elif pf_type in (PF_INT, PF_STRING, PF_BOOL, PF_OPTION, PF_FONT, PF_TEXT ):
         args = [widget_default_value]
-    elif pf_type in (PF_SLIDER, PF_FLOAT):
+    elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER, PF_ADJUSTMENT):
         # Hack, we are using FloatEntry, should use Slider???
         args = [widget_default_value,]
     elif pf_type in (PF_COLOR, PF_COLOUR):
@@ -568,26 +568,69 @@ def show_error_dialog(proc_name, image):
 
 
 
-# Map PF_ enum to Widget class
+'''
+Map PF_ enum to Widget class
+
+Feb. 2020 status:
+complete keys, but hacked values (should implement more widgets)
+'''
 _edit_map = {
         PF_INT         : IntEntry,
+        PF_INT8        : IntEntry,
+        PF_INT16       : IntEntry,
+        PF_INT32       : IntEntry,
+
+        # both return strings, just different widgets?
         PF_STRING      : StringEntry,
+        PF_TEXT        : StringEntry,
+
+        # checkbox
+        # both return bool,  just different widgets?
         PF_BOOL        : ToggleEntry,
         PF_TOGGLE      : ToggleEntry,
+
+        # TODO slider and spinner floats, or int?
         PF_FLOAT       : FloatEntry,
         PF_SLIDER      : FloatEntry,
+        PF_SPINNER     : FloatEntry,
+        PF_ADJUSTMENT  : FloatEntry,
+
+        # radio buttons, set of choices
         PF_RADIO       : RadioEntry,
-        PF_FONT        : StringEntry,
-        PF_TEXT        : StringEntry,
+
+
         # For omitted, subsequently GimpFu uses the default value
         # which should be sane
         PF_COLOR       : OmittedEntry,
         PF_COLOUR      : OmittedEntry,
+
+        # Widgets provided by GTK ?
         PF_FILE        : OmittedEntry,
         PF_FILENAME    : OmittedEntry,
         PF_DIRNAME     : OmittedEntry,
+
+        # meaning ?
         PF_OPTION      : OmittedEntry,
-        # TODO Also omitted for now
+
+        # ??? meaning?
+        PF_VALUE       : OmittedEntry,
+
+        # Widgets provided by Gimp for Gimp ephemeral objects
+        PF_ITEM        : OmittedEntry,
+        PF_DISPLAY     : OmittedEntry,
+        PF_IMAGE       : OmittedEntry,
+        PF_LAYER       : OmittedEntry,
+        PF_CHANNEL     : OmittedEntry,
+        PF_DRAWABLE    : OmittedEntry,
+        PF_VECTORS     : OmittedEntry,
+
+        # Widgets provided by Gimp for Gimp data objects?
+        # "data" objects are loaded at run-time, not as ephemeral
+        # i.e. configured, static data of the app
+        PF_FONT        : StringEntry,
+        PF_BRUSH       : StringEntry,
+        PF_PATTERN     : StringEntry,
+        PF_GRADIENT    : StringEntry,
         # formerly gimpui.palette_selector
         # Now I think palette is a parameter, but should not have a control?
         # since the currently selected palette in palette dialog is passed?

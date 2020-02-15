@@ -1,7 +1,8 @@
 '''
 PF_foo enums defined by GimpFu.
 
-!!! To get in the importers namespace, use "from gimpfu_enums import *"
+!!! To get in the Authors namespace,
+gimpfu_top executes "from gimpfu_enums import *"
 '''
 
 
@@ -10,7 +11,7 @@ PF_foo enums defined by GimpFu.
 
 '''
 v3 At import time, we don't have access to Gimp types yet.  Define PF enum without them.
-PF_TYPES eum (sic) is used in actual parameters to register(), before the plugin is registered.
+PF_TYPES enum (sic) is used in args to register(), before the plugin is registered.
 We don't need mapping to Gimp.GimpPDB types until register() executes.
 We don't use Python 3 enum class FBC.
 '''

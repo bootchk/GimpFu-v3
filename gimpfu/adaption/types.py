@@ -381,9 +381,15 @@ class Types():
         if did_upcast:
             # also convert
             try:
-                wrapped_result = GimpfuColor(a_tuple=result)
-                result = wrapped_result.unwrap()
+                # TODO move this to color.py
+                if isinstance(result, tuple):
+                    wrapped_result = GimpfuColor(a_tuple=result)
+                elif isinstance(result, str):
+                    wrapped_result = GimpfuColor(name=result)
+                else:
+                    raise Exception("Not wrappable to color: {result}.")
                 # !!! caller expects GObject i.e. unwrapped
+                result = wrapped_result.unwrap()
                 # assert result_type is-a GType
             except Exception as err:
                 do_proceed_error(f"Converting to color: {err}")

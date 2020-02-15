@@ -40,6 +40,8 @@ Examples:
 
     except ValueError, e:    =>      except ValueError as e:
 
+    print Foo => print(Foo)
+
 
 Standard module API
 ===================
