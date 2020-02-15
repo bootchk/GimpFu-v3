@@ -45,7 +45,7 @@ class Types():
         ## assert config is type Gimp.ProcedureConfig, having properties same as args of procedure
 
         arg_specs = procedure.get_arguments()    # some docs say it returns a count, it returns a list of GParam??
-        print(arg_specs)
+        # print(arg_specs)
         # assert is a list
 
         ## arg_specs = Gimp.ValueArray.new(arg_count)
@@ -142,6 +142,10 @@ class Types():
     def is_str_type(formal_arg_type):
         return formal_arg_type.name in ('GParamString', )
 
+    # !!!! GimpParam...
+    def is_float_array_type(formal_arg_type):
+        return formal_arg_type.name in ('GimpParamFloatArray', )
+
 
     # TODO rename is_drawable_formal_type
     @staticmethod
@@ -189,6 +193,33 @@ class Types():
     """
 
     @staticmethod
+    def try_float_array_conversion(proc_name, actual_arg, actual_arg_type, index):
+        ''' Convert list of int to list of float when formal_arg_type requires FloatArray. '''
+        result_arg = actual_arg
+        result_arg_type = actual_arg_type
+        did_convert = False
+        print(f"try_float_array_conversion {actual_arg}, {actual_arg_type}")
+        if isinstance(actual_arg, list):
+            formal_arg_type = Types._get_formal_argument_type(proc_name, index)
+            if formal_arg_type is not None:
+                print(formal_arg_type)
+                if Types.is_float_array_type(formal_arg_type):
+                    # convert arg, leave arg_type alone
+                    print(">>>>>>>>>>Converting float list")
+                    result_arg = [float(item) for item in actual_arg]
+                    did_convert = True
+            else:
+                # Probably too many actual args.
+                # Do not convert type.
+                do_proceed_error(f"Failed to get formal argument type for index: {index}.")
+        # else not a list i.e. not a Gimp array
+
+        return result_arg, result_arg_type, did_convert
+
+
+
+
+    @staticmethod
     def try_usual_python_conversion(proc_name, actual_arg, actual_arg_type, index):
         '''
         Perform the usual automatic Python conversion from int to (str, float).
@@ -207,6 +238,7 @@ class Types():
 
         result_arg = actual_arg
         result_arg_type = actual_arg_type
+        did_convert = False
 
         print("Actual arg type:", type(actual_arg))
 
@@ -221,10 +253,12 @@ class Types():
                     print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")
                     result_arg = float(actual_arg)  # type conversion
                     result_arg_type = type(result_arg)  # i.e. float
+                    did_convert = True
                 elif Types.is_str_type(formal_arg_type):
                     print("GimpFu: Suggest: converting int to str.  Your code might be clearer if you use explicit conversions.")
                     result_arg = str(actual_arg)  # type conversion
                     result_arg_type = type(result_arg)
+                    did_convert = True
                 # else arg is int but procedure wants int, or a type that has no conversion
                 # TODO warn now that type is int but procedure wants another type
             else:
@@ -236,7 +270,7 @@ class Types():
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
         # likewise for value of result_arg
         print("try_usual_python_conversion returns ", result_arg, result_arg_type)
-        return result_arg, result_arg_type
+        return result_arg, result_arg_type, did_convert
 
     """
     @staticmethod
