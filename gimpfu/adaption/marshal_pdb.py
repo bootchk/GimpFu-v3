@@ -7,6 +7,7 @@ from gi.repository import Gimp
 from adaption.wrappable import *
 from adaption.marshal import Marshal
 from adaption.types import Types
+from adaption.value_array import FuValueArray
 
 from message.proceed_error import *
 
@@ -63,7 +64,7 @@ class MarshalPDB():
 
 
 
-
+    # TODO refactor to call FuValueArray, hide ValueArray
 
     @staticmethod
     def marshal_args(proc_name, *args):
@@ -112,7 +113,7 @@ class MarshalPDB():
                 do_proceed_error("Passing function as argument to PDB.")
 
             # May throw but proceed with a bogus gvalue
-            gvalue = Types.new_gvalue(go_arg_type, go_arg)
+            gvalue = FuValueArray.new_gvalue(go_arg_type, go_arg)
 
             try:
                 marshalled_args.insert(index, gvalue)

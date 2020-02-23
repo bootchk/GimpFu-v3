@@ -49,28 +49,7 @@ class GimpfuGimp():
        gimp.Layer.FOO                       get an enum value defined by Gimp.Layer class?
     '''
 
-    # TODO extract to Marshal
-    # TODO: and call it
-    """
-    def _marshall_args(self, *args):
-        '''
-        Gather many args into Gimp.ValueArray
-        '''
-        marshalled_args = Gimp.ValueArray.new(len(args))
-        index = 0
-        for x in args:
-            # TODO convert to GObject
-            # GObject.Value(GObject.TYPE_STRING, tmp))
-            print("marshall arg")
-            print(type(x))
 
-            # !!! Can't assign GObject to python object: marshalled_arg = GObject.Value(Gimp.Image, x)
-            # ??? I don't understand why insert() doesn't determine the type of its second argument
-
-            marshalled_args.insert(index, GObject.Value(type(x), x))
-            index += 1
-        return marshalled_args
-    """
 
 
     """

@@ -178,37 +178,52 @@ containers:
 
 
   # with babl, gegl source i.e. source for dependencies we will build
-  # we get the source for gimp later, see gimpDev
+  # and with a gimp build directory copied from a local clone
   gimpDepsSource:
     setup:
     - !Container gimpDeps
 
-    # latest, bleeding
-    # from shared, bare repository
     # This causes build to fail, can't find git_version.h ???
     #- !Git
     #  url: https://gitlab.gnome.org/GNOME/babl.git
     #  path: /home/babl
-    #TODO
-    #git clone https://gitlab.gnome.org/GNOME/gegl.git
 
     # OR most most recent release archive
+    # 1.72=>1.74
     - !Tar
-      url: https://download.gimp.org/pub/babl/0.1/babl-0.1.72.tar.xz
-      path: /home
-
-    - !Tar
-      url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.18.tar.xz
+      url: https://download.gimp.org/pub/babl/0.1/babl-0.1.74.tar.xz
       path: /home
 
 
+    # Gimp depends on gegl 4.23 which is not released
+    #- !Tar
+    #  url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.18.tar.xz
+    #  path: /home
+
+    # latest, bleeding, from shared, bare repository
+    - !Git
+      url: https://gitlab.gnome.org/GNOME/gegl.git
+      path: /home/gegl
+
+
+    # latest, bleeding
+    #- !Git
+    #  url: https://gitlab.gnome.org/GNOME/gimp.git
+    #  path: /home/gimp
+
+    # copy files from my hacked git repo into the container
+    # note /work/gimp is in the containing, project directory
+    # First remove it in case meson build futzed with it???
+
+    - !Copy
+      source: /work/gimp
+      path:  /home/gimp
 
 
 
 
 
-
-  # Complete, ready to build babl
+  # Complete, ready to build babl, gegl
   bablGeglDev:
     setup:
     - !Container gimpDepsSource
@@ -241,7 +256,7 @@ containers:
 
     #  omit: --prefix=${GIMP_PREFIX} \
     - !Sh |
-        cd /home/babl-0.1.72
+        cd /home/babl-0.1.74
         meson _build \
          --buildtype=release \
           -Db_lto=true
@@ -272,8 +287,9 @@ containers:
     - !Sh echo ">>>>>>"
 
     # !!! Not using     --prefix=${GIMP_PREFIX} \
+    # WAS  cd /home/gegl-0.4.18
     - !Sh |
-        cd /home/gegl-0.4.18
+        cd /home/gegl
         meson _build \
          --buildtype=release \
           -Db_lto=true
@@ -299,21 +315,6 @@ containers:
     setup:
     - !Container bablGeglDev
 
-    # Get source
-
-    # latest, bleeding
-    # note path is to the containing directory
-    #- !Git
-    #  url: https://gitlab.gnome.org/GNOME/gimp.git
-    #  path: /home/gimp
-
-    # copy files from my hacked git repo into the container
-    # note path is to the containing directory
-    # First remove it in case meson build futzed with it???
-
-    - !Copy
-      source: /work/gimp
-      path:  /home/gimp
 
     # Options
     # See INSTALL or INSTALL.in file in repository.  Seems definitive
@@ -376,13 +377,6 @@ containers:
     setup:
     - !Container bablGeglDev
 
-    # TODO move this to container gimpSource??
-    # copy files from my hacked git repo into the container
-    # note path is to the container directory
-    - !Copy
-      source: /work/gimp
-      path:  /home/gimp
-
     # resolve FAILED: cursors/gimp-tool-cursors.c   Related to vector icons?
     - !Env  XDG_DATA_DIRS: "/usr/local/share:/usr/share"
 
@@ -422,7 +416,7 @@ containers:
     - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins
 
     # Remove old test.py
-    - !Sh rm /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
+    # - !Sh rm /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
 
     # install test plugins from repository to container's home  (not exactly in the container?)
     # Copy to the conventional directory for local customization of  Linux apps, specically GIMP ($HOME/.config/.... etc.)
@@ -452,8 +446,10 @@ containers:
       path:  /usr/local/lib/gimp/2.99/python
     # TODO use include-regex expression in Copy
 
-    # - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
-    # - !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
 
     environ:
       HOME: /work/.home

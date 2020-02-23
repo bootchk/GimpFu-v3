@@ -13,6 +13,13 @@ def plugin_func(image, drawable, arg, arg2):
       print("gimp inside plugin_func", gimp)
       img = gimp.Image(10, 20, RGB)
 
+      # test GimpInt32Array result
+      a_vectors = pdb.gimp_image_get_active_vectors(image)
+      print(f"vectors: {a_vectors}")
+
+      count, stroke_list = pdb.gimp_vectors_get_strokes(a_vectors)
+      print(f"count: {count} stroke id list: {stroke_list}")
+
 register(
       "accessGimp",
       "blurb",

@@ -6,6 +6,7 @@ from gi.repository import Gimp
 from gi.repository import GObject    # GObject type constants
 
 from adaption.wrappable import *    # is_subclass_of_type
+from adaption.value_array import FuValueArray
 
 from adapters.color import GimpfuColor
 
@@ -96,30 +97,7 @@ class Types():
 
 
 
-    '''
-    !!! Can't assign GValue to python object: foo = GObject.Value(Gimp.Image, x) ???
-    Must pass directly to Gimp.ValueArray.insert() ???
 
-    ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
-    I suppose GObject.Value() can't know all the types, is generic.
-    '''
-    @staticmethod
-    def new_gvalue(gvalue_type, value):
-        ''' Returns GValue'''
-        # assert gvalue_type is a GObject type constant like GObject.TYPE_STRING
-        '''
-        An exception is usually not caused by plugin author, usually GimpFu programming error.
-        Usually "Must be a GObject.GType, not a type"
-        '''
-        try:
-            result = GObject.Value(gvalue_type, value)
-        except Exception as err:
-            do_proceed_error(f"Creating GValue for type: {gvalue_type}, value: {value}, err: {err}")
-            # Return some bogus value so can proceed
-            result = GObject.Value( GObject.TYPE_INT, 1 )
-            # TODO would this work??
-            # result = GObject.Value( GObject.TYPE_NONE, None )
-        return result
 
 
 
@@ -198,6 +176,7 @@ class Types():
         result_arg = actual_arg
         result_arg_type = actual_arg_type
         did_convert = False
+
         print(f"try_float_array_conversion {actual_arg}, {actual_arg_type}")
         if isinstance(actual_arg, list):
             formal_arg_type = Types._get_formal_argument_type(proc_name, index)
@@ -206,7 +185,22 @@ class Types():
                 if Types.is_float_array_type(formal_arg_type):
                     # convert arg, leave arg_type alone
                     print(">>>>>>>>>>Converting float list")
-                    result_arg = [float(item) for item in actual_arg]
+                    float_list = [float(item) for item in actual_arg]
+
+                    try:
+                        result_arg, result_arg_type = FuValueArray.new_gimp_float_array(float_list)
+                    except Exception as err:
+                        do_proceed_error(f"Failed to create Gimp.FloatArray: {err}.")
+                        # TODO create a dummy
+
+
+                    #>>>>GimpFu continued past error: Exception in type conversion of: [1536, 0, 1536, 1984], type: <class 'list'>, index: 2
+                    #>>>>GimpFu continued past error: Creating GValue for type: <class 'list'>, value: [1536, 0, 1536, 1984], err: Must be GObject.GType, not type
+
+
+                    # This is not right, this is a type, not a GObject.type
+                    # result_arg_type = Gimp.GimpParamFloatArray
+
                     did_convert = True
             else:
                 # Probably too many actual args.
@@ -459,10 +453,16 @@ class Types():
     This does not descend enough, only one level.
     '''
     @staticmethod
-    def convert_list_elements_to_python_types(a_list):
+    def convert_list_elements_to_python_types(list):
         ''' Walk (recursive descent) converting elements to Python types. '''
         ''' !!! This is converting, but not wrapping. '''
-        result = [Types.try_convert_string_array_to_list_of_str(item) for item in a_list]
+        ''' list comprises fundamental objects, and GArray-like objects that need conversion to lists. '''
+        if len(list) > 0:
+            print(f"Type of items in list: {type(list[0])}" )
+            # TODO dispatch on type
+            result = [Types.try_convert_string_array_to_list_of_str(item) for item in list]
+        else:
+            result = []
         print(result)
         return result
 

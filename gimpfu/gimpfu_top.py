@@ -85,13 +85,19 @@ import sys
 
 
 import gi
+
+# Require 2.32 for GArray instead of GValueArray
+# import GLib before Gimp can import and older version of GLib
+# gi.require_version("GLib", "2.32")
+from gi.repository import GLib
+
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-
 # v3
 from gi.repository import Gio
-from gi.repository import GLib
+
+
 
 
 # for g_param_spec and properties
