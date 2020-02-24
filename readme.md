@@ -94,24 +94,24 @@ An author can still write a Gimp Python plugin, using only GI, without any modul
 See the document: pluginPortingGuide
 
 
-TODO list
-=========
+# TODO list
 
 This is a high-level list of features that GimpFu provides,
 that need to be ported/rewritten
 along with the status in parenthesis
 
-1. Automatic plugin GUI generation (proved concept, needs breadth)
-2. pdb convenience object (in progress)
-3. Gimp enums to Python names (no progress)
-4. PF_ enums, the ones that GimpFu/PythonFu defines (strategy devised, needs depth and breadth)
+1. Automatic plugin GUI generation (needs breadth)
+2. pdb convenience object  (needs breadth)
+3. Gimp enums to Python names (needs breadth)
+4. PF_ enums, the ones that GimpFu/PythonFu defines ( needs breadth)
 5. Use new plugin "defaults" machinery in Gimp 3, really "plugin settings", called "gimp_procedure_config" (strategy devised, no progress)
-6. Other convenience Python objects e.g. "image" (not started, possibly obsolete them?)
-7. Write a "GimpFu plugin Porting Guide" (drafted, this TODO list is its outline)
+6. Other convenience Python objects e.g. "image" (needs breadth)
+7. Write a "GimpFu plugin Porting Guide" (drafted)
 8. Adapt to new plugin installation requirements (proved)
+9. Marshaling of Gimp types GimpFloatArray, GimpStringArray, etc.
 
-Dev strategy
-============
+
+# Dev strategy
 
 True hacking.  Start coding, see what is broken, fix, and repeat.
 
@@ -131,8 +131,8 @@ So you take pieces from already ported/authored non-GimpFu Python3/Gimp3 plugins
 and put those pieces into the GimpFu framework.
 
 
-To use the source
-=================
+# To use the source
+
 The current Gimp 2.99 repository doesn't even attempt to build GimpFu.
 You don't need to hack it so it does (but eventually it should.)
 
@@ -145,8 +145,7 @@ or to the install location for Gimp packaged Python plugins.
 
 
 
-My dev environment
-==================
+# My dev environment
 
 I use Vagga tool for development containers.
 You don't need this if you already can build Gimp.
@@ -166,8 +165,7 @@ Vagga:
     - you can pull nightly changes to Gimp and the command will rebuild Gimp automatically.
 
 
-Getting started developing GimpFu
-=================================
+# Getting started developing GimpFu
 
     install Vagga from its website
     >sudo apt-get install uidmap
@@ -203,11 +201,12 @@ at the old menu, or with old parameters, or with the old run_func, etc.
 
 
 
-More about developing in a vagga container
-==========================================
+## More about developing in a vagga container
+
 
 Vagga leaves versioned containers which will fill your disk drive.
 Occasionally you will need to:
+
 >vagga _clean --unused
 
 To start from scratch (rebuilding your container from nothing):
@@ -236,10 +235,11 @@ into the container at the correct install place e.g. /usr/local/lib/gimp/2.99/py
 at the last possible moment (after compile Gimp, before running Gimp.)
 
 
-Hack to Gimp itself
-===================
+# Hacks to Gimp itself
 
 gimp/libgimp/gimp_procedure.c is hacked to allow
 several procedure.add_arg_from_property() calls with the same named property.
 Comment out the preemptive return after the error "duplicate argument name"
 See discussion Gimp issue TODO
+
+gimp/libgimpbase/gimparamspecs.c and .h are hacked re GimpFloatArray
