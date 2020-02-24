@@ -1,16 +1,98 @@
 
-Work in progress.  Just deep proof of concept, no breadth.
+Work in progress.
 
 Port of GimpFu (the simplified Gimp plugin API for Python) to Gimp 3 and Python3
 
-A few, hacked files from gimp/plug-ins/pygimp.
-For example gimpfu.py
-The current Gimp build does not even install them.
-You can test them in your own Gimp 2.99 build
-simply by installing (copying) them
-to say /usr/local/lib/gimp/2.99/python/gimpfu.py
-
 Repository also includes a Vagga script to create a development container for Gimp 3.
+
+The current status: proved the concept, now working on breadth.
+It works for many existing plugins in the wild (requiring only a few minor edits to said plugins.)
+As I test new, wild plugins, the rate at which I find holes in the GimpFu implementation is decreasing.
+
+
+# Differences between v2 and v3 of Gimpfu
+
+## Implementation (this is the crux of GimpFu)
+
+* v2 uses static binding: C language files to bind Python to Gimp
+* v3 uses dynamic binding: uses Python language files and GI (GObject Introspection.)
+
+More about GI.  Gimp is being enhanced with GObject annotations that allow GI of its API.
+The PyGObject module (import gi) lets Python code do GI.
+The PyGObject module is partially implemented in the C language,
+but GimpFu no longer uses any C language.
+
+PyGObject automatically marshals many Python objects (e.g. lists)
+into GObjects that Gimp can use.
+
+Now, to port a Gimp Python plugin:
+
+* the author must understand many details of GI.
+  For example, how to create a GValueArray.
+* each ported Gimp Python plugin uses much boilerplate.
+  The boilerplate is different (authors must re learn) from v2 GimpFu boilerplate
+
+With GimpFu:
+
+* many details of GI are hidden
+* boilerplate is reduced
+* boilerplate is backward compatible with PyGimp/GimpFu v2
+
+## Source directory
+
+* v2 gimp/plug-ins/pygimp
+* v3 this_repository/gimpfu
+
+## Plugin source code
+
+* v2 The gimp repository has a parallel directory named gimp/plug-ins/python.
+  Some of those plugins use v2 GimpFu.
+* v3 (branch mainline, i.e. 2.99) gimp/plug-ins/python: Python language plugins
+  but **none** of the plugins use GimpFu; they all have been ported to use only
+  Gimp and GI.
+* this repository:  /plug-ins : test plugins, that mostly use GimpFu.
+  Most are copied from wild plugins found on the net, often at GitHub.
+
+## Plugin source directory structure
+
+* v2 /gimp/plug-ins/pygimp is unstructured.
+  It contained many modules, some implemented in C.
+  One module was gimpfu.py, which imported many of the other modules.
+  But an author could import the other modules without importing the gimpfu module.
+
+* v3 /gimpfu is a Python package.
+  It is structured into sub-packages for ease of maintenance.
+  The gimpfu package still imports many submodules.
+  But I anticipate that few Gimp Python plugins will import submodules
+  without importing the entire gimpfu package.
+  (You could do that: "from gimpfu.gimpenums import *")
+
+
+## Installation
+
+The current Gimp development branch (mainline, 2.99) build does not even install the pygimp directory.
+
+You can test this repository in your own Gimp 2.99 build
+simply by installing (copying) the gimpfu directory to either:
+
+* /usr/local/lib/gimp/2.99/python/gimpfu.py (the official installation place)
+* ~/.config/GIMP/2.99/plug-ins (the local, custom installation place)
+
+## Disambiguation
+
+* v2: PyGimp was larger than GimpFu.  PyGimp included the 'gimpfu' module
+  as well as some modules that were useful without Gimpfu.
+* v3: PyGimp is no longer a useful moniker.  The pygimp directory no longer exists.
+  Much existing documentation refers to 'PyGimp.'
+  Usually you can just substitute 'GimpFu' for 'PyGimp'.
+
+GimpFu **is** the package that provides a mostly backward compatible API for writing Gimp Python plugins.
+An author can still write a Gimp Python plugin, using only GI, without any modules from the GimpFu package.
+
+## Porting Gimp Python plugins from v2 to v3
+
+See the document: pluginPortingGuide
+
 
 TODO list
 =========
@@ -64,7 +146,7 @@ or to the install location for Gimp packaged Python plugins.
 
 
 My dev environment
-===============
+==================
 
 I use Vagga tool for development containers.
 You don't need this if you already can build Gimp.
@@ -85,7 +167,7 @@ Vagga:
 
 
 Getting started developing GimpFu
-===============
+=================================
 
     install Vagga from its website
     >sudo apt-get install uidmap

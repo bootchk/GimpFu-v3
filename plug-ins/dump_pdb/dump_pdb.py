@@ -48,7 +48,15 @@ def plugin_func(image, drawable):
 
     f = get_gfile(filename)
 
-    info = f.query_info('standard::type,standard::size', flags=Gio.FILE_QUERY_INFO_NONE, cancellable=None)
+    '''
+    !!! See the API at "PyGObject API Reference, which is the most up-to-date"
+    There exist many dated examples on the net.
+    '''
+    # Fails: FILE_QUERY_INFO_NONE
+    # info = f.query_info('standard::type,standard::size', flags=Gio.FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, cancellable=None)
+    # info = f.query_info('standard::type,standard::size', flags=None, cancellable=None)
+    info = f.query_info('standard::type,standard::size', flags=Gio.FileQueryInfoFlags.NONE, cancellable=None)
+
     print(f"File type is: {info.get_file_type()}")
 
     result = gimp.get_pdb().dump_to_file(f)

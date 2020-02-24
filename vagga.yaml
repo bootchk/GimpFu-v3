@@ -449,7 +449,8 @@ containers:
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
+
+    ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
 
     environ:
       HOME: /work/.home
