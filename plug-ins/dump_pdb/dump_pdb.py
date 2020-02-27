@@ -37,7 +37,9 @@ def get_gfile2(filename):
     f = Gio.File(path=filename)
     f = Gio.File(uri=filename)
     # Both fails with NotImplementedError: File can not be constructed
+    # Maybe it is GLib.File ????
     return f
+
 
 def plugin_func(image, drawable):
 
@@ -55,7 +57,7 @@ def plugin_func(image, drawable):
     # Fails: FILE_QUERY_INFO_NONE
     # info = f.query_info('standard::type,standard::size', flags=Gio.FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, cancellable=None)
     # info = f.query_info('standard::type,standard::size', flags=None, cancellable=None)
-    info = f.query_info('standard::type,standard::size', flags=Gio.FileQueryInfoFlags.NONE, cancellable=None)
+    info = f.query_info('standard::type, standard::size', flags=Gio.FileQueryInfoFlags.NONE, cancellable=None)
 
     print(f"File type is: {info.get_file_type()}")
 

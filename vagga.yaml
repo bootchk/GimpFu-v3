@@ -33,7 +33,9 @@ containers:
     - !Install [build-essential]
 
 
-  # with build tools
+
+
+  # with required build tools
   baseWithTools:
     setup:
     - !Container baseOS
@@ -76,7 +78,8 @@ containers:
     - !Sh which test
 
 
-  # with library dependencies
+
+  # with required libraries
   generalDeps:
     setup:
     - !Container baseWithTools
@@ -101,14 +104,12 @@ containers:
 
     # gimp specific
 
-    # tool to build API docs
-    - !Install []
 
 
 
 
-
-  # with libraries that gimp depends on
+  # with more required libraries.
+  # Gimp requires
   # !!! Some dependency is through gegl, must be here when gegl built
   # these are package names, might depend on distribution
   gimpDeps:
@@ -172,13 +173,14 @@ containers:
     # optional for browsing API docs
     - !Install [ yelp ]
 
-
     environ:
       HOME: /work/.home
 
 
-  # with babl, gegl source i.e. source for dependencies we will build
-  # and with a gimp build directory copied from a local clone
+
+  # with babl, gegl source
+  # gimp requires latest babl, gegl, so we build instead of install
+  # These are relatively stable compared to gimp source
   gimpDepsSource:
     setup:
     - !Container gimpDeps
@@ -206,24 +208,9 @@ containers:
       path: /home/gegl
 
 
-    # latest, bleeding
-    #- !Git
-    #  url: https://gitlab.gnome.org/GNOME/gimp.git
-    #  path: /home/gimp
-
-    # copy files from my hacked git repo into the container
-    # note /work/gimp is in the containing, project directory
-    # First remove it in case meson build futzed with it???
-
-    - !Copy
-      source: /work/gimp
-      path:  /home/gimp
 
 
-
-
-
-  # Complete, ready to build babl, gegl
+  # With built babl, gegl
   bablGeglDev:
     setup:
     - !Container gimpDepsSource
@@ -310,11 +297,29 @@ containers:
 
 
 
-  # build gimp using autotools
+  # With gimp source and built gimp
+  # Uses automake variant of build system for Gimp
   gimpAMDev:
     setup:
     - !Container bablGeglDev
 
+    # rebuild container when changed: local clone of gimp repository (in /work i.e. project directory )
+    - !Depends gimp
+
+    # Get Gimp sources
+
+    # latest, bleeding
+    #- !Git
+    #  url: https://gitlab.gnome.org/GNOME/gimp.git
+    #  path: /home/gimp
+
+    # copy files from my hacked git repo into the container
+    # note /work/gimp is in the containing, project directory
+    # First remove it in case meson build futzed with it???
+
+    - !Copy
+      source: /work/gimp
+      path:  /home/gimp
 
     # Options
     # See INSTALL or INSTALL.in file in repository.  Seems definitive
@@ -404,13 +409,29 @@ containers:
         ninja
         ninja install
 
+    # Generate documentation for Python language bindings to Gimp, etc.
+    # Same documents for GLib, GObj, Gio webbed at "PyGObject API Reference"
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
 
-  # Local custom GIMP
+    ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
+
+
+
+  # With local customized GIMP
+  # We install test plug-ins locally (for user).  This is common practice.
+  # We install gimpfu locally (for user).  This is uncommon, eventually gimpfu installs w Gimp.
+
+  # Faster if a command does this.  See gimpTestGUI which runs on gimpAMDev
   gimpLocal:
     setup:
     # Choice:
     - !Container gimpAMDev
     #- !Container gimpMesonDev
+
+    # rebuild container if test plugin source (in /work i.e. project directory ) changes
+    - !Depends plug-ins
 
     # create container user's .config for GIMP, to hold locally installed plug-ins
     - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins
@@ -432,8 +453,7 @@ containers:
     # e.g. - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
     - !Sh find /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' +
 
-    # rebuild container if test plugin source (in /work i.e. project directory ) changes
-    - !Depends plug-ins
+
 
 
     # Copy hacked gimpfu sources into the install location from the project directory
@@ -446,21 +466,8 @@ containers:
       path:  /usr/local/lib/gimp/2.99/python
     # TODO use include-regex expression in Copy
 
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
-
-    ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
-
     environ:
       HOME: /work/.home
-
-
-
-
-
-
-
 
 
 
@@ -553,7 +560,7 @@ commands:
 
       /usr/local/bin/gimp-2.99 --verbose
 
-  # work in progress: quicker startup
+  # quicker startup
   gimpTestGUI: !Command
     description: Run gimp GUI in gimpDev container, with user's plugins in home
     container:  gimpAMDev
@@ -593,6 +600,14 @@ commands:
       # /usr/local/bin/gimp-2.99 --verbose --no-data
 
       /usr/local/bin/gimp-2.99 --verbose
+
+  # quicker startup
+  generateGIDocs: !Command
+    description: Generate GI docs from  gimpAMDev container to work/.home
+    container:  gimpAMDev
+    run: |
+       g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+       echo "Generated to .home/gimp-doc"
 
 
   gimpListPlugins: !Command

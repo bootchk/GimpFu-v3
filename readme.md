@@ -93,6 +93,36 @@ An author can still write a Gimp Python plugin, using only GI, without any modul
 
 See the document: pluginPortingGuide
 
+# Python GI API documents
+
+It is better to read documents for the Python API than to read documents for the C API.
+Although with some mental energy you can read the C API and figure out the Python API.
+
+## GObject, Gio, GLib, but *not* Gimp 2.99
+
+The best documentation about the GObject introspected Python API's of various projects
+is found at [PyGObject API Reference] https://lazka.github.io/pgi-docs/
+Many other docs on the web (such as at the Gnome project?) are outdated, or for the C API.
+
+## Gimp
+
+You should generate docs yourself for the GObject introspected Python API for GIMP.
+Since Gimp2.99 is a development branch, you should pull it often, and the API might change.
+When you build Gimp, the gir goes to say, /usr/local/share/gir-1.0/Gimp-3.0.gir
+
+To create a document:
+
+> g-ir-doc-tool --language=Python -o ~/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+
+To browse the document:
+
+> yelp ~/gimp-doc
+
+The vagga.yaml script does that inside the container.
+You can read the script to see how to install dependencies for building the doc
+(g-ir-doc-tool and yelp.)
+
+
 
 # TODO list
 
@@ -210,7 +240,9 @@ Occasionally you will need to:
 >vagga _clean --unused
 
 To start from scratch (rebuilding your container from nothing):
+
 >rm -Rf .vagga
+
 Dragging it to the trash doesn't help free up space.
 
 
@@ -221,12 +253,13 @@ So that the container builds Gimp from a local possibly hacked copy.
 I have one minor hack in my Gimp clone to support Gimpfu.
 
 Typically:
-   vaggaGimp (clone of this repository)
-      gimp (you add this clone of gimp 2.99 repository)
-      .vagga (ephemera, ignored, created by vagga, the containers)
-      source (from this repository )
-      vagga.yaml (from this repository)
-      test, readme, etc. (from this repository)
+
+    vaggaGimp (clone of this repository)
+       gimp (you add this clone of gimp 2.99 repository)
+       .vagga (ephemera, ignored, created by vagga, the containers)
+       source (from this repository )
+       vagga.yaml (from this repository)
+       test, readme, etc. (from this repository)
 
 
 The vagga.yaml script copies hacked .py files
