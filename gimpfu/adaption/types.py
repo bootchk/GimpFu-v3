@@ -7,6 +7,7 @@ from gi.repository import GObject    # GObject type constants
 
 from adaption.wrappable import *    # is_subclass_of_type
 from adaption.value_array import FuValueArray
+from adaption.formal_types import FormalTypes
 
 from adapters.color import GimpfuColor
 
@@ -18,9 +19,13 @@ class Types():
     '''
     Knows Gimp and Python types, and ParamSpec's which specify types.
     Type conversions.
-    Formal type specs
+    Upcasts.
 
-    Collaborates with Marshal.
+    Collaborates with:
+    - Marshal
+    - FormalTypes
+    - FuValueArray (to create GValues)
+    - GimpFuColor (to create instances of Gimp types)
 
     GimpFu converts Python ints to floats to satisfy Gimp.
 
@@ -31,119 +36,7 @@ class Types():
 
     # TODO optimize.  Get all the args at once, memoize
 
-    @staticmethod
-    def _get_formal_argument_type(proc_name, index):
-        '''
-        Get the formal argument type for a PDB procedure
-        where argument identified by index.
-        Returns an instance of GType e.g. GObject.TYPE_INT
 
-        Another implementation: Gimp.get_pdb().run_procedure( proc_name , 'gimp-pdb-get-proc-argument', args)
-        '''
-        # require procedure in PDB, it was checked earlier
-        procedure = Gimp.get_pdb().lookup_procedure(proc_name)
-        ## OLD config = procedure.create_config()
-        ## assert config is type Gimp.ProcedureConfig, having properties same as args of procedure
-
-        arg_specs = procedure.get_arguments()    # some docs say it returns a count, it returns a list of GParam??
-        # print(arg_specs)
-        # assert is a list
-
-        ## arg_specs = Gimp.ValueArray.new(arg_count)
-        ##config.get_values(arg_specs)
-
-        # assert arg_specs is Gimp.ValueArray, sequence describing args of procedure
-        # index may be out of range, GimpFu author may have provided too many args
-        try:
-            arg_spec = arg_specs[index]   # .index(index) ??
-            print(arg_spec)
-            # assert is-a GObject.GParamSpec or subclass thereof
-            ## OLD assert arg_spec is GObject.Value, describes arg of procedure (its GType is the arg's type)
-
-            '''
-            CRUFT, some comments may be pertinent.
-
-            The type of the subclass of GParamSpec is enough for our purposes.
-            Besides, GParamSpec.get_default_value() doesn't work???
-
-            formal_arg_type = type(arg_spec)
-            '''
-
-            '''
-            print(dir(arg_spec)) shows that arg_spec is NOT a GParamSpec, or at least doesn't have get_default_value.
-            I suppose it is a GParam??
-            Anyway, it has __gtype__
-            '''
-            """
-            formal_default_value = arg_spec.get_default_value()
-            print(formal_default_value)
-            # ??? new to GI 2.38
-            # assert is-a GObject.GValue
-
-            formal_arg_type = formal_default_value.get_gtype()
-            """
-            formal_arg_type = arg_spec.__gtype__
-
-        except IndexError:
-            do_proceed_error("Formal argument not found, probably too many actual args.")
-            formal_arg_type = None
-
-
-        print( "get_formal_argument returns", formal_arg_type)
-
-        # assert type of formal_arg_type is GObject.GType
-        ## OLD assert formal_arg_type has python type like GParamSpec<Enum>
-        return formal_arg_type
-
-
-
-
-
-
-
-    '''
-    formal_arg_type is like GimpParamDrawable.
-    formal_arg_type is-a GType
-    GType has property "name" which is the short name
-
-    !!! GObject type names are like GParamDouble
-    but Gimp GObject type names are like GimpParamDrawable
-    !!! *G* versus *Gimp*
-
-    !!! Not formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE
-    '''
-    @staticmethod
-    def is_float_type(formal_arg_type):
-        # use the short name
-        return formal_arg_type.name in ('GParamFloat', 'GParamDouble')
-
-    def is_str_type(formal_arg_type):
-        return formal_arg_type.name in ('GParamString', )
-
-    # !!!! GimpParam...
-    def is_float_array_type(formal_arg_type):
-        return formal_arg_type.name in ('GimpParamFloatArray', )
-
-
-    # TODO rename is_drawable_formal_type
-    @staticmethod
-    def is_drawable_type(formal_arg_type):
-        # use the short name
-        result = formal_arg_type.name in ('GimpParamDrawable', )
-        print(f"is_drawable_type formal arg name: {formal_arg_type.name} ")
-        return result
-
-
-    @staticmethod
-    def is_formal_type_equal_type(formal_type, actual_type):
-        # !!! GType.name versus PythonType.__name__
-        formal_type_name = formal_type.name
-        actual_type_name = actual_type.__name__
-
-        mangled_formal_type_name = formal_type_name.replace('GimpParam', '')
-        result = mangled_formal_type_name == actual_type_name
-        print(f"{result}    formal {formal_type_name} == actual {actual_type_name}")
-        return result
 
 
     @staticmethod
@@ -179,10 +72,10 @@ class Types():
 
         print(f"try_float_array_conversion {actual_arg}, {actual_arg_type}")
         if isinstance(actual_arg, list):
-            formal_arg_type = Types._get_formal_argument_type(proc_name, index)
+            formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
             if formal_arg_type is not None:
                 print(formal_arg_type)
-                if Types.is_float_array_type(formal_arg_type):
+                if FormalTypes.is_float_array_type(formal_arg_type):
                     # convert arg, leave arg_type alone
                     print(">>>>>>>>>>Converting float list")
                     float_list = [float(item) for item in actual_arg]
@@ -237,10 +130,10 @@ class Types():
         print("Actual arg type:", type(actual_arg))
 
         if type(actual_arg) is int:
-            formal_arg_type = Types._get_formal_argument_type(proc_name, index)
+            formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
             if formal_arg_type is not None:
                 print("     Formal arg type ", formal_arg_type.name )
-                if Types.is_float_type(formal_arg_type):
+                if FormalTypes.is_float_type(formal_arg_type):
                     # ??? Tell Gimpfu plugin author their code would be more clear if they used float() themselves
                     # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
                     # TODO make this a warning or a suggest
@@ -248,7 +141,7 @@ class Types():
                     result_arg = float(actual_arg)  # type conversion
                     result_arg_type = type(result_arg)  # i.e. float
                     did_convert = True
-                elif Types.is_str_type(formal_arg_type):
+                elif FormalTypes.is_str_type(formal_arg_type):
                     print("GimpFu: Suggest: converting int to str.  Your code might be clearer if you use explicit conversions.")
                     result_arg = str(actual_arg)  # type conversion
                     result_arg_type = type(result_arg)
@@ -326,7 +219,7 @@ class Types():
     def _should_upcast_or_convert(instance_type, formal_arg_type, cast_to_type):
         result = (
                 (instance_type != cast_to_type)
-            and Types.is_formal_type_equal_type(formal_arg_type, cast_to_type)
+            and FormalTypes.is_formal_type_equal_type(formal_arg_type, cast_to_type)
             )
         print(f"_should_upcast_or_convert: {result}")
         return result
@@ -354,7 +247,7 @@ class Types():
 
         print(f"Attempt upcast arg:{arg} from type: {get_type_name(arg)} to : {cast_to_type.__name__}")
 
-        formal_arg_type = Types._get_formal_argument_type(proc_name, index)
+        formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
         # TODO exception index out of range
 
         result = arg     # result is arg except for conversions below
