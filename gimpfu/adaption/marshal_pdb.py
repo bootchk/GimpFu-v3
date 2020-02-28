@@ -89,8 +89,10 @@ class MarshalPDB():
         # Better to introspect ??
         if proc_name.startswith('plug-in-'):
             # no GUI, this is a call from a plugin
-            FuValueArray.push_value( Gimp.RunMode.NONINTERACTIVE)
-            # Run mode is in the formal args, not in actual args
+
+            a_gvalue = FuValueArray.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)
+            FuValueArray.push_gvalue( a_gvalue )
+            # Run mode is in the formal args, not in passed actual args
             formal_args_index = 1
 
         '''
@@ -113,11 +115,13 @@ class MarshalPDB():
             if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")
 
-            FuValueArray.push_type_value_pair(go_arg_type, go_arg)
+            a_gvalue = FuValueArray.new_gvalue( go_arg_type, go_arg)
+            FuValueArray.push_gvalue(a_gvalue)
 
             formal_args_index += 1
 
             """
+            cruft
             try:
                 marshalled_args.insert(index, gvalue)
             except Exception as err:

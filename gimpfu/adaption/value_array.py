@@ -63,16 +63,10 @@ class FuValueArray():
     def reset(cls):
         cls._list_gvalues = []
 
-    @classmethod
-    def push_value(cls, value):
-        ''' Push a Gvalue where gtype can be gotten from the value. '''
-        a_gvalue = FuValueArray.new_gvalue( value.__gtype__, value)
-        cls._list_gvalues.append(a_gvalue)
 
     @classmethod
-    def push_type_value_pair(cls, go_arg_type, go_arg):
-        ''' Push a Gvalue given (gtype, value). '''
-        a_gvalue = FuValueArray.new_gvalue( go_arg_type, go_arg)
+    def push_gvalue(cls, a_gvalue):
+        ''' Push a Gvalue. '''
         cls._list_gvalues.append(a_gvalue)
 
 
