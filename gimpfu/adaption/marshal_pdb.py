@@ -64,7 +64,6 @@ class MarshalPDB():
 
 
 
-    # TODO refactor to call FuValueArray, hide ValueArray
 
     @staticmethod
     def marshal_args(proc_name, *args):
@@ -80,41 +79,45 @@ class MarshalPDB():
         6. Check error FunctionInfo
         '''
 
-        # TODO extract method
+        FuValueArray.reset()
+        print(f">>>>>> marshalled args: {FuValueArray.dump()}" )
+
+        formal_args_index = 0
+
+        # TODO extract method to GimpfuProcedure class
         # TODO python-fu- ?? What procedure names signify need run_mode?
         # Better to introspect ??
         if proc_name.startswith('plug-in-'):
-            marshalled_args = Gimp.ValueArray.new(len(args)+1)
-             # no GUI, this is a call from a plugin
-            marshalled_args.insert(0, Gimp.RunMode.NONINTERACTIVE)
-            index = 1
-        else:
-            marshalled_args = Gimp.ValueArray.new(len(args))
-            index = 0
-
+            # no GUI, this is a call from a plugin
+            FuValueArray.push_value( Gimp.RunMode.NONINTERACTIVE)
+            # Run mode is in the formal args, not in actual args
+            formal_args_index = 1
 
         '''
         If more args than formal_args (from GI introspection), conversion will not convert.
         If less args than formal_args, Gimp might return an error when we call the PDB procedure.
         '''
         for x in args:
-            ## print("marshal arg:", x )
+            print(f"\n#### marshal arg: {x} index: {formal_args_index}" )
+            print(f">>>>>> marshalled args: {FuValueArray.dump()}" )
 
             go_arg, go_arg_type = MarshalPDB._unwrap_to_param(x)
             # assert are GObject types, i.e. fundamental or Boxed
             # We may yet convert some fundamental types (tuples) to Boxed (Gimp.RGB)
 
             try:
-                go_arg, go_arg_type = MarshalPDB._try_type_conversions(proc_name, go_arg, go_arg_type, index)
+                go_arg, go_arg_type = MarshalPDB._try_type_conversions(proc_name, go_arg, go_arg_type, formal_args_index)
             except Exception as err:
-                do_proceed_error(f"Exception in type conversion of: {go_arg}, type: {go_arg_type}, index: {index}")
+                do_proceed_error(f"Exception in type conversion of: {go_arg}, type: {go_arg_type}, formal_args_index: {formal_args_index}")
 
             if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")
 
-            # May throw but proceed with a bogus gvalue
-            gvalue = FuValueArray.new_gvalue(go_arg_type, go_arg)
+            FuValueArray.push_type_value_pair(go_arg_type, go_arg)
 
+            formal_args_index += 1
+
+            """
             try:
                 marshalled_args.insert(index, gvalue)
             except Exception as err:
@@ -122,11 +125,12 @@ class MarshalPDB():
                 # ??? After this exception, often get: LibGimpBase-CRITICAL **: ...
                 # gimp_value_array_insert: assertion 'index <= value_array->n_values' failed
                 # The PDB procedure call is usually going to fail anyway.
+            """
 
-            index += 1
-
-        print("marshalled_args", marshalled_args )
-        return marshalled_args
+        result = FuValueArray.get_gvalue_array()
+        # print("marshalled args", result )
+        print(f">>>>>> marshalled args: {FuValueArray.dump()}" )
+        return result
 
 
     @staticmethod

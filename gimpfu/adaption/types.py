@@ -22,7 +22,7 @@ class Types():
 
     Collaborates with Marshal.
 
-    GimpFu converts Python ints to floats on behalf of Gimp.
+    GimpFu converts Python ints to floats to satisfy Gimp.
 
     GimpFu upcasts e.g. Layer to Drawable where Gimp is uneccessarily demanding.
     GimpFu upcasts None to e.g. Layer when passed as actual arg.
