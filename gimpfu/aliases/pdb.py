@@ -32,7 +32,7 @@ class GimpfuPDB():
     (which would create the PDB instance and establish self type is GimpPlugin).
     Such code would bind "pdb" to None, forever, since that is the way import works.
     Besides, the object returned by Gimp.get_pdb() is the PDB manager,
-    not having a method for each procedure IN the PDB.
+    not having a method for each procedure IN the PDB???
 
     Alternatively, we could require a plugin's "func" to always first call pdb = Gimp.get_pdb().
     But that is new boilerplate for GimpFu authors, and not backward compatible.
@@ -64,6 +64,8 @@ class GimpfuPDB():
     Since we override __getattribute__, use idiom to avoid infinite recursion:
     call super to access self attributes without recursively calling overridden __getattribute__.
     super is "object".  Alternatively: super().__getattribute__()
+
+    TODO should use __getattr__ instead of __getattribute__ ??
 
     Errors:
 
