@@ -17,7 +17,7 @@ from message.proceed_error import *
 
 class Types():
     '''
-    Knows Gimp and Python types, and ParamSpec's which specify types.
+    Knows Gimp and Python types
     Type conversions.
     Upcasts.
 
@@ -34,11 +34,16 @@ class Types():
     GimpFu upcasts -1 to e.g. Layer when passed as actual arg.
     '''
 
+    '''
+    Many methods return a GValue (instead of a (type, value))
+    because only Gimp.value_set_float_array()
+    lets properly converts native lists to FloatArray.
+    '''
     # TODO optimize.  Get all the args at once, memoize
 
 
 
-
+    # not used????
     @staticmethod
     def try_convert_to_null(proc_name, actual_arg, actual_arg_type, index):
         '''
@@ -53,61 +58,29 @@ class Types():
         return result_arg, result_arg_type
 
 
-    """
-    @staticmethod
-    def try_convert_to_str(proc_name, actual_arg, actual_arg_type, index):
-        return try_usual_python_conversion(proc_name, actual_arg, actual_arg_type, index, "str")
+
 
     @staticmethod
-    def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
-        return try_usual_python_conversion(proc_name, actual_arg, actual_arg_type, index, "float")
-    """
-
-    @staticmethod
-    def try_float_array_conversion(proc_name, actual_arg, actual_arg_type, index):
+    def try_float_array_conversion(proc_name, gen_value, index):
         ''' Convert list of int to list of float when formal_arg_type requires FloatArray. '''
-        result_arg = actual_arg
-        result_arg_type = actual_arg_type
-        did_convert = False
 
-        print(f"try_float_array_conversion {actual_arg}, {actual_arg_type}")
-        if isinstance(actual_arg, list):
+        print(f"try_float_array_conversion {gen_value}")
+        if isinstance(gen_value.actual_arg, list):
             formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
             if formal_arg_type is not None:
-                print(formal_arg_type)
+                # print(formal_arg_type)
                 if FormalTypes.is_float_array_type(formal_arg_type):
-                    # convert arg, leave arg_type alone
-                    print(">>>>>>>>>>Converting float list")
-                    float_list = [float(item) for item in actual_arg]
-
-                    try:
-                        result_arg, result_arg_type = FuValueArray.new_gimp_float_array(float_list)
-                    except Exception as err:
-                        do_proceed_error(f"Failed to create Gimp.FloatArray: {err}.")
-                        # TODO create a dummy
-
-
-                    #>>>>GimpFu continued past error: Exception in type conversion of: [1536, 0, 1536, 1984], type: <class 'list'>, index: 2
-                    #>>>>GimpFu continued past error: Creating GValue for type: <class 'list'>, value: [1536, 0, 1536, 1984], err: Must be GObject.GType, not type
-
-
-                    # This is not right, this is a type, not a GObject.type
-                    # result_arg_type = Gimp.GimpParamFloatArray
-
-                    did_convert = True
+                    gen_value.float_array()
             else:
                 # Probably too many actual args.
                 # Do not convert type.
                 do_proceed_error(f"Failed to get formal argument type for index: {index}.")
         # else not a list i.e. not a Gimp array
 
-        return result_arg, result_arg_type, did_convert
-
-
 
 
     @staticmethod
-    def try_usual_python_conversion(proc_name, actual_arg, actual_arg_type, index):
+    def try_usual_python_conversion(proc_name, gen_value, index):
         '''
         Perform the usual automatic Python conversion from int to (str, float).
 
@@ -115,7 +88,7 @@ class Types():
         and PDB procedure wants the other type.
         (procedure's formal parameter type in (GObject.TYPE_FLOAT, TYPE_STRING).
 
-        Returns actual_arg, type(actual_arg), possibly converted.
+        Returns a GValue, possibly converted.
         !!! Note that the caller must ensure that the original variable is not converted,
         only the variable being passed to Gimp.
 
@@ -123,13 +96,9 @@ class Types():
         '''
         # require type(actual_arg_type) is Python type or a GType
 
-        result_arg = actual_arg
-        result_arg_type = actual_arg_type
-        did_convert = False
+        print(f"Actual arg type: {gen_value}")
 
-        print("Actual arg type:", type(actual_arg))
-
-        if type(actual_arg) is int:
+        if gen_value.actual_arg_type is int:
             formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
             if formal_arg_type is not None:
                 print("     Formal arg type ", formal_arg_type.name )
@@ -138,14 +107,10 @@ class Types():
                     # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
                     # TODO make this a warning or a suggest
                     print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")
-                    result_arg = float(actual_arg)  # type conversion
-                    result_arg_type = type(result_arg)  # i.e. float
-                    did_convert = True
+                    gen_value.float()
                 elif FormalTypes.is_str_type(formal_arg_type):
                     print("GimpFu: Suggest: converting int to str.  Your code might be clearer if you use explicit conversions.")
-                    result_arg = str(actual_arg)  # type conversion
-                    result_arg_type = type(result_arg)
-                    did_convert = True
+                    gen_value.str()
                 # else arg is int but procedure wants int, or a type that has no conversion
                 # TODO warn now that type is int but procedure wants another type
             else:
@@ -156,49 +121,10 @@ class Types():
 
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
         # likewise for value of result_arg
-        print("try_usual_python_conversion returns ", result_arg, result_arg_type)
-        return result_arg, result_arg_type, did_convert
+        print(f"try_usual_python_conversion returns {gen_value}")
 
-    """
-    @staticmethod
-    def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
-        '''
-        Convert the described actual arg to float if is int
-        and PDB procedure wants a float
-        (procedure's formal parameter is type GObject.TYPE_FLOAT).
-        Only converts Python int to float.
+        # WAS return result_arg, result_arg_type, did_convert
 
-        Returns actual_arg, type(actual_arg), possibly converted
-
-        Later, GObject will convert Python types to GTypes.
-        '''
-        # require type(actual_arg_type) is Python type or a GType
-
-        result_arg = actual_arg
-        result_arg_type = actual_arg_type
-
-        print("Actual arg type:", type(actual_arg))
-
-        if type(actual_arg) is int:
-            formal_arg_type = Types._get_formal_argument_type(proc_name, index)
-            if formal_arg_type is not None:
-                print("     Formal arg type ", formal_arg_type.name )
-                if Types.is_float_type(formal_arg_type):
-                    # ??? Tell Gimpfu plugin author their code would be more clear if they used float() themselves
-                    # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
-                    print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")
-                    result_arg = float(actual_arg)  # type conversion
-                    result_arg_type = type(result_arg)  # i.e. float
-            else:
-                # Failed to get formal argument type.  Probably too many actual args.
-                # Do not convert type.
-                do_proceed_error(f"Failed to get formal argument type for index: {index}.")
-
-        # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
-        # likewise for value of result_arg
-        print("try_convert_to_float returns ", result_arg, result_arg_type)
-        return result_arg, result_arg_type
-    """
 
 
     '''
@@ -233,89 +159,71 @@ class Types():
     so that many plugs don't need to do it.
     '''
     @staticmethod
-    def try_upcast_to_type(proc_name, arg, arg_type, index, cast_to_type):
+    def try_upcast_to_type(proc_name, gen_value, index, cast_to_type):
         '''
-        When type(arg) is subclass of cast_to_type
-        and proc_name expects arg of cast_to_type at index,
+        When gen_value.actual_arg_type is subclass of cast_to_type
+        and proc_name expects cast_to_type at index,
         return cast_to_type, else return original type.
-        Does not actually change type of arg i.e. no conversion, just casting.
+        Does not actually change type i.e. no conversion, just casting.
 
-        Require arg a GObject (not wrapped).
+        Require gen_value a GObject (not wrapped).
         Require proc_name a PDB procedure name.
         '''
         # assert type is like Gimp.Drawable, cast_to_type has name like Drawable
 
-        print(f"Attempt upcast arg:{arg} from type: {get_type_name(arg)} to : {cast_to_type.__name__}")
+        print(f"Attempt upcast: {gen_value} to : {cast_to_type.__name__}")
 
         formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
         # TODO exception index out of range
 
-        result = arg     # result is arg except for conversions below
-
-        if Types._should_upcast_or_convert(arg_type, formal_arg_type, cast_to_type):
-            if is_subclass_of_type(arg, cast_to_type):
-                result_type = cast_to_type
-                did_upcast = True
-            elif arg == -1:
+        if Types._should_upcast_or_convert(gen_value.actual_arg_type, formal_arg_type, cast_to_type):
+            if is_subclass_of_type(gen_value.actual_arg, cast_to_type):
+                gen_value.upcast(cast_to_type)
+            elif gen_value.actual_arg == -1:
                 # v2 allowed -1 as arg for optional drawables
                 # # !!! convert arg given by Author
-                result = None
-                result_type = cast_to_type
-                did_upcast = True
-            elif arg is None:
+                gen_value.upcast_to_None(cast_to_type)
+            elif gen_value.actual_arg is None:
                 # TODO migrate to create_nonetype_drawable or create_none_for_type(type)
                 # Gimp wants GValue( Gimp.Drawable, None), apparently
                 # This does not work: result = -1
                 # But we can upcast NoneType, None is in every type???
-                result_type = cast_to_type
-                did_upcast = True
+                gen_value.upcast(cast_to_type)
             else:
                 # Note case Drawable == Drawable will get here, but Author cannot create instance of Drawable.
-                do_proceed_error(f"Require arg type: {formal_arg_type} , but got {arg_type} not castable.")
-                result_type = arg_type
-                did_upcast = False
+                do_proceed_error(f"Require type: {formal_arg_type} , but got {gen_value} not castable.")
+
         else:
-            result_type = arg_type
-            did_upcast = False
+            # No upcast was done
+            pass
 
         # assert result_type is-a type (a Gimp type, a GObject type)
-        print(f"upcast result: {result}, {result_type}")
-        return result, result_type, did_upcast
+        print(f"upcast result: {gen_value}")
 
 
     # TODO replace this with data driven single procedure
     @staticmethod
-    def try_upcast_to_drawable(proc_name, arg, arg_type, index):
-        return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Drawable)
+    def try_upcast_to_drawable(proc_name, gen_value, index):
+        Types.try_upcast_to_type(proc_name, gen_value, index, Gimp.Drawable)
 
     @staticmethod
-    def try_upcast_to_item(proc_name, arg, arg_type, index):
-        return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Item)
+    def try_upcast_to_item(proc_name, gen_value, index):
+        Types.try_upcast_to_type(proc_name, gen_value, index, Gimp.Item)
 
     @staticmethod
-    def try_upcast_to_layer(proc_name, arg, arg_type, index):
-        return Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.Layer)
+    def try_upcast_to_layer(proc_name, gen_value, index):
+        Types.try_upcast_to_type(proc_name, gen_value, index, Gimp.Layer)
 
     @staticmethod
-    def try_upcast_to_color(proc_name, arg, arg_type, index):
-        result, result_type, did_upcast = Types.try_upcast_to_type(proc_name, arg, arg_type, index, Gimp.RGB)
-        if did_upcast:
-            # also convert
+    def try_upcast_to_color(proc_name, gen_value, index):
+        Types.try_upcast_to_type(proc_name, gen_value, index, Gimp.RGB)
+        if gen_value.did_upcast:
+            # also convert value
             try:
-                # TODO move this to color.py
-                if isinstance(result, tuple):
-                    wrapped_result = GimpfuColor(a_tuple=result)
-                elif isinstance(result, str):
-                    wrapped_result = GimpfuColor(name=result)
-                else:
-                    raise Exception("Not wrappable to color: {result}.")
-                # !!! caller expects GObject i.e. unwrapped
-                result = wrapped_result.unwrap()
-                # assert result_type is-a GType
+                gen_value.color()
             except Exception as err:
                 do_proceed_error(f"Converting to color: {err}")
             #print(type(result))
-        return result, result_type, did_upcast
 
 
 
@@ -383,36 +291,3 @@ class Types():
         else:
             result = item
         return result
-
-
-    """
-    Cruft: more than necessary, but keep it, it documents how to use GTypes
-
-    def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
-        '''
-        Convert the described actual arg to float if is int
-        and PDB procedure wants a float (procedure's formal parameter is type float)
-
-        Returns arg, arg_type    possibly converted
-        '''
-        # require actual_arg_type is a GType
-
-        result_arg = actual_arg
-        result_arg_type = actual_arg_type
-
-        print("Actual arg type:", actual_arg_type)
-
-        '''
-        GType types are enumerated by constants of GObject.
-        E.G. GObject.TYPE_INT is-a GType .
-        In GObject docs, see "Constants"
-        '''
-        if actual_arg_type == GObject.TYPE_INT :    # INT_64 ???
-            formal_arg_type = _get_formal_argument_type(proc_name, index)
-            if formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE :
-                print("GimpFu: Warning: converting int to float.")
-                result_arg = float(actual_arg)
-                result_arg_type = GObject.TYPE_DOUBLE
-
-        return result_arg, result_arg_type
-    """

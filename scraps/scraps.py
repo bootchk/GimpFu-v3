@@ -1,4 +1,95 @@
 
+"""
+Cruft from types.def
+"""
+
+"""
+Cruft: more than necessary, but keep it, it documents how to use GTypes
+
+def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
+    '''
+    Convert the described actual arg to float if is int
+    and PDB procedure wants a float (procedure's formal parameter is type float)
+
+    Returns arg, arg_type    possibly converted
+    '''
+    # require actual_arg_type is a GType
+
+    result_arg = actual_arg
+    result_arg_type = actual_arg_type
+
+    print("Actual arg type:", actual_arg_type)
+
+    '''
+    GType types are enumerated by constants of GObject.
+    E.G. GObject.TYPE_INT is-a GType .
+    In GObject docs, see "Constants"
+    '''
+    if actual_arg_type == GObject.TYPE_INT :    # INT_64 ???
+        formal_arg_type = _get_formal_argument_type(proc_name, index)
+        if formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE :
+            print("GimpFu: Warning: converting int to float.")
+            result_arg = float(actual_arg)
+            result_arg_type = GObject.TYPE_DOUBLE
+
+    return result_arg, result_arg_type
+"""
+
+
+"""
+@staticmethod
+def try_convert_to_str(proc_name, actual_arg, actual_arg_type, index):
+    return try_usual_python_conversion(proc_name, actual_arg, actual_arg_type, index, "str")
+
+@staticmethod
+def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
+    return try_usual_python_conversion(proc_name, actual_arg, actual_arg_type, index, "float")
+"""
+
+
+"""
+@staticmethod
+def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
+    '''
+    Convert the described actual arg to float if is int
+    and PDB procedure wants a float
+    (procedure's formal parameter is type GObject.TYPE_FLOAT).
+    Only converts Python int to float.
+
+    Returns actual_arg, type(actual_arg), possibly converted
+
+    Later, GObject will convert Python types to GTypes.
+    '''
+    # require type(actual_arg_type) is Python type or a GType
+
+    result_arg = actual_arg
+    result_arg_type = actual_arg_type
+
+    print("Actual arg type:", type(actual_arg))
+
+    if type(actual_arg) is int:
+        formal_arg_type = Types._get_formal_argument_type(proc_name, index)
+        if formal_arg_type is not None:
+            print("     Formal arg type ", formal_arg_type.name )
+            if Types.is_float_type(formal_arg_type):
+                # ??? Tell Gimpfu plugin author their code would be more clear if they used float() themselves
+                # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
+                print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")
+                result_arg = float(actual_arg)  # type conversion
+                result_arg_type = type(result_arg)  # i.e. float
+        else:
+            # Failed to get formal argument type.  Probably too many actual args.
+            # Do not convert type.
+            do_proceed_error(f"Failed to get formal argument type for index: {index}.")
+
+    # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
+    # likewise for value of result_arg
+    print("try_convert_to_float returns ", result_arg, result_arg_type)
+    return result_arg, result_arg_type
+"""
+
+
+
 
 Cruft from implementation of _create_plugin_procedure_args
 

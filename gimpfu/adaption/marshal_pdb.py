@@ -8,6 +8,7 @@ from adaption.wrappable import *
 from adaption.marshal import Marshal
 from adaption.types import Types
 from adaption.value_array import FuValueArray
+from adaption.generic_value import FuGenericValue
 
 from message.proceed_error import *
 
@@ -19,11 +20,13 @@ class MarshalPDB():
 
     Crux: PDB wants GParamSpec's, not just GObjects.
     I.E. more specialized than ordinary Marshal
+
+    Most methods operate on a stateful FuGenericValue, and don't return a result.
     '''
 
 
     @staticmethod
-    def _try_type_conversions(proc_name, go_arg, go_arg_type, index):
+    def _try_type_conversions(proc_name, gen_value, index):
         '''
         Attempt type conversions and upcast when passing to Gimp procedures.
         Conversion: changes Python type of fundamental types, i.e. int to float
@@ -38,29 +41,31 @@ class MarshalPDB():
         # TODO optimize, getting type is simpler when is fundamental
         # We could retain that the arg is fundamental during unwrapping
 
+        '''
+        Any upcast or conversion is the sole upcast or conversion.
+        (But un upcast may also internally convert)
+        We don't upcast and also convert in this list.
 
+        The order is not important as we only expect one upcast or convert.
+        '''
+        Types.try_upcast_to_drawable(proc_name, gen_value, index)
+        if not gen_value.did_upcast:
+            Types.try_upcast_to_item(proc_name, gen_value, index)
+        if not gen_value.did_upcast:
+            Types.try_upcast_to_layer(proc_name, gen_value, index)
+        if not gen_value.did_upcast:
+            Types.try_upcast_to_color(proc_name, gen_value, index)
+        if not gen_value.did_upcast:
 
-        go_arg, go_arg_type, did_convert = Types.try_upcast_to_drawable(proc_name, go_arg, go_arg_type, index)
-        if not did_convert:
-            go_arg, go_arg_type, did_convert = Types.try_upcast_to_item(proc_name, go_arg, go_arg_type, index)
-        if not did_convert:
-            go_arg, go_arg_type, did_convert = Types.try_upcast_to_layer(proc_name, go_arg, go_arg_type, index)
-        if not did_convert:
-            go_arg, go_arg_type, did_convert = Types.try_upcast_to_color(proc_name, go_arg, go_arg_type, index)
-        if not did_convert:
-            go_arg, go_arg_type, did_convert = Types.try_usual_python_conversion(proc_name, go_arg, go_arg_type, index)
-        if not did_convert:
-            go_arg, go_arg_type, did_convert = Types.try_float_array_conversion(proc_name, go_arg, go_arg_type, index)
-        #    go_arg, go_arg_type = Types.try_convert_to_float(proc_name, go_arg, go_arg_type, index)
-        #if not did_convert:
-        #    go_arg, go_arg_type = Types.try_convert_to_str(proc_name, go_arg, go_arg_type, index)
+            # Continue trying conversions
+            Types.try_usual_python_conversion(proc_name, gen_value, index)
+        if not gen_value.did_convert:
+            Types.try_float_array_conversion(proc_name, gen_value, index)
 
         # !!! We don't upcast deprecated constant TRUE to G_TYPE_BOOLEAN
 
         # TODO is this necessary? I think it is only drawable that gets passed None
-        #go_arg, go_arg_type = Types.try_convert_to_null(proc_name, go_arg, go_arg_type, index)
-
-        return go_arg, go_arg_type
+        # Types.try_convert_to_null(proc_name, gen_value, index)
 
 
 
@@ -107,15 +112,20 @@ class MarshalPDB():
             # assert are GObject types, i.e. fundamental or Boxed
             # We may yet convert some fundamental types (tuples) to Boxed (Gimp.RGB)
 
+            gen_value = FuGenericValue(go_arg, go_arg_type)
+
+            """
+            """
             try:
-                go_arg, go_arg_type = MarshalPDB._try_type_conversions(proc_name, go_arg, go_arg_type, formal_args_index)
+                MarshalPDB._try_type_conversions(proc_name, gen_value, formal_args_index)
             except Exception as err:
-                do_proceed_error(f"Exception in type conversion of: {go_arg}, type: {go_arg_type}, formal_args_index: {formal_args_index}")
+                do_proceed_error(f"Exception in type conversion of: {gen_value}, formal_args_index: {formal_args_index}, {err}")
+
 
             if is_wrapped_function(go_arg):
                 do_proceed_error("Passing function as argument to PDB.")
 
-            a_gvalue = FuValueArray.new_gvalue( go_arg_type, go_arg)
+            a_gvalue = gen_value.get_gvalue()
             FuValueArray.push_gvalue(a_gvalue)
 
             formal_args_index += 1

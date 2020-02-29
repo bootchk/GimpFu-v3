@@ -9,7 +9,7 @@ class FormalTypes():
     '''
     Knows formal argument types declared for a PDB procedure.
 
-    Formal type specs are in the PDB
+    Formal type specs are in the PDB, ParamSpec's specify types.
     '''
 
     @staticmethod
