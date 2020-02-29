@@ -21,7 +21,7 @@ class MarshalPDB():
     Crux: PDB wants GParamSpec's, not just GObjects.
     I.E. more specialized than ordinary Marshal
 
-    Most methods operate on a stateful FuGenericValue, and don't return a result.
+    Many methods operate on a stateful FuGenericValue, and don't return a result.
     '''
 
 
@@ -79,9 +79,8 @@ class MarshalPDB():
         2. Optionally prefix args with run mode
         GimpFu feature: hide run_mode from calling author
         3. Unwrap wrapped arguments so all args are GObjects
-        4. Hacky upcast to Drawable ???
-        5. float(arg) as needed
-        6. Check error FunctionInfo
+        4. Upcasts and conversions
+        5. Check error FunctionInfo
         '''
 
         FuValueArray.reset()
@@ -95,7 +94,7 @@ class MarshalPDB():
         if proc_name.startswith('plug-in-'):
             # no GUI, this is a call from a plugin
 
-            a_gvalue = FuValueArray.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)
+            a_gvalue = FuGenericValue.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)
             FuValueArray.push_gvalue( a_gvalue )
             # Run mode is in the formal args, not in passed actual args
             formal_args_index = 1
@@ -164,6 +163,7 @@ class MarshalPDB():
         # caller should have previously checked that values is not a Gimp.PDBStatusType.FAIL
         if values:
             # Remember, values is-a Gimp.ValueArray, not has Pythonic methods
+            # TODO should be a method of FuValueArray
             result_list = Types.convert_gimpvaluearray_to_list_of_gvalue(values)
 
             # discard status by slicing

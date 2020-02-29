@@ -81,29 +81,3 @@ class FuValueArray():
             result.insert(index, item)
             index += 1
         return result
-
-
-    '''
-    !!! Can't assign GValue to python object: foo = GObject.Value(Gimp.Image, x) ???
-    Must pass directly to Gimp.ValueArray.insert() ???
-
-    ??? I don't understand why GObject.Value() doesn't determine the type of its second argument
-    I suppose GObject.Value() can't know all the types, is generic.
-    '''
-    @staticmethod
-    def new_gvalue(gvalue_type, value):
-        ''' Returns GValue'''
-        # assert gvalue_type is a GObject type constant like GObject.TYPE_STRING
-        '''
-        An exception is usually not caused by plugin author, usually GimpFu programming error.
-        Usually "Must be a GObject.GType, not a type"
-        '''
-        try:
-            result = GObject.Value(gvalue_type, value)
-        except Exception as err:
-            do_proceed_error(f"Creating GValue for type: {gvalue_type}, value: {value}, err: {err}")
-            # Return some bogus value so can proceed
-            result = GObject.Value( GObject.TYPE_INT, 1 )
-            # TODO would this work??
-            # result = GObject.Value( GObject.TYPE_NONE, None )
-        return result
