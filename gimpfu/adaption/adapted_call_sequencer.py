@@ -19,7 +19,7 @@ class AdaptedCallSequencer():
     and no Gimp object has properties.
     IOW, the returned value of the first adapted access will be a callable,
     and probably assigned to a variable,
-    and that is probably not what a GimpFu plugin author intends.
+    and that is probably not what a author intends.
 
     This also catches the case where GimpFu promised (in the docs)
     to adapt a Gimp method as a Python property but didn't implement.

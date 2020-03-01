@@ -37,8 +37,8 @@ class GimpfuProcedure():
     GimpFu procedure is slightly different from Gimp PluginProcedure.
     This hides the differences.
     Differences:
-       plugin_type not required of GimpFu author
-       certain procedure parameters not required of GimpFu author
+       plugin_type not required of 
+       certain procedure parameters not required of 
        FBC fixes Author use of deprecated stuff
 
     Also understands:
@@ -56,7 +56,7 @@ class GimpfuProcedure():
                 params, results, function,
                 menu, domain, on_query, on_run):
         '''
-        Takes metadata authored by GimpFu author.
+        Takes metadata authored by .
         Which is wild, so sanity test.
 
         Fix self for compatibility with Gimp.
@@ -199,13 +199,13 @@ class GimpfuProcedure():
 
     """
     def get_metadata(self):
-        ''' Return metadata authored by GimpFu author. '''
+        ''' Return metadata authored by . '''
         return _registered_plugins_[proc_name]
     """
 
 
     def get_authors_function(self):
-        ''' Return function authored by GimpFu author. '''
+        ''' Return function authored by . '''
         return self.metadata.FUNCTION
 
 

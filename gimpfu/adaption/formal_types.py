@@ -34,7 +34,7 @@ class FormalTypes():
         ##config.get_values(arg_specs)
 
         # assert arg_specs is Gimp.ValueArray, sequence describing args of procedure
-        # index may be out of range, GimpFu author may have provided too many args
+        # index may be out of range,  may have provided too many args
         try:
             arg_spec = arg_specs[index]   # .index(index) ??
             print(arg_spec)

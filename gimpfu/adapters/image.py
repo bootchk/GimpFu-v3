@@ -62,7 +62,7 @@ class GimpfuImage( Adapter ) :
 
 
     '''
-    Constructor exported to Gimpfu authors.
+    Constructor exported to s.
     Called internally for existing images as GimpfuImage(None, None, None, adaptee)
 
     See SO "How to overload __init__ method based on argument type?"

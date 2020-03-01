@@ -1,3 +1,3 @@
 
-# define aliases and adapters into Gimp plugin author's namespace
+# define aliases and adapters into author's namespace
 from gimpfu_top import *

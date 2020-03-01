@@ -9,7 +9,7 @@ from adaption.adapter import Adapter
 
 '''
 Not instantiable by itself, only inheritable.
-No GimpFu plugin author should/can use "Item.foo"
+No author should/can use "Item.foo"
 In other words, private to GimpFu
 '''
 

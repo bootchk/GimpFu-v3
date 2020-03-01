@@ -34,7 +34,7 @@ class GimpfuLayer( GimpfuDrawable ) :
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 
         if img is not None:
-            # Totally new adaptee, created at behest of GimpFu plugin author
+            # Totally new adaptee, created at behest of author
             # Gimp constructor named "new"
             super().__init__( Gimp.Layer.new(img.unwrap(), name, width, height, type, opacity, layer_mode) )
         else:

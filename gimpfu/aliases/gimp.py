@@ -142,7 +142,7 @@ class GimpfuGimp():
             func = eval(callable_name)
         except AttributeError:
             # callable_name is not adapted by GimpFu or known to Gimp
-            # Probable GimpFu author (i.e. user) error
+            # Probable  (i.e. user) error
             do_proceed_error(f"unknown Gimp method {callable_name}")
             result = None
         except Exception as err:

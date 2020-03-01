@@ -33,7 +33,7 @@ class GimpfuVectors( GimpfuDrawable ) :
     def __init__(self, img=None, adaptee=None):
 
         if img is not None:
-            # Totally new adaptee, created at behest of GimpFu plugin author
+            # Totally new adaptee, created at behest of author
             # Gimp constructor named "new"
             super().__init__( Gimp.Vectors.new(img.unwrap() ) )
         else:

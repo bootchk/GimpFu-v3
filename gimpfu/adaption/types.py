@@ -103,7 +103,7 @@ class Types():
             if formal_arg_type is not None:
                 print("     Formal arg type ", formal_arg_type.name )
                 if FormalTypes.is_float_type(formal_arg_type):
-                    # ??? Tell Gimpfu plugin author their code would be more clear if they used float() themselves
+                    # ??? Tell author their code would be more clear if they used float() themselves
                     # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
                     # TODO make this a warning or a suggest
                     print("GimpFu: Suggest: converting int to float.  Your code might be clearer if you use float literals.")

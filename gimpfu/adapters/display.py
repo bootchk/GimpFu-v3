@@ -15,7 +15,7 @@ class GimpfuDisplay( Adapter ) :
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 
         if img is not None:
-            # Totally new adaptee, created at behest of GimpFu plugin author
+            # Totally new adaptee, created at behest of author
             # Gimp constructor named "new"
             super().__init__( Gimp.Display.new(img.unwrap()))
         else:

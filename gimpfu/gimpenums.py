@@ -3,7 +3,7 @@
 Define Python symbols for Gimp enums.
 
 These are aliases.
-Convenience for GimpFu plugin authors.
+Convenience for authors.
 
 TODO Warn about deprecated symbols.
 A deprecated symbol is used by v2 plugins

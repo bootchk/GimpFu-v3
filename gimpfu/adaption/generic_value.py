@@ -211,7 +211,7 @@ class FuGenericValue():
         ''' Returns GValue'''
         # assert gvalue_type is a GObject type constant like GObject.TYPE_STRING
         '''
-        An exception is usually not caused by plugin author, usually GimpFu programming error.
+        An exception is usually not caused by author, usually GimpFu programming error.
         Usually "Must be a GObject.GType, not a type"
         '''
         try:

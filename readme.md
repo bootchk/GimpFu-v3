@@ -156,7 +156,7 @@ The most basic statement of what the port involves is:
 convert a static binding of Python to Gimp and to a dynamic GI binding.
 That has already been done for many Python plugins that don't use GimpFu.
 The problem is to convert GimpFu to a dynamic binding.
-And what GimpFu does is automate (or provide simplified API) for plugin authors.
+And what GimpFu does is automate (or provide simplified API) for authors.
 So you take pieces from already ported/authored non-GimpFu Python3/Gimp3 plugins,
 and put those pieces into the GimpFu framework.
 

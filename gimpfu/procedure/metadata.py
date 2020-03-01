@@ -271,7 +271,7 @@ class GimpfuProcedureMetadata():
         E.G. sphere.py
 
         So we diverge the signature of the plugin from the signature of the run_func.
-        The GimpFu plugin author might be unaware, unless they explore,
+        The author might be unaware, unless they explore,
         or try to call the PDB procedure from another PDB procedure.
 
         TODO after we are done, the count of args to run_func

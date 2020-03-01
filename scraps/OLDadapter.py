@@ -60,12 +60,12 @@ class Adapter():
 
     '''
     copy() was implemented in v2, but I am not sure it went through the __copy__ mechanism.
-    Anyway, a GimpFu author uses layer.copy().
+    Anyway, a  uses layer.copy().
     That invokes the copy() method, defined here.
 
      __copy__ is invoked by copy module i.e. copy.copy(foo)
     Any copy must be deep, to copy adaptee implemented by Gimp.
-    To allow Gimpfu plugin authors to use the copy module,
+    To allow authors to use the copy module,
     we should override __copy__ and __deepcopy__ also.
     Such MUST call gimp to copy the adaptee.
     TODO

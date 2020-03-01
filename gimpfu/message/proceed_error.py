@@ -20,7 +20,7 @@ so that more errors can be detected in one interpretation run.
 ProceedErrors are in the nature of GimpFu API or Gimp API errors.
 
 These are NOT ProceedErrors:
-   - errors in Python syntax in the GimpFu author's code
+   - errors in Python syntax in the 's code
    - severe GimpFu API errors (not calling register(), main())
 These raise Python Exceptions that terminate the plugin.
 
@@ -65,9 +65,9 @@ filename                                  code_context               what the co
 
 def _get_errant_source_code_line():
     '''
-    return the text line of Gimp author's source code file.
+    return the text line of author's source code file.
     E.G. from file "/work/.home/.config/GIMP/2.99/plug-ins/sphere/sphere.py", line 54, in sphere.
-    The Gimp author's call is deep on the call stack.
+    The author's call is deep on the call stack.
     Search for said call by filename in the frame stack.
     '''
     framestack = inspect.stack(context=2)   # 2 means, save 2 lines of source code
@@ -114,8 +114,8 @@ def summarize_proceed_errors():
     but GimpFu does NOT call this if the plugin ends
     with an exception (that is NOT turned into a ProceedError.)
     Such an exception may be:
-      - in ordinary (not GimpFu-related) Python code written by the plugin author
-      - in GimpFu code, written by GimpFu author.
+      - in ordinary (not GimpFu-related) Python code written by the author
+      - in GimpFu code, written by .
     '''
 
     if not log:

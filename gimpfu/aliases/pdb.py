@@ -22,7 +22,7 @@ class GimpfuPDB():
     Obsolete? not supported here yet.
 
     GimpFu creates one instance named "pdb"
-    TODO enforce singleton, but GimpFu plugin author doesn't even imagine this class exists.
+    TODO enforce singleton, but author doesn't even imagine this class exists.
 
     FBC
     Problems it solves:
@@ -35,7 +35,7 @@ class GimpfuPDB():
     not having a method for each procedure IN the PDB???
 
     Alternatively, we could require a plugin's "func" to always first call pdb = Gimp.get_pdb().
-    But that is new boilerplate for GimpFu authors, and not backward compatible.
+    But that is new boilerplate for s, and not backward compatible.
 
     2) PyGimp v2 made an object for pdb some other way???? TODO
     '''
@@ -139,11 +139,11 @@ class GimpfuPDB():
         '''
 
         '''
-        Require that GimpFu plugin author previously called main()
+        Require that author previously called main()
         which calls Gimp.main() to create PDB and establish GimpFu type is GimpPlugin
         '''
         if Gimp.get_pdb() is None:
-            # Severe error in GimpFu code, or GimpFu author did not call main()
+            # Severe error in GimpFu code, or  did not call main()
             # Cannot proceed.
             raise Exception("Gimpfu: pdb accessed before calling main()")
         else:

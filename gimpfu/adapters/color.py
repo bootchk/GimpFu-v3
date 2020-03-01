@@ -35,7 +35,7 @@ class GimpfuColor(Adapter):
 
         try:
             if r is not None:
-                # Totally new adaptee, created at behest of GimpFu plugin author or GimpFu implementation
+                # Totally new adaptee, created at behest of author or GimpFu implementation
                 # Gimp constructor NOT named "new"
                 a_adaptee = Gimp.RGB()
                 a_adaptee.set(float(r), float(g), float(b) )

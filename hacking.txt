@@ -92,7 +92,7 @@ gimpfu_widgets supports auto generation of GUI for a plugin
 In v2 these were inside gimpfu.py
 
 
-gimpfu_enums  provided Gimp enums to GimpFu authors
+gimpfu_enums  provided Gimp enums to s
 
 In v2 a C language module gimpenumsmodule.c
 

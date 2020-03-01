@@ -74,7 +74,7 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
     ''' Get args from formal spec, but override default with widget_default_value.  Returns list of args '''
     print("_get_args_for_widget_factory", formal_param, widget_default_value)
     # This is a switch statement on  PF_TYPE
-    # Since data comes from GimpFu author, don't trust it
+    # Since data comes from , don't trust it
     pf_type = formal_param.PF_TYPE
 
 
@@ -122,7 +122,7 @@ def _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params):
     actual_args: is-a Gimp.ValueArray, actual_args (could be defaults or last values) as specified by how we registered with Gimp
     FUTURE: use them to create widget's initial values
 
-    guiable_formal_params: a Python type, the original formal specs from plugin author in GimpFu notation,
+    guiable_formal_params: a Python type, the original formal specs from author in GimpFu notation,
        but just those that should have control widgets
     '''
     print("add_control_widgets")
@@ -157,7 +157,7 @@ def _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params):
         # Grid right hand side is control widget
 
         # widget types not range checked earlier
-        # plugin author COULD have entered any integer
+        # author COULD have entered any integer
         try:
             #  e.g. widget_factory = StringEntry
             widget_factory = _edit_map[a_formal_param.PF_TYPE]

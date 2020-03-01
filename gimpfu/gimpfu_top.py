@@ -21,10 +21,9 @@
 Simple interface to write GIMP plug-ins in Python.
 
 GimpFu provides a simple register() function that registers your
-plug-in, and causes your plug-in function to be called when
-needed.
+plug-in, and causes your plug-in function to be called when needed.
 
-Gimpfu will also show a user interface to let a user edit plug-in
+Gimpfu will also show a dialog to let a user edit plug-in
 parameters if the plug-in is called interactively, and will also save
 the last used parameters, so the RUN_WITH_LAST_VALUES run_type will
 work correctly.  It will also ensure displays are flushed
@@ -35,10 +34,12 @@ When registering the plug-in, you need not specify the run_type parameter.
 A typical gimpfu plug-in would look like this:
   from gimpfu import *
 
-  def plugin_func(image, drawable, args):
+  def plugin_func(image, drawable, arg):
               # do what plugins do best
+              pass
+
   register(
-              "plugin_func",
+              "plugin-func",
               "blurb",
               "help message",
               "author",
@@ -53,6 +54,7 @@ A typical gimpfu plug-in would look like this:
               ],
               [],
               plugin_func, menu="<Image>/Somewhere")
+
   main()
 
 The call to "from gimpfu import *" imports gimp constants
@@ -73,13 +75,18 @@ the translations are installed.  Then use N_() to surround GUI strings
 that should be translated, as in the example.
 """
 
-# Since GIMP3 using GI, Python3: in the comments use "FBC"
-# to denote 'For Backward Compatibility' of v2 plugins
+"""
+Notations used in the comments:
+
+"FBC" denotes 'For Backward Compatibility' of v2 plugins
+
+'author' denotes a writer of plugins, not a programmer of this code
+"""
 
 # Using GI, convention is first letter capital e.g. "Gimp."
 # FBC GimpFu provides uncapitalized aliases in the namespace: "gimp" and "pdb"
 
-# GimpFu attempts to hide GI, but GimpFu plugins MAY lso use GI.
+# GimpFu attempts to hide GI, but GimpFu plugins MAY also use GI.
 
 
 # v2 exposed to authors? v3, authors must import it themselves
@@ -113,12 +120,12 @@ from message.proceed_error import *
 from message.deprecation import Deprecation
 
 
-# Gimp enums exposed to GimpFu authors
+# Gimp enums exposed to s
 # Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
 # Name "gimpenums" retained for FBC, some non-GimpFu plugins may import
 from gimpenums import *
 
-# v3 GimpFu enums exposed to GimpFu authors e.g. PF_INT
+# v3 GimpFu enums exposed to s e.g. PF_INT
 from gimpfu_enums import *
 
 
@@ -128,7 +135,7 @@ from gimpfu_enums import *
 
 
 '''
-alias symbols "gimp" and "pdb" to expose to GimpFu authors
+Alias symbols "gimp" and "pdb" to expose to authors.
 It is not as simple as:
     pdb=Gimp.get_pdb()
     OR from gi.repository import Gimp as gimp
@@ -183,7 +190,7 @@ gettext.install = override_gettext_install
 
 
 '''
-local cache of procedures implemented in the GimpFu author's source code.
+local cache of procedures implemented in the 's source code.
 Dictionary containing elements of type GimpFuProcedure
 '''
 __local_registered_procedures__ = {}
@@ -203,7 +210,7 @@ The GimpFu API:
 '''
 Register locally, not with Gimp.
 
-Each GimpFu plugin author's source may contain many calls to register.
+Each author's source may contain many calls to register.
 '''
 # A primary phrase in GimpFu language
 def register(proc_name, blurb, help, author, copyright,
@@ -488,7 +495,7 @@ def _run(procedure, run_mode, actual_args, data):
     Understands run_mode.
     Different ways to invoke procedure batch, or interactive.
 
-    Hides run_mode from GimpFu authors.
+    Hides run_mode from s.
     I.E. their run_func signature does not have run_mode.
 
     require procedure is-a Gimp.Procedure.  All args are GObjects.
@@ -553,7 +560,7 @@ def _run(procedure, run_mode, actual_args, data):
            '''
            Probably GimpFu module programming error (e.g. bad calls to GTK)
            According to GLib docs, should be a warning, since this is not recoverable.
-           But it might be GimpFu plugin author programming code (e.g. invalid PARAMS)
+           But it might be author programming code (e.g. invalid PARAMS)
            '''
            do_proceed_error(f"Exception opening plugin dialog: {err}")
            final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
@@ -656,7 +663,7 @@ class GimpFu (Gimp.PlugIn):
         self.set_translation_domain("Gimp30-python",
                                     Gio.file_new_for_path(Gimp.locale_directory()))
 
-        # return list of all procedures implemented in the GimpFu plugin author's source code
+        # return list of all procedures implemented in the author's source code
         # For testing: result =[ gf_procedure.name, ]
         keys = __local_registered_procedures__.keys()
 

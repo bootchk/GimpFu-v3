@@ -72,7 +72,7 @@ class Adapter():
 
     @property
     def adaptee_class_name(self):
-        ''' Class name by which Gimpfu plugin author knows adaptee class e.g. Gimp.Image '''
+        ''' Class name by which author knows adaptee class e.g. Gimp.Image '''
         return type(self._adaptee).__name__
 
 
@@ -107,7 +107,7 @@ class Adapter():
 
     This is NOT __copy__
      __copy__ is invoked by copy module i.e. copy.copy(foo)
-    To allow Gimpfu plugin authors to use the copy module,
+    To allow authors to use the copy module,
     we should override __copy__ and __deepcopy__ also.
     Such MUST call gimp to copy the adaptee.
     TODO
@@ -256,7 +256,7 @@ class Adapter():
             return
 
         '''
-        All other cases should be GimpFu plugin authors attempts to assign
+        All other cases should be authors attempts to assign
         to attributes of an instance of Adapted(Adapter).
         '''
 
@@ -278,10 +278,10 @@ class Adapter():
             raise AttributeError(f"Attempt to assign to readonly attribute '{name}'")
         else:
             '''
-            Gimpfu plugin author is attempting to assign a new attribute
+            author is attempting to assign a new attribute
             to a class of the adaption mechanism (e.g. an instance that inherits Adaptor.)
             See above for the only internal attributes of Adaptor.
-            This must be an error in GimpFu plugin author's code.
+            This must be an error in author's code.
             They have instances of Gimpfu's subclasses of Adapter,
             but we disallow assigning attributes to them, they could do harm.
             Instead they should use local variables.
