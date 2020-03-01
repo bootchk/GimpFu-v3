@@ -530,7 +530,7 @@ def _run(procedure, run_mode, actual_args, data):
     if isBatch:
        try:
            # invoke func with unpacked args.  Since Python3, apply() gone.
-           # TODO is this the correct set of args?
+           # TODO is this the correct set of args? E.G. Gimp is handling RUN_WITH_LAST_VALS, etc. ???
            result = func(*actual_args)
            # TODO add result values
            final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())

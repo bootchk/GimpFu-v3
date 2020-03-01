@@ -6,10 +6,7 @@ from gi.repository import Gimp
 from gi.repository import GObject    # GObject type constants
 
 from adaption.wrappable import *    # is_subclass_of_type
-from adaption.value_array import FuValueArray
 from adaption.formal_types import FormalTypes
-
-from adapters.color import GimpfuColor
 
 from message.proceed_error import *
 
@@ -24,8 +21,7 @@ class Types():
     Collaborates with:
     - Marshal
     - FormalTypes
-    - FuValueArray (to create GValues)
-    - GimpFuColor (to create instances of Gimp types)
+    - FuGenericValue (some args are instances, but does not import the module)
 
     GimpFu converts Python ints to floats to satisfy Gimp.
 
