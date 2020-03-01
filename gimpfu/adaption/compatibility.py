@@ -41,7 +41,7 @@ class GimpFuMap(Mapping):
         '''
         CRUX:
         If the key is not in the wrapped dictionary, return unmapped key
-        And print a warning.
+        If key is in dictionary, return mapped and tell author of deprecated.
         '''
         # TODO implement with except KeyError: would be faster?
         if key in self.__dict__.keys():
@@ -100,6 +100,7 @@ TODO can we adapt signature also
 # !!! both left and right sides hyphenated, not underbar
 pdb_renaming = {
     "gimp-edit-fill"        : "gimp-drawable-edit-fill",
+    "gimp-edit-clear"        : "gimp-drawable-edit-clear",
     "gimp-histogram"        : "gimp-drawable-histogram",
     # Rest are guesses, not tested
     "gimp-edit-bucket-fill" : "gimp-drawable-edit-bucket-fill", # TODO # (fill_type, x, y):
