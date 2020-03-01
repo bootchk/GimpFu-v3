@@ -203,20 +203,20 @@ class GimpfuGimp():
         Don't check, would only discover caller is not importing gimpfu.
         '''
 
-        # attribute name e.g. "Image()" or "displays_flush"
-        # We don't preflight, e.g. check that it is attribute of Gimp object
+        '''
+        assert attribute name is e.g. "Image()" or "displays_flush.
 
-        '''
-        announce names that could be accessed without GimpFu ???
-        Every name that reaches here has not been adapted.
-        '''
-        print(f"You can use Gimp.{name} instead of gimp.{name}")
+        For any name that reaches here, GimpFuGimp does not have a distinct adapter method.
 
-        '''
-        We can't just return attribute of Gimp object:
+        We don't preflight, e.g. check that name is attribute of Gimp object.
+        We can't just get attribute of Gimp object:
         "Gimp.__get_attribute__(name)" returns
         AttributeError: 'gi.repository.Gimp' object has no attribute '__get_attribute__'
+        Maybe Gimp.__getattr__ works?
         Also, we need to handle constructors such as "Image()"
+
+        We could tell the author: f"You can use Gimp.{name} instead of gimp.{name}")
+        but they should already know that.
         '''
 
         # remember state for soon-to-come call
@@ -225,7 +225,6 @@ class GimpfuGimp():
         if name is "pdb":
             do_proceed_error("Use 'pdb', not 'gimp.pdb'.")
             # do more so that GimpFu really can proceed without more exceptions
-
 
         print("return gimp adaptor func")
         # return adapter function soon to be called
