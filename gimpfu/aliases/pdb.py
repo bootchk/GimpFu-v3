@@ -159,6 +159,12 @@ class GimpfuPDB():
                 self.adapted_proc_name = mangled_proc_name
                 # return intercept function soon to be called
                 result = object.__getattribute__(self, "_adaptor_func")
+
+                # TODO We could redirect deprecated names to new procedure names
+                # if they have same signature
+                # e.g. gimp_image_get_filename => gimp-image-get-file (but not same signature)
+                # That case should be adapted, since a filename is not a GFile
+                # elif name = deprecate_pdb_procedure_name_map()
             else:
                 # Can proceed if we catch the forthcoming call
                 # by returning a do_nothing_intercept_func
@@ -170,3 +176,28 @@ class GimpfuPDB():
             # OLD
             # will raise AttributeError for names that are not defined by GimpPDB
             # return adapteeValue.__getattribute__(mangled_proc_name)
+
+
+
+
+
+
+    # specialized, convenience
+
+    '''
+    These are pdb procedures from v2 that we don't intend to deprecate
+    since some plugins may still use them.
+    '''
+
+    """
+    WIP
+    # Since v3 obsolete but having replacement with different return type in signature.
+    def gimp_image_get_filename(image):
+        file = Gimp.gimp_image_get_file(image):
+        if file:
+            # is-a GFile
+            result = file.name ....
+        else:
+            result = None
+        return result
+    """

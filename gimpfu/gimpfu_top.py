@@ -1,5 +1,6 @@
-#   Gimp-Python - allows the writing of GIMP plug-ins in Python.
+#   GimpFu - Lets you write GIMP plug-ins in Python, with a simple API.
 #   Copyright (C) 1997  James Henstridge <james@daa.com.au>
+#   Copyright (C) 2020  Lloyd Konneker <konnekerl@gmail.com>
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -14,22 +15,22 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Simple interface for writing GIMP plug-ins in Python.
 
-Instead of worrying about all the user interaction, saving last used
-values and everything, the gimpfu module can take care of it for you.
-It provides a simple register() function that will register your
-plug-in if needed, and cause your plug-in function to be called when
+
+"""
+Simple interface to write GIMP plug-ins in Python.
+
+GimpFu provides a simple register() function that registers your
+plug-in, and causes your plug-in function to be called when
 needed.
 
-Gimpfu will also handle showing a user interface for editing plug-in
+Gimpfu will also show a user interface to let a user edit plug-in
 parameters if the plug-in is called interactively, and will also save
 the last used parameters, so the RUN_WITH_LAST_VALUES run_type will
-work correctly.  It will also make sure that the displays are flushed
+work correctly.  It will also ensure displays are flushed
 on completion if the plug-in was run interactively.
 
-When registering the plug-in, you do not need to worry about
-specifying the run_type parameter.
+When registering the plug-in, you need not specify the run_type parameter.
 
 A typical gimpfu plug-in would look like this:
   from gimpfu import *
@@ -43,7 +44,7 @@ A typical gimpfu plug-in would look like this:
               "author",
               "copyright",
               "year",
-              "My plug-in",
+              N_("My plug-in menu label"),
               "*",
               [
                   (PF_IMAGE, "image", "Input image", None),
@@ -54,28 +55,31 @@ A typical gimpfu plug-in would look like this:
               plugin_func, menu="<Image>/Somewhere")
   main()
 
-The call to "from gimpfu import *" will import all the gimp constants
-into the plug-in namespace, and also import the symbols gimp, pdb,
+The call to "from gimpfu import *" imports gimp constants
+into the plug-in namespace, and also imports the symbols: gimp, pdb,
 register and main.  This should be just about all any plug-in needs.
 
-You can use any of the PF_* constants below as parameter types, and an
-appropriate user interface element will be displayed when the plug-in
+You can use any of the PF_* constants below as parameter types, and GimpFu will
+display an appropriate user interface element when the plug-in
 is run in interactive mode.  Note that the the PF_SPINNER and
 PF_SLIDER types expect a fifth element in their description tuple -- a
 3-tuple of the form (lower,upper,step), which defines the limits for
 the slider or spinner.
 
-If want to localize your plug-in, add an optional domain parameter to
+To localize your plug-in, add an optional domain parameter to
 the register call. It can be the name of the translation domain or a
 tuple that consists of the translation domain and the directory where
-the translations are installed.
+the translations are installed.  Then use N_() to surround GUI strings
+that should be translated, as in the example.
 """
 
-# Since GIMP3 using GI, Python3: here we use "FBC" to denote stuff For Backward Compatibility to old plugins
+# Since GIMP3 using GI, Python3: in the comments use "FBC"
+# to denote 'For Backward Compatibility' of v2 plugins
 
-# Using GI, convention is first letter capital e.g. "Gimp."  FBC we often alias to uncapitalized, e.g. "gimp"
-# Aliases in this top level are accessible in plugins that import gimpfu.
-# Plugins that import gimpfu additionally MAY use GI, but gimpfu attempts to hide GI.
+# Using GI, convention is first letter capital e.g. "Gimp."
+# FBC GimpFu provides uncapitalized aliases in the namespace: "gimp" and "pdb"
+
+# GimpFu attempts to hide GI, but GimpFu plugins MAY lso use GI.
 
 
 # v2 exposed to authors? v3, authors must import it themselves
@@ -97,9 +101,6 @@ from gi.repository import Gimp
 # v3
 from gi.repository import Gio
 
-
-
-
 # for g_param_spec and properties
 from gi.repository import GObject
 
@@ -114,11 +115,10 @@ from message.deprecation import Deprecation
 
 # Gimp enums exposed to GimpFu authors
 # Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
-# Name "gimpenums" retained for FBC
-# v2 from gimpenums import *
+# Name "gimpenums" retained for FBC, some non-GimpFu plugins may import
 from gimpenums import *
 
-# GimpFu enums exposed to GimpFu authors e.g. PF_INT
+# v3 GimpFu enums exposed to GimpFu authors e.g. PF_INT
 from gimpfu_enums import *
 
 
@@ -132,7 +132,7 @@ alias symbols "gimp" and "pdb" to expose to GimpFu authors
 It is not as simple as:
     pdb=Gimp.get_pdb()
     OR from gi.repository import Gimp as gimp
-These are adapters. TODO kind of adapters
+These are adapters.
 '''
 from aliases.pdb import GimpfuPDB
 pdb = GimpfuPDB()
@@ -140,24 +140,6 @@ pdb = GimpfuPDB()
 from aliases.gimp import GimpfuGimp
 gimp = GimpfuGimp()
 
-"""
-CRUFT
-def _define_compatibility_aliases():
-    '''
-    alias  PDB and Gimp.
-    FBC.
-    Aliases are uncapitalized.
-    Cannot create aliases until after calling Gimp.main(),
-    which establishes self as GimpPlugin.
-    '''
-    print('Aliasing')
-    #global gimp
-    global pdb
-
-    #gimp = Gimp
-    pdb = Gimp.get_pdb()
-    assert pdb is not None
-"""
 
 
 
@@ -202,7 +184,7 @@ gettext.install = override_gettext_install
 
 '''
 local cache of procedures implemented in the GimpFu author's source code.
-Dictionary containing elements of  type GimpFuProcedure
+Dictionary containing elements of type GimpFuProcedure
 '''
 __local_registered_procedures__ = {}
 
@@ -496,8 +478,6 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
 def _run_imagelessprocedure(procedure, actual_args, data):
     ''' GimpFu wrapper of the author's "main" function, aka run_func '''
     print("_run_imagelessprocedure ", procedure, actual_args)
-    for arg in actual_args:
-        print("\n", arg)
     #run_mode = Gimp.RunMode.INTERACTIVE
     all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, image=None, drawable=None)
     _run(procedure, run_mode, all_args, data)
@@ -580,7 +560,7 @@ def _run(procedure, run_mode, actual_args, data):
        """
 
     '''
-    Make any alterations to user created images visible.
+    Make visible any alterations to user created images.
     GimpFu promises to hide the need for this.
     '''
     Gimp.displays_flush()   # !!! Gimp, not gimp

@@ -20,6 +20,8 @@ from adaption.compatibility import gimp_name_map
 
 from message.proceed_error import *
 
+
+
 class GimpfuGimp():
     '''
     Adaptor to Gimp
@@ -178,6 +180,14 @@ class GimpfuGimp():
 
     # Methods and properties offered dynamically.
 
+    '''
+    # TODO: fails for gimp.pdb.foo().
+    Rare: see crop_flatten_save.py.
+    Most authors just use 'pdb.foo()'
+    I.E. can we make 'pdb' appear in the 'gimp' namespace,
+    or just obsolete it?  See proceed_error below.
+    '''
+
     def __getattr__(self, name):
         # !!! not def  __getattribute__(self, name):
 
@@ -211,6 +221,11 @@ class GimpfuGimp():
 
         # remember state for soon-to-come call
         self.adapted_gimp_object_name = name
+
+        if name is "pdb":
+            do_proceed_error("Use 'pdb', not 'gimp.pdb'.")
+            # do more so that GimpFu really can proceed without more exceptions
+
 
         print("return gimp adaptor func")
         # return adapter function soon to be called

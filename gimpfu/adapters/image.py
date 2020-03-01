@@ -8,16 +8,15 @@ from gi.repository import Gimp
 # absolute from SYSPATH that points to top of gimpfu package
 from adaption.adapter import Adapter
 
-#from gimpfu_property import GimpfuProperty, GimpfuProperty2
 
 '''
 
 Adapts (wraps) Gimp.Image.
 
 Constructor appears in GimpFu plugin code as e.g. : gimp.Image(w, h, RGB)
-I.E. an attribute of gimp instance (see gimpfu_gimp.py.)
+I.E. an attribute of gimp instance (see aliases/gimp.py.)
 
-In PyGimp v2, similar concept implemented by pygimp-image.c
+In v2, similar concept implemented by pygimp-image.c
 Since v3, implemented in Python using GI.
 
 FBC all specialized methods here should match the implementation in pygimp-image.c v2.

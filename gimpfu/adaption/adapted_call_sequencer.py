@@ -1,14 +1,21 @@
 
+
+'''
+lkk I think this is not used, but could be resurrected.
+It is a lot of work just to catch one author error.
+'''
+
+
 class AdaptedCallSequencer():
     '''
     Enforces that all sequences of accesses
     to attributes of adapted Gimp objects
     are in proper syntax (sorta BNF notation):
 
-    OK: <name>(...)   <name>(...)
-    WRONG: <name>   <name>(...)
+    OK: <name1>(...)   <name2>(...)
+    WRONG: <name1>   <name2>(...)
 
-    The latter is wrong because the first access has property semantics,
+    The latter is wrong because the first access to name1 has property semantics,
     and no Gimp object has properties.
     IOW, the returned value of the first adapted access will be a callable,
     and probably assigned to a variable,

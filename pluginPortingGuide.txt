@@ -195,6 +195,8 @@ This refers to .../plug-ins/gimpfu/gui/dialog.py
 Miscellaneous changes
 ---------------------
 
+Use 'pdb.foo()', not 'gimp.pdb.foo()'.  'pdb' is not in the 'gimp' namespace.
+
 The image parameter to a plugin is not wrapped.
 For example, it is usually named "timg"
 TODO this was fixed.

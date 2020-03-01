@@ -5,7 +5,7 @@ Knows:
 
     which Gimp types are wrappable by Gimpfu and vice versa.
     which Gimp attributes are functions
-    which Gimp types are subclasses of Drawable
+    the class hierarchy of Gimp types (mainly subclasses of Drawable, Item)
 '''
 
 
@@ -113,7 +113,7 @@ def is_subclass_of_type(instance, super_type):
     elif  super_type_name == 'Drawable':
         result =  instance_type_name in DrawableTypeNames
     elif super_type_name == 'Item':
-        result = instance_type_name in ItemTypeNames or type_name in DrawableTypeNames
+        result = instance_type_name in ItemTypeNames or instance_type_name in DrawableTypeNames
     elif super_type_name == 'RGB':
         result = instance_type_name in ColorTypeNames
     print(f"is_subclass_of_type ( {instance_type_name}, {super_type_name}) returns {result}")
