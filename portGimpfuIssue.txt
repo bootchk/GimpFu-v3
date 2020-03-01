@@ -1,0 +1,51 @@
+
+Port GimpFu to Gimp 3 ?
+
+This issue is for discussion of the future of GimpFu in Gimp 3.
+
+PyGimp (GIMP Python) has two API's and many modules.
+GimpFu is the simple API.
+The full API of PyGimp could be obsoleted while keeping the GimpFu simple API.
+Some modules of PyGimp (e.g. gimpshelf and gimpui) could be obsoleted
+because their capabilities have been implemented in Gimp proper.
+GimpFu could be deprecated or obsoleted because GI lets authors
+write Gimp plugins in any language binding.
+But a ported GimpFu provides:
+1) backward compatibility for existing third party plugins
+2) a simpler API (continues to hide much complexity)
+
+A prototype, proof-of-concept port of GimpFu to v3
+is in a MR merge request referencing this issue.
+The port's branch has a document "gimpfuPluginPortingGuide.txt"
+that tells plugin authors how to make the few changes
+to port a v2 GimpFu plugin to v3.
+The v2 document "GIMP Python Documentation" remains mostly accurate.
+Those documents tell what GimpFu does.
+To experience what the proposed GimpFu port does,
+you should try porting a Python plugin with and without the GimpFu port.
+
+Status of the port.  The prototype runs several existing v2 GimpFu plugins
+after minor edits to them.
+For example, the v2 clothify.py plugin will run in Gimp 2.99.
+However much work remains.
+
+The port is pure Python (no compiled C.)
+The static binding of v2 is all dynamic in v3.
+The MR does not alter makefiles to install the port.
+The port can be installed as a third-party plugin simply by copying
+to ~/.config/GIMP/2.99/plug-ins.
+However it requires one hack of Gimp:
+comment out the preemptive return after the warning "Argument with name '%s' already exists"
+at line 1159 of libgimp/gimpprocedure.c.
+(I will open another issue about that.)
+
+I do not necessarily suggest you accept this MR as is, since it is very rough.
+It is readable but contains notes, cruft, and TODO's.
+I think there are many Python programmers in the Gimp community
+who could understand, contribute to, rewrite, and maintain the code.
+
+Its a case where I needed it, so I worked on it.
+The code is open sourced.
+I can continue to contribute. 
+I hope the code can be put under the Gimp umbrella,
+I don't want to be solely responsible.
