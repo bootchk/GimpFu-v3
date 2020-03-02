@@ -97,16 +97,21 @@ class FuGenericValue():
     '''
     def convert(self, type_converter):
         ''' Convert result_type using given conversion method. '''
-        print(f"FuGenericValue.convert to {type_converter}")
-        print(type_converter)
-        print(type_converter.__name__)
 
         '''
-        TODO
-        The type may already be the desired type.
-        If a conversion should be done,
-        print a message saying an explicit conversion might be more readable.
+        It is not a requirement that the actual_arg_type is different from
+        the type_converter type.
+        Since the type_converter will do nothing in that case.
+        But now, all callers insure the type IS different before they call.
         '''
+        # print(type_converter.__name__)
+
+        # TODO message module put all suggestions in a log
+        # ??? Tell author their code would be more clear if they used float() themselves
+        # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
+        print(f"GimpFu: Suggest: converting {self._actual_arg_type.__name__} to {type_converter.__name__}.")
+        print("Your code might be clearer if you use explicit conversions or literals that denote the type.")
+
         self._result_arg = type_converter(self._actual_arg)  # type conversion
         self._result_arg_type = type(self._result_arg)
         self._did_convert = True
