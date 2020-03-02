@@ -587,7 +587,8 @@ commands:
       cp -r /work/plug-ins/* /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Chmoding test plugins"
-      find /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' +
+      # find -D exec /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' + -print
+      find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
 
       echo "Copying gimpfu source directory to local plugin directory"
       cp -r /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins

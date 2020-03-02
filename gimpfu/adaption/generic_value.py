@@ -98,17 +98,31 @@ class FuGenericValue():
     def convert(self, type_converter):
         ''' Convert result_type using given conversion method. '''
         print(f"FuGenericValue.convert to {type_converter}")
+        print(type_converter)
+        print(type_converter.__name__)
+
+        '''
+        TODO
+        The type may already be the desired type.
+        If a conversion should be done,
+        print a message saying an explicit conversion might be more readable.
+        '''
         self._result_arg = type_converter(self._actual_arg)  # type conversion
         self._result_arg_type = type(self._result_arg)
         self._did_convert = True
 
-
+    '''
+    To convert, pass built-in type converter method to self.convert()
+    I.E. below is functional programming, passing a func as an arg.
+    '''
     def float(self):
-        self.convert(float) # pass built-in type converter method
-
+        self.convert(float)
 
     def str(self):
-        self.convert(str) # pass built-in type converter method
+        self.convert(str)
+
+    def int(self):
+        self.convert(int)
 
 
     def float_array(self):

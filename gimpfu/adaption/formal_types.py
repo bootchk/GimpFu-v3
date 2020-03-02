@@ -96,6 +96,10 @@ class FormalTypes():
     def is_str_type(formal_arg_type):
         return formal_arg_type.name in ('GParamString', )
 
+    def is_int_type(formal_arg_type):
+        print(f"is_int_type: {formal_arg_type.name}")
+        return formal_arg_type.name in ('GParamInt', )  # ??? GParamUInt
+
     # !!!! GimpParam...
     def is_float_array_type(formal_arg_type):
         return formal_arg_type.name in ('GimpParamFloatArray', )

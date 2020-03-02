@@ -99,9 +99,11 @@ TODO can we adapt signature also
 
 # !!! both left and right sides hyphenated, not underbar
 pdb_renaming = {
-    "gimp-edit-fill"        : "gimp-drawable-edit-fill",
+    "gimp-edit-fill"         : "gimp-drawable-edit-fill",
     "gimp-edit-clear"        : "gimp-drawable-edit-clear",
-    "gimp-histogram"        : "gimp-drawable-histogram",
+    "gimp-histogram"         : "gimp-drawable-histogram",
+    "gimp-undo-push-group-start"   : "gimp-image-undo-group-start",
+    "gimp-undo-push-group-end"     : "gimp-image-undo-group-end",
     # Rest are guesses, not tested
     "gimp-edit-bucket-fill" : "gimp-drawable-edit-bucket-fill", # TODO # (fill_type, x, y):
     "gimp-ellipse-select"   : "gimp-image-select-ellipse",

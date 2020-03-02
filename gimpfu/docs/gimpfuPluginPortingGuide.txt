@@ -147,7 +147,7 @@ For example:
 (TODO can this restriction be eased?)
 
 
-Gimp model Changes
+Gimp model changes
 ------------------
 
 The model of Channel in Gimp v3 is expanded from v2.
@@ -260,7 +260,7 @@ Use 'pdb.foo()', not 'gimp.pdb.foo()'.  'pdb' is not in the 'gimp' namespace.
 The pdb object cannot be accessed using index notation:
 pdb['gimp-edit-fill']()    =>    pdb.gimp-edit-fill()
 
-The attributes of Gimpfu objects can still be accessed using property notation
+The attributes of GimpFu objects can still be accessed using property notation
 without parens
 e.g. timg.width
 (Note that using GI, Gimp object properties are accessed using getter call notation
@@ -275,3 +275,28 @@ It is possible to rewrite a plugin without using GimpFu,
 using just Python and GI.
 
 See examples in  2.99/plug-ins/python
+
+
+Summary of differences Python/GI versus GimpFu
+-----------------------------------
+
+Again, you can use GimpFu or not (just Python with GI of Gimp.)
+
+Briefly, GimpFu makes writing a plugin more Pythonic.
+
+When you use GimpFu, Python remains dynamically typed with duck typing.
+For example, you can pass an int to a PDB procedure where it expects a float,
+and vice versa
+Without GimpFu, in the same case, you need explicit conversion: float(foo).
+
+Without GimpFu, constructors are named 'new', i.e. Gimp.Layer.new()
+instead of gimp.Layer().
+
+With GimpFu, Gimp constants are brief, e.g. BACKGROUND_FILL.
+Without GimpFu, use fully qualified constant names, e.g. Gimp.FillType.BACKGROUND.
+
+With GimpFu classes, properties use property syntax, without parentheses.
+Without GimpFu, properties of Gimp object use getter/setter call syntax with parentheses.
+
+With GimpFu, the boilerplate might be more condensed.
+Whether you use GimpFu or not, you can still start from a template.

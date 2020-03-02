@@ -16,6 +16,9 @@ But a ported GimpFu provides:
 
 A prototype, proof-of-concept port of GimpFu to v3
 is in a MR merge request referencing this issue.
+The code is in my GitLab fork of Gimp, at plug-ins/gimpfu
+(should eventually replace v2 plug-ins/pygimp.
+It should remain named gimpfu because existing plugins import that name.)
 The port's branch has a document "gimpfuPluginPortingGuide.txt"
 that tells plugin authors how to make the few changes
 to port a v2 GimpFu plugin to v3.
@@ -46,6 +49,6 @@ who could understand, contribute to, rewrite, and maintain the code.
 
 Its a case where I needed it, so I worked on it.
 The code is open sourced.
-I can continue to contribute. 
+I can continue to contribute.
 I hope the code can be put under the Gimp umbrella,
 I don't want to be solely responsible.

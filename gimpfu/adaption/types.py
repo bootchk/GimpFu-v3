@@ -94,10 +94,18 @@ class Types():
 
         print(f"Actual arg type: {gen_value}")
 
-        if gen_value.actual_arg_type is int:
-            formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
-            if formal_arg_type is not None:
-                print("     Formal arg type ", formal_arg_type.name )
+        # TODO faster if we short circuit where actual == formal
+        # TODO make the converter print what the conversion was
+        '''
+        The matrix of conversions:
+        int => float, str
+        float => int, str
+        TODO str => float, int ???
+        '''
+        formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
+        print("     Formal arg type ", formal_arg_type.name )
+        if formal_arg_type is not None:
+            if gen_value.actual_arg_type is int:
                 if FormalTypes.is_float_type(formal_arg_type):
                     # ??? Tell author their code would be more clear if they used float() themselves
                     # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
@@ -107,13 +115,20 @@ class Types():
                 elif FormalTypes.is_str_type(formal_arg_type):
                     print("GimpFu: Suggest: converting int to str.  Your code might be clearer if you use explicit conversions.")
                     gen_value.str()
-                # else arg is int but procedure wants int, or a type that has no conversion
-                # TODO warn now that type is int but procedure wants another type
-            else:
-                # Probably too many actual args.
-                # Do not convert type.
-                do_proceed_error(f"Failed to get formal argument type for index: {index}.")
-        # else not a usual Python conversion from int
+            elif gen_value.actual_arg_type is float:
+                if FormalTypes.is_int_type(formal_arg_type):
+                    print("GimpFu: Suggest: converting double to int.  Your code might be clearer if you use explicit conversions.")
+                    gen_value.int()
+                elif FormalTypes.is_str_type(formal_arg_type):
+                    print("GimpFu: Suggest: converting float to str.  Your code might be clearer if you use explicit conversions.")
+                    gen_value.str()
+            # else not a usual Python conversion, or doesn't need conversion
+
+        else:
+            # Probably too many actual args.
+            # Do not convert type.
+            do_proceed_error(f"Failed to get formal argument type for index: {index}.")
+
 
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
         # likewise for value of result_arg
