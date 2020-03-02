@@ -51,6 +51,10 @@ def get_enum_name(enum):
     return long_name
 
 
+"""
+TODO we could check that a symbol is not already defined before we define it.
+"""
+
 def define_symbols_for_enum(enum, prefix="", suffix=""):
     '''
     Define into the GimpFu Python global namespace:
@@ -91,6 +95,12 @@ FG_BG_RGB_MODE      = 1999
 # TODO not sure this is correct
 BG_BUCKET_FILL      = Gimp.FillType.BACKGROUND
 
+SATURATION_MODE = Gimp.LayerMode.HSV_SATURATION
+HUE_MODE        = Gimp.LayerMode.HSV_HUE
+# TODO bug in Gimp?
+COLOR_MODE = Gimp.LayerMode.HSL_COLOR
+VALUE_MODE = Gimp.LayerMode.HSV_VALUE
+
 
 """
 '''
@@ -111,6 +121,10 @@ for attribute in dir(foo):
         exec(statement)
 """
 
+"""
+TODO open an issue with Gimp:
+the naming is inconsistent, not alway FooType, sometimes just Foo.
+"""
 print("gimpenums defining enums...")
 define_symbols_for_enum(Gimp.MergeType)
 # ImageBaseType is superset of ImageType, i.e. RGB => RGB, RGBA, etc.
@@ -140,6 +154,12 @@ define_symbols_for_enum(Gimp.AddMaskType, prefix='ADD_MASK_')
 # ADD_MASK_SELECTION = Gimp.AddMaskType.SELECTION
 define_symbols_for_enum(Gimp.SizeType)
 # PIXELS = Gimp.SizeType.PIXELS,     POINTS
+define_symbols_for_enum(Gimp.HueRange, prefix='HUE_RANGE_')
+# HUE_RANGE_ALL = Gimp.HueRange.ALL
+
+# TODO this is a guess, find a test case in the wild
+define_symbols_for_enum(Gimp.DesaturateMode, prefix='DESATURATE_')
+# DESATURATE_LIGHNTESS = Gimp.DesaturateMode.LIGHTNESS
 
 
 
