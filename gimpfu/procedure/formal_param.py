@@ -1,5 +1,5 @@
 
-class GimpfuFormalParam():
+class FuFormalParam():
     def __init__(self, pf_type, label, desc, default_value, extras = [] ):
         self.PF_TYPE= pf_type
         self.LABEL= label

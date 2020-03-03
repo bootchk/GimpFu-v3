@@ -19,15 +19,20 @@
 
 """
 Simple interface to write GIMP plug-ins in Python.
+An alternative is to use GObject Introspection
+and a template plugin that does not import GimpFu."
 
-GimpFu provides a simple register() function that registers your
-plug-in, and causes your plug-in function to be called when needed.
+GimpFu provides a simple register() function that registers your plug-in.
 
-Gimpfu will also show a dialog to let a user edit plug-in
-parameters if the plug-in is called interactively, and will also save
-the last used parameters, so the RUN_WITH_LAST_VALUES run_type will
-work correctly.  It will also ensure displays are flushed
-on completion if the plug-in was run interactively.
+Gimp will call your plug-in function as needed.
+Gimp will also show a dialog to let a user edit plug-in
+parameters when a user invokes your plug-in interactively.
+Gimp will also save the last used parameters, so a user can
+"Repeat" or "Reshow" your filters with those saved parameters.
+Gimp will also flush displays so the user sees the plugin results
+when a user runs your plug-in interactively.
+All these features are provided by Gimp, whether or not you use GimpFu,
+since Gimp 3.
 
 When registering the plug-in, you need not specify the run_type parameter.
 
@@ -114,7 +119,7 @@ from gi.repository import GObject
 
 # import private implementation
 from adaption.marshal import Marshal
-from procedure.procedure import GimpfuProcedure
+from procedure.procedure import FuProcedure
 from message.proceed_error import *
 
 from message.deprecation import Deprecation
@@ -221,7 +226,7 @@ def register(proc_name, blurb, help, author, copyright,
 
     print("Gimpfu: register ", proc_name)
 
-    gf_procedure = GimpfuProcedure(proc_name, blurb, help, author, copyright,
+    gf_procedure = FuProcedure(proc_name, blurb, help, author, copyright,
                             date, label, imagetypes,
                             params, results, function,
                             menu, domain, on_query, on_run)
@@ -290,29 +295,7 @@ def _query():
 """
 
 '''
-TODO replace this with gimp_procedure_config
-
-def _get_defaults(proc_name):
-    import gimpshelf
-
-    (blurb, help, author, copyright, date,
-     label, imagetypes, plugin_type,
-     params, results, function, menu, domain,
-     on_query, on_run) = _registered_plugins_[proc_name]
-
-    key = "python-fu-save--" + proc_name
-
-    if gimpshelf.shelf.has_key(key):
-        return gimpshelf.shelf[key]
-    else:
-        # return the default values
-        return [x[3] for x in params]
-
-def _set_defaults(proc_name, defaults):
-    import gimpshelf
-
-    key = "python-fu-save--" + proc_name
-    gimpshelf.shelf[key] = defaults
+TODO Replace the original _get_defaults (calls gimpshelf) with gimp_procedure_config
 '''
 
 
@@ -354,10 +337,9 @@ def _interact(procedure, actual_args):
     # get name from instance of Gimp.Procedure
     proc_name = procedure.get_name()
 
-    # get GimpfuProcedure from container by name
+    # get FuProcedure from container by name
     gf_procedure = __local_registered_procedures__[proc_name]
 
-    formal_params = gf_procedure.metadata.PARAMS
     function = gf_procedure.metadata.FUNCTION
     on_run = gf_procedure.metadata.ON_RUN
 
@@ -631,6 +613,10 @@ def _run(proc_name, params):
 
 
 
+
+
+
+
 '''
 See header comments for type Gimp.Plugin.
 
@@ -735,7 +721,7 @@ class GimpFu (Gimp.PlugIn):
             Gimpfu does not tell Gimp about first two formal args (Gimp knows already)
             run_func takes img, drw as first two params
             Gimp passes run_mode, image, drawable, otherArgArray to Gimpfu when run() callback is called.
-            Gimpfu massages image, drawable, otherArgArray (but not run_mode) into args to run_func
+            Gimpfu massages image, drawable, otherArgArray (but omits run_mode) into args to run_func
             '''
             gf_procedure.convey_procedure_arg_declarations_to_gimp(
                 procedure,

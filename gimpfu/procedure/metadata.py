@@ -4,16 +4,23 @@ import string   # v2 as _string to hide from authors
 from message.proceed_error import  do_proceed_error
 from message.deprecation import Deprecation
 
-from procedure.formal_param import GimpfuFormalParam
+from procedure.formal_params import FuFormalParams
 
 from gimpfu_enums import *  # PF_ enums
 
 
-# v3 _registered_plugins_ is a dictionary of GimpfuProcedureMetadata
+# v3 _registered_plugins_ is a dictionary of FuProcedureMetadata
 
-class GimpfuProcedureMetadata():
+class FuProcedureMetadata():
     '''
-    Responsible for sanity checking and fixups to author's declaration.
+    Responsibilities:
+    1. for sanity checking and fixups to author's declaration.
+    2. conveying to Gimp
+    3. understands old versus new style registration
+    4. understands plugin type (Image, File)
+    5. provide utility function letter_check to FuFormalParams class
+
+
     This is in the nature of compiling:
        - give warnings
        - or throw exceptions (sanity)
@@ -22,14 +29,7 @@ class GimpfuProcedureMetadata():
     Author must delete ~/.config/.../pluginrc to see warnings again.
     '''
 
-    '''
-    Constant class data
-    '''
 
-    file_params = [GimpfuFormalParam(PF_STRING, "filename", "The name of the file", ""),
-                   GimpfuFormalParam(PF_STRING, "raw-filename", "The name of the file", "")]
-    image_param = GimpfuFormalParam(PF_IMAGE, "image", "Input image", None)
-    drawable_param = GimpfuFormalParam(PF_DRAWABLE, "drawable", "Input drawable", None)
 
     '''
     Since: 3.0 Gimp enforces: Identifiers for procedure names and parameter names:
@@ -53,9 +53,9 @@ class GimpfuProcedureMetadata():
        function, menu, domain,
        on_query, on_run):
 
-        label =GimpfuProcedureMetadata.substitute_empty_string_for_none(label, "label")
-        imagetypes = GimpfuProcedureMetadata.substitute_empty_string_for_none(imagetypes, "imagetypes")
-        menu = GimpfuProcedureMetadata.substitute_empty_string_for_none(menu, "menupath")
+        label =FuProcedureMetadata.substitute_empty_string_for_none(label, "label")
+        imagetypes = FuProcedureMetadata.substitute_empty_string_for_none(imagetypes, "imagetypes")
+        menu = FuProcedureMetadata.substitute_empty_string_for_none(menu, "menupath")
 
         # wild data, soon to be fixed up
         self.BLURB=blurb
@@ -73,12 +73,10 @@ class GimpfuProcedureMetadata():
         self.ON_QUERY= on_query
         self.ON_RUN= on_run
 
-        self.PARAMS= []
+        self.params = FuFormalParams()
         for param in params:
-             # assert param is a tuple
-             self.PARAMS.append(GimpfuFormalParam(*param))
-
-
+             # assert param is a tuple, unpack when passing
+             self.params.append(*param)
 
         '''
         Fix author's mistakes and allow deprecated constructs.
@@ -90,13 +88,83 @@ class GimpfuProcedureMetadata():
         self._sanity_test_registration()
 
         self.did_fix_menu = self._deriveMissingMenu()
-        self._deriveMissingParams()
+
+        self.params.deriveMissingParams(self)   # pass self as metadata
         '''
         !!! When we insert image params,
         signature registered with Gimp
         differs from signature of run_func.
         '''
-        self.did_insert_image_params = self._deriveMissingImageParams()
+        self.did_insert_image_params = self.params.deriveMissingImageParams(self)
+
+
+
+    def convey_to_gimp(self, procedure, name):
+        ''' convey self to procedure (is-a Gimp.PluginProcedure) '''
+        procedure.set_image_types(self.IMAGETYPES);
+        procedure.set_documentation (self.BLURB,
+                                     self.HELP,
+                                     name)
+        procedure.set_menu_label(self.MENUITEMLABEL)
+        procedure.set_attribution(self.AUTHOR,
+                                  self.COPYRIGHT,
+                                  self.DATE)
+        # TODO apparently GIMP can declare error (see console)
+        # TODO is there are result of this call that we can check?
+        procedure.add_menu_path (self.MENUPATH)
+
+
+
+
+    '''
+    Don't call these until metadata initialized and fixed up.
+    I.E. we look at fixed up menupath and not at any path that was in label (old style).
+    See asserts.
+    '''
+    @property
+    def is_image_procedure_type(self):
+        assert self.MENUPATH is not None
+        return self.MENUPATH.startswith("<Image>")
+
+    @property
+    def is_save_procedure_type(self):
+        assert self.MENUPATH is not None
+        return self.MENUPATH.startswith("<Save>")
+
+    @property
+    def is_load_procedure_type(self):
+        assert self.MENUPATH is not None
+        return self.MENUPATH.startswith("<Load>")
+
+
+
+    '''
+    This only refers to registration with GimpFu.
+    Registration with Gimp no longer supports old style?
+    I.E. this if FBC.
+
+    Old style:
+        denoted by menu path in the label field (must be fixed up)
+        first two specfied args (img, drawable) implicit
+        run_func formal args includes (img, drawable)
+    New style:
+        denoted by menu path in the menupath field
+        first two specified args (img, drawable) are explicit
+           (if the plugin run_func wants them)
+        run_func formal args may or may not include (img, drawable)
+
+    Require _deriveMissingMenu() called prior.
+    '''
+    @property
+    def is_old_style_registration(self):
+        return self.did_fix_menu
+
+    @property
+    def is_new_style_registration(self):
+        return not self.is_old_style_registration
+
+
+
 
 
     @classmethod
@@ -123,8 +191,7 @@ class GimpfuProcedureMetadata():
     '''
     public: metadata knows how to fix procedure name
     '''
-    @classmethod
-    def makeProcNamePrefixCanonical(cls, proc_name):
+    def makeProcNamePrefixCanonical(self, proc_name):
         '''
         if given name not canonical, make it so.
 
@@ -142,9 +209,9 @@ class GimpfuProcedureMetadata():
         '''
 
         # FBC.  Gimp v3 does not allow underbar
-        proc_name = GimpfuProcedureMetadata.fix_underbar(proc_name)
-        proc_name = GimpfuProcedureMetadata.canonicalize_prefix(proc_name)
-        if not GimpfuProcedureMetadata.letterCheck(proc_name, GimpfuProcedureMetadata.proc_name_allowed):
+        proc_name = FuProcedureMetadata.fix_underbar(proc_name)
+        proc_name = FuProcedureMetadata.canonicalize_prefix(proc_name)
+        if not self.letterCheck(proc_name, FuProcedureMetadata.proc_name_allowed):
             raise Exception(f"Procedure name: {proc_name} contains illegal characters.")
         print(f"Procedure name: {proc_name}")
         return proc_name
@@ -165,7 +232,7 @@ class GimpfuProcedureMetadata():
 
 
 
-    def letterCheck(str, allowed):
+    def letterCheck(self, str, allowed):
         for ch in str:
             if not ch in allowed:
                 return False
@@ -225,102 +292,13 @@ class GimpfuProcedureMetadata():
 
 
 
-    def _deriveMissingParams(self):
-        ''' FBC Add missing params according to plugin type. '''
 
-        '''
-        FBC.
-        In the distant past, an author could specify menu like <Load>
-        and not provide a label
-        and not provide the first two params,
-        in which case GimpFu inserts two params.
-        Similarly for other cases.
-        '''
-        # v2 if self.did_fix_menu and plugin_type == PLUGIN:
-        # require _deriveMissingMenu called earlier
-        if not self.did_fix_menu:
-            return
-
-
-        if self.MENUPATH is None:
-            pass
-        elif self.MENUPATH.startswith("<Load>"):
-            # insert into slice
-            self.PARAMS[0:0] = GimpfuFormalParam.file_params
-            message = f" Fixing two file params for Load plugin"
-            Deprecation.say(message)
-        elif self.MENUPATH.startswith("<Image>") or self.MENUPATH.startswith("<Save>"):
-            self.PARAMS.insert(0, GimpfuProcedureMetadata.image_param)
-            self.PARAMS.insert(1, GimpfuProcedureMetadata.drawable_param)
-            message = f" Fixing two image params for Image or Save plugin"
-            Deprecation.say(message)
-            if self.MENUPATH.startswith("<Save>"):
-                self.PARAMS[2:2] = file_params
-                message = f" Fixing two file params for Save plugin"
-                Deprecation.say(message)
-        #print(self.PARAMS)
-
-
-    def _deriveMissingImageParams(self):
-        '''
-        Some plugins declare they are <Image> plugins,
-        but don't have first two params equal to (image, drawable),
-        and have imagetype == "" (menu item enabled even if no image is open).
-        And then Gimp refuses to create procedure
-        (but does create an item in pluginrc!)
-        E.G. sphere.py
-
-        So we diverge the signature of the plugin from the signature of the run_func.
-        The author might be unaware, unless they explore,
-        or try to call the PDB procedure from another PDB procedure.
-
-        TODO after we are done, the count of args to run_func
-        and the count of formal parameters (PARAMS) should be the same.
-        Can we count the formal parameters of run_func?
-        '''
-        if not self.MENUPATH:
-            return
-
-        result = False
-        # if missing params (never there, or not fixed by earlier patch)
-        # TODO if params are missing altogether
-        if ( self.MENUPATH.startswith("<Image>")
-            and self.PARAMS[0].PF_TYPE != PF_IMAGE
-            and self.PARAMS[1].PF_TYPE != PF_DRAWABLE
-            ):
-            self.PARAMS.insert(0, GimpfuProcedureMetadata.image_param)
-            self.PARAMS.insert(1, GimpfuProcedureMetadata.drawable_param)
-            message = f" Fixing two image params for Image plugin"
-            Deprecation.say(message)
-            result = True
-        return result
 
 
     def _sanity_test_registration(self):
         ''' Quit when detect exceptional results or params. '''
 
-        for param in self.PARAMS:
-            """
-            TODO
-            if len(ent) < 4:
-                raise Exception( ("parameter definition must contain at least 4 "
-                              "elements (%s given: %s)" % (len(ent), ent)) )
-            """
-
-            if not isinstance(param.PF_TYPE, int):
-                # TODO check in range
-                exception_str = f"Plugin parameter type {param.PF_TYPE} not a valid PF_ enum"
-                raise Exception(exception_str)
-
-
-            # Common mistake is a space in the LABEL
-            param.LABEL = param.LABEL.replace( ' ' , '_')
-
-            if not GimpfuProcedureMetadata.letterCheck(param.LABEL, GimpfuProcedureMetadata.param_name_allowed):
-                # Not fatal since we don't use it, args are a sequence, not by keyword
-                # But Gimp may yet complain.
-                # TODO transliterate space to underbar
-                do_proceed_error(f"parameter name '{param.LABEL}'' contains illegal characters")
+        self.params.sanity_test(self)   # pass self for callback
 
         for ent in self.RESULTS:
             # ent is tuple
@@ -333,6 +311,6 @@ class GimpfuProcedureMetadata():
             if not isinstance(ent[0], int):
                 raise Exception("result must be of integral type")
 
-            if not GimpfuProcedureMetadata.letterCheck(ent[1], GimpfuProcedureMetadata.param_name_allowed):
+            if not self.letterCheck(ent[1], self.param_name_allowed):
                 # not fatal unless we use it?
                 do_proceed_error(f"result name '{ent[1]}' contains illegal characters")

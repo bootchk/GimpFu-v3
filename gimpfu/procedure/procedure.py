@@ -1,7 +1,6 @@
 
 
-from procedure.metadata import GimpfuProcedureMetadata
-from procedure.formal_param import GimpfuFormalParam
+from procedure.metadata import FuProcedureMetadata
 
 
 '''
@@ -19,26 +18,19 @@ Namely, PARAMS have extra information: the kind of control widget for each param
 And pdb and gimp symbols are not defined.
 '''
 
-# Temp hack ???
-from procedure.prop_holder import PropHolder
-
-prop_holder = PropHolder()
-print("prop_holder.props", prop_holder.props)
-print("prop_holder.props.IntProp:", prop_holder.props.IntProp)
 
 
 
 
-
-class GimpfuProcedure():
+class FuProcedure():
     '''
     Understands and wraps Gimp procedure.
 
     GimpFu procedure is slightly different from Gimp PluginProcedure.
     This hides the differences.
     Differences:
-       plugin_type not required of 
-       certain procedure parameters not required of 
+       plugin_type not required of
+       certain procedure parameters not required of
        FBC fixes Author use of deprecated stuff
 
     Also understands:
@@ -63,7 +55,7 @@ class GimpfuProcedure():
 
         This does NOT create the procedure in Gimp PDB, which happens later.
         '''
-        print ('new GimpfuProcedure', proc_name)
+        print ('new FuProcedure', proc_name)
 
         '''
         v2 plugin_type = PLUGIN
@@ -77,14 +69,15 @@ class GimpfuProcedure():
         # TODO a hack, Gimpfu never use plugin_type?
         plugin_type = 1
 
-        # name is not part of metadata, but is the key
-        self.name = GimpfuProcedureMetadata.makeProcNamePrefixCanonical(proc_name)
-
-        self.metadata = GimpfuProcedureMetadata(blurb, help, author, copyright,
+        self.metadata = FuProcedureMetadata(blurb, help, author, copyright,
                                         date, label, imagetypes,
                                         plugin_type, params, results,
                                         function, menu, domain,
                                         on_query, on_run)
+
+        # name is not part of metadata, but is the key
+        # and metadata knows how to make it canonical
+        self.name = self.metadata.makeProcNamePrefixCanonical(proc_name)
 
 
 
@@ -98,10 +91,10 @@ class GimpfuProcedure():
         if self.is_a_imageprocedure_subclass:
             # slice off prefix of formal param descriptions (i.e. image and drawable)
             # leaving only descriptions of GUI-time params
-            result = self.metadata.PARAMS[2:]
+            result = self.metadata.params.PARAMS[2:]
         else:
             # is LoadProcedure
-            result = self.metadata.PARAMS
+            result = self.metadata.params.PARAMS
 
         print("guiable_formal_params:", result)
         return result
@@ -214,25 +207,7 @@ class GimpfuProcedure():
     '''
 
     def convey_metadata_to_gimp(self, procedure):
-        '''
-        understands GimpProcedure methods
-
-        procedure is-a Gimp.PluginProcedure
-        '''
-        procedure.set_image_types(self.metadata.IMAGETYPES);
-
-        procedure.set_documentation (self.metadata.BLURB,
-                                     self.metadata.HELP,
-                                     self.name)
-        procedure.set_menu_label(self.metadata.MENUITEMLABEL)
-        procedure.set_attribution(self.metadata.AUTHOR,
-                                  self.metadata.COPYRIGHT,
-                                  self.metadata.DATE)
-        # TODO apparently GIMP can declare error (see console)
-        # TODO is there are result of this call that we can check?
-        procedure.add_menu_path (self.metadata.MENUPATH)
-
-
+        self.metadata.convey_to_gimp(procedure, self.name);
 
     def convey_runmode_arg_declaration_to_gimp(self, procedure):
         procedure.add_argument_from_property(prop_holder, "RunmodeProp")
@@ -242,23 +217,6 @@ class GimpfuProcedure():
         procedure,
         count_omitted_leading_args=0,
         prefix_with_run_mode=False):
-        '''
-        Convey  to Gimp a declaration of args to the procedure.
-        From formal params as recorded in local cache under proc_name
-        '''
 
-        '''
-        This implementation uses one property on self many times.
-        Requires a hack to Gimp, which otherwise refuses to add are many times from same named property.
-        '''
-        formal_params = self.metadata.PARAMS
-
-        if prefix_with_run_mode :
-            pass
-            # WIP
-            # procedure.add_argument_from_property(prop_holder, "intprop")
-
-        for i in range(count_omitted_leading_args, len(formal_params)):
-            # TODO map PF_TYPE to types known to Gimp (a smaller set)
-            # use named properties of prop_holder
-            procedure.add_argument_from_property(prop_holder, "IntProp")
+        # TODO metadata.params should be hidden
+        self.metadata.params.convey_to_gimp(procedure, count_omitted_leading_args, prefix_with_run_mode);

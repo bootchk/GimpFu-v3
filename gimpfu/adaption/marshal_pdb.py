@@ -88,7 +88,7 @@ class MarshalPDB():
 
         formal_args_index = 0
 
-        # TODO extract method to GimpfuProcedure class
+        # TODO extract method to FuProcedure class
         # TODO python-fu- ?? What procedure names signify need run_mode?
         # Better to introspect ??
         if proc_name.startswith('plug-in-'):
