@@ -694,20 +694,7 @@ class GimpFu (Gimp.PlugIn):
                                 None)
         """
 
-        if gf_procedure.is_a_imagelessprocedure_subclass :
-            print("Create imageless procedure")
-            procedure = Gimp.Procedure.new(self,
-                                            name,
-                                            Gimp.PDBProcType.PLUGIN,
-                                            _run_imagelessprocedure, 	# wrapped plugin method
-                                            None)
-            gf_procedure.convey_metadata_to_gimp(procedure)
-
-            gf_procedure.convey_runmode_arg_declaration_to_gimp(procedure)
-            gf_procedure.convey_procedure_arg_declarations_to_gimp(
-                procedure,
-                count_omitted_leading_args=0)
-        else:
+        if gf_procedure.is_image_procedure_type :
             # ImageProcedure
             procedure = Gimp.ImageProcedure.new(self,
                                             name,
@@ -718,7 +705,11 @@ class GimpFu (Gimp.PlugIn):
             '''
             ImageProcedure:
             Gimpfu does not tell Gimp about run_mode (Gimp knows already that parameter exists) ???
-            Gimpfu does not tell Gimp about first two formal args (Gimp knows already)
+            Gimpfu does not tell Gimp about first two formal args (Gimp knows already).
+            Gimpfu only conveys the "extra" args.
+
+            !!! But when Gimp calls, it passes more args.
+            TODO move these comments to where the call lands.
             run_func takes img, drw as first two params
             Gimp passes run_mode, image, drawable, otherArgArray to Gimpfu when run() callback is called.
             Gimpfu massages image, drawable, otherArgArray (but omits run_mode) into args to run_func
@@ -726,11 +717,25 @@ class GimpFu (Gimp.PlugIn):
             gf_procedure.convey_procedure_arg_declarations_to_gimp(
                 procedure,
                 count_omitted_leading_args=2)
-        """
         else:
             # TODO Better message, since this error depends on authored code
             # TODO preflight this at registration time.
-            raise Exception("Unknown subclass of Gimp.Procedure")
+            raise Exception("Unknown type of Gimp.Procedure")
+
+        """
+                print("Create imageless procedure")
+                procedure = Gimp.Procedure.new(self,
+                                                name,
+                                                Gimp.PDBProcType.PLUGIN,
+                                                _run_imagelessprocedure, 	# wrapped plugin method
+                                                None)
+                gf_procedure.convey_metadata_to_gimp(procedure)
+
+                gf_procedure.convey_runmode_arg_declaration_to_gimp(procedure)
+                gf_procedure.convey_procedure_arg_declarations_to_gimp(
+                    procedure,
+                    count_omitted_leading_args=0)
+            else:
         """
 
         # ensure result is-a Gimp.Procedure

@@ -123,6 +123,9 @@ class FuProcedureMetadata():
     '''
     @property
     def is_image_procedure_type(self):
+        '''
+        !!! ImageType does not mean that args necessarily include (image, drawable)
+        '''
         assert self.MENUPATH is not None
         return self.MENUPATH.startswith("<Image>")
 

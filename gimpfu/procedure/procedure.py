@@ -88,7 +88,8 @@ class FuProcedure():
     @property
     def guiable_formal_params(self):
         # computable property
-        if self.is_a_imageprocedure_subclass:
+        # TODO and image_type is not empty
+        if self.is_image_procedure_type:
             # slice off prefix of formal param descriptions (i.e. image and drawable)
             # leaving only descriptions of GUI-time params
             result = self.metadata.params.PARAMS[2:]
@@ -162,7 +163,11 @@ class FuProcedure():
     '''
 
     @property
-    def is_a_imageprocedure_subclass(self):
+    def is_image_procedure_type(self):
+        ''' Metatdata knows the type of procedure. '''
+        return self.metadata.is_image_procedure_type
+        """
+        OLD
         '''
         An ImageProcedure must have signature (Image, Drawable, ...)
         and a non-null IMAGETYPES
@@ -170,6 +175,7 @@ class FuProcedure():
         '''
         # not empty string is True
         return self.metadata.IMAGETYPES
+        """
 
     @property
     def is_a_imagelessprocedure_subclass(self):
