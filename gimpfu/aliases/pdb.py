@@ -88,13 +88,22 @@ class GimpfuPDB():
         return None
 
 
-    def _adaptor_func(self, *args):
+    def _adaptor_func(self, *args, **kwargs):
         ''' run a PDB procedure whose name was used like "pdb.name()" e.g. like a method call of pdb object '''
+        '''
+        args are from author.  That is, they are external (like i/o, beyond our control).
+        Thus we catch exceptions (and check for other errors) and proceed.
+        '''
+
         print ("pdb adaptor called, args", args)
-        # !!! Must unpack args before passing to _marshall_args
+
+        if kwargs:
+            do_proceed_error(f"PDB procedures do not take keyword args.")
+
         # !!! avoid infinite recursion
         proc_name = object.__getattribute__(self, "adapted_proc_name")
 
+        # !!! Must unpack args before passing to _marshall_args
         try:
             marshaled_args = MarshalPDB.marshal_args(proc_name, *args)
         except Exception as err: # TODO catch only MarshalError ???
@@ -104,7 +113,7 @@ class GimpfuPDB():
         if marshaled_args is not None:
             # require marshaled_args is not None, but it could be an empty GimpValueArray
 
-            # Not a try: except?
+            # Not a try: except????
             inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
 
             # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke

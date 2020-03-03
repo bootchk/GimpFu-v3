@@ -149,9 +149,12 @@ define_symbols_for_enum(Gimp.HistogramChannel, prefix='HISTOGRAM_')
 #HISTOGRAM_VALUE      = Gimp.HistogramChannel.VALUE
 define_symbols_for_enum(Gimp.MaskApplyMode, prefix='MASK_')
 #MASK_APPLY           = Gimp.MaskApplyMode.APPLY
-# New to v3
+
+# New to v3, or possibly since 2.8
+# Prefix and suffix?  ADD_ALPHA_TRANSFER_MASK seen in feather_paste.py
 define_symbols_for_enum(Gimp.AddMaskType, prefix='ADD_MASK_')
 # ADD_MASK_SELECTION = Gimp.AddMaskType.SELECTION
+
 define_symbols_for_enum(Gimp.SizeType)
 # PIXELS = Gimp.SizeType.PIXELS,     POINTS
 define_symbols_for_enum(Gimp.HueRange, prefix='HUE_RANGE_')

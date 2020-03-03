@@ -104,6 +104,7 @@ pdb_renaming = {
     "gimp-histogram"         : "gimp-drawable-histogram",
     "gimp-undo-push-group-start"   : "gimp-image-undo-group-start",
     "gimp-undo-push-group-end"     : "gimp-image-undo-group-end",
+    "gimp-levels"            : "gimp-drawable-levels",
     # Rest are guesses, not tested
     "gimp-edit-bucket-fill" : "gimp-drawable-edit-bucket-fill", # TODO # (fill_type, x, y):
     "gimp-ellipse-select"   : "gimp-image-select-ellipse",

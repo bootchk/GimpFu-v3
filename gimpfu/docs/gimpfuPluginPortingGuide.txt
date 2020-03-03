@@ -150,10 +150,24 @@ For example:
 Gimp model changes
 ------------------
 
+Channel
+=======
 The model of Channel in Gimp v3 is expanded from v2.
 
 Some procedures, like gimp-threshold have been replaced e.g. gimp-drawable-threshold
 and require a new "channel" parameter.
+
+Threshold/Level parameters
+==========================
+
+In v2, some parameters were int in the range [0,255].
+In v3, some of those parameters changed to float in range [0.0, 1.0].
+GimpFu v3 does not adapt to that change.
+You should change the parameter in your plugin source.
+
+Gimp v3 PDB procedure gimp-drawable-levels() has two more "clamp" parameters
+than the deprectated v2 gimp-levels()
+
 
 TODO other model changes
 
