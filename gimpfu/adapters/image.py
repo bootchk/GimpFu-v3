@@ -51,7 +51,7 @@ class GimpfuImage( Adapter ) :
     # Name of getter() func is property name prefixed with 'get_'
     @classmethod
     def DynamicReadOnlyAdaptedProperties(cls):
-        return ('selection',  'layers', )
+        return ('selection',  'layers', 'vectors')
 
     # True: name of getter() func is same as name of property
     @classmethod
@@ -145,37 +145,7 @@ class GimpfuImage( Adapter ) :
     '''
 
     """
-    OLD Cruft
-    # Reason: marshal to wrap result
-    @property
-    def layers(self):
-        # avoid circular import, import when needed
-        from adaption.marshal import Marshal
-
-        '''
-        Override:
-        - to insure returned objects are wrapped ???
-        - because the Gimp name is get_layers
-
-        Typical use by authors: position=img.layers.index(drawable) + 1
-        And then the result goes out of scope quickly.
-        But note that the wrapped item in the list
-        won't be equal to other wrappers of the same Gimp.Layer
-        UNLESS we also override equality operator for wrapper.
-
-        !!! If you break this, the error is "AttributeError: Image has no attr layers"
-        '''
-        print("layers property accessed")
-        layer_list = self._adaptee.get_layers()
-        result_list = []
-        for layer in layer_list:
-            # rebind item in list
-            result_list.append(Marshal.wrap(layer))
-        print("layers property returns ", result_list)
-        return result_list
-    """
-
-    # TODO can be a property now
+    # CRUFT, is a dynamic read-only property now
     @property
     def vectors(self):
         # avoid circular import, import when needed
@@ -184,30 +154,8 @@ class GimpfuImage( Adapter ) :
         unwrapped_list = self._adaptee.get_vectors()
         result_list = Marshal.wrap_args(unwrapped_list)
         return result_list
-
-
-    # TODO all these properties are rote changes to name i.e. prefix with get_
-    # Do this at runtime, or code generate?
-
     """
-    CRUFT moved to DynamicReadOnlyAdaptedProperties
-    @property
-    def active_layer(self):
-        # Delegate to Gimp.Image
-        # TODO wrap result or lazy wrap
-        return self._adaptee.get_active_layer()
-    @active_layer.setter
-    def active_layer(self, layer):
-        # TODO:
-        raise RuntimeError("not implemented")
 
-
-    @property
-    def base_type(self):
-        # Delegate to Gimp.Image
-        # Result is fundamental type (enum int)
-        return self._adaptee.base_type()
-    """
 
 
     """
