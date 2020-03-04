@@ -341,7 +341,6 @@ def _interact(procedure, actual_args):
     gf_procedure = __local_registered_procedures__[proc_name]
 
     function = gf_procedure.metadata.FUNCTION
-    on_run = gf_procedure.metadata.ON_RUN
 
     wrapped_in_actual_args = Marshal.wrap_args(actual_args)
     guiable_formal_params =  gf_procedure.guiable_formal_params
@@ -381,8 +380,10 @@ def _interact(procedure, actual_args):
 
         #TODO duplicate??
         # on_run only called when GUI??
-        if on_run:
+        # TODO make this a method of FuProcedure
+        if gf_procedure.metadata.ON_RUN:
             print("Call on_run")
+            on_run = gf_procedure.metadata.ON_RUN
             on_run()
 
         import gui.dialog

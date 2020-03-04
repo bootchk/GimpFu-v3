@@ -139,6 +139,7 @@ class FuProcedure():
         if self.metadata.did_insert_image_params:
             # nonguiable args in signature of both plugin and run_func
             result = guiable
+            print(">>>>>>>>>>>>Omitting image params to run_func")
         else:
             # nonguiable args in signature of plugin but not the run_func
             result = nonguiable + guiable

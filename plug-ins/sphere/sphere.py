@@ -66,8 +66,10 @@ def sphere(radius, light, shadow, foo, bg_colour, sphere_colour):
             shadow_x = cx + shadow_w
             shadow_w = -shadow_w
 
+        #lkk signature changed TODO
         pdb.gimp_ellipse_select(img, shadow_x, shadow_y, shadow_w, shadow_h,
                                 CHANNEL_OP_REPLACE, True, True, 7.5)
+        #lkk TODO signature change
         pdb.gimp_edit_bucket_fill(drawable, BG_BUCKET_FILL,
                                   MULTIPLY_MODE, 100, 0, False, 0, 0)
 
