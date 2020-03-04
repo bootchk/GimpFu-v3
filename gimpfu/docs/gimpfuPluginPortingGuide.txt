@@ -83,6 +83,7 @@ Obsolete Modules
 -----------------------
 
 Some modules part of PyGimp v2 are obsolete :
+    gimp
     gimpshelf
     gimpui
     gimpcolor
@@ -90,6 +91,11 @@ Some modules part of PyGimp v2 are obsolete :
 To use GimpFu you only need to import the gimpfu module,
 which then imports any other modules it needs.
 Loosely speaking, that has always been the case for GimpFu.
+
+You should NOT import the above modules.
+If you do, and your PYTHONPATH is such that it finds modules by those names,
+(which usually only happens for developers)
+it will cause mysterious failures.
 
 
 
@@ -314,3 +320,10 @@ Without GimpFu, properties of Gimp object use getter/setter call syntax with par
 
 With GimpFu, the boilerplate might be more condensed.
 Whether you use GimpFu or not, you can still start from a template.
+
+
+Other notes
+-----------
+
+gimp.message() (which resolves to Gimp.message)
+since Gimp 3 (???) may write to a status bar instead of present a dialog.
