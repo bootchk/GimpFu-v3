@@ -58,6 +58,15 @@ class GimpfuImage( Adapter ) :
     def DynamicTrueAdaptedProperties(cls):
         return ('width', 'height', 'base_type')
 
+    # Method name on adaptee is mapped
+    @classmethod
+    def DynamicMappedMethods(cls):
+        return  {
+                'disable_undo'         : 'undo_disable',
+                'enable_undo'          : 'undo_enable',
+                'freeze_undo'          : 'undo_freeze',
+                }
+
 
 
 

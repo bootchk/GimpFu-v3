@@ -225,6 +225,13 @@ class Adapter():
             # avoid infinite recursion
             object.__setattr__(self, "_adaptee_callable", adaptee_callable)
             result = self._adapter_func
+        elif self.is_mapped_callable_name_on_instance(adaptee, name):
+            mapped_name = self.is_mapped_callable_name_on_instance(adaptee, name)
+            # assert mapped_name is_attr(_adaptee)
+            adaptee_callable = getattr(self.__dict__['_adaptee'], mapped_name)
+            # get callable for mapped_name
+            object.__setattr__(self, "_adaptee_callable", adaptee_callable)
+            result = self._adapter_func
         elif AdaptedProperty.is_dynamic_readable_property_name(self, name):
             result = AdaptedProperty.get(adaptee, name)
         else:
@@ -294,4 +301,16 @@ class Adapter():
             """
 
         # assert result is a value, or the callable adapter_func
+        return result
+
+
+    def is_mapped_callable_name_on_instance(self, instance, name):
+        ''' Is map(<name>) an attribute on instance, accessed like map(<name>)() ? '''
+        name_map = self.DynamicMappedMethods()
+        if name in name_map:
+            result = name_map[name]
+            # TODO we could check that result is an attribute of instance
+            # but we rely on the map being accurate
+        else:
+            result = None
         return result
