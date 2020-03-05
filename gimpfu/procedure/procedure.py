@@ -24,7 +24,7 @@ And pdb and gimp symbols are not defined.
 
 class FuProcedure():
     '''
-    Understands and wraps Gimp procedure.
+    Understands and wraps Gimp.Procedure.
 
     GimpFu procedure is slightly different from Gimp PluginProcedure.
     This hides the differences.
@@ -178,6 +178,8 @@ class FuProcedure():
         return self.metadata.IMAGETYPES
         """
 
+    """
+    Cruft
     @property
     def is_a_imagelessprocedure_subclass(self):
         '''
@@ -189,6 +191,8 @@ class FuProcedure():
         '''
         result = (self.metadata.IMAGETYPES is None) or (self.metadata.IMAGETYPES == "")
         return result
+    """
+
     """
     TODO is_a_loadprocedure_subclass
     A LoadProcedure usually installs to menu File>, but need not.
@@ -212,18 +216,43 @@ class FuProcedure():
     '''
     Conveyance methods
     '''
+    def set_wrapped_procedure(self, procedure):
+        """ Set the Gimp.Procedure that self wraps. """
+        self._wrapped_gimp_procedure = procedure
 
-    def convey_metadata_to_gimp(self, procedure):
-        self.metadata.convey_to_gimp(procedure, self.name);
+    # all conveyance methods require set_wrapped_procedure() was called prior
 
-    def convey_runmode_arg_declaration_to_gimp(self, procedure):
-        procedure.add_argument_from_property(prop_holder, "RunmodeProp")
+    def convey_metadata_to_gimp(self):
+        self.metadata.convey_to_gimp(self._wrapped_gimp_procedure, self.name);
+
+    def convey_runmode_arg_declaration_to_gimp(self):
+        self._wrapped_gimp_procedure.add_argument_from_property(prop_holder, "RunmodeProp")
 
 
     def convey_procedure_arg_declarations_to_gimp(self,
-        procedure,
         count_omitted_leading_args=0,
         prefix_with_run_mode=False):
 
         # TODO metadata.params should be hidden
-        self.metadata.params.convey_to_gimp(procedure, count_omitted_leading_args, prefix_with_run_mode);
+        self.metadata.params.convey_to_gimp(self._wrapped_gimp_procedure, count_omitted_leading_args, prefix_with_run_mode);
+
+
+    def convey_return_value_declarations_to_gimp(self):
+        """ Declare to Gimp return value types of this plugin procedure. """
+        print("convey_return_value_declarations_to_gimp NOT IMPLEMENTED")
+        # procedure.add_return_value_from_property(self, "new-palette")
+
+
+    def convey_last_values(self, guiable_args):
+        """ Tell Gimp to shelve user's latest choices of settings. """
+
+        """
+        Implementation notes:
+        None of the current Python plugins do this.
+        See the .c plugins for example code.
+        The best example is plug-ins/common/despeckle.c
+        """
+        print("convey_last_values NOT IMPLEMENTED")
+        config = self._wrapped_gimp_procedure.create_config()
+        print(config)
+        ## assert config is type Gimp.ProcedureConfig, having properties same as args of procedure

@@ -55,7 +55,7 @@ register(
         "2019",
         "<Image>/Image/Guides/Add Guides...",
         "*",
-        # lkk make reasonable defaults
+        # lkk make reasonable defaults: 0 space in between is infinite loop
         [
             (PF_OPTION, "direction", "guides direction", 0, DIRECTION_LIST),
             (PF_FLOAT, "space", "space in between", 100.0),

@@ -404,7 +404,8 @@ def _interact(procedure, actual_args):
             guiable_actual_args,
             guiable_formal_params)
         if not was_canceled :
-            # TODO save the changed settings i.e. new defaults
+
+            gf_procedure.convey_last_values(guied_args)
 
             # update incoming guiable args with guied args
             wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args, guied_args)
@@ -462,7 +463,8 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data)
 
     _run(procedure, run_mode, all_args, data)
 
-
+"""
+cruft?
 #def _run_imagelessprocedure(procedure, run_mode, actual_args, data):
 #def _run_imagelessprocedure(procedure, run_mode, actual_args):
 def _run_imagelessprocedure(procedure, actual_args, data):
@@ -471,6 +473,7 @@ def _run_imagelessprocedure(procedure, actual_args, data):
     #run_mode = Gimp.RunMode.INTERACTIVE
     all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, image=None, drawable=None)
     _run(procedure, run_mode, all_args, data)
+"""
 
 
 def _run(procedure, run_mode, actual_args, data):
@@ -702,7 +705,10 @@ class GimpFu (Gimp.PlugIn):
                                             Gimp.PDBProcType.PLUGIN,
                                             _run_imageprocedure, 	# wrapped plugin method
                                             None)
-            gf_procedure.convey_metadata_to_gimp(procedure)
+
+            gf_procedure.set_wrapped_procedure(procedure)
+
+            gf_procedure.convey_metadata_to_gimp()
             '''
             ImageProcedure:
             Gimpfu does not tell Gimp about run_mode (Gimp knows already that parameter exists) ???
@@ -715,9 +721,10 @@ class GimpFu (Gimp.PlugIn):
             Gimp passes run_mode, image, drawable, otherArgArray to Gimpfu when run() callback is called.
             Gimpfu massages image, drawable, otherArgArray (but omits run_mode) into args to run_func
             '''
-            gf_procedure.convey_procedure_arg_declarations_to_gimp(
-                procedure,
-                count_omitted_leading_args=2)
+            gf_procedure.convey_procedure_arg_declarations_to_gimp(count_omitted_leading_args=2)
+
+            gf_procedure.convey_return_value_declarations_to_gimp()
+
         else:
             # TODO Better message, since this error depends on authored code
             # TODO preflight this at registration time.

@@ -26,8 +26,6 @@ class FormalTypes():
         '''
         # require procedure in PDB, it was checked earlier
         procedure = Gimp.get_pdb().lookup_procedure(proc_name)
-        ## OLD config = procedure.create_config()
-        ## assert config is type Gimp.ProcedureConfig, having properties same as args of procedure
 
         arg_specs = procedure.get_arguments()    # some docs say it returns a count, it returns a list of GParam??
         # print(arg_specs)
