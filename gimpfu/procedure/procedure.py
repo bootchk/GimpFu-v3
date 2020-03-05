@@ -35,8 +35,12 @@ class FuProcedure():
 
     Also understands:
      - what parameters are guiable.
-     - how to convey to Gimp the specs for a procedure
+     - how to convey to Gimp:
+     -- the specs for a procedure
+     -- the return values for a procedure
      - types of procedure
+
+    Note that FuProcedure does not understand last values, see FuProcedureConfig
     '''
 
 
@@ -243,6 +247,8 @@ class FuProcedure():
         # procedure.add_return_value_from_property(self, "new-palette")
 
 
+    '''
+    Cruft
     def convey_last_values(self, guiable_args):
         """ Tell Gimp to shelve user's latest choices of settings. """
 
@@ -256,3 +262,4 @@ class FuProcedure():
         config = self._wrapped_gimp_procedure.create_config()
         print(config)
         ## assert config is type Gimp.ProcedureConfig, having properties same as args of procedure
+    '''

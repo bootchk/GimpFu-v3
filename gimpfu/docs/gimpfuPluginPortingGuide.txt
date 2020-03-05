@@ -175,6 +175,15 @@ Gimp v3 PDB procedure gimp-drawable-levels() has two more "clamp" parameters
 than the deprectated v2 gimp-levels()
 
 
+Layer Modes
+===========
+
+In v2, the modes that used colorspaces i.e. HSV values (COLOR, SATURATION, HUE, VALUE )
+did not specify which colorspace they used.
+
+In v3, the modes are HSL_COLOR, HSV_SATURATION, HSV_HUE, and HSV_VALUE
+and their name tells you which colorspace they use.
+
 TODO other model changes
 
 

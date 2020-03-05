@@ -56,7 +56,7 @@ class Marshal():
         Where:
             actual_args is-a Gimp.ValueArray
             image, drawable are optional GObjects
-        !!! Returns Python list, not a Gimp.ValueArray
+        !!! Returns Python list of GValue, not a Gimp.ValueArray
         '''
 
         args_list = Types.convert_gimpvaluearray_to_list_of_gvalue(actual_args)

@@ -120,6 +120,7 @@ from gi.repository import GObject
 # import private implementation
 from adaption.marshal import Marshal
 from procedure.procedure import FuProcedure
+from procedure.procedure_config import FuProcedureConfig
 from message.proceed_error import *
 
 from message.deprecation import Deprecation
@@ -294,10 +295,6 @@ def _query():
             on_query()
 """
 
-'''
-TODO Replace the original _get_defaults (calls gimpshelf) with gimp_procedure_config
-'''
-
 
 def _try_run_func(proc_name, function, args):
     '''
@@ -325,14 +322,14 @@ def _try_run_func(proc_name, function, args):
 
 
 
-def _interact(procedure, actual_args):
+def _interact(procedure, list_gvalues_all_args, config):
     '''
     Show GUI when guiable args, then execute run_func.
     Progress will show in Gimp window, not dialog window.
 
     Return (was_canceled, (results of run_func or None))
     '''
-    print("_interact called", procedure, actual_args)
+    print("_interact called", procedure, list_gvalues_all_args)
 
     # get name from instance of Gimp.Procedure
     proc_name = procedure.get_name()
@@ -342,7 +339,7 @@ def _interact(procedure, actual_args):
 
     function = gf_procedure.metadata.FUNCTION
 
-    wrapped_in_actual_args = Marshal.wrap_args(actual_args)
+    wrapped_in_actual_args = Marshal.wrap_args(list_gvalues_all_args)
     guiable_formal_params =  gf_procedure.guiable_formal_params
 
     """
@@ -405,7 +402,7 @@ def _interact(procedure, actual_args):
             guiable_formal_params)
         if not was_canceled :
 
-            gf_procedure.convey_last_values(guied_args)
+            config.set_changed_settings(guied_args)
 
             # update incoming guiable args with guied args
             wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args, guied_args)
@@ -447,21 +444,21 @@ Now it is of C type GimpImageProcedure or Python type ImageProcedure
 
 !!! Args are Gimp types, not Python types
 '''
-def _run_imageprocedure(procedure, run_mode, image, drawable, actual_args, data):
+def _run_imageprocedure(procedure, run_mode, image, drawable, original_args, data):
     ''' GimpFu wrapper of the author's "main" function, aka run_func '''
 
-    print("_run_imageprocedure ", procedure, run_mode, image, drawable, actual_args)
-    print("_run_imageprocedure count actual_args", actual_args.length())
+    print("_run_imageprocedure ", procedure, run_mode, image, drawable, original_args)
+    print("_run_imageprocedure count original_args", original_args.length())
 
     '''
     Create GimpValueArray of *most* args.
     !!! We  pass GimpValueArray of Gimp types to lower level methods.
     That might change when the lower level methods are fleshed out to persist values.
-    *most* means (image, drawable, *actual_args), but not run_mode!
+    *most* means (image, drawable, *original_args), but not run_mode!
     '''
-    all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, image, drawable)
+    list_gvalues_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, drawable)
 
-    _run(procedure, run_mode, all_args, data)
+    _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
 
 """
 cruft?
@@ -476,7 +473,7 @@ def _run_imagelessprocedure(procedure, actual_args, data):
 """
 
 
-def _run(procedure, run_mode, actual_args, data):
+def _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data):
     '''
     Understands run_mode.
     Different ways to invoke procedure batch, or interactive.
@@ -484,20 +481,21 @@ def _run(procedure, run_mode, actual_args, data):
     Hides run_mode from s.
     I.E. their run_func signature does not have run_mode.
 
-    require procedure is-a Gimp.Procedure.  All args are GObjects.
-    require actual_args is-a Gimp.ValueArray.  Thus has non-Python methods, only GI methods.
-    e.g. actual_args.length(), NOT len(actual_args)
+    require procedure is-a Gimp.Procedure.
+    require original_arges is-a Gimp.ValueArray.
+    require list_gvalues_all_args is a list of GValues
     '''
-    assert isinstance(actual_args, list)
+    # args have already been marshalled into native types
+    assert isinstance(list_gvalues_all_args, list)
 
     # To get the Python name of a Gimp.Procedure method,
     # see gimp/libgimp/gimpprocedure.h, and then remove the prefix gimp_procedure_
     name = procedure.get_name()
 
-    print("_run ", name, run_mode, actual_args)
+    print("_run ", name, run_mode, list_gvalues_all_args)
     '''
-    actual_args are one-to-one with formal params.
-    actual_args may include some args that are not guiable (i.e. image, drawable)
+    list_gvalues_all_args are one-to-one with formal params.
+    list_gvalues_all_args may include some args that are not guiable (i.e. image, drawable)
     '''
 
     # get local GimpFuProcedure
@@ -513,11 +511,14 @@ def _run(procedure, run_mode, actual_args, data):
 
     func = gf_procedure.get_authors_function()
 
+    config = FuProcedureConfig(procedure)
+    config.begin_run(image, run_mode, original_args)
+
     if isBatch:
        try:
            # invoke func with unpacked args.  Since Python3, apply() gone.
            # TODO is this the correct set of args? E.G. Gimp is handling RUN_WITH_LAST_VALS, etc. ???
-           result = func(*actual_args)
+           result = func(*list_gvalues_all_args)
            # TODO add result values
            final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
        except:
@@ -532,13 +533,15 @@ def _run(procedure, run_mode, actual_args, data):
        either by calling our own dialog or by calling a Gimp.ErrorDialog (not exist)
        or by passing the exception string back to Gimp.
        '''
-       was_canceled, result = _interact(procedure, actual_args)
+       was_canceled, result = _interact(procedure, list_gvalues_all_args, config)
        if was_canceled:
            final_result = procedure.new_return_values(Gimp.PDBStatusType.CANCEL, GLib.Error())
+           config.end_run(Gimp.PDBStatusType.CANCEL)
        else:
            # TODO add result values to Gimp  procedure.add_return_value ....
            # trigger Gimp create all return values from this status and prior add_return_value
            final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
+           config.end_run(Gimp.PDBStatusType.SUCCESS)
        """
        OLD above was enclosed in try
        try:

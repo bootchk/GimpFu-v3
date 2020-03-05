@@ -35,6 +35,8 @@ _ = t.gettext
 class EntryValueError(Exception):
     pass
 
+"""
+Probably CRUFT
 # FUTURE i.e. work in progress
 # TODO param actual_args of type Gimp.ValueArray.
 def show_plugin_procedure_dialog():
@@ -46,29 +48,9 @@ def show_plugin_procedure_dialog():
     Before the dialog run, ProcedureConfig contains initial values for widgets.
     After the dialog run, ProcedureConfig contains values the user chose.
     '''
-    config = procedure.create_config()
-    config.begin_run(image, Gimp.RunMode.INTERACTIVE, args)  # GObject.NULL)  # image, run_mode, args
     procedureDialog = Gimp.ProcedureDialog.new(procedure, config, 'foo')
     procedureDialog.run()
-    config.end_run(GIMP_PDB_SUCCESS)
-
-    '''
-    , the above is somewhat based on this code from despeckle
-  if (run_mode == GIMP_RUN_INTERACTIVE)
-    {
-      if (! despeckle_dialog (procedure, G_OBJECT (config), drawable))
-        {
-          return gimp_procedure_new_return_values (procedure,
-                                                   GIMP_PDB_CANCEL,
-                                                   NULL);
-        }
-    }
-
-  despeckle (drawable, G_OBJECT (config));
-
-  gimp_procedure_config_end_run (config, GIMP_PDB_SUCCESS);
-  g_object_unref (config);
-    '''
+  """
 
 def _get_args_for_widget_factory(formal_param, widget_default_value):
     ''' Get args from formal spec, but override default with widget_default_value.  Returns list of args '''
