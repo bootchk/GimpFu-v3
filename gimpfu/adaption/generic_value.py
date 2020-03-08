@@ -238,7 +238,13 @@ class FuGenericValue():
         except Exception as err:
             do_proceed_error(f"Creating GValue for type: {gvalue_type}, value: {value}, err: {err}")
             # Return some bogus value so can proceed
-            result = GObject.Value( GObject.TYPE_INT, 1 )
+            result = FuGenericValue.new_int_gvalue()
             # TODO would this work??
             # result = GObject.Value( GObject.TYPE_NONE, None )
         return result
+
+
+    @staticmethod
+    def new_int_gvalue():
+        """ Returns a gvalue of type INT and value 1. """
+        return GObject.Value( GObject.TYPE_INT, 1 )

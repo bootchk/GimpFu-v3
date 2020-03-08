@@ -44,21 +44,23 @@ A typical gimpfu plug-in would look like this:
               pass
 
   register(
-              "plugin-func",
+              "plugin-name",
               "blurb",
               "help message",
               "author",
               "copyright",
               "year",
-              N_("My plug-in menu label"),
+              N_("My plug-in menu label..."),
               "*",
               [
                   (PF_IMAGE, "image", "Input image", None),
                   (PF_DRAWABLE, "drawable", "Input drawable", None),
-                  (PF_STRING, "arg", "The argument", "default-value")
+                  (PF_STRING, "arg", "a_argument", "default-value")
               ],
               [],
-              plugin_func, menu="<Image>/Somewhere")
+              plugin_func,
+              menu="<Image>/Somewhere"
+          )
 
   main()
 
@@ -66,12 +68,32 @@ The call to "from gimpfu import *" imports gimp constants
 into the plug-in namespace, and also imports the symbols: gimp, pdb,
 register and main.  This should be just about all any plug-in needs.
 
-You can use any of the PF_* constants below as parameter types, and GimpFu will
-display an appropriate user interface element when the plug-in
-is run in interactive mode.  Note that the the PF_SPINNER and
-PF_SLIDER types expect a fifth element in their description tuple -- a
-3-tuple of the form (lower,upper,step), which defines the limits for
-the slider or spinner.
+Use any of the PF_* constants as parameter types.
+They denote the kind of user interface control for the plugin's dialog box.
+The PF_SPINNER and PF_SLIDER types expect a fifth element in their description tuple -- a
+3-tuple of the form (lower,upper,step), which defines the valid limits for
+the setting.
+
+All the strings in the example are your choices, following these guidelines:
+"plugin-name" should use hyphens.
+GimpFu will canonicalize the name (make it meet standards) before registering it
+(the example yields actual name "python-fu-plugin-name".)
+Argument names ("image", etc.) should not use spaces.
+They do not need to match the names of the formal parameters of the "plugin_func".
+Parameter descriptions should match the formal parameters in number.
+The symbol plugin_func can be anything but must be a valid Python identifier.
+The menu label should follow common conventions: first letter capitalized and
+using trailing "...." to denote a dialog will open.
+The menu path string (e.g. "<Image>/Somewhere"): the prefix must be from a small
+set defined elsewhere, and the suffix "Somewhere" is optional:
+your choice to make a new sub-menu.
+Omitting the menu path description is deprecated (highly discouraged).
+"*" denotes image_types the plugin will accept, from a small set:
+"RGB", "RGBA", "RGB*", "GRAY", "GRAYA", "GRAY*"
+TODO or a tuple???
+TODO return values.
+TODO domain
+
 
 To localize your plug-in, add an optional domain parameter to
 the register call. It can be the name of the translation domain or a
@@ -327,7 +349,7 @@ def _interact(procedure, list_gvalues_all_args, config):
     Show GUI when guiable args, then execute run_func.
     Progress will show in Gimp window, not dialog window.
 
-    Return (was_canceled, (results of run_func or None))
+    Returns (was_canceled, (results of run_func or None))
     '''
     print("_interact called", procedure, list_gvalues_all_args)
 
@@ -340,6 +362,7 @@ def _interact(procedure, list_gvalues_all_args, config):
     function = gf_procedure.metadata.FUNCTION
 
     wrapped_in_actual_args = Marshal.wrap_args(list_gvalues_all_args)
+
     guiable_formal_params =  gf_procedure.guiable_formal_params
 
     """
@@ -376,12 +399,7 @@ def _interact(procedure, list_gvalues_all_args, config):
         # create GUI from guiable formal args, let user edit actual args
 
         #TODO duplicate??
-        # on_run only called when GUI??
-        # TODO make this a method of FuProcedure
-        if gf_procedure.metadata.ON_RUN:
-            print("Call on_run")
-            on_run = gf_procedure.metadata.ON_RUN
-            on_run()
+        gf_procedure.on_run()
 
         import gui.dialog
 
@@ -395,6 +413,13 @@ def _interact(procedure, list_gvalues_all_args, config):
             guiable_formal_params, run_script)
         '''
         nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_in_actual_args)
+
+        '''
+        If you omit this next step, it does not use last_values, instead
+        using actual_args, which will be defaults in many cases.
+        '''
+        # Wrong: config.get_initial_settings(guiable_actual_args)
+        # TEMP: this is correct, but not working:  guiable_actual_args = config.get_initial_settings()
 
         was_canceled, guied_args = gui.dialog.show_plugin_dialog(
             procedure,
@@ -511,7 +536,7 @@ def _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
 
     func = gf_procedure.get_authors_function()
 
-    config = FuProcedureConfig(procedure)
+    config = FuProcedureConfig(procedure, len(list_gvalues_all_args)-2 )
     config.begin_run(image, run_mode, original_args)
 
     if isBatch:

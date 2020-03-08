@@ -38,7 +38,7 @@ class EntryValueError(Exception):
 """
 Probably CRUFT
 # FUTURE i.e. work in progress
-# TODO param actual_args of type Gimp.ValueArray.
+# TODO param guiable_initial_values of type Gimp.ValueArray.
 def show_plugin_procedure_dialog():
     '''
     Implement using Gimp.ProcedureDialog
@@ -52,9 +52,9 @@ def show_plugin_procedure_dialog():
     procedureDialog.run()
   """
 
-def _get_args_for_widget_factory(formal_param, widget_default_value):
-    ''' Get args from formal spec, but override default with widget_default_value.  Returns list of args '''
-    print("_get_args_for_widget_factory", formal_param, widget_default_value)
+def _get_args_for_widget_factory(formal_param, widget_initial_value):
+    ''' Get args from formal spec, but override default with widget_initial_value.  Returns list of args '''
+    print("_get_args_for_widget_factory", formal_param, widget_initial_value)
     # This is a switch statement on  PF_TYPE
     # Since data comes from , don't trust it
     pf_type = formal_param.PF_TYPE
@@ -64,21 +64,21 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
         Deprecation.say("Use PF_COLOR instead of PF_COLOUR")
 
     if pf_type in ( PF_RADIO, ):
-        args = [widget_default_value, formal_param.EXTRAS]
+        args = [widget_initial_value, formal_param.EXTRAS]
     elif pf_type in (PF_FILE, PF_FILENAME):
         # TODO need keyword 'title'?
-        # args = [widget_default_value, title= "%s - %s" % (proc_name, tooltip_text)]
-        # args = [widget_default_value, "%s - %s" % (proc_name, tooltip_text)]
+        # args = [widget_initial_value, title= "%s - %s" % (proc_name, tooltip_text)]
+        # args = [widget_initial_value, "%s - %s" % (proc_name, tooltip_text)]
         # TEMP: widget is omitted, use default defined by author
 
         # TODO this should work, but its not
-        # args = [widget_default_value,]
+        # args = [widget_initial_value,]
         args = ["/tmp/lkkfoopluginout"]
     elif pf_type in (PF_INT, PF_STRING, PF_BOOL, PF_OPTION, PF_FONT, PF_TEXT ):
-        args = [widget_default_value]
+        args = [widget_initial_value]
     elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER, PF_ADJUSTMENT):
         # Hack, we are using FloatEntry, should use Slider???
-        args = [widget_default_value,]
+        args = [widget_initial_value,]
     elif pf_type in (PF_COLOR, PF_COLOUR):
         # Omitted, use a constant color
         color = Gimp.RGB()
@@ -97,17 +97,27 @@ def _get_args_for_widget_factory(formal_param, widget_default_value):
     return args
 
 
+def _add_tooltip_to_widget(wid, a_formal_param ):
 
-def _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params):
+    tooltip_text = a_formal_param.tooltip_text
+
+    if a_formal_param.PF_TYPE != PF_TEXT:
+        wid.set_tooltip_text(tooltip_text)
+    else:
+        # Attach tip to TextView, not to ScrolledWindow
+        wid.view.set_tooltip_text(tooltip_text)
+
+
+def _add_control_widgets_to_dialog(box, guiable_initial_values, guiable_formal_params):
     ''' add control widget for each formal param, returning tuple of controls'''
     '''
-    actual_args: is-a Gimp.ValueArray, actual_args (could be defaults or last values) as specified by how we registered with Gimp
-    FUTURE: use them to create widget's initial values
+    guiable_initial_values: is-a Gimp.ValueArray, guiable_initial_values (could be defaults or last values)
+    as specified by how we registered with Gimp
 
-    guiable_formal_params: a Python type, the original formal specs from author in GimpFu notation,
-       but just those that should have control widgets
+    guiable_formal_params: a Python type, formal specs from author in GimpFu notation,
+    but just guiable (those that should have control widgets.)
     '''
-    print("add_control_widgets")
+    print(f"add_control_widgets: {guiable_initial_values}")
 
     label = Gtk.Label.new_with_mnemonic("Off_set")
     box.pack_start(label, False, False, 1)
@@ -130,16 +140,16 @@ def _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params):
         a_formal_param = guiable_formal_params[i]
 
         # Grid left hand side is LABEL
-        label = Gtk.Label(a_formal_param.LABEL)
+        label = Gtk.Label(a_formal_param.label)
         label.set_use_underline(True)
-        label.set_alignment(0.0, 0.5)
+        label.set_alignment(1.0, 0.5)
         grid.attach(label, 1, i, 1, 1)
         label.show()
 
         # Grid right hand side is control widget
 
         # widget types not range checked earlier
-        # author COULD have entered any integer
+        # author COULD err by specifying out of range widget type
         try:
             #  e.g. widget_factory = StringEntry
             widget_factory = _edit_map[a_formal_param.PF_TYPE]
@@ -147,34 +157,32 @@ def _add_control_widgets_to_dialog(box, actual_args, guiable_formal_params):
             exception_str = f"Invalid or not implemented PF_ widget type: {a_formal_param.PF_TYPE}"
             raise Exception(exception_str)
 
-
         '''
-        There is a default specified in the guiable_formal_params,
-        but override it with a value passed in, i.e. from LAST_VALS
+        There is a default specified in the guiable_formal_params.
+        But initial value is passed in,
         i.e. from the last value the user entered in the GUI.
-        The default is now the default for the widget (not for the procedure.)
-        TODO
+        This is a hack until FuProcedureConfig works, i.e.
+        until we can register args with Gimp using GProperty or GParamSpec
         '''
-        widget_default_value = a_formal_param.DEFAULT_VALUE
-        tooltip_text = 'foo'  # TODO
+        is_use_defaults = True
+        if is_use_defaults:
+            widget_initial_value = a_formal_param.DEFAULT_VALUE
+        else:
+            widget_initial_value = guiable_initial_values[i]
+
         proc_name = 'bar' # TODO procedure.procedure_name()
 
-        factory_specs = _get_args_for_widget_factory(a_formal_param, widget_default_value)
+        factory_specs = _get_args_for_widget_factory(a_formal_param, widget_initial_value)
 
+        # TODO pass tooltip_text
+        # tooltip_text = a_formal_param.tooltip_text)
         print("Calling factory with specs", widget_factory, factory_specs)
         control_widget = widget_factory(*factory_specs)
-        # e.g. control_widget = StringEntry(widget_default_value)
+        # e.g. control_widget = StringEntry(widget_initial_value)
         label.set_mnemonic_widget(control_widget)
         grid.attach(control_widget, 2, i, 1, 1)
 
-        '''
-        TODO
-        if pf_type != PF_TEXT:
-            wid.set_tooltip_text(tooltip_text)
-        else:
-            # Attach tip to TextView, not to ScrolledWindow
-            wid.view.set_tooltip_text(tooltip_text)
-        '''
+        _add_tooltip_to_widget(control_widget, a_formal_param )
 
         control_widget.show()
         control_widget.desc = a_formal_param.DESC
@@ -199,13 +207,13 @@ spin.show()
 
 
 
-def _create_gimp_dialog(guiable_actual_args, guiable_formal_params):
+def _create_gimp_dialog(guiable_initial_values, guiable_formal_params):
     '''
     Show plugin dialog implemented using Gimp.Dialog
 
-    Returns a tuple of values or None (user canceled.)
+    Returns list of control widgets and dialog
     '''
-    print("_create_gimp_dialog", guiable_actual_args, guiable_formal_params)
+    print(f"_create_gimp_dialog:  {guiable_initial_values}: {guiable_formal_params} ")
 
     use_header_bar = Gtk.Settings.get_default().get_property("gtk-dialogs-use-header")
     dialog = Gimp.Dialog(use_header_bar=use_header_bar,
@@ -219,7 +227,7 @@ def _create_gimp_dialog(guiable_actual_args, guiable_formal_params):
     dialog.get_content_area().add(box)
     box.show()
 
-    controls = _add_control_widgets_to_dialog(box, guiable_actual_args, guiable_formal_params)
+    controls = _add_control_widgets_to_dialog(box, guiable_initial_values, guiable_formal_params)
 
     return controls, dialog
 
@@ -238,20 +246,20 @@ I presume so that the dialog would stay up with its progress bar.
 v3 returns control_values and caller must invoke result=run_func(control_values)
 Progress is still shown, but in the image's display window's progress bar.
 '''
-def show_plugin_dialog(procedure, guiable_actual_args, guiable_formal_params):
+def show_plugin_dialog(procedure, guiable_initial_values, guiable_formal_params):
     '''
     Present GUI.
     Returns (was_canceled, tuple of result values) from running plugin
     '''
-    print("show_plugin_dialog", procedure, guiable_actual_args, guiable_formal_params)
+    print("show_plugin_dialog", procedure, guiable_initial_values, guiable_formal_params)
     #assert type(procedure.__name == )
-    #assert len(guiable_actual_args) == len(guiable_formal_params )
+    #assert len(guiable_initial_values) == len(guiable_formal_params )
     #print("after assert")
 
     Gimp.ui_init('foo') # TODO procedure.name()
 
     # choice of implementation
-    controls, dialog = _create_gimp_dialog(guiable_actual_args, guiable_formal_params)  # implemented by GimpFu in Python
+    controls, dialog = _create_gimp_dialog(guiable_initial_values, guiable_formal_params)  # implemented by GimpFu in Python
     # show_plugin_procedure_dialog() # implemented by Gimp in C
 
     # TODO transient

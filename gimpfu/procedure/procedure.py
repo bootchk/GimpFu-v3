@@ -39,6 +39,8 @@ class FuProcedure():
      -- the specs for a procedure
      -- the return values for a procedure
      - types of procedure
+     - the callbacks for the plugin: on_query, on_run
+
 
     Note that FuProcedure does not understand last values, see FuProcedureConfig
     '''
@@ -245,6 +247,17 @@ class FuProcedure():
         """ Declare to Gimp return value types of this plugin procedure. """
         print("convey_return_value_declarations_to_gimp NOT IMPLEMENTED")
         # procedure.add_return_value_from_property(self, "new-palette")
+
+    '''
+    callbacks
+    '''
+
+    def on_run(self):
+        if self.metadata.ON_RUN:
+            print("Call on_run")
+            a_callback = self.metadata.ON_RUN
+            a_callback()
+
 
 
     '''

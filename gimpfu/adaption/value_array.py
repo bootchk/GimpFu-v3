@@ -17,6 +17,10 @@ from message.proceed_error import *
 
 
 
+# TODO not a pure class, but with instances
+# __init__,   dump() => __repr__
+# and rename methods push_gvalue => push()
+# and with method get_empty_of_length(length)
 
 class FuValueArray():
     '''
