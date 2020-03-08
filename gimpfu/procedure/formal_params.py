@@ -13,6 +13,7 @@ class FuFormalParams():
     Responsibilities:
     - keep a list of FuFormalParams
     - fixups on self
+    - convey self to Gimp
     '''
 
     '''
@@ -23,11 +24,7 @@ class FuFormalParams():
     image_param = FuFormalParam(PF_IMAGE, "image", "Input image", None)
     drawable_param = FuFormalParam(PF_DRAWABLE, "drawable", "Input drawable", None)
 
-    # Temp hack ???
-    from procedure.prop_holder import PropHolder
-    prop_holder = PropHolder()
-    print("prop_holder.props", prop_holder.props)
-    print("prop_holder.props.IntProp:", prop_holder.props.IntProp)
+
 
 
 
@@ -145,10 +142,4 @@ class FuFormalParams():
             # procedure.add_argument_from_property(prop_holder, "intprop")
 
         for i in range(count_omitted_leading_args, len(self.PARAMS)):
-            # TODO map PF_TYPE to types known to Gimp (a smaller set)
-            # use named properties of prop_holder
-
-            # This just conveys a sequence of undescribed args
-            # TODO the intended design of Gimp is to convey types, but this doesn't
-            # and the Gimp design is bogus
-            procedure.add_argument_from_property(FuFormalParams.prop_holder, "IntProp")
+            self.PARAMS[i].convey_to_gimp(procedure)
