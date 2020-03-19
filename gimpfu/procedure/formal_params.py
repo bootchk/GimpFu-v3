@@ -142,4 +142,4 @@ class FuFormalParams():
             # procedure.add_argument_from_property(prop_holder, "intprop")
 
         for i in range(count_omitted_leading_args, len(self.PARAMS)):
-            self.PARAMS[i].convey_to_gimp(procedure)
+            self.PARAMS[i].convey_to_gimp(procedure, i)
