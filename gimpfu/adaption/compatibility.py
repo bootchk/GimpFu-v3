@@ -105,10 +105,10 @@ pdb_renaming = {
     "gimp-undo-push-group-start"   : "gimp-image-undo-group-start",
     "gimp-undo-push-group-end"     : "gimp-image-undo-group-end",
     "gimp-levels"            : "gimp-drawable-levels",
-    # Rest are guesses, not tested
-    "gimp-edit-bucket-fill" : "gimp-drawable-edit-bucket-fill", # TODO # (fill_type, x, y):
-    "gimp-ellipse-select"   : "gimp-image-select-ellipse",
 
+    # See pdb.py, now specially adapted because the signatures changed
+    # "gimp-ellipse-select"   : "gimp-image-select-ellipse",
+    # "gimp-edit-bucket-fill" : "gimp-drawable-edit-bucket-fill", # TODO # (fill_type, x, y):
 }
 """
 Tested not renamed.

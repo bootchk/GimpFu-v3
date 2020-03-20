@@ -93,6 +93,7 @@ Exceptions to the rules
 FG_BG_RGB_MODE      = 1999
 
 # TODO not sure this is correct
+FG_BUCKET_FILL      = Gimp.FillType.FOREGROUND
 BG_BUCKET_FILL      = Gimp.FillType.BACKGROUND
 
 SATURATION_MODE = Gimp.LayerMode.HSV_SATURATION

@@ -137,7 +137,8 @@ class GimpfuPDB():
 
 
 
-    def  __getattribute__(self, name):
+    # def  __getattribute__(self, name):
+    def __getattr__(self, name):
         '''
         Adapts attribute access to become invocation of PDB procedure.
         Returns an adapter_func
@@ -194,9 +195,31 @@ class GimpfuPDB():
     # specialized, convenience
 
     '''
-    These are pdb procedures from v2 that we don't intend to deprecate
-    since some plugins may still use them.
+    These are pdb procedures from v2 that Gimp deprecated.
+    Since some plugins may still use them, FBC define adaptors.
     '''
+
+    # TODO say deprecated
+
+    def gimp_ellipse_select(self, img, x, y, width, height, channel_op, foo, bar, zed):
+        # 1. Discard last three parameters.  I don't know what effect that has.
+        # 2. Reorder the other parameters
+        # 3. renamed
+        """
+        We either must mangle the procedure name hyphens to call Gimp.get_pdb()
+        or call the Gimp function directly.
+        """
+        # Not this:  Gimp.get_pdb().gimp_image_select_ellipse(img, channel_op, x, y, width, height)
+        Gimp.Image.select_ellipse(img.unwrap(), channel_op, x, y, width, height)
+
+
+    def gimp_edit_bucket_fill(self, layer, fill_type, layer_mode, opacity, threshold, sample_merged, x, y):
+        """
+        1.  Discard some parameters, effect could differ.
+        2. renamed.
+        """
+        Gimp.Drawable.edit_bucket_fill(layer.unwrap(), fill_type, x, y)
+
 
     """
     WIP

@@ -122,26 +122,33 @@ class GimpfuImage( Adapter ) :
     # Methods
 
 
-    # Reason: allow optional args
-    def insert_layer(self, layer, parent=None, position=-1):
-        print("insert_layer called")
-
+    def _mangle_layer_args(self, layer, parent, position):
         """
         A hack to allow (layer, position) signature,
         which apparently is a very old signature.
         """
         if position == -1 and parent is not None:
             # swap passed parent into the position arg
-            success = self._adaptee.insert_layer(layer.unwrap(), None, parent)
+            result = (layer, None, parent)
         else:
-            # Note that first arg "image" to Gimp comes from self
-            success = self._adaptee.insert_layer(layer.unwrap(), parent, position)
+            result = (layer, parent, position)
+        return result
+
+
+    # Reason: allow optional args
+    def insert_layer(self, layer, parent=None, position=-1):
+        print("insert_layer called")
+
+        layer, parent, position = self._mangle_layer_args(layer, parent, position)
+        # Note that first arg "image" to Gimp comes from self
+        success = self._adaptee.insert_layer(layer.unwrap(), parent, position)
         if not success:
             raise Exception("Failed insert_layer")
 
     # Reason: allow optional args, rename
     def add_layer(self, layer, parent=None, position=-1):
         print("add_layer called")
+        layer, parent, position = self._mangle_layer_args(layer, parent, position)
         success = self._adaptee.insert_layer(layer.unwrap(), parent, position)
         if not success:
             raise Exception("Failed add_layer")
