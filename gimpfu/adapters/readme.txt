@@ -6,3 +6,10 @@ They all have super class Adapter.
 
 Possibly there could be a abstract base class for all.
 For now, comments are scattered around the classes.
+
+Code near the top is similar (since they all inherit Adapter.)
+E.G. it defines the adapted properties of the class.
+
+Code near the bottom is specialized.
+Mostly FBC.
+E.G. define methods that GimpFu v2 defined that are not in Gimp itself.

@@ -140,15 +140,11 @@ class FuProcedure():
 
 
     def join_nonguiable_to_guiable_args(self, nonguiable, guiable):
-        '''
-        Understands whether we have different signature for run_func '''
-        if self.metadata.does_runfunc_signature_differ_from_gimp_signature:
-            # nonguiable args in signature of both plugin and run_func
-            result = guiable
-            print(">>>>>>>>>>>>Omitting image params to run_func")
-        else:
-            # nonguiable args in signature of plugin but not the run_func
+        """ Possibly join args """
+        if self.metadata.does_runfunc_take_nonguiable_args(len(guiable)):
             result = nonguiable + guiable
+        else:
+            result = guiable
         return result
 
 
@@ -207,16 +203,9 @@ class FuProcedure():
     """
 
 
-    """
-    def get_metadata(self):
-        ''' Return metadata authored by . '''
-        return _registered_plugins_[proc_name]
-    """
-
-
     def get_authors_function(self):
-        ''' Return function authored by . '''
-        return self.metadata.FUNCTION
+        return self.metadata.get_authors_function()
+
 
 
     '''

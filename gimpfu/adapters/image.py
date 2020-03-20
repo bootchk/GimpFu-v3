@@ -126,8 +126,16 @@ class GimpfuImage( Adapter ) :
     def insert_layer(self, layer, parent=None, position=-1):
         print("insert_layer called")
 
-        # Note that first arg "image" to Gimp comes from self
-        success = self._adaptee.insert_layer(layer.unwrap(), parent, position)
+        """
+        A hack to allow (layer, position) signature,
+        which apparently is a very old signature.
+        """
+        if position == -1 and parent is not None:
+            # swap passed parent into the position arg
+            success = self._adaptee.insert_layer(layer.unwrap(), None, parent)
+        else:
+            # Note that first arg "image" to Gimp comes from self
+            success = self._adaptee.insert_layer(layer.unwrap(), parent, position)
         if not success:
             raise Exception("Failed insert_layer")
 

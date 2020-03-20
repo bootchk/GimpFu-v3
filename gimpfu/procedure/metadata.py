@@ -8,6 +8,9 @@ from procedure.formal_params import FuFormalParams
 
 from gimpfu_enums import *  # PF_ enums
 
+# introspection of Python code
+from inspect import signature
+
 
 # v3 _registered_plugins_ is a dictionary of FuProcedureMetadata
 
@@ -96,11 +99,11 @@ class FuProcedureMetadata():
         differs from signature of run_func.
         '''
         # !!! Pass self as parameter
-        self.does_runfunc_signature_differ_from_gimp_signature = self.params.deriveMissingParams(self)
+        self.does_gimpfu_signature_differ_from_gimp_signature = self.params.deriveMissingParams(self)
         # TODO why do we do this twice, consolidate or make cases distinct?
         # One checks for new style registration, the other doesn't???
-        if not self.does_runfunc_signature_differ_from_gimp_signature:
-            self.does_runfunc_signature_differ_from_gimp_signature = self.params.deriveMissingImageParams(self)
+        if not self.does_gimpfu_signature_differ_from_gimp_signature:
+            self.does_gimpfu_signature_differ_from_gimp_signature = self.params.deriveMissingImageParams(self)
 
 
 
@@ -336,3 +339,64 @@ class FuProcedureMetadata():
             if not self.letterCheck(ent[1], self.param_name_allowed):
                 # not fatal unless we use it?
                 do_proceed_error(f"result name '{ent[1]}' contains illegal characters")
+
+
+    """
+    Three different signatures:
+       1. formal gimp signature
+       2. formal gimpfu signature (from author, in the params list)
+       3. formal runfunc signature (from author, in the runfunc itself)
+
+    History:
+    In the past, certain arguments could be omitted.
+    Thus signatures could differ.
+    The epochs are:
+       old style registration
+       new style registration
+       v3 registration
+
+    GimpFu FBC still allows the image params to be omitted from the formal GimpFu parameter spec.
+    Gimp v3 enforces that an image type plugin have signature (registered with Gimp) with image params.
+
+    Note that the difference between 1. and 2. is a different but related concern
+    from difference between 2. and 3.
+    """
+
+
+
+    def get_authors_function(self):
+        ''' Return author's function AKA the run_func .
+        !!! This is not a string, but a callable.
+        Because in the author's source, in the registration data,
+        the function name is not quoted but is a reference to the function.
+        '''
+        return self.FUNCTION
+
+
+    """
+    !!! This assumes that author did not define run_func with var args i.e "*args"
+    """
+    def get_runfunc_arg_count(self):
+        sig = signature(self.get_authors_function())
+        return len(sig.parameters)
+
+
+
+    def does_runfunc_take_nonguiable_args(self, count_guiable_args):
+        """ Understands whether we have different signature for run_func.
+
+        One implementation is to determine the cases
+        by examining formal signatures.
+        Here, we take a more direct approach: introspect the run_func
+        to determine the count of parameters.
+        If the count of guiable args is less than what the run_func wants,
+        assume we need to prefix args with image args passed from Gimp.
+        """
+        # This is nieve, and doesn't work well.
+        # result = self.does_gimpfu_signature_differ_from_gimp_signature
+
+
+        result = count_guiable_args < self.get_runfunc_arg_count()
+        if not result:
+            print(">>>>>>>>>>>>Omitting image params to run_func")
+        return result
