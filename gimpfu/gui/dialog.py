@@ -74,7 +74,7 @@ def _get_args_for_widget_factory(formal_param, widget_initial_value):
         # TODO this should work, but its not
         # args = [widget_initial_value,]
         args = ["/tmp/lkkfoopluginout"]
-    elif pf_type in (PF_INT, PF_STRING, PF_BOOL, PF_OPTION, PF_FONT, PF_TEXT ):
+    elif pf_type in (PF_INT, PF_INT8, PF_INT16, PF_INT32, PF_STRING, PF_BOOL, PF_OPTION, PF_FONT, PF_TEXT ):
         args = [widget_initial_value]
     elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER, PF_ADJUSTMENT):
         # Hack, we are using FloatEntry, should use Slider???

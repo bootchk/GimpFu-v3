@@ -88,14 +88,19 @@ class FuProcedureMetadata():
         self._sanity_test_registration()
 
         self.did_fix_menu = self._deriveMissingMenu()
+        self._fix_deprecated_menu()
 
-        self.params.deriveMissingParams(self)   # pass self as metadata
         '''
         !!! When we insert image params,
         signature registered with Gimp
         differs from signature of run_func.
         '''
-        self.did_insert_image_params = self.params.deriveMissingImageParams(self)
+        # !!! Pass self as parameter
+        self.does_runfunc_signature_differ_from_gimp_signature = self.params.deriveMissingParams(self)
+        # TODO why do we do this twice, consolidate or make cases distinct?
+        # One checks for new style registration, the other doesn't???
+        if not self.does_runfunc_signature_differ_from_gimp_signature:
+            self.does_runfunc_signature_differ_from_gimp_signature = self.params.deriveMissingImageParams(self)
 
 
 
@@ -248,6 +253,21 @@ class FuProcedureMetadata():
     Fixups to self.  !!! Side effects on self
     '''
 
+    def _fix_deprecated_menu(self):
+        """ Fix menu paths deprecated. """
+        # require _deriveMissingMenu() called prior
+
+        # Deprecated Since 2.8.
+        # No longer the case that they should be in <File>/New as some docs say???
+
+        if self.MENUPATH.startswith("<Toolbox>/Xtns") :
+            self.MENUPATH = self.MENUPATH.replace("<Toolbox>/Xtns", "<Image>/Filters/Extensions")
+            Deprecation.say("Replaced menu path <Toolbox>/Xtns with: <Image>/Filters/Extensions")
+        elif self.MENUPATH.startswith("<Toolbox>") :
+            self.MENUPATH = self.MENUPATH.replace("<Toolbox>", "<Image>")
+            Deprecation.say("Replaced menu path <Toolbox> with: <Image>")
+
+
 
     def _deriveMissingMenu(self):
         '''
@@ -270,9 +290,8 @@ class FuProcedureMetadata():
                     Deprecation.say(message)
                 else:
                     # 'label' is not a path, can't derive menu path
-                    message = f" Simple menu item 'label' without 'menu' path."
                     # TODO will GIMP show it in the GUI in a fallback place?
-                    Deprecation.say(message)
+                    Deprecation.say(f" Simple menu item 'label' without 'menu' path.")
             else:
                 # no menu and no label
                 # Normal, user intends to create plugin only callable by other plugins

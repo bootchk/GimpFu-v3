@@ -142,7 +142,7 @@ class FuProcedure():
     def join_nonguiable_to_guiable_args(self, nonguiable, guiable):
         '''
         Understands whether we have different signature for run_func '''
-        if self.metadata.did_insert_image_params:
+        if self.metadata.does_runfunc_signature_differ_from_gimp_signature:
             # nonguiable args in signature of both plugin and run_func
             result = guiable
             print(">>>>>>>>>>>>Omitting image params to run_func")

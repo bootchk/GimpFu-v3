@@ -61,7 +61,9 @@ class FuFormalParams():
 
 
     def deriveMissingParams(self, metadata):
-        ''' FBC Add missing params according to plugin type. '''
+        """ FBC Add missing params according to plugin type.
+        Returns True when insert params.
+        """
 
         '''
         FBC.
@@ -71,17 +73,20 @@ class FuFormalParams():
         in which case GimpFu inserts two params.
         Similarly for other cases.
         '''
+
+        result = False
+
         # v2 if self.did_fix_menu and plugin_type == PLUGIN:
         # require _deriveMissingMenu called earlier
         if metadata.is_new_style_registration:
-            # specified params are explict, requires no fixup
-            return
-
-        if metadata.is_load_procedure_type:
+            # specified params are explict, requires no fix
+            pass
+        elif metadata.is_load_procedure_type:
             # insert into slice
             self.PARAMS[0:0] = FuFormalParams.file_params
             message = f" Fixing two file params for Load plugin"
             Deprecation.say(message)
+            result = True
         elif metadata.is_image_procedure_type or metadata.is_save_procedure_type:
             self.PARAMS.insert(0, FuFormalParams.image_param)
             self.PARAMS.insert(1, FuFormalParams.drawable_param)
@@ -91,7 +96,9 @@ class FuFormalParams():
                 self.PARAMS[2:2] = file_params
                 message = f" Fixing two file params for Save plugin"
                 Deprecation.say(message)
+            result = True
         #print(self.PARAMS)
+        return result
 
 
     def deriveMissingImageParams(self, metadata):
