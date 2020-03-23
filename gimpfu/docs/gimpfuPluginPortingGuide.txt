@@ -213,6 +213,8 @@ plus all the functions defined on the Gimp and Gimp.PDB classes
 (They are distinct from the 'Gimp' and 'Gimp.PDB' symbols,
 which are defined when you use GI directly.)
 
+Note that "gimp.pdb" was allowed in v2 but is obsolete in v3.  Use "pdb".
+
 
 The GimpFu classes
 ------------------
@@ -284,16 +286,39 @@ This refers to .../plug-ins/gimpfu/gui/dialog.py
 Miscellaneous changes
 ---------------------
 
+gimp.pdb
+========
 Use 'pdb.foo()', not 'gimp.pdb.foo()'.  'pdb' is not in the 'gimp' namespace.
 
 The pdb object cannot be accessed using index notation:
 pdb['gimp-edit-fill']()    =>    pdb.gimp-edit-fill()
 
+Property notation
+=================
+
 The attributes of GimpFu objects can still be accessed using property notation
 without parens
 e.g. timg.width
-(Note that using GI, Gimp object properties are accessed using getter call notation
-e.g. timg.width() )
+Using GI, Gimp object properties are accessed using getter call notation
+e.g. timg.width() , with parenthesis.
+
+Nested calls to gimp
+====================
+
+This doesn't work in v3:
+
+pdb.gimp_floating_sel_anchor(pdb.gimp_image_get_floating_sel(img))
+
+Instead, unnest the calls:
+
+foo = pdb.gimp_image_get_floating_sel(img)
+pdb.gimp_floating_sel_anchor(foo)
+
+(This is a quirk of the GimpFu implementation, and in the future could be changed.)
+
+
+
+
 
 
 
