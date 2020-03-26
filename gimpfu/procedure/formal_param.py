@@ -5,6 +5,8 @@ from gi.repository import GObject
 
 from gimpfu_enums import *
 
+from procedure.prop_holder_factory import PropHolderFactory
+
 
 
 '''
@@ -127,10 +129,23 @@ class FuFormalParam(GObject.Object):
         procedure.add_argument_from_property(self, "spacing")
 
 
+    def convey_using_dynamic_class_property(self, procedure):
+        type = map_PF_TYPE_to_type[self.PF_TYPE]
+        default = self.DEFAULT_VALUE
+
+        factory = PropHolderFactory()
+        # !!! need strings but str() and repr() don't work for type
+        instance, property_name = factory.produce("int", "1")   # str(type), str(default))
+        procedure.add_argument_from_property(instance, property_name)
+        #instance and property go out of scope
+
+
     def convey_to_gimp(self, procedure, index):
         """ Convey self as formal arg to GimpProcedure procedure. """
         # TODO get dynamic property to work
-        self.convey_using_static_property(procedure)
+
+        #self.convey_using_static_property(procedure)
+        self.convey_using_dynamic_class_property(procedure)
         #self.convey_using_dynamic_property(procedure, index)
 
 
