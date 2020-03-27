@@ -2,7 +2,8 @@
 from gimpfu import *
 
 def special_crop(image):
-        print "Start"
+        #lkk add parens
+        print("Start")
         pdb = gimp.pdb
         top = pdb.gimp_image_find_next_guide(image, 0)
         top_y = pdb.gimp_image_get_guide_position(image,top)

@@ -11,6 +11,8 @@ from procedure.prop_holder_factory import PropHolderFactory
 
 import sys
 
+from message.deprecation import Deprecation
+
 '''
 Inherits GObject.Object so we can install properties.
 '''
@@ -152,14 +154,18 @@ class FuFormalParam(GObject.Object):
         #self.convey_using_dynamic_property(procedure, index)
 
 
-
+    # TODO not necessary because Gimp accepts properties without defaults?
+    # TODO but catch string valued literals for default value here?
     def mangle_default(self):
         """ Create Gimp types for certain defaults.
         PyObject creates GObject types for most defaults.
         E.G. GimpFu allows tuples and string for Gimp.RGB
         """
+        # TODO this crashes, and is not necessary
         if self.PF_TYPE in (PF_COLOR, PF_COLOUR):
-            result = FuColor.color_from_python_type(self.DEFAULT_VALUE)
+            # result = FuColor.color_from_python_type(self.DEFAULT_VALUE)
+            # TODO get the repr string for the author's given default value
+            result = "Gimp.RGB()"
         else:
             result = self.DEFAULT_VALUE
         return result
@@ -190,9 +196,15 @@ class FuFormalParam(GObject.Object):
             min = 0
             max = 1
         elif extras_type == 3:
+            # PF_RADIO and PF_OPTION
             if extras:
+                # TODO should extract the min and max of the ints
+                # For most cases, this will suffice but max should be -1
+                if not isinstance (extras[0][1], int):
+                    # TODO exception
+                    Deprecation.say(f"String literal valued extras are obsolete.")
                 min = 0
-                max = len(extras) - 1
+                max = len(extras)
             else:
                 print("Missing extras")
         else:
@@ -208,6 +220,7 @@ that specifies widget kind and format of extras.
 """
 PF_TYPE >> python type or Gimp type
 Many to one.
+!!! We return a string for Gimp types, not an instance of Type.
 """
 map_PF_TYPE_to_type = {
     PF_INT8:      int,
@@ -217,15 +230,15 @@ map_PF_TYPE_to_type = {
     PF_FLOAT:     float,
     PF_STRING:    str,
     PF_VALUE:     int,
-    PF_COLOR:     Gimp.RGB,  # tuple?
-    PF_COLOUR:    Gimp.RGB,
-    PF_ITEM:      int,
-    PF_DISPLAY:   int,
-    PF_IMAGE:     int,
-    PF_LAYER:     int,
-    PF_CHANNEL:   int,
-    PF_DRAWABLE:  int,
-    PF_VECTORS:   int,
+    PF_COLOR:     "Gimp.RGB",  # tuple?
+    PF_COLOUR:    "Gimp.RGB",
+    PF_ITEM:      "Gimp.Item",
+    PF_DISPLAY:   "Gimp.Display",
+    PF_IMAGE:     "Gimp.Image",
+    PF_LAYER:     "Gimp.Layer",
+    PF_CHANNEL:   "Gimp.Channel",
+    PF_DRAWABLE:  "Gimp.Drawable",
+    PF_VECTORS:   "Gimp.Vectors",
     PF_TOGGLE:    int,
     PF_BOOL:      int,
     PF_SLIDER:    float,
@@ -233,12 +246,12 @@ map_PF_TYPE_to_type = {
     PF_ADJUSTMENT: int,
     PF_FONT:      str,
     PF_FILE:      str,  # ??? GFile?
-    PF_BRUSH:     int,
-    PF_PATTERN:   int,
-    PF_GRADIENT:  int,
+    PF_BRUSH:     int,  # ???
+    PF_PATTERN:   int,  # ???
+    PF_GRADIENT:  int,  # ???
     PF_RADIO:     int,
     PF_TEXT:      str,
-    PF_PALETTE:   int,
+    PF_PALETTE:   int,  # ???
     PF_FILENAME:  str,
     PF_DIRNAME:   str,
     PF_OPTION:    int,

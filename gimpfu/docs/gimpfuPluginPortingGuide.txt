@@ -120,7 +120,7 @@ See example code in a Python plugin that has already been ported to Gimp 3.
 For example see gimp/plugins/goat-exercises/goat-exercise-py3.py
 (TODO does it persist settings?)
 
-2) In a few cases, you might have used gimpshelf module for other purposes.
+3) Plugins that use gimpshelf module for other purposes.
 
 You will need to use GI as above, or find some other mechanism for persisting.
 
@@ -183,6 +183,7 @@ did not specify which colorspace they used.
 
 In v3, the modes are HSL_COLOR, HSV_SATURATION, HSV_HUE, and HSV_VALUE
 and their name tells you which colorspace they use.
+Note that the first uses "HSL" instead of "HSV" colorspace (it always has, even in v2.)
 
 TODO other model changes
 
@@ -270,8 +271,8 @@ In Python, use None.
 GimpFu packaging
 ----------------
 
-How GimpFu is packaged is irrelevant to most authors,
-but the knowledge may aid debugging.
+Most authors should not care how GimpFu is packaged.
+Some authors may want to know to aid debugging.
 
 In v2, gimpfu was many .py files in the same directory, each file a Python module.
 
@@ -300,7 +301,8 @@ The attributes of GimpFu objects can still be accessed using property notation
 without parens
 e.g. timg.width
 Using GI, Gimp object properties are accessed using getter call notation
-e.g. timg.width() , with parenthesis.
+e.g. if timg has type Gimp.Image, use timg.width() , with parenthesis.
+
 
 Nested calls to gimp
 ====================
@@ -317,6 +319,15 @@ pdb.gimp_floating_sel_anchor(foo)
 (This is a quirk of the GimpFu implementation, and in the future could be changed.)
 
 
+String valued PF_RADIO parameters
+=================================
+
+GimpFu v2 allowed parameters of type PF_RADIO that returned string values.
+E.G. , with "extras"  (("Foo", "foo"), ("Bar", "bar"))
+
+In v3, GimpFu requires integer literals for the values returned
+by a radio button group widget.
+E.G. , with "extras"  (("Foo", 0), ("Bar", 1))
 
 
 
@@ -353,7 +364,7 @@ With GimpFu classes, properties use property syntax, without parentheses.
 Without GimpFu, properties of Gimp object use getter/setter call syntax with parentheses.
 
 With GimpFu, the boilerplate might be more condensed.
-Whether you use GimpFu or not, you can still start from a template.
+Whether you use GimpFu or not, you can still start creating a plugin from template code.
 
 
 Other notes

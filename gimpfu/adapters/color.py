@@ -64,7 +64,9 @@ class FuColor(Adapter):
 
         print("new GimpfuColor with adaptee", self._adaptee)
 
-    # TODO repr
+    def __repr__(self):
+        # Gimp.RGB has no name() method, so print the fields
+        return f"FuColor {self.adaptee.r}"
 
     @classmethod
     def create_RGB_from_string(cls, value):

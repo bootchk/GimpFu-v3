@@ -2,7 +2,7 @@
 
 
 """
-We don't use gi directrly,
+We don't use gi directly,
 but it must be in scope for exec
 """
 import gi
@@ -17,6 +17,9 @@ import string
 
 """
 Factory that creates a GObject having a templated property.
+
+Used to pass properties to Gimp to specify parameters.
+This all could go away if GParamSpec is fixed in PyGObject
 """
 class PropHolderFactory():
 
@@ -26,6 +29,13 @@ class PropHolderFactory():
         self.counter = 1
 
         """
+        Template strings.
+
+        !!! Note that string.Template may call repr() on any substitutions
+        when a value passed is not already type string.
+        Thus the string returned by __repr__  must be true to the standard for repr
+        i.e. when execed it must reproduce the value.
+
         Indentation important on template strings.
         # type, nick, blurb, default, min, max, flags
         """
@@ -47,6 +57,17 @@ class Foo(GObject.GObject):
   }
 '''
 
+        """
+        case: type is Gimp types
+        !!! Default is omitted.
+        """
+        self.template_string_gimp_value = r'''
+global Foo
+class Foo(GObject.GObject):
+  __gproperties__ = {
+    "$name": ($type, "nick", "blurb", GObject.ParamFlags.READWRITE ),
+  }
+'''
 
 
     def get_unique_name(self):
@@ -72,9 +93,12 @@ class Foo(GObject.GObject):
         elif type is str:
             template = string.Template(self.template_string_str)
             code_string = template.substitute(type="str", name=unique_prop_name, default=default)
-        elif type is Gimp.RGB:
-            template = string.Template(self.template_string_str)
-            code_string = template.substitute(type="Gimp.RGB", name=unique_prop_name, default=default)
+        elif isinstance(type, str):
+            # assert str names a Gimp type
+            template = string.Template(self.template_string_gimp_value)
+            # !!! Omit default
+            code_string = template.substitute(type=type, name=unique_prop_name)
+            # print(code_string)
         else:
             raise RuntimeError(f"Unhandled property type: {type}")
 
