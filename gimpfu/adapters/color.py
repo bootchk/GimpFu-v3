@@ -7,9 +7,16 @@ from adaption.adapter import Adapter
 
 
 
-#TODO name just Color?
+"""
+# TODO:
+The name "Color" does not appear to be in GimpFu v2.
+E.G. not gimp.Color similar to gimp.Layer
+An author can use Gimp.RGB directly.
+But if we find any wild plugins that refer to gimp.Color??
+"""
 
-class GimpfuColor(Adapter):
+
+class FuColor(Adapter):
     '''
     Color is mostly for parameters to PDB.
 
@@ -40,11 +47,9 @@ class GimpfuColor(Adapter):
                 a_adaptee = Gimp.RGB()
                 a_adaptee.set(float(r), float(g), float(b) )
             elif name is not None:
-                a_adaptee = Gimp.RGB()
-                a_adaptee.parse_name(name, -1)  # -1 means null terminated
+                a_adaptee = FuColor.create_RGB_from_string(name)
             elif a_tuple is not None:
-                a_adaptee = Gimp.RGB()
-                a_adaptee.set(float(a_tuple[0]), float(a_tuple[1]), float(a_tuple[2]) )
+                a_adaptee = FuColor.create_RGB_from_tuple(a_tuple)
             elif adaptee is not None:
                 # Create wrapper for existing adaptee (from Gimp)
                 # Adaptee was created earlier at behest of Gimp user and is being passed into GimpFu plugin
@@ -53,10 +58,41 @@ class GimpfuColor(Adapter):
                 raise RuntimeError("Illegal call to GimpFuColor constructor")
         except Exception as err:
             do_proceed_error(f"Creating GimpfuColor: {err}")
-            
+
         # Adapter
         super().__init__(a_adaptee)
 
         print("new GimpfuColor with adaptee", self._adaptee)
 
     # TODO repr
+
+    @classmethod
+    def create_RGB_from_string(cls, value):
+        """ Create a Gimp.RGB from a string. """
+        result = Gimp.RGB()
+        result.parse_name(name, -1)  # -1 means null terminated
+        return result
+
+    @classmethod
+    def create_RGB_from_tuple(cls, tuple):
+        """ Create a Gimp.RGB from a 3-tuple. """
+        result = Gimp.RGB()
+        # upcast to type float when type int was passed
+        result.set(float(tuple[0]), float(tuple[1]), float(tuple[2]) )
+        return result
+
+
+    @classmethod
+    def color_from_python_type(cls, value):
+        """ Create a Gimp.RGB from a string or 3-tuple of ints.
+
+        Convenience method on the class.
+        """
+        if isinstance(value, str):
+            result = FuColor.create_RGB_from_string(value)
+        elif isinstance(value, tuple):
+            result = FuColor.create_RGB_from_tuple(value)
+        else:
+            print("Illegal Python type for color.")
+            result = None
+        return result
