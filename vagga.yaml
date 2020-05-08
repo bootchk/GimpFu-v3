@@ -26,6 +26,8 @@ containers:
     # - !Ubuntu disco
     # ubuntu 19.10, which has meson 51
     - !Ubuntu eoan
+    # 20.4 LTS
+    #- !Ubuntu fossa
 
     # enable universe repository (where gimp lives)
     - !UbuntuUniverse
@@ -185,16 +187,25 @@ containers:
     setup:
     - !Container gimpDeps
 
-    # This causes build to fail, can't find git_version.h ???
+    - !Sh rm /etc/resolv.conf
+
+
+    # This causes build to fail, can't find git_version.h because this gets only the files, not .git
     #- !Git
     #  url: https://gitlab.gnome.org/GNOME/babl.git
     #  path: /home/babl
+
+    # OR use git to clone the repository
+    #- !Sh |
+    #   git clone https://gitlab.gnome.org/GNOME/babl.git /home/babl
 
     # OR most most recent release archive
     # 1.72=>1.74
     - !Tar
       url: https://download.gimp.org/pub/babl/0.1/babl-0.1.74.tar.xz
       path: /home
+
+
 
 
     # Gimp depends on gegl 4.23 which is not released
@@ -240,8 +251,8 @@ containers:
 
 
     # Note babl and gegl build the same
+    # WAS: cd /home/babl-0.1.74
 
-    #  omit: --prefix=${GIMP_PREFIX} \
     - !Sh |
         cd /home/babl-0.1.74
         meson _build \
@@ -382,6 +393,10 @@ containers:
     setup:
     - !Container bablGeglDev
 
+    - !Copy
+      source: /work/gimp
+      path:  /home/gimp
+
     # resolve FAILED: cursors/gimp-tool-cursors.c   Related to vector icons?
     - !Env  XDG_DATA_DIRS: "/usr/local/share:/usr/share"
 
@@ -390,11 +405,10 @@ containers:
     # -Dpoppler=false => -Dpdf=false is not correct
     # -Dpoppler=false still fails to build
 
+    # --buildtype=release \
     # currently crashes g-ir-scanner SIGILL
 
     # Note that meson builds out of tree, i.e. does not touch gimp directory
-
-    # scrap:  --prefix=${GIMP_PREFIX} \
 
     # build
     - !Sh |
@@ -484,7 +498,7 @@ commands:
 
   testMeson: !Command
     description: Test sanity of meson in container withTools
-    container: withTools
+    container: baseWithTools
     run: |
       meson -h
       which pkg-config
@@ -508,6 +522,15 @@ commands:
 
   #   cd /home/gegl-0.4.18/_build
   #    ninja test
+
+
+  gimpMeson: !Command
+    description: Build gimp using meson
+    container: gimpMesonDev
+    run: |
+      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
+      echo $LD_LIBRARY_PATH
+      /usr/local/bin/gimp-2.99 --version
 
 
   gimpVersion: !Command
@@ -552,6 +575,29 @@ commands:
       echo $XDG_DATA_DIRS
       export PATH="/usr/local/bin:$PATH"
       export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu"
+      echo "GEGL_PATH" $GEGL_PATH
+      which gegl
+      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
+      export NO_AT_BRIDGE=1
+
+      /usr/local/bin/gimp-2.99 --verbose
+
+  # export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
+
+  gimpMesonRunGUI: !Command
+    description: Run the meson built gimp GUI in gimpMesonDev container
+    container: gimpMesonDev
+    run: |
+      export HOME=/work/.home
+      echo "HOME" $HOME
+      export GIMP_PREFIX="/usr/local"
+      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
+      echo $LD_LIBRARY_PATH
+      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
+      echo $XDG_DATA_DIRS
+      export PATH="/usr/local/bin:$PATH"
+      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4/"
       echo "GEGL_PATH" $GEGL_PATH
       which gegl
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0

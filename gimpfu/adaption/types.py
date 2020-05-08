@@ -288,6 +288,10 @@ class Types():
             # print(type(item.data)) get utf-8 decode error
             # print(item.data.length()) get same errors
             # print(item.data.decode('latin-1').encode('utf-8')) also fails
+            print(f"item is: {item}")
+            # Gimp.StringArray is not iterable
+            print(f"item.static_data is: {item.static_data}")
+            # prints "False"
             result = []
             result.append("foo")    # TEMP
             print("convert string result:", result)
