@@ -414,7 +414,7 @@ containers:
     - !Sh |
         cd /home/gimp
         meson _build \
-         --buildtype=release \
+         --buildtype=debug \
          -Djavascript=never \
          -Dlua=never \
          -Dpython=always \
@@ -441,8 +441,8 @@ containers:
   gimpLocal:
     setup:
     # Choice:
-    - !Container gimpAMDev
-    #- !Container gimpMesonDev
+    #- !Container gimpAMDev
+    - !Container gimpMesonDev
 
     # rebuild container if test plugin source (in /work i.e. project directory ) changes
     - !Depends plug-ins

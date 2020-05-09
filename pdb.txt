@@ -384,28 +384,6 @@
   (
   )
 )
-(register-procedure "python-fu-sphere"
-  "Simple sphere with drop shadow"
-  "Simple sphere with drop shadow"
-  "James Henstridge"
-  "James Henstridge"
-  "1997-1999, 2007"
-  "GIMP Plug-In"
-  (
-    (
-      "RunmodeProp"
-      "GParamEnum"
-      "Run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "IntProp"
-      "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
-    )
-  )
-  (
-  )
-)
 (register-procedure "script-fu-make-brush-elliptical"
   "Create an elliptical brush"
   ""
@@ -2875,9 +2853,29 @@ This is a debug utility procedure. It is subject to change at any point, and sho
       "The input drawable"
     )
     (
-      "IntProp"
+      "DummyProp1"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (-1000000 <= DummyProp1 <= 1000000)"
+    )
+    (
+      "DummyProp2"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp2 <= 1000000)"
+    )
+    (
+      "DummyProp3"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp3 <= 1000000)"
+    )
+    (
+      "DummyProp4"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp4 <= 1000000)"
+    )
+    (
+      "DummyProp5"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp5 <= 1000000)"
     )
   )
   (
@@ -3036,9 +3034,19 @@ This procedure is affected by the following context setters: 'gimp-context-set-t
       "The input drawable"
     )
     (
-      "IntProp"
-      "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "DummyProp1"
+      "GParamDouble"
+      "blurb (-360 <= DummyProp1 <= 360)"
+    )
+    (
+      "DummyProp2"
+      "GParamDouble"
+      "blurb (-1e+06 <= DummyProp2 <= 1e+06)"
+    )
+    (
+      "DummyProp3"
+      "GParamDouble"
+      "blurb (-1e+06 <= DummyProp3 <= 1e+06)"
     )
   )
   (
@@ -3146,9 +3154,29 @@ This procedure is affected by the following context setters: 'gimp-context-set-t
       "The input drawable"
     )
     (
-      "IntProp"
+      "DummyProp1"
+      "GParamString"
+      "blurb"
+    )
+    (
+      "DummyProp2"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (-1000000 <= DummyProp2 <= 1000000)"
+    )
+    (
+      "DummyProp3"
+      "GParamInt"
+      "blurb (0 <= DummyProp3 <= 1)"
+    )
+    (
+      "DummyProp4"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp4 <= 1000000)"
+    )
+    (
+      "DummyProp5"
+      "GParamString"
+      "blurb"
     )
   )
   (
@@ -3178,7 +3206,7 @@ This procedure is affected by the following context setters: 'gimp-context-set-t
 )
 (register-procedure "gimp-file-save-thumbnail"
   "Saves a thumbnail for the given image"
-  "This procedure saves a thumbnail for the given image according to the Free Desktop Thumbnail Managing Standard. The thumbnail is saved so that it belongs to the file with the given filen. This means you have to save the image under this name first, otherwise this procedure will fail. This procedure may become useful if you want to explicitly save a thumbnail with a file."
+  "This procedure saves a thumbnail for the given image according to the Free Desktop Thumbnail Managing Standard. The thumbnail is saved so that it belongs to the given file. This means you have to save the image under this name first, otherwise this procedure will fail. This procedure may become useful if you want to explicitly save a thumbnail with a file."
   "Josh MacDonald"
   "Josh MacDonald"
   "1997"
@@ -5392,57 +5420,6 @@ This procedure is affected by the following context setters: 'gimp-context-set-o
   (
   )
 )
-(register-procedure "python-fu-accessPDB"
-  "blurb"
-  "help message"
-  "author"
-  "copyright"
-  "year"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "image"
-      "GimpParamImage"
-      "The input image"
-    )
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The input drawable"
-    )
-    (
-      "IntProp"
-      "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
-    )
-  )
-  (
-  )
-)
-(register-procedure "gimp-context-set-sample-transparent"
-  "Set the sample transparent setting."
-  "This procedure modifies the sample transparent setting. If an operation depends on the colors of the pixels present in a drawable, like when doing a seed fill, this setting controls whether transparency is considered to be a unique selectable color. When this setting is TRUE, transparent areas can be selected or filled.
-
-This setting affects the following procedures: 'gimp-image-select-color', 'gimp-image-select-contiguous-color', 'gimp-drawable-edit-bucket-fill'."
-  "Michael Natterer <mitch@@gimp.org>"
-  "Michael Natterer"
-  "2011"
-  "Internal GIMP procedure"
-  (
-    (
-      "sample-transparent"
-      "GParamBoolean"
-      "The sample transparent setting (TRUE or FALSE)"
-    )
-  )
-  (
-  )
-)
 (register-procedure "file-pnm-load"
   "Loads files in the PNM file format"
   "This plug-in loads files in the various Netpbm portable file formats."
@@ -5468,6 +5445,25 @@ This setting affects the following procedures: 'gimp-image-select-color', 'gimp-
       "GimpParamImage"
       "Output image"
     )
+  )
+)
+(register-procedure "gimp-context-set-sample-transparent"
+  "Set the sample transparent setting."
+  "This procedure modifies the sample transparent setting. If an operation depends on the colors of the pixels present in a drawable, like when doing a seed fill, this setting controls whether transparency is considered to be a unique selectable color. When this setting is TRUE, transparent areas can be selected or filled.
+
+This setting affects the following procedures: 'gimp-image-select-color', 'gimp-image-select-contiguous-color', 'gimp-drawable-edit-bucket-fill'."
+  "Michael Natterer <mitch@@gimp.org>"
+  "Michael Natterer"
+  "2011"
+  "Internal GIMP procedure"
+  (
+    (
+      "sample-transparent"
+      "GParamBoolean"
+      "The sample transparent setting (TRUE or FALSE)"
+    )
+  )
+  (
   )
 )
 (register-procedure "gimp-context-set-ink-speed-sensitivity"
@@ -6234,6 +6230,38 @@ If your image's type if INDEXED, a colormap must also be added with 'gimp-image-
   (
   )
 )
+(register-procedure "python-fu-message"
+  "Show message"
+  "Show message"
+  "Pin-Chou Liu"
+  "Pin-Chou Liu"
+  "2019"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
+    )
+    (
+      "DummyProp1"
+      "GParamString"
+      "blurb"
+    )
+  )
+  (
+  )
+)
 (register-procedure "gimp-layer-get-composite-space"
   "Get the composite space of the specified layer."
   "This procedure returns the specified layer's composite space."
@@ -6461,7 +6489,7 @@ If your image's type if INDEXED, a colormap must also be added with 'gimp-image-
     (
       "compose-type"
       "GParamString"
-      "What to compose: \"RGB\", \"RGBA\", \"HSV\", \"HSL\", \"CMY\", \"CMYK\", \"LAB\", \"LCH\", \"YCbCr_ITU_R470\", \"YCbCr_ITU_R709\", \"YCbCr_ITU_R470_256\", \"YCbCr_ITU_R709_256\""
+      "What to compose: \"RGB\", \"RGBA\", \"HSV\", \"HSL\", \"CMYK\", \"LAB\", \"LCH\", \"YCbCr_ITU_R470\", \"YCbCr_ITU_R709\", \"YCbCr_ITU_R470_256\", \"YCbCr_ITU_R709_256\""
     )
   )
   (
@@ -8145,33 +8173,23 @@ This setting affects affects the following procedures: 'gimp-item-transform-flip
   (
   )
 )
-(register-procedure "python-fu-testProperties"
-  "blurb"
-  "help message"
-  "author"
-  "copyright"
-  "year"
-  "GIMP Plug-In"
+(register-procedure "gimp-image-set-active-layer"
+  "Sets the specified image's active layer."
+  "If the layer exists, it is set as the active layer in the image. Any previous active layer or channel is set to inactive. An exception is a previously existing floating selection, in which case this procedure will return an execution error."
+  "Spencer Kimball & Peter Mattis"
+  "Spencer Kimball & Peter Mattis"
+  "1995-1996"
+  "Internal GIMP procedure"
   (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
     (
       "image"
       "GimpParamImage"
-      "The input image"
+      "The image"
     )
     (
-      "drawable"
-      "GimpParamDrawable"
-      "The input drawable"
-    )
-    (
-      "IntProp"
-      "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "active-layer"
+      "GimpParamLayer"
+      "The new image active layer"
     )
   )
   (
@@ -8209,28 +8227,6 @@ This setting affects affects the following procedures: 'gimp-item-transform-flip
       "vertical"
       "GParamDouble"
       "Vertical radius of gaussian blur (in pixels (0 <= vertical <= 500)"
-    )
-  )
-  (
-  )
-)
-(register-procedure "gimp-image-set-active-layer"
-  "Sets the specified image's active layer."
-  "If the layer exists, it is set as the active layer in the image. Any previous active layer or channel is set to inactive. An exception is a previously existing floating selection, in which case this procedure will return an execution error."
-  "Spencer Kimball & Peter Mattis"
-  "Spencer Kimball & Peter Mattis"
-  "1995-1996"
-  "Internal GIMP procedure"
-  (
-    (
-      "image"
-      "GimpParamImage"
-      "The image"
-    )
-    (
-      "active-layer"
-      "GimpParamLayer"
-      "The new image active layer"
     )
   )
   (
@@ -8510,33 +8506,6 @@ The layer mask still needs to be added to the layer. This can be done with a cal
       "file"
       "GParamObject"
       "The dump filename"
-    )
-  )
-  (
-  )
-)
-(register-procedure "python-fu-test-missing-drawable-attribute"
-  "blurb"
-  "help message"
-  "author"
-  "copyright"
-  "year"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "image"
-      "GimpParamImage"
-      "The input image"
-    )
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The input drawable"
     )
   )
   (
@@ -8883,6 +8852,58 @@ This procedure is affected by the following context setters: 'gimp-context-set-o
       "rotated"
       "GParamBoolean"
       "Whether to rotate the RGB pattern by ninety degrees (TRUE or FALSE)"
+    )
+  )
+  (
+  )
+)
+(register-procedure "python-fu-trim-to-size"
+  "Trim to Size"
+  "Trims an image to the specified dimensions, with optional scaling"
+  "Júlio Reis"
+  "© Júlio Reis – licensed via GPL v3"
+  "2016"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
+    )
+    (
+      "DummyProp1"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp1 <= 1000000)"
+    )
+    (
+      "DummyProp2"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp2 <= 1000000)"
+    )
+    (
+      "DummyProp3"
+      "GParamInt"
+      "blurb (0 <= DummyProp3 <= 1)"
+    )
+    (
+      "DummyProp4"
+      "GParamInt"
+      "blurb (0 <= DummyProp4 <= 3)"
+    )
+    (
+      "DummyProp5"
+      "GParamInt"
+      "blurb (0 <= DummyProp5 <= 3)"
     )
   )
   (
@@ -9762,7 +9783,7 @@ This setting affects the following procedures: 'gimp-drawable-edit-gradient-fill
 )
 (register-procedure "gimp-file-save"
   "Saves a file by extension."
-  "This procedure invokes the correct file save handler according to the file's extension and/or prefix. The name of the file to save is typically a full pathname, and the name entered is what the user actually typed before prepending a directory path. The reason for this is that if the user types https://www.gimp.org/foo.png she wants to fetch a URL, and the full pathname will not look like a URL."
+  "This procedure invokes the correct file save handler according to the file's extension and/or prefix."
   "Josh MacDonald"
   "Josh MacDonald"
   "1997"
@@ -10479,9 +10500,29 @@ This setting affects the following procedures: 'gimp-drawable-edit-gradient-fill
       "The input drawable"
     )
     (
-      "IntProp"
+      "DummyProp1"
+      "GParamDouble"
+      "blurb (1 <= DummyProp1 <= 30)"
+    )
+    (
+      "DummyProp2"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (0 <= DummyProp2 <= 1)"
+    )
+    (
+      "DummyProp3"
+      "GParamInt"
+      "blurb (0 <= DummyProp3 <= 1)"
+    )
+    (
+      "DummyProp4"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp4 <= 1000000)"
+    )
+    (
+      "DummyProp5"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp5 <= 1000000)"
     )
   )
   (
@@ -11882,6 +11923,70 @@ This setting affects the following procedures: 'gimp-drawable-edit-stroke-select
   (
   )
 )
+(register-procedure "python-fu-add-guides"
+  "Add multiple guides with same space in between"
+  "Add multiple guides with same space in between"
+  "Pin-Chou Liu"
+  "Pin-Chou Liu"
+  "2019"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
+    )
+    (
+      "DummyProp1"
+      "GParamInt"
+      "blurb (0 <= DummyProp1 <= 3)"
+    )
+    (
+      "DummyProp2"
+      "GParamDouble"
+      "blurb (-1e+06 <= DummyProp2 <= 1e+06)"
+    )
+    (
+      "DummyProp3"
+      "GParamInt"
+      "blurb (0 <= DummyProp3 <= 2)"
+    )
+  )
+  (
+  )
+)
+(register-procedure "gimp-drawable-is-gray"
+  "Returns whether the drawable is a grayscale type."
+  "This procedure returns TRUE if the specified drawable is of type @{ Gray, GrayA @}."
+  "Spencer Kimball & Peter Mattis"
+  "Spencer Kimball & Peter Mattis"
+  "1995-1996"
+  "Internal GIMP procedure"
+  (
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The drawable"
+    )
+  )
+  (
+    (
+      "is-gray"
+      "GParamBoolean"
+      "TRUE if the drawable is a grayscale type (TRUE or FALSE)"
+    )
+  )
+)
 (register-procedure "script-fu-waves-anim"
   "Create a multi-layer image with an effect like a stone was thrown into the current image"
   ""
@@ -11927,28 +12032,6 @@ This setting affects the following procedures: 'gimp-drawable-edit-stroke-select
     )
   )
   (
-  )
-)
-(register-procedure "gimp-drawable-is-gray"
-  "Returns whether the drawable is a grayscale type."
-  "This procedure returns TRUE if the specified drawable is of type @{ Gray, GrayA @}."
-  "Spencer Kimball & Peter Mattis"
-  "Spencer Kimball & Peter Mattis"
-  "1995-1996"
-  "Internal GIMP procedure"
-  (
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The drawable"
-    )
-  )
-  (
-    (
-      "is-gray"
-      "GParamBoolean"
-      "TRUE if the drawable is a grayscale type (TRUE or FALSE)"
-    )
   )
 )
 (register-procedure "gimp-text-get-extents-fontname"
@@ -13402,9 +13485,19 @@ This setting affects the following procedures: 'gimp-drawable-edit-stroke-select
       "The input drawable"
     )
     (
-      "IntProp"
-      "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "DummyProp1"
+      "GParamString"
+      "blurb"
+    )
+    (
+      "DummyProp3"
+      "GParamDouble"
+      "blurb (0 <= DummyProp3 <= 10)"
+    )
+    (
+      "DummyProp4"
+      "GParamDouble"
+      "blurb (0 <= DummyProp4 <= 100)"
     )
   )
   (
@@ -15132,6 +15225,28 @@ This setting affects the following procedures: 'gimp-drawable-edit-stroke-select
     )
   )
 )
+(register-procedure "gimp-drawable-height"
+  "Returns the height of the drawable."
+  "This procedure returns the specified drawable's height in pixels."
+  "Spencer Kimball & Peter Mattis"
+  "Spencer Kimball & Peter Mattis"
+  "1995-1996"
+  "Internal GIMP procedure"
+  (
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The drawable"
+    )
+  )
+  (
+    (
+      "height"
+      "GParamInt"
+      "Height of drawable"
+    )
+  )
+)
 (register-procedure "file-raw-placeholder-pef-load"
   "Load files in the PEF raw format via placeholder"
   "This plug-in loads files in Pentax' raw PEF format by calling placeholder."
@@ -15157,59 +15272,6 @@ This setting affects the following procedures: 'gimp-drawable-edit-stroke-select
       "GimpParamImage"
       "Output image"
     )
-  )
-)
-(register-procedure "gimp-drawable-height"
-  "Returns the height of the drawable."
-  "This procedure returns the specified drawable's height in pixels."
-  "Spencer Kimball & Peter Mattis"
-  "Spencer Kimball & Peter Mattis"
-  "1995-1996"
-  "Internal GIMP procedure"
-  (
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The drawable"
-    )
-  )
-  (
-    (
-      "height"
-      "GParamInt"
-      "Height of drawable"
-    )
-  )
-)
-(register-procedure "python-fu-palette-sort"
-  "Sort the colors in a palette"
-  "palette_sort (palette, selection, slice_expr, channel,
-channel2, quantize, ascending, pchannel, pquantize) -> new_palette
-Sorts a palette, or part of a palette, using several options.
-One can select two color channels over which to sort,
-and several auxiliary parameters create a 2D sorted
-palette with sorted rows, among other things.
-One can optionally install colormath
-(https://pypi.python.org/pypi/colormath/1.0.8)
-to GIMP's Python to get even more channels to choose from.
-"
-  "João S. O. Bueno, Carol Spears, David Gowers"
-  "João S. O. Bueno, Carol Spears, David Gowers"
-  "2006-2014"
-  "GIMP Plug-In"
-  (
-    (
-      "RunmodeProp"
-      "GParamEnum"
-      "Run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "IntProp"
-      "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
-    )
-  )
-  (
   )
 )
 (register-procedure "gimp-message-get-handler"
@@ -16772,9 +16834,9 @@ Each call to 'gimp-image-freeze-layers' should be matched by a corresponding cal
       "The input drawable"
     )
     (
-      "IntProp"
+      "DummyProp1"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (-1000000 <= DummyProp1 <= 1000000)"
     )
   )
   (
@@ -17169,48 +17231,6 @@ Each call to 'gimp-image-freeze-layers' should be matched by a corresponding cal
   (
   )
 )
-(register-procedure "file-raw-save"
-  "Dump images to disk in raw format"
-  "Dump images to disk in raw format"
-  "Björn Kautler, Bjoern@@Kautler.net"
-  "Björn Kautler, Bjoern@@Kautler.net"
-  "April 2014"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "image"
-      "GimpParamImage"
-      "The image to save"
-    )
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The drawable to save"
-    )
-    (
-      "file"
-      "GParamObject"
-      "The file to save to"
-    )
-    (
-      "image-type"
-      "GParamInt"
-      "The image type @{ RAW_RGB (0), RAW_PLANAR (6) @} (0 <= image-type <= 6)"
-    )
-    (
-      "palette-type"
-      "GParamInt"
-      "The palette type @{ RAW_PALETTE_RGB (0), RAW_PALETTE_BGR (1) @} (0 <= palette-type <= 1)"
-    )
-  )
-  (
-  )
-)
 (register-procedure "gimp-brushes-set-popup"
   "Sets the current brush in a brush selection dialog."
   "Sets the current brush in a brush selection dialog."
@@ -17248,6 +17268,28 @@ Each call to 'gimp-image-freeze-layers' should be matched by a corresponding cal
   (
   )
 )
+(register-procedure "gimp-item-detach-parasite"
+  "Removes a parasite from an item."
+  "This procedure detaches a parasite from an item. It has no return values."
+  "Jay Cox"
+  "Jay Cox"
+  "1998"
+  "Internal GIMP procedure"
+  (
+    (
+      "item"
+      "GimpParamItem"
+      "The item"
+    )
+    (
+      "name"
+      "GimpParamString"
+      "The name of the parasite to detach from the item."
+    )
+  )
+  (
+  )
+)
 (register-procedure "gimp-unit-get-identifier"
   "Returns the textual identifier of the unit."
   "This procedure returns the textual identifier of the unit. For built-in units it will be the english singular form of the unit's name. For user-defined units this should equal to the singular form."
@@ -17270,23 +17312,43 @@ Each call to 'gimp-image-freeze-layers' should be matched by a corresponding cal
     )
   )
 )
-(register-procedure "gimp-item-detach-parasite"
-  "Removes a parasite from an item."
-  "This procedure detaches a parasite from an item. It has no return values."
-  "Jay Cox"
-  "Jay Cox"
-  "1998"
-  "Internal GIMP procedure"
+(register-procedure "file-raw-save"
+  "Dump images to disk in raw format"
+  "Dump images to disk in raw format"
+  "Björn Kautler, Bjoern@@Kautler.net"
+  "Björn Kautler, Bjoern@@Kautler.net"
+  "April 2014"
+  "GIMP Plug-In"
   (
     (
-      "item"
-      "GimpParamItem"
-      "The item"
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
     )
     (
-      "name"
-      "GimpParamString"
-      "The name of the parasite to detach from the item."
+      "image"
+      "GimpParamImage"
+      "The image to save"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The drawable to save"
+    )
+    (
+      "file"
+      "GParamObject"
+      "The file to save to"
+    )
+    (
+      "image-type"
+      "GParamInt"
+      "The image type @{ RAW_RGB (0), RAW_PLANAR (6) @} (0 <= image-type <= 6)"
+    )
+    (
+      "palette-type"
+      "GParamInt"
+      "The palette type @{ RAW_PALETTE_RGB (0), RAW_PALETTE_BGR (1) @} (0 <= palette-type <= 1)"
     )
   )
   (
@@ -17455,38 +17517,6 @@ Other procedures useful with layer groups: 'gimp-image-reorder-item', 'gimp-item
   (
   )
 )
-(register-procedure "python-fu-accessGimp"
-  "blurb"
-  "help message"
-  "author"
-  "copyright"
-  "year"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "image"
-      "GimpParamImage"
-      "The input image"
-    )
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The input drawable"
-    )
-    (
-      "IntProp"
-      "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
-    )
-  )
-  (
-  )
-)
 (register-procedure "gimp-context-get-line-cap-style"
   "Get the line cap style setting."
   "This procedure returns the line cap style setting."
@@ -17624,6 +17654,35 @@ Other procedures useful with layer groups: 'gimp-image-reorder-item', 'gimp-item
     )
   )
 )
+(register-procedure "python-fu-crop-flatten-save"
+  "Crop-Flatten-Save"
+  "1. Crops an image to the current selection (if any);
+2. Flattens the image;
+3. Saves the image. WARNING: overwrites original image"
+  "Júlio Reis"
+  "© Júlio Reis – licensed via GPL v3"
+  "2016"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
+    )
+  )
+  (
+  )
+)
 (register-procedure "plug-in-palettemap"
   "Recolor the image using colors from the active palette"
   "This plug-in maps the contents of the specified drawable with the active palette. It calculates luminosity of each pixel and replaces the pixel by the palette sample at the corresponding index. A complete black pixel becomes the lowest palette entry, and complete white becomes the highest. Works on both Grayscale and RGB image with/without alpha channel."
@@ -17651,6 +17710,18 @@ Other procedures useful with layer groups: 'gimp-image-reorder-item', 'gimp-item
   (
   )
 )
+(register-procedure "gimp-context-set-brush-default-hardness"
+  "Set brush spacing to its default."
+  "Set the brush spacing to the default for paintbrush, airbrush, or pencil tools."
+  "Alexia Death"
+  "Alexia Death"
+  "2014"
+  "Internal GIMP procedure"
+  (
+  )
+  (
+  )
+)
 (register-procedure "plug-in-laplace"
   "High-resolution edge detection"
   "This plug-in creates one-pixel wide edges from the image, with the value proportional to the gradient. It uses the Laplace operator (a 3x3 kernel with -8 in the middle). The image has to be laplacered to get useful results, a gauss_iir with 1.5 - 5.0 depending on the noise in the image is best."
@@ -17674,18 +17745,6 @@ Other procedures useful with layer groups: 'gimp-image-reorder-item', 'gimp-item
       "GimpParamDrawable"
       "Input drawable"
     )
-  )
-  (
-  )
-)
-(register-procedure "gimp-context-set-brush-default-hardness"
-  "Set brush spacing to its default."
-  "Set the brush spacing to the default for paintbrush, airbrush, or pencil tools."
-  "Alexia Death"
-  "Alexia Death"
-  "2014"
-  "Internal GIMP procedure"
-  (
   )
   (
   )
@@ -17911,9 +17970,19 @@ Other procedures useful with layer groups: 'gimp-image-reorder-item', 'gimp-item
       "The input drawable"
     )
     (
-      "IntProp"
+      "DummyProp1"
+      "GParamDouble"
+      "blurb (0.5 <= DummyProp1 <= 2)"
+    )
+    (
+      "DummyProp2"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (0 <= DummyProp2 <= 2)"
+    )
+    (
+      "DummyProp3"
+      "GParamInt"
+      "blurb (0 <= DummyProp3 <= 1)"
     )
   )
   (
@@ -18042,29 +18111,12 @@ This procedure should match a corresponding call to 'gimp-image-freeze-vectors'.
   (
   )
 )
-(register-procedure "gimp-context-set-paint-mode"
-  "Set the paint mode."
-  "This procedure modifies the paint_mode setting."
-  "Michael Natterer <mitch@@gimp.org> & Sven Neumann <sven@@gimp.org>"
-  "Michael Natterer & Sven Neumann"
-  "2004"
-  "Internal GIMP procedure"
-  (
-    (
-      "paint-mode"
-      "GParamEnum"
-      "The paint mode @{ LAYER-MODE-NORMAL-LEGACY (0), LAYER-MODE-DISSOLVE (1), LAYER-MODE-BEHIND-LEGACY (2), LAYER-MODE-MULTIPLY-LEGACY (3), LAYER-MODE-SCREEN-LEGACY (4), LAYER-MODE-OVERLAY-LEGACY (5), LAYER-MODE-DIFFERENCE-LEGACY (6), LAYER-MODE-ADDITION-LEGACY (7), LAYER-MODE-SUBTRACT-LEGACY (8), LAYER-MODE-DARKEN-ONLY-LEGACY (9), LAYER-MODE-LIGHTEN-ONLY-LEGACY (10), LAYER-MODE-HSV-HUE-LEGACY (11), LAYER-MODE-HSV-SATURATION-LEGACY (12), LAYER-MODE-HSL-COLOR-LEGACY (13), LAYER-MODE-HSV-VALUE-LEGACY (14), LAYER-MODE-DIVIDE-LEGACY (15), LAYER-MODE-DODGE-LEGACY (16), LAYER-MODE-BURN-LEGACY (17), LAYER-MODE-HARDLIGHT-LEGACY (18), LAYER-MODE-SOFTLIGHT-LEGACY (19), LAYER-MODE-GRAIN-EXTRACT-LEGACY (20), LAYER-MODE-GRAIN-MERGE-LEGACY (21), LAYER-MODE-COLOR-ERASE-LEGACY (22), LAYER-MODE-OVERLAY (23), LAYER-MODE-LCH-HUE (24), LAYER-MODE-LCH-CHROMA (25), LAYER-MODE-LCH-COLOR (26), LAYER-MODE-LCH-LIGHTNESS (27), LAYER-MODE-NORMAL (28), LAYER-MODE-BEHIND (29), LAYER-MODE-MULTIPLY (30), LAYER-MODE-SCREEN (31), LAYER-MODE-DIFFERENCE (32), LAYER-MODE-ADDITION (33), LAYER-MODE-SUBTRACT (34), LAYER-MODE-DARKEN-ONLY (35), LAYER-MODE-LIGHTEN-ONLY (36), LAYER-MODE-HSV-HUE (37), LAYER-MODE-HSV-SATURATION (38), LAYER-MODE-HSL-COLOR (39), LAYER-MODE-HSV-VALUE (40), LAYER-MODE-DIVIDE (41), LAYER-MODE-DODGE (42), LAYER-MODE-BURN (43), LAYER-MODE-HARDLIGHT (44), LAYER-MODE-SOFTLIGHT (45), LAYER-MODE-GRAIN-EXTRACT (46), LAYER-MODE-GRAIN-MERGE (47), LAYER-MODE-VIVID-LIGHT (48), LAYER-MODE-PIN-LIGHT (49), LAYER-MODE-LINEAR-LIGHT (50), LAYER-MODE-HARD-MIX (51), LAYER-MODE-EXCLUSION (52), LAYER-MODE-LINEAR-BURN (53), LAYER-MODE-LUMA-DARKEN-ONLY (54), LAYER-MODE-LUMA-LIGHTEN-ONLY (55), LAYER-MODE-LUMINANCE (56), LAYER-MODE-COLOR-ERASE (57), LAYER-MODE-ERASE (58), LAYER-MODE-MERGE (59), LAYER-MODE-SPLIT (60), LAYER-MODE-PASS-THROUGH (61), LAYER-MODE-REPLACE (62), LAYER-MODE-ANTI-ERASE (63) @}"
-    )
-  )
-  (
-  )
-)
-(register-procedure "file-print-gtk"
-  "Print the image"
-  "Print the image using the GTK+ Print API."
-  "Bill Skaggs, Sven Neumann, Stefan Röllin"
-  "Bill Skaggs <weskaggs@@primate.ucdavis.edu>"
-  "2006 - 2008"
+(register-procedure "python-fu-rpg-character-sketch"
+  "makes image look hand-drawn"
+  "makes image look hand-drawn"
+  "Nicholas Shewmaker"
+  "Nicholas Shewmaker"
+  "2019"
   "GIMP Plug-In"
   (
     (
@@ -18081,6 +18133,23 @@ This procedure should match a corresponding call to 'gimp-image-freeze-vectors'.
       "drawable"
       "GimpParamDrawable"
       "The input drawable"
+    )
+  )
+  (
+  )
+)
+(register-procedure "gimp-context-set-paint-mode"
+  "Set the paint mode."
+  "This procedure modifies the paint_mode setting."
+  "Michael Natterer <mitch@@gimp.org> & Sven Neumann <sven@@gimp.org>"
+  "Michael Natterer & Sven Neumann"
+  "2004"
+  "Internal GIMP procedure"
+  (
+    (
+      "paint-mode"
+      "GParamEnum"
+      "The paint mode @{ LAYER-MODE-NORMAL-LEGACY (0), LAYER-MODE-DISSOLVE (1), LAYER-MODE-BEHIND-LEGACY (2), LAYER-MODE-MULTIPLY-LEGACY (3), LAYER-MODE-SCREEN-LEGACY (4), LAYER-MODE-OVERLAY-LEGACY (5), LAYER-MODE-DIFFERENCE-LEGACY (6), LAYER-MODE-ADDITION-LEGACY (7), LAYER-MODE-SUBTRACT-LEGACY (8), LAYER-MODE-DARKEN-ONLY-LEGACY (9), LAYER-MODE-LIGHTEN-ONLY-LEGACY (10), LAYER-MODE-HSV-HUE-LEGACY (11), LAYER-MODE-HSV-SATURATION-LEGACY (12), LAYER-MODE-HSL-COLOR-LEGACY (13), LAYER-MODE-HSV-VALUE-LEGACY (14), LAYER-MODE-DIVIDE-LEGACY (15), LAYER-MODE-DODGE-LEGACY (16), LAYER-MODE-BURN-LEGACY (17), LAYER-MODE-HARDLIGHT-LEGACY (18), LAYER-MODE-SOFTLIGHT-LEGACY (19), LAYER-MODE-GRAIN-EXTRACT-LEGACY (20), LAYER-MODE-GRAIN-MERGE-LEGACY (21), LAYER-MODE-COLOR-ERASE-LEGACY (22), LAYER-MODE-OVERLAY (23), LAYER-MODE-LCH-HUE (24), LAYER-MODE-LCH-CHROMA (25), LAYER-MODE-LCH-COLOR (26), LAYER-MODE-LCH-LIGHTNESS (27), LAYER-MODE-NORMAL (28), LAYER-MODE-BEHIND (29), LAYER-MODE-MULTIPLY (30), LAYER-MODE-SCREEN (31), LAYER-MODE-DIFFERENCE (32), LAYER-MODE-ADDITION (33), LAYER-MODE-SUBTRACT (34), LAYER-MODE-DARKEN-ONLY (35), LAYER-MODE-LIGHTEN-ONLY (36), LAYER-MODE-HSV-HUE (37), LAYER-MODE-HSV-SATURATION (38), LAYER-MODE-HSL-COLOR (39), LAYER-MODE-HSV-VALUE (40), LAYER-MODE-DIVIDE (41), LAYER-MODE-DODGE (42), LAYER-MODE-BURN (43), LAYER-MODE-HARDLIGHT (44), LAYER-MODE-SOFTLIGHT (45), LAYER-MODE-GRAIN-EXTRACT (46), LAYER-MODE-GRAIN-MERGE (47), LAYER-MODE-VIVID-LIGHT (48), LAYER-MODE-PIN-LIGHT (49), LAYER-MODE-LINEAR-LIGHT (50), LAYER-MODE-HARD-MIX (51), LAYER-MODE-EXCLUSION (52), LAYER-MODE-LINEAR-BURN (53), LAYER-MODE-LUMA-DARKEN-ONLY (54), LAYER-MODE-LUMA-LIGHTEN-ONLY (55), LAYER-MODE-LUMINANCE (56), LAYER-MODE-COLOR-ERASE (57), LAYER-MODE-ERASE (58), LAYER-MODE-MERGE (59), LAYER-MODE-SPLIT (60), LAYER-MODE-PASS-THROUGH (61), LAYER-MODE-REPLACE (62), LAYER-MODE-ANTI-ERASE (63) @}"
     )
   )
   (
@@ -18113,6 +18182,33 @@ This procedure should match a corresponding call to 'gimp-image-freeze-vectors'.
       "scale-y"
       "GParamDouble"
       "Scale factor in y direction"
+    )
+  )
+  (
+  )
+)
+(register-procedure "file-print-gtk"
+  "Print the image"
+  "Print the image using the GTK+ Print API."
+  "Bill Skaggs, Sven Neumann, Stefan Röllin"
+  "Bill Skaggs <weskaggs@@primate.ucdavis.edu>"
+  "2006 - 2008"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
     )
   )
   (
@@ -18194,9 +18290,34 @@ This procedure should match a corresponding call to 'gimp-image-freeze-vectors'.
       "The input drawable"
     )
     (
-      "IntProp"
+      "DummyProp1"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (-1000000 <= DummyProp1 <= 1000000)"
+    )
+    (
+      "DummyProp2"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp2 <= 1000000)"
+    )
+    (
+      "DummyProp3"
+      "GParamString"
+      "blurb"
+    )
+    (
+      "DummyProp4"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp4 <= 1000000)"
+    )
+    (
+      "DummyProp5"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp5 <= 1000000)"
+    )
+    (
+      "DummyProp6"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp6 <= 1000000)"
     )
   )
   (
@@ -18341,7 +18462,7 @@ This procedure should match a corresponding call to 'gimp-image-freeze-vectors'.
     (
       "compose-type"
       "GParamString"
-      "What to compose: \"RGB\", \"RGBA\", \"HSV\", \"HSL\", \"CMY\", \"CMYK\", \"LAB\", \"LCH\", \"YCbCr_ITU_R470\", \"YCbCr_ITU_R709\", \"YCbCr_ITU_R470_256\", \"YCbCr_ITU_R709_256\""
+      "What to compose: \"RGB\", \"RGBA\", \"HSV\", \"HSL\", \"CMYK\", \"LAB\", \"LCH\", \"YCbCr_ITU_R470\", \"YCbCr_ITU_R709\", \"YCbCr_ITU_R470_256\", \"YCbCr_ITU_R709_256\""
     )
   )
   (
@@ -19102,7 +19223,7 @@ This setting affects the following procedures: 'gimp-image-select-contiguous-col
 )
 (register-procedure "gimp-file-load-thumbnail"
   "Loads the thumbnail for a file."
-  "This procedure tries to load a thumbnail that belongs to the file with the given file. This name is a full pathname. The returned data is an array of colordepth 3 (RGB), regardless of the image type. Width and height of the thumbnail are also returned. Don't use this function if you need a thumbnail of an already opened image, use 'gimp-image-thumbnail' instead."
+  "This procedure tries to load a thumbnail that belongs to the given file. The returned data is an array of colordepth 3 (RGB), regardless of the image type. Width and height of the thumbnail are also returned. Don't use this function if you need a thumbnail of an already opened image, use 'gimp-image-thumbnail' instead."
   "Adam D. Moss, Sven Neumann"
   "Adam D. Moss, Sven Neumann"
   "1999-2003"
@@ -20428,6 +20549,28 @@ If there is no selection this function returns TRUE and the returned bounds are 
   (
   )
 )
+(register-procedure "gimp-edit-copy"
+  "Copy from the specified drawable."
+  "If there is a selection in the image, then the area specified by the selection is copied from the specified drawable and placed in an internal GIMP edit buffer. It can subsequently be retrieved using the 'gimp-edit-paste' command. If there is no selection, then the specified drawable's contents will be stored in the internal GIMP edit buffer. This procedure will fail if the selected area lies completely outside the bounds of the current drawable and there is nothing to copy from."
+  "Spencer Kimball & Peter Mattis"
+  "Spencer Kimball & Peter Mattis"
+  "1995-1996"
+  "Internal GIMP procedure"
+  (
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The drawable to copy from"
+    )
+  )
+  (
+    (
+      "non-empty"
+      "GParamBoolean"
+      "TRUE if the cut was successful, FALSE if there was nothing to copy from (TRUE or FALSE)"
+    )
+  )
+)
 (register-procedure "gimp-brush-set-angle"
   "Sets the rotation angle of a generated brush."
   "This procedure sets the rotation angle for a generated brush. If called for any other type of brush, it does not succeed."
@@ -20452,33 +20595,6 @@ If there is no selection this function returns TRUE and the returned bounds are 
       "angle-out"
       "GParamDouble"
       "The brush rotation angle actually assigned"
-    )
-  )
-)
-(register-procedure "gimp-pdb-get-proc-return-value"
-  "Queries the procedural database for information on the specified procedure's return value."
-  "This procedure returns the #GParamSpec of procedure_name's return value."
-  "Michael Natterer <mitch@@gimp.org>"
-  "Michael Natterer"
-  "2019"
-  "Internal GIMP procedure"
-  (
-    (
-      "procedure-name"
-      "GimpParamString"
-      "The procedure name"
-    )
-    (
-      "val-num"
-      "GParamInt"
-      "The return value number"
-    )
-  )
-  (
-    (
-      "param-spec"
-      "GParamParam"
-      "The GParamSpec of the return value"
     )
   )
 )
@@ -20509,25 +20625,30 @@ If there is no selection this function returns TRUE and the returned bounds are 
   (
   )
 )
-(register-procedure "gimp-edit-copy"
-  "Copy from the specified drawable."
-  "If there is a selection in the image, then the area specified by the selection is copied from the specified drawable and placed in an internal GIMP edit buffer. It can subsequently be retrieved using the 'gimp-edit-paste' command. If there is no selection, then the specified drawable's contents will be stored in the internal GIMP edit buffer. This procedure will fail if the selected area lies completely outside the bounds of the current drawable and there is nothing to copy from."
-  "Spencer Kimball & Peter Mattis"
-  "Spencer Kimball & Peter Mattis"
-  "1995-1996"
+(register-procedure "gimp-pdb-get-proc-return-value"
+  "Queries the procedural database for information on the specified procedure's return value."
+  "This procedure returns the #GParamSpec of procedure_name's return value."
+  "Michael Natterer <mitch@@gimp.org>"
+  "Michael Natterer"
+  "2019"
   "Internal GIMP procedure"
   (
     (
-      "drawable"
-      "GimpParamDrawable"
-      "The drawable to copy from"
+      "procedure-name"
+      "GimpParamString"
+      "The procedure name"
+    )
+    (
+      "val-num"
+      "GParamInt"
+      "The return value number"
     )
   )
   (
     (
-      "non-empty"
-      "GParamBoolean"
-      "TRUE if the cut was successful, FALSE if there was nothing to copy from (TRUE or FALSE)"
+      "param-spec"
+      "GParamParam"
+      "The GParamSpec of the return value"
     )
   )
 )
@@ -20655,57 +20776,6 @@ If there is no selection this function returns TRUE and the returned bounds are 
       "alpha-test-threshold"
       "GParamDouble"
       "Alpha test threshold value for which alpha test converage should be preserved (0 <= alpha-test-threshold <= 1)"
-    )
-  )
-  (
-  )
-)
-(register-procedure "python-fu-histogram-export"
-  "Exports the image histogram to a text file (CSV)"
-  "
-Exports the image histogram to a text file,
-so that it can be used by other programs
-and loaded into spreadsheets.
-
-The resulting file is a CSV file (Comma Separated
-Values), which can be imported
-directly in most spreadsheet programs.
-
-The first two collums are the bucket boundaries,
-followed by the selected columns. The histogram
-refers to the selected image area, and
-can use either Sample Average data or data
-from the current drawable only.;
-
-The output is in \"weighted pixels\" - meaning
-all fully transparent pixels are not counted.
-
-Check the gimp-histogram call
-"
-  "João S. O. Bueno"
-  "João S. O. Bueno, 2014"
-  "2014"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "image"
-      "GimpParamImage"
-      "The input image"
-    )
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The input drawable"
-    )
-    (
-      "IntProp"
-      "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
     )
   )
   (
@@ -22198,7 +22268,7 @@ Note that the returned boolean does NOT correspond with the returned region bein
 )
 (register-procedure "gimp-file-load"
   "Loads an image file by invoking the right load handler."
-  "This procedure invokes the correct file load handler using magic if possible, and falling back on the file's extension and/or prefix if not. The name of the file to load is typically a full pathname, and the name entered is what the user actually typed before prepending a directory path. The reason for this is that if the user types https://www.gimp.org/foo.png he wants to fetch a URL, and the full pathname will not look like a URL."
+  "This procedure invokes the correct file load handler using magic if possible, and falling back on the file's extension and/or prefix if not."
   "Josh MacDonald"
   "Josh MacDonald"
   "1997"
@@ -22651,33 +22721,6 @@ blend from the color regions to the black border lines smoother and the lines th
   (
   )
 )
-(register-procedure "python-fu-foo"
-  "Test foo"
-  "Tests Gimp/PyGObject implementation of conversions."
-  "Konneker"
-  "Konneker"
-  "2020"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "image"
-      "GimpParamImage"
-      "The input image"
-    )
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The input drawable"
-    )
-  )
-  (
-  )
-)
 (register-procedure "gimp-image-delete"
   "Delete the specified image."
   "If there are no displays associated with this image it will be deleted. This means that you can not delete an image through the PDB that was created by the user. If the associated display was however created through the PDB and you know the display ID, you may delete the display. Removal of the last associated display will then delete the image."
@@ -22937,7 +22980,7 @@ blend from the color regions to the black border lines smoother and the lines th
     (
       "decompose-type"
       "GParamString"
-      "What to decompose: \"RGB\", \"RGBA\", \"Red\", \"Green\", \"Blue\", \"Alpha\", \"HSV\", \"Hue\", \"Saturation\", \"Value\", \"HSL\", \"Hue (HSL)\", \"Saturation (HSL)\", \"Lightness\", \"CMY\", \"Cyan\", \"Magenta\", \"Yellow\", \"CMYK\", \"Cyan_K\", \"Magenta_K\", \"Yellow_K\", \"LAB\", \"LCH\", \"YCbCr_ITU_R470\", \"YCbCr_ITU_R470_256\", \"YCbCr_ITU_R709\", \"YCbCr_ITU_R709_256\""
+      "What to decompose: \"RGB\", \"RGBA\", \"Red\", \"Green\", \"Blue\", \"Alpha\", \"HSV\", \"Hue\", \"Saturation\", \"Value\", \"HSL\", \"Hue (HSL)\", \"Saturation (HSL)\", \"Lightness\", \"CMYK\", \"Cyan\", \"Magenta\", \"Yellow\", \"Black\", \"LAB\", \"LCH\", \"YCbCr_ITU_R470\", \"YCbCr_ITU_R470_256\", \"YCbCr_ITU_R709\", \"YCbCr_ITU_R709_256\""
     )
     (
       "layers-mode"
@@ -23121,6 +23164,43 @@ blend from the color regions to the black border lines smoother and the lines th
       "GimpParamParasite"
       "The found parasite"
     )
+  )
+)
+(register-procedure "python-fu-fisheye"
+  "Create a Layer with a Fisheye Effect"
+  "Create a Layer with a Fisheye Effect from a eclipse selection"
+  "Werner Hartnagel"
+  "(c) 2005, Werner Hartnagel"
+  "2005-08-28"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
+    )
+    (
+      "DummyProp1"
+      "GParamDouble"
+      "blurb (-1e+06 <= DummyProp1 <= 1e+06)"
+    )
+    (
+      "DummyProp2"
+      "GParamInt"
+      "blurb (0 <= DummyProp2 <= 20)"
+    )
+  )
+  (
   )
 )
 (register-procedure "gimp-image-get-component-active"
@@ -24126,14 +24206,56 @@ This procedure is affected by the following context setters: 'gimp-context-set-i
   "GIMP Plug-In"
   (
     (
-      "RunmodeProp"
+      "run-mode"
       "GParamEnum"
-      "Run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
     )
     (
-      "IntProp"
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
+    )
+    (
+      "DummyProp1"
+      "GParamString"
+      "blurb"
+    )
+    (
+      "DummyProp2"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (0 <= DummyProp2 <= 1)"
+    )
+  )
+  (
+  )
+)
+(register-procedure "python-fu-feather-paste"
+  "Feathered paste"
+  "Allows one to feather a pasted object borders before commiting to the image"
+  "João S. O. Bueno"
+  "Creative Commons v 3.0 attribution required"
+  " 2013"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
     )
   )
   (
@@ -25863,9 +25985,29 @@ This setting affects all procedures that are affected by 'gimp-context-set-feath
       "The input drawable"
     )
     (
-      "IntProp"
+      "DummyProp1"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (0 <= DummyProp1 <= 7)"
+    )
+    (
+      "DummyProp2"
+      "GParamString"
+      "blurb"
+    )
+    (
+      "DummyProp3"
+      "GParamInt"
+      "blurb (0 <= DummyProp3 <= 1)"
+    )
+    (
+      "DummyProp4"
+      "GParamInt"
+      "blurb (0 <= DummyProp4 <= 1)"
+    )
+    (
+      "DummyProp5"
+      "GParamInt"
+      "blurb (0 <= DummyProp5 <= 1)"
     )
   )
   (
@@ -26102,13 +26244,13 @@ This setting affects all procedures that are affected by 'gimp-context-set-feath
   (
   )
 )
-(register-procedure "file-dicom-save"
-  "Save file in the DICOM file format"
-  "Save an image in the medical standard DICOM image formats. The standard is defined at http://medical.nema.org/. The file format is defined in section 10 of the standard. The files are saved uncompressed and the compulsory DICOM tags are filled with default dummy values."
-  "Dov Grobgeld"
-  "Dov Grobgeld <dov@@imagic.weizmann.ac.il>"
-  "2003"
-  "GIMP Plug-In"
+(register-procedure "plug-in-colortoalpha"
+  "Convert a specified color to transparency"
+  "This replaces as much of a given color as possible in each pixel with a corresponding amount of alpha, then readjusts the color accordingly."
+  "Spencer Kimball & Peter Mattis"
+  "Spencer Kimball & Peter Mattis"
+  "1999"
+  "Internal GIMP procedure"
   (
     (
       "run-mode"
@@ -26118,17 +26260,17 @@ This setting affects all procedures that are affected by 'gimp-context-set-feath
     (
       "image"
       "GimpParamImage"
-      "The image to save"
+      "Input image (unused)"
     )
     (
       "drawable"
       "GimpParamDrawable"
-      "The drawable to save"
+      "Input drawable"
     )
     (
-      "file"
-      "GParamObject"
-      "The file to save to"
+      "color"
+      "GimpParamRGB"
+      "Color to remove"
     )
   )
   (
@@ -26263,13 +26405,13 @@ This procedure returns the final position."
   (
   )
 )
-(register-procedure "plug-in-colortoalpha"
-  "Convert a specified color to transparency"
-  "This replaces as much of a given color as possible in each pixel with a corresponding amount of alpha, then readjusts the color accordingly."
-  "Spencer Kimball & Peter Mattis"
-  "Spencer Kimball & Peter Mattis"
-  "1999"
-  "Internal GIMP procedure"
+(register-procedure "file-dicom-save"
+  "Save file in the DICOM file format"
+  "Save an image in the medical standard DICOM image formats. The standard is defined at http://medical.nema.org/. The file format is defined in section 10 of the standard. The files are saved uncompressed and the compulsory DICOM tags are filled with default dummy values."
+  "Dov Grobgeld"
+  "Dov Grobgeld <dov@@imagic.weizmann.ac.il>"
+  "2003"
+  "GIMP Plug-In"
   (
     (
       "run-mode"
@@ -26279,17 +26421,17 @@ This procedure returns the final position."
     (
       "image"
       "GimpParamImage"
-      "Input image (unused)"
+      "The image to save"
     )
     (
       "drawable"
       "GimpParamDrawable"
-      "Input drawable"
+      "The drawable to save"
     )
     (
-      "color"
-      "GimpParamRGB"
-      "Color to remove"
+      "file"
+      "GParamObject"
+      "The file to save to"
     )
   )
   (
@@ -26813,38 +26955,6 @@ Note that the actual PDB procedure only transfers the format's encoding. In orde
       "GimpParamLayer"
       "The layer created when loading the image file"
     )
-  )
-)
-(register-procedure "python-fu-duplicate-to-scaled-layer"
-  "Duplicate to Scaled Layer"
-  "Duplicates the current layer and scales down the layer to some maximum dimension."
-  "Ethan Blackwelder"
-  "Ethan Blackwelder"
-  "2013"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "image"
-      "GimpParamImage"
-      "The input image"
-    )
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The input drawable"
-    )
-    (
-      "IntProp"
-      "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
-    )
-  )
-  (
   )
 )
 (register-procedure "gimp-selection-none"
@@ -27521,33 +27631,6 @@ This procedure returns the final position."
     )
   )
 )
-(register-procedure "python-fu-plugin-vector2mask"
-  "Convert or update path to layer mask"
-  "Convert or update path to layer mask if the name of both is the same. Adds feather of 2px to the mask"
-  "Rumen Belev"
-  "copyright Rumen Belev"
-  "2018"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "image"
-      "GimpParamImage"
-      "The input image"
-    )
-    (
-      "drawable"
-      "GimpParamDrawable"
-      "The input drawable"
-    )
-  )
-  (
-  )
-)
 (register-procedure "gimp-text-layer-set-line-spacing"
   "Adjust the line spacing in a text layer."
   "This procedure sets the additional spacing used between lines a text layer."
@@ -27580,14 +27663,29 @@ of a given width and height"
   "GIMP Plug-In"
   (
     (
-      "RunmodeProp"
+      "run-mode"
       "GParamEnum"
-      "Run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
     )
     (
-      "IntProp"
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
+    )
+    (
+      "DummyProp1"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (-1000000 <= DummyProp1 <= 1000000)"
+    )
+    (
+      "DummyProp2"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp2 <= 1000000)"
     )
   )
   (
@@ -27610,6 +27708,63 @@ of a given width and height"
       "blend-space"
       "GParamEnum"
       "The new layer blend space @{ LAYER-COLOR-SPACE-AUTO (0), LAYER-COLOR-SPACE-RGB-LINEAR (1), LAYER-COLOR-SPACE-RGB-PERCEPTUAL (2), LAYER-COLOR-SPACE-LAB (3) @}"
+    )
+  )
+  (
+  )
+)
+(register-procedure "python-fu-random-shapes"
+  "random Shapes"
+  "Render a stand-alone Image with random Shapes"
+  "Werner Hartnagel"
+  "(c) 2006, Werner Hartnagel"
+  "2006"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
+    )
+    (
+      "DummyProp1"
+      "GParamString"
+      "blurb"
+    )
+    (
+      "DummyProp2"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp2 <= 1000000)"
+    )
+    (
+      "DummyProp3"
+      "GParamInt"
+      "blurb (-1000000 <= DummyProp3 <= 1000000)"
+    )
+    (
+      "DummyProp4"
+      "GParamInt"
+      "blurb (1 <= DummyProp4 <= 1000)"
+    )
+    (
+      "DummyProp5"
+      "GParamInt"
+      "blurb (10 <= DummyProp5 <= 4000)"
+    )
+    (
+      "DummyProp6"
+      "GParamInt"
+      "blurb (0 <= DummyProp6 <= 1)"
     )
   )
   (
@@ -27836,6 +27991,23 @@ This setting affects the following procedures: 'gimp-image-select-color', 'gimp-
     )
   )
 )
+(register-procedure "gimp-getpid"
+  "Returns the PID of the host GIMP process."
+  "This procedure returns the process ID of the currently running GIMP."
+  "Michael Natterer <mitch@@gimp.org>"
+  "Michael Natterer"
+  "2005"
+  "Internal GIMP procedure"
+  (
+  )
+  (
+    (
+      "pid"
+      "GParamInt"
+      "The PID"
+    )
+  )
+)
 (register-procedure "plug-in-sample-colorize"
   "Colorize image using a sample image as a guide"
   "This plug-in colorizes the contents of the specified (gray) layer with the help of a  sample (color) layer. It analyzes all colors in the sample layer. The sample colors are sorted by brightness (== intentisty) and amount and stored in a sample colortable (where brightness is the index) The pixels of the destination layer are remapped with the help of the sample colortable. If use_subcolors is TRUE, the remapping process uses all sample colors of the corresponding brightness-intensity and distributes the subcolors according to their amount in the sample (If the sample has 5 green, 3 yellow, and 1 red pixel of the  intensity value 105, the destination pixels at intensity value 105 are randomly painted in green, yellow and red in a relation of 5:3:1 If use_subcolors is FALSE only one sample color per intensity is used. (green will be used in this example) The brightness intensity value is transformed at the remapping process according to the levels: out_lo, out_hi, in_lo, in_high and gamma The in_low / in_high levels specify an initial mapping of the intensity. The gamma value determines how intensities are interpolated between the in_lo and in_high levels. A gamma value of 1.0 results in linear interpolation. Higher gamma values results in more high-level intensities Lower gamma values results in more low-level intensities The out_low/out_high levels constrain the resulting intensity index The intensity index is used to pick the corresponding color in the sample colortable. If hold_inten is FALSE the picked color is used 1:1 as resulting remap_color. If hold_inten is TRUE The brightness of the picked color is adjusted back to the original intensity value (only hue and saturation are taken from the picked sample color) (or to the input level, if orig_inten is set FALSE) Works on both Grayscale and RGB image with/without alpha channel. (the image with the dst_drawable is converted to RGB if necessary) The sample_drawable should be of type RGB or RGBA"
@@ -27913,6 +28085,28 @@ This setting affects the following procedures: 'gimp-image-select-color', 'gimp-
   (
   )
 )
+(register-procedure "gimp-display-new"
+  "Create a new display for the specified image."
+  "Creates a new display for the specified image. If the image already has a display, another is added. Multiple displays are handled transparently by GIMP. The newly created display is returned and can be subsequently destroyed with a call to 'gimp-display-delete'. This procedure only makes sense for use with the GIMP UI, and will result in an execution error if called when GIMP has no UI."
+  "Spencer Kimball & Peter Mattis"
+  "Spencer Kimball & Peter Mattis"
+  "1995-1996"
+  "Internal GIMP procedure"
+  (
+    (
+      "image"
+      "GimpParamImage"
+      "The image"
+    )
+  )
+  (
+    (
+      "display"
+      "GimpParamDisplay"
+      "The new display"
+    )
+  )
+)
 (register-procedure "gimp-item-set-lock-content"
   "Set the 'lock content' state of the specified item."
   "This procedure sets the specified item's lock content state."
@@ -27933,50 +28127,6 @@ This setting affects the following procedures: 'gimp-image-select-color', 'gimp-
     )
   )
   (
-  )
-)
-(register-procedure "file-jpeg-load"
-  "Loads files in the JPEG file format"
-  "Loads files in the JPEG file format"
-  "Spencer Kimball, Peter Mattis & others"
-  "Spencer Kimball & Peter Mattis"
-  "1995-2007"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "file"
-      "GParamObject"
-      "The file to load"
-    )
-  )
-  (
-    (
-      "image"
-      "GimpParamImage"
-      "Output image"
-    )
-  )
-)
-(register-procedure "gimp-getpid"
-  "Returns the PID of the host GIMP process."
-  "This procedure returns the process ID of the currently running GIMP."
-  "Michael Natterer <mitch@@gimp.org>"
-  "Michael Natterer"
-  "2005"
-  "Internal GIMP procedure"
-  (
-  )
-  (
-    (
-      "pid"
-      "GParamInt"
-      "The PID"
-    )
   )
 )
 (register-procedure "gimp-gradient-segment-get-left-pos"
@@ -28006,25 +28156,30 @@ This setting affects the following procedures: 'gimp-image-select-color', 'gimp-
     )
   )
 )
-(register-procedure "gimp-display-new"
-  "Create a new display for the specified image."
-  "Creates a new display for the specified image. If the image already has a display, another is added. Multiple displays are handled transparently by GIMP. The newly created display is returned and can be subsequently destroyed with a call to 'gimp-display-delete'. This procedure only makes sense for use with the GIMP UI, and will result in an execution error if called when GIMP has no UI."
+(register-procedure "file-jpeg-load"
+  "Loads files in the JPEG file format"
+  "Loads files in the JPEG file format"
+  "Spencer Kimball, Peter Mattis & others"
   "Spencer Kimball & Peter Mattis"
-  "Spencer Kimball & Peter Mattis"
-  "1995-1996"
-  "Internal GIMP procedure"
+  "1995-2007"
+  "GIMP Plug-In"
   (
     (
-      "image"
-      "GimpParamImage"
-      "The image"
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "file"
+      "GParamObject"
+      "The file to load"
     )
   )
   (
     (
-      "display"
-      "GimpParamDisplay"
-      "The new display"
+      "image"
+      "GimpParamImage"
+      "Output image"
     )
   )
 )
@@ -30133,6 +30288,33 @@ This is a debug utility procedure. It is subject to change at any point, and sho
   (
   )
 )
+(register-procedure "file-tiff-load"
+  "loads files of the tiff file format"
+  "FIXME: write help for tiff_load"
+  "Spencer Kimball, Peter Mattis & Nick Lamb"
+  "Nick Lamb <njl195@@zepler.org.uk>"
+  "1995-1996,1998-2003"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "file"
+      "GParamObject"
+      "The file to load"
+    )
+  )
+  (
+    (
+      "image"
+      "GimpParamImage"
+      "Output image"
+    )
+  )
+)
 (register-procedure "gimp-image-select-round-rectangle"
   "Create a rectangular selection with round corners over the specified image;"
   "This tool creates a rectangular selection with round corners over the specified image. The rectangular region can be either added to, subtracted from, or replace the contents of the previous selection mask.
@@ -30185,33 +30367,6 @@ This procedure is affected by the following context setters: 'gimp-context-set-a
     )
   )
   (
-  )
-)
-(register-procedure "file-tiff-load"
-  "loads files of the tiff file format"
-  "FIXME: write help for tiff_load"
-  "Spencer Kimball, Peter Mattis & Nick Lamb"
-  "Nick Lamb <njl195@@zepler.org.uk>"
-  "1995-1996,1998-2003"
-  "GIMP Plug-In"
-  (
-    (
-      "run-mode"
-      "GParamEnum"
-      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
-    )
-    (
-      "file"
-      "GParamObject"
-      "The file to load"
-    )
-  )
-  (
-    (
-      "image"
-      "GimpParamImage"
-      "Output image"
-    )
   )
 )
 (register-procedure "plug-in-noisify"
@@ -30996,6 +31151,33 @@ This procedure returns the final position."
     )
   )
 )
+(register-procedure "python-fu-mega-test-gimp"
+  "Exhaustively test Gimp"
+  "This plugin creates and executes more plugins, each tests a call to a PDB procedure."
+  "Lloyd Konneker"
+  "Copyright 2020 Lloyd Konneker"
+  "2020"
+  "GIMP Plug-In"
+  (
+    (
+      "run-mode"
+      "GParamEnum"
+      "The run mode @{ RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1), RUN-WITH-LAST-VALS (2) @}"
+    )
+    (
+      "image"
+      "GimpParamImage"
+      "The input image"
+    )
+    (
+      "drawable"
+      "GimpParamDrawable"
+      "The input drawable"
+    )
+  )
+  (
+  )
+)
 (register-procedure "gimp-text-layer-get-font-size"
   "Get the font size from a text layer."
   "This procedure returns the size of the font which is used in a text layer. You will receive the size as a float 'font-size' in 'unit' units."
@@ -31224,9 +31406,29 @@ This procedure returns the final position."
       "The input drawable"
     )
     (
-      "IntProp"
+      "DummyProp1"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (1 <= DummyProp1 <= 512)"
+    )
+    (
+      "DummyProp2"
+      "GParamInt"
+      "blurb (1 <= DummyProp2 <= 512)"
+    )
+    (
+      "DummyProp4"
+      "GParamInt"
+      "blurb (0 <= DummyProp4 <= 1)"
+    )
+    (
+      "DummyProp5"
+      "GParamString"
+      "blurb"
+    )
+    (
+      "DummyProp6"
+      "GParamInt"
+      "blurb (1 <= DummyProp6 <= 48)"
     )
   )
   (
@@ -31736,9 +31938,14 @@ This procedure returns the final position."
       "The input drawable"
     )
     (
-      "IntProp"
+      "DummyProp1"
       "GParamInt"
-      "A property that contains an integer (1 <= IntProp <= 5)"
+      "blurb (0 <= DummyProp1 <= 1)"
+    )
+    (
+      "DummyProp2"
+      "GParamInt"
+      "blurb (0 <= DummyProp2 <= 1)"
     )
   )
   (
