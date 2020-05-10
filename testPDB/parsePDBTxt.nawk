@@ -4,6 +4,8 @@
 
 # Output is a JSON file and another format that looks like type signatures
 
+# TODO !!! The JSON has an extra comma after the last procedure
+
 # lloyd konneker May 2020
 
 
@@ -54,7 +56,8 @@ function captureProcNameJSON(name) {
 
 function closeProcJSON() {
   # close dict of params
-  print indent "}"
+  # comma between procs
+  print indent "},"
   # don't close ProcSet    print "}"
 }
 
@@ -137,8 +140,9 @@ BEGIN {
 
 END {
   closeProcSet()
+
   # append signatures to JSON file
-  for (key in signatures) { print signatures[key] }
+  #for (key in signatures) { print signatures[key] }
 }
 
 /\(register-procedure / {
