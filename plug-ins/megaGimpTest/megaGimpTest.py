@@ -64,6 +64,8 @@ from gimpfu import *
 
 gettext.install("gimp30-python", gimp.locale_directory)
 
+
+
 def plugin_main(image, drawable):
     """
     from gimpscripter.gui import main_gui
@@ -79,6 +81,9 @@ def plugin_main(image, drawable):
     app = main_gui.gimpscripterApp(dictofviews)  # create instance of gtkBuilder app
     app.main()  # event loop for app
     """
+
+    with open("pdb.json", "r") as read_file:
+        data = json.load(read_file)
 
     # regex for procedure_type as given from PDBBrowser
     count, names = pdb.gimp_pdb_query("","","","","","","Internal GIMP procedure")

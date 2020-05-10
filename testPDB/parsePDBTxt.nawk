@@ -1,15 +1,26 @@
 # parse a dump of the pdb, into PDB procedure signatures
-# dump the pdb by calling pdb.dump_to_file(f)
+
+# Input is a text file dump of the pdb, created by calling pdb.dump_to_file(f)
+
+# Output is a JSON file and another format that looks like type signatures
+
 # lloyd konneker May 2020
+
+
 
 # Implements a small state machine
 
+# note that both the input and the JSON do not omit empty containers
+# e.g. a list of out params always, even if list is empty
+
+
+
+
+
 
 # captures signature in associative array <signatures>
-function captureType() {
-  # capture type on second following line
-  getline; getline
-  type = stripQuotes($1)
+
+function captureTypeSig(type) {
   signatures[currentProc] = signatures[currentProc]  " " type
 }
 
@@ -22,20 +33,118 @@ function stripQuotes(text) {
   return text
 }
 
+function captureProcNameSig(name) {
+  name = stripQuotes(name)
+  signatures[name] = name " : "
+}
 
 
 
-BEGIN {state = "null"}
+
+
+
+# translates to JSON
+# JSON is dict[name] of dict[inParams list[types], outParams list[types]]
+
+function captureProcNameJSON(name) {
+  print name ":"
+  # always a dictionary of params, keyed by "in" and "out"
+  print indent "{"
+}
+
+function closeProcJSON() {
+  # close dict of params
+  print indent "}"
+  # don't close ProcSet    print "}"
+}
+
+# JSON does not allow trailing commas, JSON5 does
+function captureTypeJSON(type, shouldPrefixComma) {
+  # types are in a comma delimited list
+  if (shouldPrefixComma == "true") {
+    print indent indent ", " type
+  }
+  else {
+    print indent indent type
+  }
+
+}
+
+
+
+# chooses or doubles up on format of output
+# JSON is written immediately, signature is dumped at END
+
+
+# signature list has no open and close delimiter, only json
+function openProcSet() { print "{" }
+function closeProcSet() { print "}" }
+
+
+function captureProcName(name) {
+  captureProcNameSig(name)
+  captureProcNameJSON(name)
+}
+
+function closeProc() {
+  closeProcJSON()
+}
+
+function openParamSet(inOut) {
+   # just JSON
+   # key, and start list
+   print indent "\""  inOut  "\": ["
+}
+
+function closeParamSet(shouldAddComma) {
+   # signature
+   if (shouldAddComma == "true") {
+    appendToSignature(" => ")
+   }
+
+   # JSON
+   # close list
+   if (shouldAddComma == "true") {
+    print indent indent "],"
+   }
+   else {
+    print indent indent "]"
+   }
+}
+
+function captureType(shouldPrefixComma) {
+  # capture type on second following line
+  # it is already quoted
+  getline; getline
+  type = $1
+
+  captureTypeSig(stripQuotes(type))
+  captureTypeJSON(type, shouldPrefixComma)
+}
+
+
+
+
+
+
+
+
+BEGIN {
+  state = "null"
+  openProcSet()
+  indent = "   "
+}
 
 END {
+  closeProcSet()
+  # append signatures to JSON file
   for (key in signatures) { print signatures[key] }
 }
 
 /\(register-procedure / {
-   name = stripQuotes($2)
-   # print name
-   currentProc = name
-   signatures[name] = name " : "
+   captureProcName($2)
+
+   currentProc = stripQuotes($2)
    state = "proc"
    next
    }
@@ -47,21 +156,37 @@ END {
    switch ( state )  {
      case "proc":
         state = "inParamSet"
+        openParamSet("in")
         break
+
      case "inParamSet":
         state = "inParam"
-        captureType()
-        break
-      case "afterInParams":
-        appendToSignature(" => ")
-        state = "outParamSet"
+        captureType("false")
         break
       case "outParamSet":
          state = "outParam"
          captureType()
          break
+
+      case "afterInParam":
+        state = "inParam"
+        captureType("true")
+        break
+      case "afterOutParam":
+        state = "outParam"
+        captureType("true")
+        break
+
+      case "afterInParamSet":
+        openParamSet("out")
+        state = "outParamSet"
+        break
+      case "afterOutParamSet":
+        print "Parse error: open paren after out params"
+        break
+
       default:
-        print "unknown state open paren"
+        print "found open paren in unknown state " state
    }
    next
 }
@@ -73,24 +198,39 @@ END {
      case "proc":
         print "Parse error"
         break
+
      case "inParam":
-        state = "inParamSet"
+        state = "afterInParam"
         break
       case "outParam":
-         state = "outParamSet"
+         state = "afterOutParam"
          break
+
+     case "afterInParam":
+        state = "afterInParamSet"
+        closeParamSet("true")
+        break
+      case "afterOutParam":
+         state = "afterOutParamSet"
+         closeParamSet("false")
+         break
+
        case "inParamSet":
-         state = "afterInParams"
+         state = "afterInParamSet"
+         closeParamSet("true")
          break
        case "outParamSet":
-          state = "afterOutParams"
+          state = "afterOutParamSet"
+          closeParamSet("false")
           break
-        case "afterOutParams":
-        case "afterInParams":
+
+        case "afterOutParamSet":
+        case "afterInParamSet":
+          closeProc()
           state = "null"
           break
         default:
-          print "unknown state close paren"
+          print "found close paren in unknown state: " state
   }
    next
 }
