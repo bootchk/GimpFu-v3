@@ -39,7 +39,12 @@ class GimpfuImage( Adapter ) :
 
 
     '''
-    classmethods needed by Adapter
+    classmethods that dynamically make properties on the Adapter.
+    Most property methods invoke methods on the adaptee,
+    after several kinds of adaption ot the property name,
+    e.g. adapt property name 'selection' on adaptor to name 'get_selection' on adaptee.
+
+    These methods must be defined on all Adapters.
 
     Notes:
     filename is NOT canonical property of Image, in Gimp v3.  See get_name()

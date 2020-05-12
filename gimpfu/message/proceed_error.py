@@ -91,7 +91,9 @@ def _get_errant_source_code_line():
             """
             Found first line that is not a gimpfu source filename
             code_context is a list of source code lines from filename.
+
             Context is None if eval() is being executed?
+            And then frameinfo.filename is "<string>"
             """
             context = frameinfo.code_context
             if context:

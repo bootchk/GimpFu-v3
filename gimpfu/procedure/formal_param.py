@@ -5,7 +5,7 @@ from gi.repository import GObject
 from gi.repository import Gimp
 
 from gimpfu_enums import *
-from adapters.color import FuColor
+#from adapters.color import FuColor
 
 from procedure.prop_holder_factory import PropHolderFactory
 
@@ -158,7 +158,7 @@ class FuFormalParam(GObject.Object):
     # TODO but catch string valued literals for default value here?
     def mangle_default(self):
         """ Create Gimp types for certain defaults.
-        PyObject creates GObject types for most defaults.
+        PyGObject creates GObject types for most defaults.
         E.G. GimpFu allows tuples and string for Gimp.RGB
         """
         # TODO this crashes, and is not necessary

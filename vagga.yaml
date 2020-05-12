@@ -619,7 +619,7 @@ commands:
       export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
       echo $XDG_DATA_DIRS
       export PATH="/usr/local/bin:$PATH"
-      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu"
+      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
       echo "GEGL_PATH" $GEGL_PATH
       which gegl
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0

@@ -12,6 +12,7 @@ from adaption.types import Types
 from adapters.image import GimpfuImage
 from adapters.layer import GimpfuLayer
 from adapters.vectors import GimpfuVectors
+from adapters.rgb import GimpfuRGB
 
 from message.proceed_error import *
 
@@ -102,12 +103,17 @@ class Marshal():
         but the adaptee has and knows its attributes.
         '''
         print("Wrap ", gimp_instance)
+        result = None
 
         if is_gimpfu_wrappable(gimp_instance):
             gimp_type_name = get_type_name(gimp_instance)
             statement = 'Gimpfu' + gimp_type_name + '(adaptee=gimp_instance)'
             # e.g. statement  'GimpfuImage(adaptee=gimp_instance)'
-            result = eval(statement)
+            try:
+                result = eval(statement)
+            except Exception as err:
+                """ Exception in Gimpfu code e.g. missing wrapper. """
+                do_proceed_error(f"Wrapping: {err}")
         else:
             exception_str = f"GimpFu: can't wrap gimp type {gimp_type_name}"
             do_proceed_error(exception_str)
