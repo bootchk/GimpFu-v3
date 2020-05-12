@@ -69,6 +69,8 @@ def _get_errant_source_code_line():
     E.G. from file "/work/.home/.config/GIMP/2.99/plug-ins/sphere/sphere.py", line 54, in sphere.
     The author's call is deep on the call stack.
     Search for said call by filename in the frame stack.
+
+    If plugin being executed does an eval(), this returns "unknown" ??
     '''
     framestack = inspect.stack(context=2)   # 2 means, save 2 lines of source code
 
@@ -80,13 +82,22 @@ def _get_errant_source_code_line():
     for source of plugins and gimpfu
     '''
     for frameinfo in framestack:
-        #print(frameinfo.filename)
+        # uncomment to know frames on framestack
+        print(frameinfo.filename)
         if frameinfo.filename.find("gimpfu") > 0 :
+            # skip frames from gimpfu source
             pass
         else:
-            # Found first line that is not a gimpfu source filename
-            # code_context is a list of source code lines from filename
-            source_text = frameinfo.code_context[frameinfo.index]
+            """
+            Found first line that is not a gimpfu source filename
+            code_context is a list of source code lines from filename.
+            Context is None if eval() is being executed?
+            """
+            context = frameinfo.code_context
+            if context:
+                source_text = frameinfo.code_context[frameinfo.index]
+            else:
+                source_text = "unknown"
             break
 
     return source_text

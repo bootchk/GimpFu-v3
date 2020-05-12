@@ -630,7 +630,10 @@ commands:
       rm -rf /work/.home/.config/GIMP/2.99/plug-ins/*
 
       echo "Copying test plugins"
-      cp -r /work/plug-ins/* /work/.home/.config/GIMP/2.99/plug-ins
+      # all
+      # cp -r /work/plug-ins/* /work/.home/.config/GIMP/2.99/plug-ins
+      # just one
+      cp -r /work/plug-ins/mega* /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Chmoding test plugins"
       # find -D exec /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' + -print
