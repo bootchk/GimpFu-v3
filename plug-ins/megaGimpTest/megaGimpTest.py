@@ -6,56 +6,19 @@ Generates test cases from PDB.
 """
 
 
-'''
-A GIMP plugin.
-Generates another plugin (in Python language).
-Then invokes the plugin.
-
-Generated plugin is a test plugin.
-'''
-
-
 from gimpfu import *
+
+from megaGimpTestUtils import *
+
 
 import json
-from string import Template
 
 
-template = r'''
-from gimpfu import *
-
-def plugin_main(image, drawable):
-    # just execute
-    pdb.$name
-
-register(
-    "python_fu_test_$name",
-    "", "", "", "",
-    "2020",
-    N_("Megatest $name..."),  # menu item
-    "*", # image types: blank means don't care but no image param
-    [(PF_IMAGE,  "i", _("_Image"), None),
-     (PF_DRAWABLE, "d", _("_Drawable"), None),
-    ],
-    [], # No return value
-    plugin_main,
-    menu=N_("<Image>/Filters"), # menupath
-    domain=("gimp30-python", gimp.locale_directory))
-
-main()
-'''
 
 
 
 gettext.install("gimp30-python", gimp.locale_directory)
 
-
-# Don't need this?
-def createNewPluginSource():
-    # substitute into template
-    s = Template(template)
-    result = s.substitute(name=newName)
-    return result
 
 
 def appendParameter(paramString, parameter):
@@ -63,25 +26,47 @@ def appendParameter(paramString, parameter):
     result = paramString + parameter + ','
     return result
 
-def generateParamString(inParamList,  image, drawable):
+def generateParamString(procName, inParamList,  image, drawable):
+    # TODO why GParam and GimpParam ??
     result = "("
     for aType in inParamList:
-        if aType == "GimpParamString":
+        if aType == "GimpParamString" or aType == "GParamString" :
             result = appendParameter(result, '"foo"')
         elif aType == "GParamInt" :
             result = appendParameter(result, '0')
-        elif aType == "GParamItem" :
+        elif aType == "GParamUInt" :
+            result = appendParameter(result, '7')
+        elif aType == "GParamDouble" :
+            result = appendParameter(result, '1.0003')
+        elif aType == "GParamBoolean" :
+            # bool is int ??
+            result = appendParameter(result, '0')
+        elif aType == "GimpParamItem" :
             # items are ints
             result = appendParameter(result, '1')
+        elif aType == "GParamEnum" or aType == "GimpParamEnum" :
+            # enums are ints
+            result = appendParameter(result, '0')
         elif aType == "GimpParamImage" :
             # reference a symbol in Python context at time of eval
             result = appendParameter(result, 'image')
         elif aType == "GimpParamDrawable" :
             # reference a symbol in Python context at time of eval
             result = appendParameter(result, 'drawable')
+        elif aType == "GimpParamLayer" :
+            # reference a symbol in Python context at time of eval
+            # assert drawable is-a Layer
+            result = appendParameter(result, 'drawable')
+
         # TODO more types
+        # TODO GimpParamParasite
+        # GimpParamUInt8Array
+        # GimpParamRGB
+        # GimpParamChannel
+        # GParamObject
         else:
             # some type we don't handle, abandon
+            TestLog.say(f"unhandled type {aType} for {procName}")
             return ""
 
     result = result + ')'
@@ -89,35 +74,8 @@ def generateParamString(inParamList,  image, drawable):
 
 
 
-
-
 def testProcHavingNoParams(procName):
-
-     # Skip some, that invoke GUI? They don't return?
-     if procName == "extension-script-fu": return
-
      evalCatchingExceptions(procName, "()")
-
-
-def printPDBError(testStmt):
-    """
-    megaGimpTest is-a GimpFu plugin, so pdb is defined,
-    but get_last_error() is not *in* the PDB, only a method of the pdb.
-    Hence we call Gimp.get_pdb().
-
-    PDB is stateful on errors so we can get the last error until we call the next PDB procedure.
-
-    error_str = Gimp.get_pdb().get_last_error()
-    print(f"Error string from pdb procedure execution: {error_str}")
-    if error_str != 'success':
-    """
-
-    """
-    GimpFu continues past exceptions on PDB procedures.
-    also has already printed an error like "Error: Gimp PDB execution error: <foo>"
-    But that mechanism doesn't print the stmt.
-    """
-    print(f"Error executing {testStmt}")
 
 
 def evalCatchingExceptions(procName, params, image=None, drawable=None):
@@ -136,8 +94,7 @@ def evalCatchingExceptions(procName, params, image=None, drawable=None):
         Since Gimpfu catches and proceeds past exceptions while doing
         its own eval of author source.
         """
-        print(f"Gimpfu: ******exception in Gimpfu code: {err}")
-        printPDBError(testStmt)
+        TestLog.say(f"exception in Gimpfu code: {err} for test: {testStmt}")
 
 
 def testProcHavingStringParam(procName):
@@ -145,50 +102,74 @@ def testProcHavingStringParam(procName):
     evalCatchingExceptions(procName, '("foo")')
 
 
-def testProcThatIsPlugin(procName, inParamList, image, drawable):
 
-    # Skip a plugin that opens Window and hangs the test
-    if procName == "plug-in-animationplay":
-        return
-
+def testPluginWith3Params():
+    # Since in GimpFu, no need to pass run mode
     if len(inParamList)==3:
         print("..................test plugin", procName)
-        """
-        Since we are in gimpFu, no need to provide first parameter "mode":
-        gimpFu will insert value sorta RUN-NONINTERACTIVE
-        """
         evalCatchingExceptions(procName, '(image, drawable)', image, drawable)
+    else:
+        TestLog.say(f"omit test plugin: {procName}")
 
 
-def testGeneralProc(procName, inParamList,  image, drawable):
-    paramString = generateParamString(inParamList,  image, drawable)
+
+def testProcThatIsPlugin(procName, inParamList, image, drawable):
+    """
+    Since we are in gimpFu, no need to provide first parameter "mode":
+    gimpFu will insert value sorta RUN-NONINTERACTIVE
+    """
+
+    # hack off the run mode from formal params
+    inParamList.pop(0)
+
+    paramString = generateParamString(procName, inParamList,  image, drawable)
     if paramString:
         evalCatchingExceptions(procName, paramString, image, drawable)
         result = True
     else:
+        # already logged why we could not generate params
+        result = False
+
+
+
+
+def testGeneralProc(procName, inParamList,  image, drawable):
+
+    paramString = generateParamString(procName, inParamList,  image, drawable)
+    if paramString:
+        evalCatchingExceptions(procName, paramString, image, drawable)
+        result = True
+    else:
+        # already logged why we could not generate params
         result = False
 
     # success means we tested it, not that it succeeded
     return result
 
 
+
+
 def testProcGivenInParams(procName, inParamList,  image, drawable):
+
+    # Exclude certain procs
+    if not shouldTestProcedure(procName):
+        TestLog.say(f"omit certain: {procName}")
+        return
+
     """
-    Dispatch on various flavors of procedure,
-    based on inspecting the signature.
+    Dispatch on various flavors of procedure signature.
     """
     if not len(inParamList):
         print("No in", procName)
         testProcHavingNoParams(procName)
     elif (len(inParamList) == 1) and inParamList[0] == "GimpParamString":
         testProcHavingStringParam(procName)
-    elif (len(inParamList) > 0) and procName.find("plug-in-")==0:
-        #inParamList[0] == "GimpParamString":
+    elif isPlugin(procName):
         testProcThatIsPlugin(procName, inParamList,  image, drawable)
     elif testGeneralProc(procName, inParamList,  image, drawable):
         pass
     else:
-        # unhandled signature or unhandled parameter type
+        # Omitted: unhandled signature or unhandled parameter type or is interactive
         print(f".....................Omitting test of {procName}")
 
 
@@ -199,31 +180,28 @@ def testAProc(procName, paramsDict,  image, drawable):
     # not len(paramsDict["out"]
     testProcGivenInParams(procName, paramsDict["in"], image, drawable)
 
-def undo():
-    """
-    Restore the image to previous state.
-    So testing is always from a known base.
 
-    Note there is no undo() operation in the PDB.
-    """
-    # TODO
-    pass
 
 
 def testProcs(data,  image, drawable):
+    """ Iterate over procs, and wrap each test in various contexts e.g. a test image. """
     for key in data.keys():
         # print(key)
 
-        # create copy of original image
-        # Alternatively, use the same image over and over, but errors will be different?
+        """
+        So testing is always from a known base, test on a copy of original image
+        Note there is no undo() operation in the PDB.
+        Alternatively, use the same image over and over, but errors will be different?
+        """
         testImage = pdb.gimp_image_duplicate(image)
         testDrawable = pdb.gimp_image_get_active_drawable(testImage)
 
         # pass procName, its paramDict
         testAProc(key, data[key],  testImage, testDrawable)
 
-        # optionally undo the last changes
-        # undo()
+        # delete test image or undo changes made by procedure
+        pdb.gimp_image_delete(image)
+
 
 
 def plugin_main(image, drawable):
@@ -232,7 +210,11 @@ def plugin_main(image, drawable):
     # get dictionary of PDB signatures
     with open("pdb.json", "r") as read_file:
         data = json.load(read_file)
+
+        # run tests
         testProcs(data, image, drawable)
+
+    TestLog.summarize()
 
     # regex for procedure_type as given from PDBBrowser
     #count, names = pdb.gimp_pdb_query("","","","","","","Internal GIMP procedure")
