@@ -47,7 +47,7 @@ def shouldTestProcedure(procName):
        "plug-in-metadata-viewer",
        # Known bad actors?  Seems to lock the test, with many Gtk errors
        "plug-in-metadata-editor",
-       "plug-in-plug-in-details"
+       "plug-in-plug-in-details",
        # ??
        "extension-script-fu",
        #
