@@ -1,0 +1,66 @@
+This is a comparison of GimpFu plugins in v3 (using the prototype port of GimpFu)
+to v3 plugins that use only GI GObject Introspection.
+
+Two comparisons: size of scripts, and number of API's that a plugin author must learn.
+There could be other comparisons,
+I don't mean to brush aside other concerns.
+
+SIZE OF SCRIPTS
+===============
+
+Using the clothify.py plugin.
+The v2 clothify plugin has been ported to v3 using GI (see the Gimp repository.)
+The v2 clothify plugin also executes under the prototype v3 GimpFu port,
+after about three lines were edited. (See the GimpFuv3 repository on GitHub)
+
+Using v3 GimpFu: 80 lines, 2500 characters
+Using v3 GI: 130 lines, 4800 characters
+
+
+
+APIS AN AUTHOR MUST LEARN
+=========================
+
+For both implementations, an author must know:
+
+PDB API
+Gimp (libgimp) API
+
+For GimpFu implementation, add:
+
+GimpFu API
+(Which is two functions: register() and main().
+There is more to the GimpFu API, but mostly convenience,
+wrapping Gimp API that the plugin author already knows.)
+
+For GI implementation, add:
+
+PyGObject API (import gi)
+GObject API  (from gi.repository import GObject)
+GLib API  (from gi.repository import GLib)
+other G libs, e.g Gio API in some cases
+
+
+DISCUSSION
+==========
+
+The sheer count of new API's is not important.
+Some plugin authors may already be familiar with GObject API's,
+just as some may already be familiar with GimpFu API.
+
+The GObject API needed in a plugin is not much, and mostly rote, easily copied.
+But v3 GimpFu attempts to hide the GObject API.
+
+Much of the bloat in a GI plugin is marshalling args into a Gimp.ValueArray.
+GimpFu v3 does hide that marshalling.
+There might be an alternative to GimpFu, a different Python module, that also hides the marshalling.
+
+(An aside:  Gimp is too strict about argument types passed in a Gimp.ValueArray
+and to a PDB procedure?
+If a procedure requires a GimpDrawable, you can't pass a GimpLayer,
+even though GimpLayer is-a GimpDrawable.
+The marshalling of args in some cases is upcasting to another type.
+It might be that the error checking in Gimp at the API interface could be enhanced,
+to better understand the object model.
+There is some code in GimpFu v3 that handles this.
+)

@@ -100,8 +100,10 @@ class MarshalPDB():
             formal_args_index = 1
 
         '''
-        If more args than formal_args (from GI introspection), conversion will not convert.
-        If less args than formal_args, Gimp might return an error when we call the PDB procedure.
+        If more actual args than formal_args (from GI introspection), conversion will fail
+        since we can't know the formal type of the excess actual args.
+        If less actual args than formal_args, we convert the given args,
+        but Gimp might return an error when we call the PDB procedure with too few args.
         '''
         for x in args:
             print(f"\n#### marshal arg: {x} index: {formal_args_index}" )
