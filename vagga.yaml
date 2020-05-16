@@ -501,6 +501,7 @@ commands:
       which pkg-config
       which python3
       which intltool
+      python3 -V
 
   testSource: !Command
     description: List contents of cloned source
@@ -540,7 +541,7 @@ commands:
 
   # if you have yelp installed outside the container, and pwd is vaggaGimp, just "yelp .home/gimp-doc"
   gimpBrowse: !Command
-    description: Browse Gimp GI use: vagga --use-env DISPLAY gimpBrowse
+    description: Browse Gimp GI use  >vagga --use-env DISPLAY gimpBrowse
     container: gimpLocal
     run: |
       yelp /work/.home/gimp-doc

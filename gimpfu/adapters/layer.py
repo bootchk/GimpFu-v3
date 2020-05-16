@@ -20,9 +20,7 @@ class GimpfuLayer( GimpfuDrawable ) :
     def DynamicReadOnlyAdaptedProperties(cls):
         return ('mask', ) + super().DynamicReadOnlyAdaptedProperties()
 
-    @classmethod
-    def DynamicTrueAdaptedTrueProperties(cls):
-        return () + super().DynamicTrueAdaptedProperties()
+    # DynamicTrueAdaptedTrueProperties() inherited from GimpfuDrawable
 
     '''
     Notes on properties:
@@ -90,14 +88,3 @@ class GimpfuLayer( GimpfuDrawable ) :
 
     TODO, does Gimp GI provide properties?
     '''
-
-
-    """
-    OLD
-    @property
-    def lock_alpha(self):
-        return self._adaptee.get_lock_alpha()
-    @lock_alpha.setter
-    def lock_alpha(self, truth):
-        return self._adaptee.set_lock_alpha(truth)
-    """

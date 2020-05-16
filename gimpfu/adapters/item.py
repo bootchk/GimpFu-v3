@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adaption.adapter import Adapter
+from adapters.adapter import Adapter
 
 
 
@@ -22,25 +22,23 @@ class GimpfuItem( Adapter ) :
     Attributes common to Drawable and Vector
     '''
 
+    '''
+    We invoke super()...AdaptedProperties even though we know it is empty.
+
+    Empty DynamicReadOnlyAdaptedProperties()  and DynamicTrueAdaptedProperties()
+    are inherited from Adapter.
+    '''
     @classmethod
     def DynamicWriteableAdaptedProperties(cls):
         # !!! return ('name') is not a tuple, use tuple('name') or ('name',)
-        return tuple( 'name' )
-
-    @classmethod
-    def DynamicReadOnlyAdaptedProperties(cls):
-        return ()
-
-    @classmethod
-    def DynamicTrueAdaptedProperties(cls):
-        return ()
+        return tuple( 'name' ) + super().DynamicWriteableAdaptedProperties()
 
 
     '''
     methods
     '''
 
-    # Reason: alias
+    # Reason: alias.  Deprecated name is "translate", new name is "transform_translate"
     def translate(self, x, y):
         # assert adaptee is-a Gimp.Item that has transform methods
         self._adaptee.transform_translate(x,y)
@@ -50,22 +48,7 @@ class GimpfuItem( Adapter ) :
     Properties
     '''
 
-    # Reason:alies, upper case to lower case
+    # Reason:alias, upper case to lower case
     def ID(self):
         # !!! id is property of Item
         return self._adaptee.id
-
-
-    """
-    OLD now Dynamic
-    @property
-    def name(self):
-        print("Calling Foo.get_name(): ")
-        #print(dir(self._adaptee))
-        result = self._adaptee.get_name()
-        print("name() returns item name: ", result)
-        return result
-    @name.setter
-    def name(self, name):
-        return self._adaptee.set_name(name)
-    """

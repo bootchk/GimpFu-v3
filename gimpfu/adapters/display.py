@@ -2,15 +2,18 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adaption.adapter import Adapter
+from adapters.adapter import Adapter
 
 from message.proceed_error import *
 
 
 
-class GimpfuDisplay( Adapter ) :
+class GimpfuDisplay( Adapter) :
 
-    # TODO properties?
+    """
+    Has no properties, or dynamic adapted properties,
+    and inherits dynamic adapted properties from Adapter.
+    """
 
     def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
 
@@ -42,9 +45,3 @@ class GimpfuDisplay( Adapter ) :
     def copy(self):
         do_proceed_error("Cannot copy Display")
         return None
-
-    '''
-    Properties.
-    '''
-
-    # GimpFu provides no properties for Display

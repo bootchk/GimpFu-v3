@@ -12,22 +12,9 @@ from adapters.drawable import GimpfuDrawable
 class GimpfuVectors( GimpfuDrawable ) :
 
     '''
-    Notes on properties:
-    name inherited
+    Notes on dynamic adapted properties: all inherited from super
+    "name" inherited from GimpfuItem
     '''
-    @classmethod
-    def DynamicWriteableAdaptedProperties(cls):
-        return () + super().DynamicWriteableAdaptedProperties()
-
-    @classmethod
-    def DynamicReadOnlyAdaptedProperties(cls):
-        return () + super().DynamicReadOnlyAdaptedProperties()
-
-    @classmethod
-    def DynamicTrueAdaptedProperties(cls):
-        return () + super().DynamicTrueAdaptedProperties()
-
-
 
 
     def __init__(self, img=None, adaptee=None):
@@ -65,16 +52,3 @@ class GimpfuVectors( GimpfuDrawable ) :
 
     def to_selection(self):
         raise RuntimeError("Obsolete: use image.select_item()")
-
-
-    '''
-    Properties.
-
-    For convenience, GimpFu makes certain attributes have property semantics.
-    I.E. get without parenthesises, and set by assignment, without calling setter() func.
-
-    Properties that are canonically (with get_foo, and set_foo) implemented by Adaptee Gimp.Vectors
-    are handled aby Adaptor.
-
-    TODO, does Gimp GI provide properties?
-    '''

@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adaption.adapter import Adapter
+from adapters.adapter import Adapter
 
 
 
@@ -18,30 +18,19 @@ But if we find any wild plugins that refer to gimp.Color??
 
 class GimpfuRGB(Adapter):
     '''
-    Color is mostly for parameters to PDB.
+    RGB aka Color is mostly for parameters to PDB.
 
     Author CAN instantiate.
     But has no methods or properties.
-    And usually easier to use 3-tuples and strings, GimpFu automatically converts
-    on passing to PDB.
+    And usually easier to use 3-tuples and strings, GimpFu automatically converts when passing to PDB.
 
     That is, typically Author does not need a Color except as an arg to a PDB procedure.
     '''
 
     """
-    Notes on properties: has none?  TODO see PyGimp documents, maybe there is a 'r' property.
+    Properties: has none.
+    Inherits dynamic adapted properties from Adapter
     """
-    @classmethod
-    def DynamicWriteableAdaptedProperties(cls):
-        return ()
-
-    @classmethod
-    def DynamicReadOnlyAdaptedProperties(cls):
-        return ()
-
-    @classmethod
-    def DynamicTrueAdaptedProperties(cls):
-        return ()
 
 
     def __init__(self, r=None, g=None, b=None, name=None, a_tuple=None, adaptee=None):

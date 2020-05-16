@@ -221,7 +221,7 @@ def plugin_main(image, drawable):
     """
     """
     # get dictionary of PDB signatures
-    with open("pdb.json", "r") as read_file:
+    with open("testPDB/pdb.json", "r") as read_file:
         data = json.load(read_file)
 
         # run tests

@@ -62,6 +62,27 @@ class Adapter():
         return f"<{self.__class__} of {self.adaptee_class_name}>"
 
 
+
+
+    """
+    Adapter is a GimpFu construct without a corresponding Gimp class.
+    Therefore it defines no dynamic adapted properties itself,
+    but defined the base implementation, which return an empty tuple of adapted properties.
+    Each subclass may have its own tuple of dynamic adapted properties,
+    and MUST concatenate those with super's tuple.
+    """
+    @classmethod
+    def DynamicWriteableAdaptedProperties(cls):  return tuple()
+
+    @classmethod
+    def DynamicReadOnlyAdaptedProperties(cls):  return tuple()
+
+    @classmethod
+    def DynamicTrueAdaptedProperties(cls):      return tuple()
+
+
+
+
     '''
     Expose adaptee and its class_name.
     '''
@@ -305,7 +326,7 @@ class Adapter():
 
 
     def is_mapped_callable_name_on_instance(self, instance, name):
-        ''' Is map(<name>) an attribute on instance, accessed like map(<name>)() ? '''
+        ''' Is map(<name>) an attribute on instance, a callable used like map(<name>)() ? '''
         name_map = self.DynamicMappedMethods()
         if name in name_map:
             result = name_map[name]

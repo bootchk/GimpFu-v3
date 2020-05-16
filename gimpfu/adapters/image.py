@@ -6,7 +6,7 @@ from gi.repository import Gimp
 
 
 # absolute from SYSPATH that points to top of gimpfu package
-from adaption.adapter import Adapter
+from adapters.adapter import Adapter
 
 
 '''

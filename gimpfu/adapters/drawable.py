@@ -30,9 +30,7 @@ class GimpfuDrawable( GimpfuItem ) :
     def DynamicWriteableAdaptedProperties(cls):
         return ('mode', 'name', 'lock_alpha' ) + super().DynamicWriteableAdaptedProperties()
 
-    @classmethod
-    def DynamicReadOnlyAdaptedProperties(cls):
-        return () + super().DynamicReadOnlyAdaptedProperties()
+    # inherits DynamicReadOnlyAdaptedProperties() from super
 
     @classmethod
     def DynamicTrueAdaptedProperties(cls):
