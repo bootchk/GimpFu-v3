@@ -467,9 +467,6 @@ containers:
     # e.g. - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
     - !Sh find /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' +
 
-
-
-
     # Copy hacked gimpfu sources into the install location from the project directory
     # Copy entire directory
     # Must be a Python package, directory having a ????
@@ -541,8 +538,9 @@ commands:
       echo $LD_LIBRARY_PATH
       /usr/local/bin/gimp-2.99 --version
 
+  # if you have yelp installed outside the container, and pwd is vaggaGimp, just "yelp .home/gimp-doc"
   gimpBrowse: !Command
-    description: Browse Gimp GI use --use-env DISPLAY
+    description: Browse Gimp GI use: vagga --use-env DISPLAY gimpBrowse
     container: gimpLocal
     run: |
       yelp /work/.home/gimp-doc
@@ -632,8 +630,12 @@ commands:
       echo "Copying test plugins"
       # all
       # cp -r /work/plug-ins/* /work/.home/.config/GIMP/2.99/plug-ins
-      # just one
-      cp -r /work/plug-ins/mega* /work/.home/.config/GIMP/2.99/plug-ins
+
+      # just a few
+      # megaTestGimp
+      cp -r /work/plug-ins/mega*      /work/.home/.config/GIMP/2.99/plug-ins
+      # testColor
+      cp -r /work/testPlugins/testRGB /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Chmoding test plugins"
       # find -D exec /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' + -print

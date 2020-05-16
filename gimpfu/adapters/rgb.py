@@ -72,12 +72,12 @@ class GimpfuRGB(Adapter):
             else:
                 raise RuntimeError("Illegal call to GimpfuRGB constructor")
         except Exception as err:
-            do_proceed_error(f"Creating GimpfuColor: {err}")
+            do_proceed_error(f"Creating GimpfuRGB: {err}")
 
         # Adapter
         super().__init__(a_adaptee)
 
-        print("new GimpfuColor with adaptee", self._adaptee)
+        print("new GimpfuRGB with adaptee", self._adaptee)
 
 
     def __repr__(self):
@@ -87,17 +87,30 @@ class GimpfuRGB(Adapter):
 
 
     @classmethod
-    def create_RGB_from_string(cls, value):
+    def create_RGB_from_string(cls, colorName):
         """ Create a Gimp.RGB from a string. """
         result = Gimp.RGB()
-        result.parse_name(name, -1)  # -1 means null terminated
+        # TODO Gimp.RGB.parse_name does what when colorName invalid?
+        # the GIR doc does not say what
+        # result.parse_name(colorName, -1)  # -1 means null terminated
+        # TODO the GIR doc says len should be passed, possibly -1
+        # The following doesn't seem to throw for invalid name.
+        result.parse_name(colorName)
         return result
 
     @classmethod
     def create_RGB_from_tuple(cls, tuple):
-        """ Create a Gimp.RGB from a 3-tuple. """
+        """ Create a Gimp.RGB from a tuple.
+
+        Expects a 3-tuple.
+        If tuple has less than three items, will raise Exception
+        If tuple has more than three items, will use the first three.
+
+
+        """
         result = Gimp.RGB()
         # upcast to type float when type int was passed
+        # TODO Gimp.RGB.set does what when values are out of range ???
         result.set(float(tuple[0]), float(tuple[1]), float(tuple[2]) )
         return result
 

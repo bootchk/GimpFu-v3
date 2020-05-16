@@ -33,7 +33,7 @@ def is_gimpfu_wrappable_name(name):
     return name in ('Image', 'Layer', 'Display', 'Vectors', 'RGB')
 
 def is_gimpfu_unwrappable( instance):
-    return get_type_name(instance) in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay", "GimpfuVectors", "GimpfuColor")
+    return get_type_name(instance) in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay", "GimpfuVectors", "GimpfuRGB")
 
 
 

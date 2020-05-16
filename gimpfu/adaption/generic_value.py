@@ -5,6 +5,7 @@ from gi.repository import GObject
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
+from adapters.rgb import GimpfuRGB
 
 from message.proceed_error import *
 
@@ -16,7 +17,7 @@ class FuGenericValue():
     A (type, value) that holds any ('generic') value.
     Similar to GValue.
 
-    Used for adapting Python types to GTypes.
+    Adapts Python types to GTypes.
 
     Stateful:
     Operations in this sequence:  init, apply conversions and upcasts, get_gvalue
@@ -29,7 +30,7 @@ class FuGenericValue():
     - performing conversions and Upcasts
     - produce a Gvalue
 
-    Is not a singleton, but could be, only one is ever in use.
+    Is not a singleton, but only one is ever in use.
     '''
 
 
@@ -172,17 +173,19 @@ class FuGenericValue():
         ''' Convert result_arg to instance of type Gimp.RGB '''
         assert self._did_upcast
 
-        # TODO move this to color.py i.e. GimpfuColor.convert()
-        if isinstance(self._actual_arg, tuple):
-            wrapped_result = GimpfuColor(a_tuple=self._actual_arg)
-        elif isinstance(self._actual_arg, str):
-            wrapped_result = GimpfuColor(name=self._actual_arg)
+        RGB_result = GimpfuRGB.color_from_python_type(self._actual_arg)
+        # assert RGB_result is-a Gimp.RGB or None
+        if not RGB_result:
+            # formal arg type is Gimp.RGB but could not convert actual_arg
+            proceed_error("Not convertable to color: {self._actual_arg}.")
+            self._did_convert = False
         else:
-            raise Exception("Not wrappable to color: {self._actual_arg}.")
-        # !!! caller expects GObject i.e. unwrapped
-        self._result_arg = wrapped_result.unwrap()
-        # assert result_type is-a GType
-        self._did_convert = True
+            self._result_arg = RGB_result
+            self._result_arg_type = Gimp.RGB
+            # assert result_type is-a GType
+            self._did_convert = True
+        # assert self._did_convert is True and (self.result_type is Gimp.RGB and self.result_arg is-a Gimp.RGB)
+        # or (self._did_convert is False and self.result_arg is still None)
 
 
     '''

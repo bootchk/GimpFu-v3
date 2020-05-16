@@ -47,6 +47,9 @@ class MarshalPDB():
         We don't upcast and also convert in this list.
 
         The order is not important as we only expect one upcast or convert.
+
+        Try a sequence of upcasts and conversions.
+        TODO just get the formal argument type and dispatch on it???
         '''
         Types.try_upcast_to_drawable(proc_name, gen_value, index)
         if not gen_value.did_upcast:
@@ -83,8 +86,9 @@ class MarshalPDB():
         5. Check error FunctionInfo
         '''
 
+        # FuValueArray is global adaptor of Gimp.ValueArray.  Empty it.
         FuValueArray.reset()
-        print(f">>>>>> marshalled args: {FuValueArray.dump()}" )
+        # print(f">>>>>> marshalled args: {FuValueArray.dump()}" )
 
         formal_args_index = 0
 

@@ -1,5 +1,8 @@
 
-import inspect
+from message.framestack import Framestack
+from message.debug_log import DebugLog 
+
+
 
 
 '''
@@ -17,17 +20,19 @@ returned mostly at points of contact with Gimp.
 Referred to as proceedErrors.
 GimpFu can continue past proceedErrors,
 so that more errors can be detected in one interpretation run.
-ProceedErrors are in the nature of GimpFu API or Gimp API errors.
+ProceedErrors are often the author's mistaken use of GimpFu API or Gimp API.
+
+Bugs in GimpFu source can also be erroneously declared as ProceedErrors.
 
 These are NOT ProceedErrors:
-   - errors in Python syntax in the 's code
+   - errors in Python syntax in the author's code
    - severe GimpFu API errors (not calling register(), main())
 These raise Python Exceptions that terminate the plugin.
 
 The GimpFu code, when it discovers a proceedError() at a statement,
 attempts to continue i.e. to proceed,
-returning for example None for results of the erroneous statement.
-Any following statements may generate spurious proceedErrors.
+returning for example None for results of the erroneous author's statement.
+Any following author's statements may generate spurious proceedErrors.
 
 The results of a plugin (on the Gimp state, e.g. open image)
 after a proceedError can be very garbled.
@@ -41,14 +46,14 @@ FUTURE this behaviour is configurable to raise an exception instead of proceedin
 '''
 
 # cumulative error messages, possibly many lines per error
-log = []
+proceedLog = []
 
 
 
 '''
 When do_proceed_error is called,
 framestack is usually a sequence of frameinfo's like this:
-(this for the case where plugin source and gimpfu source all mixed in /plug-ins/ directory)
+(this for the case where plugin source and gimpfu source all in /plug-ins/ directory)
 filename                                  code_context               what the code is
 ---------------------------------------------------------------------------------
 .../plug-ins/gimpfu/message.proceed_error.py   framestack.inspect(stack)  the current line from this source file
@@ -63,63 +68,21 @@ filename                                  code_context               what the co
 .../plug-ins/sphere/sphere.py            "pdb.foo()"                the author's call to GimpFu main()
 '''
 
-def _get_errant_source_code_line():
-    '''
-    return the text line of author's source code file.
-    E.G. from file "/work/.home/.config/GIMP/2.99/plug-ins/sphere/sphere.py", line 54, in sphere.
-    The author's call is deep on the call stack.
-    Search for said call by filename in the frame stack.
-
-    If plugin being executed does an eval(), this returns "unknown" ??
-    '''
-    framestack = inspect.stack(context=2)   # 2 means, save 2 lines of source code
-
-    # FrameInfo(frame, filename, lineno, function, code_context, index)
-    source_text = "Unknown"
-    '''
-    Find the first line from the top whose filename is not a gimpfu source file.
-    This works but is fragile with respect to naming and directory structures
-    for source of plugins and gimpfu
-    '''
-    for frameinfo in framestack:
-        # uncomment to know frames on framestack
-        print(frameinfo.filename)
-        if frameinfo.filename.find("gimpfu") > 0 :
-            # skip frames from gimpfu source
-            pass
-        else:
-            """
-            Found first line that is not a gimpfu source filename
-            code_context is a list of source code lines from filename.
-
-            Context is None if eval() is being executed?
-            And then frameinfo.filename is "<string>"
-            """
-            context = frameinfo.code_context
-            if context:
-                source_text = frameinfo.code_context[frameinfo.index]
-            else:
-                source_text = "unknown"
-            break
-
-    return source_text
-
 
 
 def do_proceed_error(message):
 
-    # print it on console
-    # interspersed with any other debug output
-    # TODO print any exception strings?
-    print(">>>>GimpFu continued past error:", message)
-    log.append("Error: " + message)
-    source_text = _get_errant_source_code_line()
-    log.append("Plugin author's source:" + source_text)
+    DebugLog.log(f"GimpFu continued past error: {message}", severity=True)
+
+    proceedLog.append("Error: " + message)
+    source_text = Framestack.get_errant_source_code_line()
+    proceedLog.append("Plugin author's source:" + source_text)
+
 
 
 def summarize_proceed_errors():
     '''
-    Print the log of errors that we continued past.
+    Print the proceedLog of errors that we continued past.
 
     Returns whether exist errors.
 
@@ -131,7 +94,7 @@ def summarize_proceed_errors():
       - in GimpFu code, written by .
     '''
 
-    if not log:
+    if not proceedLog:
         result = False
     else:
         print("===========================")
@@ -142,7 +105,7 @@ def summarize_proceed_errors():
         print("")
         print("Gimpfu warnings may also appear prior to this in the console.")
         print("===========================")
-        for line in log:
+        for line in proceedLog:
             print(line)
         print("")
         result = True
