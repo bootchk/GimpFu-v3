@@ -211,7 +211,7 @@ They support all the methods defined by  the "GIMP Python Documentation",
 plus all the functions defined on the Gimp and Gimp.PDB classes
 (in some document generated from the Gimp .gir files.)
 
-(They are distinct from the 'Gimp' and 'Gimp.PDB' symbols,
+(They are distinct from the 'Gimp' and 'Gimp.get_pdb()' symbols,
 which are defined when you use GI directly.)
 
 Note that "gimp.pdb" was allowed in v2 but is obsolete in v3.  Use "pdb".
@@ -365,6 +365,11 @@ Without GimpFu, properties of Gimp object use getter/setter call syntax with par
 
 With GimpFu, the boilerplate might be more condensed.
 Whether you use GimpFu or not, you can still start creating a plugin from template code.
+
+With GimpFu, arguments to PDB procedures are Pythonic, since GimpFu marshals them before passing to Gimp.
+Without GimpFu, you must explicitly create a Gimp.ValueArray to pass to a PDB procedure
+(e.g. the "args" for Gimp.get_pdb().run_procedure('plug-in-plasma', args) )
+
 
 
 Other notes
