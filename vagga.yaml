@@ -637,6 +637,8 @@ commands:
       cp -r /work/plug-ins/mega*      /work/.home/.config/GIMP/2.99/plug-ins
       # testColor
       cp -r /work/testPlugins/testRGB /work/.home/.config/GIMP/2.99/plug-ins
+      # testUpcast
+      cp -r /work/testPlugins/testUpCast /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Chmoding test plugins"
       # find -D exec /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' + -print

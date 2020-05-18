@@ -13,11 +13,17 @@ Re: PDB
 You said " there is only one API to know with introspected libgimp. PDB is an internal protocol and plug-in developers don't have to know what it is."
 
 For the purpose of comparison, it is moot whether a plugin author *needs* the PDB,
-since the PDB will still exist(?) and a plugin author *may* use it whether using GI or GimpFu.
+since I *think* the PDB will still exist(?) and a plugin author *may* use it whether using GI or GimpFu.
 A plugin author does not need the "Internal Procedures" in the PDB but does use the "GIMP Plug-in" and "Temporary Procedure" type procedures that are only in the PDB.
 You can see in the GI foggify.py plugin how clunky it is to marshal params to use a plugin e.g. "Gimp.get_pdb().run_procedure('plug-in-plasma', args)".
 Again, there could be an alternative solution that is less clunky, an alternative to the automatic marshalling that GimpFu does.
-I can describe in more detail how that works if you are interested.
+
+I have wondered myself whether the PDB can or will go away.
+But I think there are project members who have a vested interest in it (that know the history and rationale better than I.)
+Also, the PDB has about 280 callable procedures of type "GIMP Plug-in" or "Temporary Procedure", that aren't anywhere else (?)
+I do agree that it might not be necessary to keep
+the duplication between PDB procedures of type "Internal GIMP procedure" and introspectable libgimp functions.
+(Which you discuss in your comment to issue #5073.)
 
 
 Re: advantages of GI
@@ -35,13 +41,23 @@ Yes, thanks for clarifying that the intended behaviour is otherwise.   I hope to
 
 
 I am glad to discuss and document the features of GimpFu.
-The document "Porting GimpFu Plugins to Gimp 3 and Python 3"  https://github.com/bootchk/GimpFu-v3/blob/master/gimpfu/docs/gimpfuPluginPortingGuide.txt
+The document "Porting GimpFu Plugins to Gimp 3 and Python 3"
+https://github.com/bootchk/GimpFu-v3/blob/master/gimpfu/docs/gimpfuPluginPortingGuide.txt
 might help you understand what GimpFu v3 provides.
 Especially see the section "Summary of differences Python/GI versus GimpFu".
-Even now as I reread it, the differences can seem trivial and petty.
+But even now as I reread it, the differences can seem trivial and petty e.g. invoking the buzzword "pythonic."
 
 GimpFu is much about backward compatibility, which is not easy and has diminishing returns.
+In porting GimpFu to v3, while testing "wild" existing plugins, I have found that much of the work indeed
+is supporting deprecated symbols and function names.
+I might even guess that GimpFu v3 as exists now (a proof of concept that works for many wild plugins with few edits)
+is only about 20% of the work that would need to be done to be fully backward compatible.
+You could say I have only implemented the fun, interesting, metaprogramming stuff.
 
 Again, GimpFu v3 could exist unsupported by Gimp.
 It is all Python (no compiling) and people who want it can install it just like any other Python plugin.
-It might prove useful to some, and Gimp.org would not need to field the probably many bug reports (e.g. "my construct foo doesn't work like it did before".)
+It might prove useful to some, and Gimp.org would not need to field the probably many bug reports
+(e.g. "my construct foo doesn't work like it did before".)
+
+I know that automatic GUI generation is coming to Gimp 3, and that feature in GimpFu v3 is rudimentary (but easy to fix.)
+So a GimpFu v3 could be a stop-gap, to hasten the release of Gimp 3, relaxing the blocker "automatic GUI generation for plugins" (if that is a blocker.)
