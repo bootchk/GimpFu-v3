@@ -10,6 +10,7 @@ from adaption.compatibility import pdb_name_map
 
 from message.proceed_error import *
 
+import logging
 
 
 class GimpfuPDB():
@@ -80,11 +81,12 @@ class GimpfuPDB():
     Or should we allow set attribute to mean "store a procedure"?
     '''
 
-
+    def __init__(self):
+        self.logger = logging.getLogger("GimpFu.GimpfuPDB")
 
     def _nothing_adaptor_func(self, *args):
         ''' Do nothing when an unknown PDB procedure is called. '''
-        print("_nothing_adaptor_func called")
+        self.logger.warning("_nothing_adaptor_func called for unknown PDB procedure")
         return None
 
 
@@ -95,7 +97,7 @@ class GimpfuPDB():
         Thus we catch exceptions (and check for other errors) and proceed.
         '''
 
-        print ("pdb adaptor called, args", args)
+        self.logger.debug(f"_adaptor_func called, args: {args}")
 
         if kwargs:
             do_proceed_error(f"PDB procedures do not take keyword args.")
@@ -131,7 +133,7 @@ class GimpfuPDB():
 
         # Most PDB calls have side_effects on image, but few return values?
         # ensure result is defined and (is-a list OR None)
-        print(f"Return from pdb call to: {proc_name}, result:", result)
+        self.logger.debug(f"_adaptor_func for: {proc_name}  returns: {result}")
         return result
 
 
@@ -164,7 +166,7 @@ class GimpfuPDB():
             mangled_proc_name = pdb_name_map[name]
 
             if Gimp.get_pdb().procedure_exists(mangled_proc_name):
-                print("return _adaptor_func for pdb.", mangled_proc_name)
+                self.logger.debug(f"__getattr__ returns callable _adaptor_func for reference to: {mangled_proc_name}")
                 # remember state for soon-to-come call
                 self.adapted_proc_name = mangled_proc_name
                 # return intercept function soon to be called

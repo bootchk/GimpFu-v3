@@ -9,6 +9,8 @@ is_test = False
 from adaption.wrappable import *
 from adaption.adapted_property import AdaptedProperty
 
+from adapters.adapter_logger import AdapterLogger
+
 
 '''
 Adapter component of the Wrapper/Adapter pattern.
@@ -51,6 +53,9 @@ TODO enumerate errors it detects
 class Adapter():
 
     def __init__(self, adaptee):
+        # TODO can we log the subclass name here?
+        AdapterLogger.logger.info(f"New instance of subclass of Adapter for {adaptee}")
+
         if is_gimpfu_wrappable(adaptee):
             self._adaptee = adaptee
             self._adaptee_callable = None
@@ -88,7 +93,7 @@ class Adapter():
     '''
     def unwrap(self):
         ''' Return inner object, of a Gimp type, used when passing args back to Gimp'''
-        print("unwrap to", self._adaptee)
+        AdapterLogger.logger.debug(f"unwrap to {self._adaptee}")
         return self._adaptee
 
     @property
@@ -105,7 +110,7 @@ class Adapter():
          '''
          Override equality.
          Two Adapted instances are equal if:
-         - both same superclass of Adapter
+         - both have same superclass of Adapter
          - AND their adaptee's are equal.
 
          Require self and other both inherit Adapter, ow exception.
@@ -116,8 +121,14 @@ class Adapter():
              # Could use public unwrap() for more generality
              return self._adaptee == other.unwrap()
          except AttributeError:
-             print("Adaptor can't compare types ", type(self), type(other))
-             raise
+             """
+             GimpFu codes does not compare.
+             This emanates from Authors code.
+             """
+             # TODO define GimpFuException class of exceptions and do logging there
+             message = f"Can't compare types: {type(self)}, {type(other)}"
+             AdapterLogger.logger.critical(message)
+             raise Exception(message)
 
 
 
@@ -163,7 +174,7 @@ class Adapter():
          # Create Adapted instance
          result =  Marshal.wrap(adaptee_clone)
 
-         print(f"Copy: {adaptee_clone} into copy of Adapted instance {result}")
+         AdapterLogger.logger.debug(f"Made wrapped copy: {result} of copied adaptee {adaptee_clone}")
          return result
 
 
@@ -177,7 +188,7 @@ class Adapter():
     def _adapter_func(self, *args):
         ''' intercepts calls to previously accessed attribute '''
 
-        print("Adapter._adapter_func called, args:", *args)
+        AdapterLogger.logger.debug(f"_adapter_func called, args: { {*args} }")
         from adaption.marshal import Marshal
 
         # arg could be a wrapped type, convert to unwrapped type i.e. foreign type
@@ -212,7 +223,7 @@ class Adapter():
     '''
 
     def __getattr__(self, name):
-        print("Adapter.__getattr__", name)
+        AdapterLogger.logger.debug(f"__getattr__ called for: {name}")
 
         '''
         Instance is AdaptedAdaptee (it inherits Adapter).
@@ -223,8 +234,8 @@ class Adapter():
         ''
         """
         msg = f"Missing DynamicReadOnly... in Adapter for {self.adaptee_class_name} "
-        print(type(self).__name__)
-        print(dir(self))
+        AdapterLogger.logger.debug(type(self).__name__)
+        AdapterLogger.logger.debug(dir(self))
         assert object.__getattribute__(self, 'DynamicReadOnlyAdaptedProperties'), msg
         msg = f"Missing DynamicWriteable... in Adapter for {self.adaptee_class_name} "
         assert object.__getattribute__(self, 'DynamicWriteableAdaptedProperties'), msg
@@ -316,8 +327,8 @@ class Adapter():
             '''
             raise AttributeError(f"Attempt to assign to attribute: {name} of Gimpfu Adaptor of: {self.adaptee_class_name})")
             """
-            print("Assigned to Adapted(Adapter) class")
-            print("Adapter.__setattr__", name)
+            AdapterLogger.logger.debug("Assigned to Adapted(Adapter) class")
+            AdapterLogger.logger.debug("Adapter.__setattr__", name)
             object.__setattr__(self, name, value)
             """
 

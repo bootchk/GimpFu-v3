@@ -41,7 +41,10 @@ class GimpfuLayer( GimpfuDrawable ) :
             assert adaptee is not None
             super().__init__(adaptee)
 
-        print("new GimpfuLayer with adaptee", self._adaptee)
+        # super Adapter does logging of __init__
+
+        # !!! Any assign to attributes must use __setattr__ to avoid adaption pattern recursion
+
 
 
 

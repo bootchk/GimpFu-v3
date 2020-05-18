@@ -3,6 +3,8 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
+from message.proceed_error import *
+
 from adapters.adapter import Adapter
 
 
@@ -66,11 +68,11 @@ class GimpfuRGB(Adapter):
         # Adapter
         super().__init__(a_adaptee)
 
-        print("new GimpfuRGB with adaptee", self._adaptee)
+        # super logs this
 
 
     def __repr__(self):
-        # Gimp.RGB has no name() method, so print the fields
+        # Gimp.RGB has no name() method, so return the fields
         # TODO field alpha?
         return f"GimpfuRGB {self._adaptee.r} {self._adaptee.g} {self._adaptee.b}"
 
@@ -115,6 +117,6 @@ class GimpfuRGB(Adapter):
         elif isinstance(value, tuple):
             result = GimpfuRGB.create_RGB_from_tuple(value)
         else:
-            print("Illegal Python type for color.")
+            do_proceed_error("Illegal Python type for color.")
             result = None
         return result

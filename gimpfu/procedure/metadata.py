@@ -224,7 +224,6 @@ class FuProcedureMetadata():
         proc_name = FuProcedureMetadata.canonicalize_prefix(proc_name)
         if not self.letterCheck(proc_name, FuProcedureMetadata.proc_name_allowed):
             raise Exception(f"Procedure name: {proc_name} contains illegal characters.")
-        print(f"Procedure name: {proc_name}")
         return proc_name
 
 

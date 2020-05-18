@@ -29,7 +29,7 @@ class GimpfuVectors( GimpfuDrawable ) :
             assert adaptee is not None
             super().__init__(adaptee)
 
-        print("new GimpfuVectors with adaptee", self._adaptee)
+        # super logs this
 
 
 

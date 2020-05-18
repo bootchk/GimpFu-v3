@@ -5,7 +5,7 @@ from gi.repository import Gimp
 
 
 from adapters.item import GimpfuItem
-
+from adapters.adapter_logger import AdapterLogger
 
 
 '''
@@ -74,20 +74,16 @@ class GimpfuDrawable( GimpfuItem ) :
     # special: adapt return values
     @property
     def mask_bounds(self):
-        #print("Calling Foo.get_name(): ")
-        #print(dir(self._adaptee))
-        #x1, y1, x2, y2 = None, None, None, None
-        #is_selection = self._adaptee.mask_bounds(x1, y1, x2, y2)
-        #result = (x1, y1, x2, y2)
+
         bounds = self._adaptee.mask_bounds()
         '''
-        bounds is (is_selection, x1, y1, x2, y2)
-        The is_selection value was never of any use,
+        bounds returns (is_selection, x1, y1, x2, y2)
+        is_selection value was never of any use,
         since the bounding box can be empty even if there is a selection.
         Discard is_selection
         '''
         result = bounds[1:]
-        print(f"mask_bounds() returns {result}")
+        AdapterLogger.logger.debug(f"mask_bounds() returns {result}")
         return result
     # no setter
 

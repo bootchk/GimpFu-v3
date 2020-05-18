@@ -10,6 +10,7 @@ from adaption.formal_types import FormalTypes
 
 from message.proceed_error import *
 
+import logging
 
 
 class Types():
@@ -37,7 +38,7 @@ class Types():
     '''
     # TODO optimize.  Get all the args at once, memoize
 
-
+    logger = logging.getLogger("GimpFu.Types")
 
     # not used????
     @staticmethod
@@ -50,7 +51,7 @@ class Types():
         if actual_arg is None:
             result_arg = -1     # Somewhat arbitrary
             result_arg_type = GObject.TYPE_INT
-        print("try_convert_to_null returns ", result_arg, result_arg_type)
+        Types.logger.info(f"try_convert_to_null returns: {result_arg} of type: {result_arg_type}")
         return result_arg, result_arg_type
 
 
@@ -60,11 +61,11 @@ class Types():
     def try_float_array_conversion(proc_name, gen_value, index):
         ''' Convert list of int to list of float when formal_arg_type requires FloatArray. '''
 
-        print(f"try_float_array_conversion {gen_value}")
+        Types.logger.info(f"try_float_array_conversion {gen_value}")
         if isinstance(gen_value.actual_arg, list):
             formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
             if formal_arg_type is not None:
-                # print(formal_arg_type)
+                # Types.logger.info(formal_arg_type)
                 if FormalTypes.is_float_array_type(formal_arg_type):
                     gen_value.float_array()
             else:
@@ -92,10 +93,10 @@ class Types():
         '''
         # require type(actual_arg_type) is Python type or a GType
 
-        print(f"Actual arg type: {gen_value}")
+        Types.logger.info(f"Actual arg type: {gen_value}")
 
         # TODO faster if we short circuit where actual == formal
-        # TODO make the converter print what the conversion was
+        # TODO make the converter log what the conversion was
         '''
         The matrix of conversions:
         int => float, str
@@ -103,7 +104,7 @@ class Types():
         TODO str => float, int ???
         '''
         formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
-        print("     Formal arg type ", formal_arg_type.name )
+        # ("     Formal arg type ", formal_arg_type.name )
         if formal_arg_type is not None:
             if gen_value.actual_arg_type is int:
                 if FormalTypes.is_float_type(formal_arg_type):
@@ -124,7 +125,7 @@ class Types():
 
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
         # likewise for value of result_arg
-        print(f"try_usual_python_conversion returns {gen_value}")
+        Types.logger.info(f"try_usual_python_conversion returns {gen_value}")
 
         # WAS return result_arg, result_arg_type, did_convert
 
@@ -150,7 +151,7 @@ class Types():
                 (instance_type != cast_to_type)
             and FormalTypes.is_formal_type_equal_type(formal_arg_type, cast_to_type)
             )
-        print(f"_should_upcast_or_convert: {result}")
+        Types.logger.info(f"_should_upcast_or_convert: {result}")
         return result
 
 
@@ -174,7 +175,7 @@ class Types():
         '''
         # assert type is like Gimp.Drawable, cast_to_type has name like Drawable
 
-        print(f"Attempt upcast: {gen_value} to : {cast_to_type.__name__}")
+        Types.logger.info(f"Attempt upcast: {gen_value} to : {cast_to_type.__name__}")
 
         formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
         # TODO exception index out of range
@@ -201,7 +202,7 @@ class Types():
             pass
 
         # assert result_type is-a type (a Gimp type, a GObject type)
-        print(f"upcast result: {gen_value}")
+        Types.logger.info(f"try_upcast_to_type returns: {gen_value}")
 
 
     # TODO replace this with data driven single procedure
@@ -226,7 +227,7 @@ class Types():
                 gen_value.color()
             except Exception as err:
                 do_proceed_error(f"Converting to color: {err}")
-            #print(type(result))
+            #Types.logger.info(type(result))
 
 
 
@@ -262,12 +263,12 @@ class Types():
         ''' !!! This is converting, but not wrapping. '''
         ''' list comprises fundamental objects, and GArray-like objects that need conversion to lists. '''
         if len(list) > 0:
-            print(f"Type of items in list: {type(list[0])}" )
+            Types.logger.info(f"Type of items in list: {type(list[0])}" )
             # TODO dispatch on type
             result = [Types.try_convert_string_array_to_list_of_str(item) for item in list]
         else:
             result = []
-        print(result)
+        Types.logger.info(f"convert_list_elements_to_python_types returns: {result}")
         return result
 
 
@@ -281,20 +282,20 @@ class Types():
         ''' Try convert item from to list(str). Returns item, possibly converted.'''
         if isinstance(item, Gimp.StringArray):
             # Gimp.StringArray has fields, not methods
-            print("StringArray length", item.length)
-            # print("StringArray data", array.data)
+            Types.logger.info(f"StringArray length: {item.length}")
+            # Types.logger.info("StringArray data", array.data)
             # 0xa0 in first byte, unicode decode error?
-            print("Convert StringArray to list(str)")
-            # print(type(item.data)) get utf-8 decode error
-            # print(item.data.length()) get same errors
-            # print(item.data.decode('latin-1').encode('utf-8')) also fails
-            print(f"item is: {item}")
+            Types.logger.info("Convert StringArray to list(str)")
+            # Types.logger.info(type(item.data)) get utf-8 decode error
+            # Types.logger.info(item.data.length()) get same errors
+            # Types.logger.info(item.data.decode('latin-1').encode('utf-8')) also fails
+            Types.logger.info(f"item is: {item}")
             # Gimp.StringArray is not iterable
-            print(f"item.static_data is: {item.static_data}")
-            # prints "False"
+            Types.logger.info(f"item.static_data is: {item.static_data}")
+            # says "False"
             result = []
             result.append("foo")    # TEMP
-            print("convert string result:", result)
+            Types.logger.info(f"convert string result: {result}")
         else:
             result = item
         return result

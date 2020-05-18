@@ -16,7 +16,7 @@ from adapters.rgb import GimpfuRGB
 
 from message.proceed_error import *
 
-
+import logging
 
 
 class Marshal():
@@ -44,7 +44,8 @@ class Marshal():
     For call to PDB, see marshal_pdb.py.
     '''
 
-
+    # static attribute of singleton class
+    logger = logging.getLogger('GimpFu.Marshal')
 
     '''
     Gimp breaks out image and drawable from other args.
@@ -102,13 +103,14 @@ class Marshal():
         the Nones mean we don't know attributes of adaptee,
         but the adaptee has and knows its attributes.
         '''
-        print("Wrap ", gimp_instance)
+        Marshal.logger.info(f"Wrap: {gimp_instance}")
         result = None
 
         if is_gimpfu_wrappable(gimp_instance):
             gimp_type_name = get_type_name(gimp_instance)
             statement = 'Gimpfu' + gimp_type_name + '(adaptee=gimp_instance)'
             # e.g. statement  'GimpfuImage(adaptee=gimp_instance)'
+            Marshal.logger.info(f"attempting to eval: {statement}")
             try:
                 result = eval(statement)
             except Exception as err:
@@ -119,25 +121,7 @@ class Marshal():
             do_proceed_error(exception_str)
         return result
 
-        """
-        OLD
-        # Dispatch on gimp type
-        # This is a switch statement, default is an error
-        gimp_type = type(gimp_instance).__name__    # idiom for class name
-        if  gimp_type == 'Image':
-            result = GimpfuImage(adaptee=gimp_instance)
-        elif gimp_type == 'Layer':
-            result = GimpfuLayer(adaptee=gimp_instance)
-        elif gimp_type == 'Display':
-            result = GimpfuDisplay(adaptee=gimp_instance)
-        elif gimp_type == 'Vectors':
-            result = GimpfuVectors(adaptee=gimp_instance)
-        #elif gimp_type == 'Channel':
-        # result = GimpfuLayer(None, None, None, None, None, None, None, gimp_instance)
-        else:
-            exception_str = f"GimpFu: can't wrap gimp type {gimp_type}"
-            do_proceed_error(exception_str)
-        """
+
 
 
     @staticmethod
@@ -163,7 +147,7 @@ class Marshal():
         else:
             # arg is already Gimp type, or a fundamental type
             result_arg = arg
-        print("unwrap result:", result_arg)
+        Marshal.logger.info(f"unwrapped to: {result_arg}")
         return result_arg
 
 
@@ -234,12 +218,12 @@ class Marshal():
         - from Gimp calling back the plugin.
         - from the plugin calling Gimp
         '''
-        print("wrap_args", args)
         result = []
         for instance in args:
             if is_gimpfu_wrappable(instance):
                 result.append(Marshal.wrap(instance))
             else:   # fundamental
+                Marshal.logger.info(f"Not wrapped: {instance}")
                 result.append(instance)
         return result
 
@@ -252,12 +236,12 @@ class Marshal():
         Unwrap instances that are wrapped.
         Returns list.
         '''
-        print("unwrap_args", args)
         result = []
         for instance in args:
             if is_gimpfu_unwrappable(instance):
                 result.append(Marshal.unwrap(instance))
             else:   # fundamental
+                Marshal.logger.info(f"Not unwrapped: {instance}")
                 result.append(instance)
         return result
 

@@ -116,12 +116,16 @@ Notations used in the comments:
 # GimpFu attempts to hide GI, but GimpFu plugins MAY also use GI.
 
 
-# v2 exposed to authors? v3, authors must import it themselves
+# Expose to Authors: math.  v2 did? v3, Authors must import it themselves
 # v2 import math
 
 import sys
 
 
+'''
+Expose to authors: GI
+GI is also heavily used by GimpFu
+'''
 import gi
 
 # Require 2.32 for GArray instead of GValueArray
@@ -131,39 +135,61 @@ from gi.repository import GLib
 
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
-
-# v3
 from gi.repository import Gio
-
-# for g_param_spec and properties
-from gi.repository import GObject
+from gi.repository import GObject   # for g_param_spec and properties
 
 
-# import private implementation
+# imports  for implementation.  Intended to be private from Authors
 from adaption.marshal import Marshal
 from procedure.procedure import FuProcedure
 from procedure.procedure_config import FuProcedureConfig
-from message.proceed_error import *
 
+from message.proceed_error import *
 from message.deprecation import Deprecation
 
-
-# Gimp enums exposed to s
-# Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
-# Name "gimpenums" retained for FBC, some non-GimpFu plugins may import
-from gimpenums import *
-
-# v3 GimpFu enums exposed to s e.g. PF_INT
-from gimpfu_enums import *
-
-
-
-# TODO import gimpcolor
+'''
+Initialize logging.
+See 'Using logging in multiple modules'
+recipe https://docs.python.org/3/howto/logging-cookbook.html#logging-cookbook
+'''
+import logging
+logger = logging.getLogger('GimpFu')
+# TODO make the level come from the command line or the environment
+#logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
+# create file handler which logs even debug messages
+#fh = logging.FileHandler('spam.log')
+#fh.setLevel(logging.DEBUG)
+# create console handler with same log level
+ch = logging.StreamHandler()
+# possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
+ch.setLevel(logging.DEBUG)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+#fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# add the handlers to the logger
+#logger.addHandler(fh)
+logger.addHandler(ch)
 
 
 
 '''
-Alias symbols "gimp" and "pdb" to expose to authors.
+Expose to Authors: Gimp enums
+Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
+Name "gimpenums" retained for FBC, some non-GimpFu plugins may import
+'''
+from gimpenums import *
+
+''' Expose to Authors: v3 GimpFu enums  e.g. PF_INT '''
+from gimpfu_enums import *
+
+# v2 import gimpcolor
+
+
+
+'''
+Expose to Authors : alias symbols "gimp" and "pdb" to
 It is not as simple as:
     pdb=Gimp.get_pdb()
     OR from gi.repository import Gimp as gimp
@@ -207,7 +233,7 @@ def N_(message):
 # Warn v2 authors
 # Signature that will catch gettext older versions
 def override_gettext_install(name, locale, **kwargs):
-    print("Warning: GimpFu plugins should not call gettext.install, it is already done.")
+    logger.info("Warning: GimpFu plugins should not call gettext.install, it is already done.")
 
 gettext.install = override_gettext_install
 '''
@@ -218,7 +244,7 @@ gettext.install = override_gettext_install
 
 
 '''
-local cache of procedures implemented in the 's source code.
+local cache of procedures implemented in the 'Authors source code.
 Dictionary containing elements of type GimpFuProcedure
 '''
 __local_registered_procedures__ = {}
@@ -238,7 +264,7 @@ The GimpFu API:
 '''
 Register locally, not with Gimp.
 
-Each author's source may contain many calls to register.
+Each Authors source may contain many calls to register.
 '''
 # A primary phrase in GimpFu language
 def register(proc_name, blurb, help, author, copyright,
@@ -247,7 +273,7 @@ def register(proc_name, blurb, help, author, copyright,
             menu=None, domain=None, on_query=None, on_run=None):
     """ GimpFu method that registers a plug-in. May be called many times from same source file."""
 
-    print("Gimpfu: register ", proc_name)
+    logger.info(f"register procedure: {proc_name}")
 
     gf_procedure = FuProcedure(proc_name, blurb, help, author, copyright,
                             date, label, imagetypes,
@@ -263,7 +289,7 @@ def register(proc_name, blurb, help, author, copyright,
 def main():
     """This should be called after registering the plug-in."""
     # v2:   gimp.main(None, None, _query, _run)
-    print('GimpFu main called\n')
+    logger.info('GimpFu main called')
     Gimp.main(GimpFu.__gtype__, sys.argv)
 
 
@@ -332,9 +358,9 @@ def _try_run_func(proc_name, function, args):
 
         # TODO this needs image
         # gimpfu_dialog.show_error_dialog(proc_name, image)
-        print(">>>>>>>>>>>TODO error dialog??")
+        logger.info(">>>>>>>>>>>TODO error dialog??")
         exc_str, exc_only_str = gui.dialog._create_exception_str()
-        print(exc_str, exc_only_str)
+        logger.info(f"{exc_str}, {exc_only_str}")
         result = None
         # TODO either pass exc_str back so Gimp shows in dialog,
         # or reraise so Gimp shows a generic "plugin failed" dialog
@@ -351,7 +377,7 @@ def _interact(procedure, list_gvalues_all_args, config):
 
     Returns (was_canceled, (results of run_func or None))
     '''
-    print("_interact called", procedure, list_gvalues_all_args)
+    logger.info(f"_interact, {procedure}, {list_gvalues_all_args}")
 
     # get name from instance of Gimp.Procedure
     proc_name = procedure.get_name()
@@ -378,10 +404,10 @@ def _interact(procedure, list_gvalues_all_args, config):
         nonlocal nonguiable_actual_args
 
         wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args,  guiable_actual_args)
-        print("wrapped_run_args", wrapped_run_args)
+        logger.info("wrapped_run_args", wrapped_run_args)
         '''
-        invoke author's func on unpacked args
-        !!! author's func never has run_mode, Gimpfu hides need for it.
+        invoke Authors func on unpacked args
+        !!! Authors func never has run_mode, Gimpfu hides need for it.
         '''
         result = function(*wrapped_run_args)
         return result
@@ -391,7 +417,7 @@ def _interact(procedure, list_gvalues_all_args, config):
 
     if len(guiable_formal_params) == 0:
         #Just execute, don't open dialog.
-        print("no guiable parameters")
+        logger.info("no guiable parameters")
         was_canceled = False
         # !!! no gui can change in args
         result = _try_run_func(proc_name, function, wrapped_in_actual_args)
@@ -403,7 +429,6 @@ def _interact(procedure, list_gvalues_all_args, config):
 
         import gui.dialog
 
-        print("Call show_plugin_dialog")
         '''
         v2
         # executes run_script if not canceled, returns tuple of run_script result
@@ -431,7 +456,7 @@ def _interact(procedure, list_gvalues_all_args, config):
 
             # update incoming guiable args with guied args
             wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args, guied_args)
-            print("Wrapped args to run_func", wrapped_run_args )
+            logger.info(f"Wrapped args to run_func, {wrapped_run_args}" )
 
             # !!! with args modified since passed in
             result = _try_run_func(proc_name, function, wrapped_run_args)
@@ -470,10 +495,10 @@ Now it is of C type GimpImageProcedure or Python type ImageProcedure
 !!! Args are Gimp types, not Python types
 '''
 def _run_imageprocedure(procedure, run_mode, image, drawable, original_args, data):
-    ''' GimpFu wrapper of the author's "main" function, aka run_func '''
+    ''' GimpFu wrapper of the Authors "main" function, aka run_func '''
 
-    print("_run_imageprocedure ", procedure, run_mode, image, drawable, original_args)
-    print("_run_imageprocedure count original_args", original_args.length())
+    logger.info(f"_run_imageprocedure , {procedure}, {run_mode}, {image}, {drawable}, {original_args}")
+    # logger.info("_run_imageprocedure count original_args", original_args.length())
 
     '''
     Create GimpValueArray of *most* args.
@@ -490,8 +515,8 @@ cruft?
 #def _run_imagelessprocedure(procedure, run_mode, actual_args, data):
 #def _run_imagelessprocedure(procedure, run_mode, actual_args):
 def _run_imagelessprocedure(procedure, actual_args, data):
-    ''' GimpFu wrapper of the author's "main" function, aka run_func '''
-    print("_run_imagelessprocedure ", procedure, actual_args)
+    ''' GimpFu wrapper of the Authors "main" function, aka run_func '''
+    logger.info("_run_imagelessprocedure ", procedure, actual_args)
     #run_mode = Gimp.RunMode.INTERACTIVE
     all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, image=None, drawable=None)
     _run(procedure, run_mode, all_args, data)
@@ -503,7 +528,7 @@ def _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
     Understands run_mode.
     Different ways to invoke procedure batch, or interactive.
 
-    Hides run_mode from s.
+    Hides run_mode from Authors.
     I.E. their run_func signature does not have run_mode.
 
     require procedure is-a Gimp.Procedure.
@@ -517,7 +542,7 @@ def _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
     # see gimp/libgimp/gimpprocedure.h, and then remove the prefix gimp_procedure_
     name = procedure.get_name()
 
-    print("_run ", name, run_mode, list_gvalues_all_args)
+    logger.info(f"_run: {name}, {run_mode}, {list_gvalues_all_args}")
     '''
     list_gvalues_all_args are one-to-one with formal params.
     list_gvalues_all_args may include some args that are not guiable (i.e. image, drawable)
@@ -660,7 +685,7 @@ GimpFu is wrapper.
 Has no properties itself.
 More generally (unwrapped) properties  represent params (sic arguments) to ultimate plugin.
 
-_run() above wraps author's "function" i.e. ultimate plugin method,
+_run() above wraps Authors "function" i.e. ultimate plugin method,
 which is referred to as "run_func" here and in Gimp documents.
 '''
 
@@ -674,14 +699,14 @@ class GimpFu (Gimp.PlugIn):
     OR when ~/.config/GIMP/2.99/pluginrc (a cache of installed plugins) is being recreated.
     '''
     def do_query_procedures(self):
-        print("do_query_procedures")
+        logger.info("do_query_procedures")
 
         # TODO Why set the locale again?
         # Maybe this is a requirement documented for class Gimp.Plugin????
         self.set_translation_domain("Gimp30-python",
                                     Gio.file_new_for_path(Gimp.locale_directory()))
 
-        # return list of all procedures implemented in the author's source code
+        # return list of all procedures implemented in the Authors source code
         # For testing: result =[ gf_procedure.name, ]
         keys = __local_registered_procedures__.keys()
 
@@ -705,7 +730,7 @@ class GimpFu (Gimp.PlugIn):
     '''
     def do_create_procedure(self, name):
 
-        print ('do_create_procedure: ', name)
+        logger.info (f"do_create_procedure: {name}")
 
         # We need the kind of plugin, and to ensure the passed name is know to us
         gf_procedure = __local_registered_procedures__[name]
@@ -759,7 +784,7 @@ class GimpFu (Gimp.PlugIn):
             raise Exception("Unknown type of Gimp.Procedure")
 
         """
-                print("Create imageless procedure")
+                logger.info("Create imageless procedure")
                 procedure = Gimp.Procedure.new(self,
                                                 name,
                                                 Gimp.PDBProcType.PLUGIN,

@@ -25,6 +25,11 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
+import logging
+
+module_logger = logging.getLogger('GimpFu.gimpenums')
+
+
 '''
 # TODO:
 
@@ -85,6 +90,9 @@ def define_symbols_for_enum(enum, prefix="", suffix=""):
             exec(defining_statement, globals())
 
 
+module_logger.info("defining enums...")
+
+
 '''
 Exceptions to the rules
 '''
@@ -126,7 +134,7 @@ for attribute in dir(foo):
 TODO open an issue with Gimp:
 the naming is inconsistent, not alway FooType, sometimes just Foo.
 """
-print("gimpenums defining enums...")
+
 define_symbols_for_enum(Gimp.MergeType)
 # ImageBaseType is superset of ImageType, i.e. RGB => RGB, RGBA, etc.
 define_symbols_for_enum(Gimp.ImageBaseType)

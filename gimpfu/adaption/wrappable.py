@@ -1,5 +1,10 @@
 
 
+import logging
+
+module_logger = logging.getLogger('GimpFu.Wrappable')
+
+
 '''
 Knows:
 
@@ -116,5 +121,8 @@ def is_subclass_of_type(instance, super_type):
         result = instance_type_name in ItemTypeNames or instance_type_name in DrawableTypeNames
     elif super_type_name == 'RGB':
         result = instance_type_name in ColorTypeNames
-    print(f"is_subclass_of_type ( {instance_type_name}, {super_type_name}) returns {result}")
+
+    module_logger.info(f"is_subclass_of_type ( {instance_type_name}, {super_type_name}) returns {result}")
+    if result:
+        module_logger.debug(f"is_subclass_of_type ( {instance_type_name}, {super_type_name}) returns {result}")
     return result

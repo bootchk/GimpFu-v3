@@ -4,7 +4,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 from message.proceed_error import do_proceed_error
-
+import logging
 
 
 
@@ -14,6 +14,9 @@ class FormalTypes():
 
     Formal type specs are in the PDB, ParamSpec's specify types.
     '''
+
+    logger = logging.getLogger("GimpFu.Types")
+
 
     @staticmethod
     def _get_formal_argument_type(proc_name, index):
@@ -28,8 +31,7 @@ class FormalTypes():
         procedure = Gimp.get_pdb().lookup_procedure(proc_name)
 
         arg_specs = procedure.get_arguments()    # some docs say it returns a count, it returns a list of GParam??
-        # print(arg_specs)
-        # assert is a list
+        # assert arg_specs is-a list
 
         ## arg_specs = Gimp.ValueArray.new(arg_count)
         ##config.get_values(arg_specs)
@@ -38,43 +40,28 @@ class FormalTypes():
         # index may be out of range,  may have provided too many args
         try:
             arg_spec = arg_specs[index]   # .index(index) ??
-            print(arg_spec)
             # assert is-a GObject.GParamSpec or subclass thereof
             ## OLD assert arg_spec is GObject.Value, describes arg of procedure (its GType is the arg's type)
 
             '''
-            CRUFT, some comments may be pertinent.
+            Documenting various things I tried, which we may need to try again.
 
-            The type of the subclass of GParamSpec is enough for our purposes.
-            Besides, GParamSpec.get_default_value() doesn't work???
+            (dir(arg_spec)) at this point shows attributes of arg_spec
 
-            formal_arg_type = type(arg_spec)
+            1) formal_arg_type = type(arg_spec)
+
+            2) formal_default_value = arg_spec.get_default_value()
+               formal_arg_type = formal_default_value.get_gtype()
             '''
-
-            '''
-            print(dir(arg_spec)) shows that arg_spec is NOT a GParamSpec, or at least doesn't have get_default_value.
-            I suppose it is a GParam??
-            Anyway, it has __gtype__
-            '''
-            """
-            formal_default_value = arg_spec.get_default_value()
-            print(formal_default_value)
-            # ??? new to GI 2.38
-            # assert is-a GObject.GValue
-
-            formal_arg_type = formal_default_value.get_gtype()
-            """
             formal_arg_type = arg_spec.__gtype__
 
         except IndexError:
             do_proceed_error("Formal argument not found, probably too many actual args.")
             formal_arg_type = None
 
+        FormalTypes.logger.info(f"get_formal_argument_type returns: {formal_arg_type}")
 
-        print( "get_formal_argument returns", formal_arg_type)
-
-        # assert type of formal_arg_type is GObject.GType
-        ## OLD assert formal_arg_type has python type like GParamSpec<Enum>
+        # assert type of formal_arg_type is-a GObject.GType
         return formal_arg_type
 
 
@@ -94,11 +81,11 @@ class FormalTypes():
         # use the short name
         return formal_arg_type.name in ('GParamFloat', 'GParamDouble')
 
+    # TODO missing @staticmethod ?
     def is_str_type(formal_arg_type):
         return formal_arg_type.name in ('GParamString', )
 
     def is_int_type(formal_arg_type):
-        print(f"is_int_type: {formal_arg_type.name}")
         return formal_arg_type.name in ('GParamInt', )  # ??? GParamUInt
 
     # !!!! GimpParam...
@@ -111,7 +98,7 @@ class FormalTypes():
     def is_drawable_type(formal_arg_type):
         # use the short name
         result = formal_arg_type.name in ('GimpParamDrawable', )
-        print(f"is_drawable_type formal arg name: {formal_arg_type.name} ")
+        FormalTypes.logger.debug(f"is_drawable_type formal arg name: {formal_arg_type.name} ")
         return result
 
 
@@ -123,5 +110,5 @@ class FormalTypes():
 
         mangled_formal_type_name = formal_type_name.replace('GimpParam', '')
         result = mangled_formal_type_name == actual_type_name
-        print(f"{result}    formal {formal_type_name} == actual {actual_type_name}")
+        FormalTypes.logger.debug(f"{result}    formal {formal_type_name} == actual {actual_type_name}")
         return result

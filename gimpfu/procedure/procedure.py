@@ -2,6 +2,7 @@
 
 from procedure.metadata import FuProcedureMetadata
 
+import logging
 
 '''
 Nothing translatable here.
@@ -53,6 +54,9 @@ class FuProcedure():
                 date, label, imagetypes,
                 params, results, function,
                 menu, domain, on_query, on_run):
+
+        self.logger = logging.getLogger("GimpFu.FuProcedure")
+
         '''
         Takes metadata authored by .
         Which is wild, so sanity test.
@@ -61,7 +65,7 @@ class FuProcedure():
 
         This does NOT create the procedure in Gimp PDB, which happens later.
         '''
-        print ('new FuProcedure', proc_name)
+        self.logger.info (f"new instance: {proc_name}")
 
         '''
         v2 plugin_type = PLUGIN
@@ -103,7 +107,7 @@ class FuProcedure():
             # is LoadProcedure
             result = self.metadata.params.PARAMS
 
-        print("guiable_formal_params:", result)
+        self.logger.info(f"has guiable_formal_params: {result}")
         return result
 
 
@@ -234,7 +238,7 @@ class FuProcedure():
 
     def convey_return_value_declarations_to_gimp(self):
         """ Declare to Gimp return value types of this plugin procedure. """
-        print("convey_return_value_declarations_to_gimp NOT IMPLEMENTED")
+        self.logger.warning("convey_return_value_declarations_to_gimp NOT IMPLEMENTED")
         # procedure.add_return_value_from_property(self, "new-palette")
 
     '''
@@ -243,7 +247,7 @@ class FuProcedure():
 
     def on_run(self):
         if self.metadata.ON_RUN:
-            print("Call on_run")
+            self.logger.info("on_run called")
             a_callback = self.metadata.ON_RUN
             a_callback()
 
@@ -260,8 +264,8 @@ class FuProcedure():
         See the .c plugins for example code.
         The best example is plug-ins/common/despeckle.c
         """
-        print("convey_last_values NOT IMPLEMENTED")
+        self.logger.info("convey_last_values NOT IMPLEMENTED")
         config = self._wrapped_gimp_procedure.create_config()
-        print(config)
+        self.logger.info(config)
         ## assert config is type Gimp.ProcedureConfig, having properties same as args of procedure
     '''

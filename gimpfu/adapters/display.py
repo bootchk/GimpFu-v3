@@ -29,7 +29,7 @@ class GimpfuDisplay( Adapter) :
             assert adaptee is not None
             super().__init__(adaptee)
 
-        print("new GimpfuDisplay with adaptee", self._adaptee)
+        # super Adaptor logs this
 
 
 

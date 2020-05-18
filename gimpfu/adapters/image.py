@@ -7,7 +7,7 @@ from gi.repository import Gimp
 
 # absolute from SYSPATH that points to top of gimpfu package
 from adapters.adapter import Adapter
-
+from adapters.adapter_logger import AdapterLogger
 
 '''
 
@@ -87,7 +87,7 @@ class GimpfuImage( Adapter ) :
             final_adaptee = adaptee
         else:
             # Gimp constructor named "new"
-            print("Calling Gimp.Image.new with width", width)
+            AdapterLogger.logger.debug(f"Calling Gimp.Image.new")
             final_adaptee = Gimp.Image.new(width, height, image_mode)
 
         # super is Adaper, and it stores adaptee
@@ -95,13 +95,15 @@ class GimpfuImage( Adapter ) :
 
 
 
+    """
     # TODO Not needed ??
     def adaptee(self):
         ''' Getter for private _adaptee '''
         # Handled by super Adaptor
         result = self._adaptee
-        print("adaptee getter returns:", result)
+        AdapterLogger.logger.debug(f"adaptee getter returns: {result}")
         return result
+    """
 
 
 
@@ -142,7 +144,7 @@ class GimpfuImage( Adapter ) :
 
     # Reason: allow optional args
     def insert_layer(self, layer, parent=None, position=-1):
-        print("insert_layer called")
+        AdapterLogger.logger.debug("insert_layer called")
 
         layer, parent, position = self._mangle_layer_args(layer, parent, position)
         # Note that first arg "image" to Gimp comes from self
@@ -152,7 +154,7 @@ class GimpfuImage( Adapter ) :
 
     # Reason: allow optional args, rename
     def add_layer(self, layer, parent=None, position=-1):
-        print("add_layer called")
+        AdapterLogger.logger.debug("add_layer called")
         layer, parent, position = self._mangle_layer_args(layer, parent, position)
         success = self._adaptee.insert_layer(layer.unwrap(), parent, position)
         if not success:
@@ -190,7 +192,7 @@ class GimpfuImage( Adapter ) :
         Returns string that is path to file the image was saved to.
         Returns "Untitled" if image not loaded from file, or not saved.
         '''
-        # print("GimpfuImage.filename get called")
+        # AdapterLogger.logger.debug("GimpfuImage.filename get called")
         # sic Image.get_name returns a filepath
         result = self._adaptee.get_name()
         return result

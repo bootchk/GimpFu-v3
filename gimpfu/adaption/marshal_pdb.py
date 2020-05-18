@@ -12,6 +12,7 @@ from adaption.generic_value import FuGenericValue
 
 from message.proceed_error import *
 
+import logging
 
 
 class MarshalPDB():
@@ -24,6 +25,7 @@ class MarshalPDB():
     Many methods operate on a stateful FuGenericValue, and don't return a result.
     '''
 
+    logger = logging.getLogger("GimpFu.MarshalPDB")
 
     @staticmethod
     def _try_type_conversions(proc_name, gen_value, index):
@@ -88,7 +90,6 @@ class MarshalPDB():
 
         # FuValueArray is global adaptor of Gimp.ValueArray.  Empty it.
         FuValueArray.reset()
-        # print(f">>>>>> marshalled args: {FuValueArray.dump()}" )
 
         formal_args_index = 0
 
@@ -110,8 +111,9 @@ class MarshalPDB():
         but Gimp might return an error when we call the PDB procedure with too few args.
         '''
         for x in args:
-            print(f"\n#### marshal arg: {x} index: {formal_args_index}" )
-            print(f">>>>>> marshalled args: {FuValueArray.dump()}" )
+            MarshalPDB.logger.debug(f"marshalling arg: {x} index: {formal_args_index}" )
+            # to dump more uncomment this
+            # MarshalPDB.logger.debug(f"cumulative marshalled args: {FuValueArray.dump()}" )
 
             go_arg, go_arg_type = MarshalPDB._unwrap_to_param(x)
             # assert are GObject types, i.e. fundamental or Boxed
@@ -147,8 +149,8 @@ class MarshalPDB():
             """
 
         result = FuValueArray.get_gvalue_array()
-        # print("marshalled args", result )
-        print(f">>>>>> marshalled args: {FuValueArray.dump()}" )
+
+        MarshalPDB.logger.debug(f"marshal_args returns: {FuValueArray.dump()}" )
         return result
 
 
@@ -164,7 +166,7 @@ class MarshalPDB():
 
         For all returned objects, wrap as necessary.
         '''
-        print("PDB status result is:", values.index(0))
+        MarshalPDB.logger.debug(f"PDB status result is: {values.index(0)}")
 
         # caller should have previously checked that values is not a Gimp.PDBStatusType.FAIL
         if values:
@@ -184,7 +186,7 @@ class MarshalPDB():
             # TODO is this always the correct thing to do?
             # Some procedure signatures may return a list of one?
             if len(result_list) is 1:
-                print("Unpacking single element list.")
+                MarshalPDB.logger.debug("Unpacking single element list.")
                 result = result_list[0]
             else:
                 result = result_list
@@ -193,7 +195,7 @@ class MarshalPDB():
 
         # ensure result is None or result is list or result is one object
         # TODO ensure wrapped?
-        print("unmarshal_pdb_result", result)
+        MarshalPDB.logger.debug(f"unmarshal_results returns: {result}")
         return result
 
 
@@ -212,5 +214,5 @@ class MarshalPDB():
         result_arg = Marshal.unwrap(arg)
         result_arg_type = type(result_arg)
 
-        print("_unwrap_to_param", result_arg, result_arg_type)
+        MarshalPDB.logger.debug(f"_unwrap_to_param returns: {result_arg} of type {result_arg_type}")
         return result_arg, result_arg_type

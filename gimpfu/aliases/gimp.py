@@ -20,6 +20,7 @@ from adaption.compatibility import gimp_name_map
 
 from message.proceed_error import *
 
+import logging
 
 
 class GimpfuGimp():
@@ -52,7 +53,8 @@ class GimpfuGimp():
     '''
 
 
-
+    def __init__(self):
+        self.logger = logging.getLogger("GimpFu.GimpfuGimp")
 
     """
     If experience shows this would be helpful,
@@ -66,7 +68,7 @@ class GimpfuGimp():
 
         Returns a tuple
         '''
-        print("_adapt_signature", name, args)
+        self.logger.info("_adapt_signature", name, args)
         if name is "set_background":
             # TODO create a color
             # TEMP return a constant color
@@ -92,7 +94,7 @@ class GimpfuGimp():
          - a call to a GimpFu adapter constructor GimpFu<foo>(<bar>)
          - OR a call to a Gimp method Gimp.<foo>(<bar>)
         '''
-        print ("gimp adaptor called, args:", *args)
+        self.logger.info("_adaptor_func called, args:  {*args}")
 
         # test
 
@@ -100,10 +102,10 @@ class GimpfuGimp():
         # Futz with args that had property semantics in v2
         new_args = []
         for arg in args:
-            print("arg type is:", type(arg))
-            print(arg.invoke())
+            self.logger.info("arg type is:", type(arg))
+            self.logger.info(arg.invoke())
             if type(arg) is gi.FunctionInfo:
-                print("arg.invoke")
+                self.logger.info("arg.invoke")
                 new_arg = arg.invoke()
             else:
                 new_arg = arg
@@ -125,7 +127,7 @@ class GimpfuGimp():
             Constructor will in turn call Gimp.Layer constructor.
             '''
             callable_name = "Gimpfu" + dot_name
-            print("Calling constructor: ", callable_name)
+            self.logger.info(f"Calling constructor: {callable_name}")
         else:
             '''
             The attribute is a Gimp function.
@@ -173,7 +175,7 @@ class GimpfuGimp():
 
 
         # ensure result is defined, even if None
-        print(result)
+        self.logger.info("_adaptor_func returns: {result}")
         return result
 
 
@@ -226,7 +228,7 @@ class GimpfuGimp():
             do_proceed_error("Use 'pdb', not 'gimp.pdb'.")
             # do more so that GimpFu really can proceed without more exceptions
 
-        print("return gimp adaptor func")
+        self.logger.info("__getattr__ returns callable _adaptor_func")
         # return adapter function soon to be called
         return object.__getattribute__(self, "_adaptor_func")
 
@@ -255,7 +257,7 @@ class GimpfuGimp():
         Gimp.Image.delete() et al says it will not delete
         if is on display (has a DISPLAY) i.e. if Gimp user created as opposed to just the plugin.
         '''
-        print("TODO gimp.delete() called")
+        self.logger.warning("gimp.delete() not implemented")
 
 
     def set_background(self, r, g=None, b=None):

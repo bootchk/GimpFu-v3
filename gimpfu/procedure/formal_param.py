@@ -1,17 +1,21 @@
-1
+
 
 import gi
 from gi.repository import GObject
 from gi.repository import Gimp
 
 from gimpfu_enums import *
-#from adapters.color import FuColor
 
 from procedure.prop_holder_factory import PropHolderFactory
 
 import sys
 
-from message.deprecation import Deprecation
+# from message.deprecation import Deprecation
+from message.proceed_error import *
+
+
+import logging
+
 
 '''
 Inherits GObject.Object so we can install properties.
@@ -43,8 +47,8 @@ class FuFormalParam(GObject.Object):
     # Temp hack ???
     from procedure.prop_holder import PropHolder
     prop_holder = PropHolder()
-    print("prop_holder.props", prop_holder.props)
-    print("prop_holder.props.IntProp:", prop_holder.props.IntProp1)
+    #self.logger.debug("prop_holder.props", prop_holder.props)
+    #self.logger.debug("prop_holder.props.IntProp:", prop_holder.props.IntProp1)
 
     prop_holder_factory = PropHolderFactory()
 
@@ -56,6 +60,8 @@ class FuFormalParam(GObject.Object):
         self.DEFAULT_VALUE= default_value
         self.EXTRAS = extras
         # EXTRAS defaults to empty list or ???  [None]  Python 3.7
+
+        self.logger = logging.getLogger("GimpFu.FuFormalParam")
 
 
     def __repr__(self):
@@ -147,7 +153,7 @@ class FuFormalParam(GObject.Object):
 
     def convey_to_gimp(self, procedure, index):
         """ Convey self as formal arg to GimpProcedure procedure. """
-        print(f"Convey: {self}")
+        self.logger.debug(f"Convey: {self}")
         # TODO choice of implementation
         #self.convey_using_static_property(procedure)
         self.convey_using_dynamic_class_property(procedure)
@@ -180,7 +186,7 @@ class FuFormalParam(GObject.Object):
         max = None
         if extras_type == 0:
             if extras:
-                print("Unexpected extras on parameter spec.")
+                do_proceed_error("Unexpected extras on parameter spec.")
             pass
         elif extras_type == 1:
             if extras:
@@ -198,17 +204,16 @@ class FuFormalParam(GObject.Object):
         elif extras_type == 3:
             # PF_RADIO and PF_OPTION
             if extras:
-                # TODO should extract the min and max of the ints
-                # For most cases, this will suffice but max should be -1
+                # TODO should extract the min and max of the given list of option ordinals
+                # For most cases, this will suffice but max should be len()-1 ??
                 if not isinstance (extras[0][1], int):
-                    # TODO exception
-                    Deprecation.say(f"String literal valued extras are obsolete.")
+                    do_proceed_error(f"String literal valued extras are obsolete.")
                 min = 0
                 max = len(extras)
             else:
-                print("Missing extras")
+                do_proceed_error("Missing extras")
         else:
-            print("Unhandled extras type")
+            do_proceed_error("Unhandled extras type")
 
         return (min, max)
 
