@@ -10,8 +10,8 @@ from procedure.prop_holder_factory import PropHolderFactory
 
 import sys
 
-# from message.deprecation import Deprecation
-from message.proceed_error import *
+from message.deprecation import Deprecation
+#from message.proceed_error import *
 
 
 import logging
@@ -177,6 +177,15 @@ class FuFormalParam(GObject.Object):
         return result
 
 
+    def _on_extras_error(self, message):
+        """ Log an Author's error in source, in the Params
+
+        Don't use do_proceed_error(), don't need its stack trace.
+        But the user's code was not fixed so this should be more severe than a warning?
+        """
+        Deprecation.say("Error in plugin author's source: " + message)
+
+
     def derive_min_max_from_extras(self):
         """ Parse extras tuple, yield min and max. """
         extras_type = map_PF_TYPE_to_extras_type[self.PF_TYPE]
@@ -206,14 +215,21 @@ class FuFormalParam(GObject.Object):
             if extras:
                 # TODO should extract the min and max of the given list of option ordinals
                 # For most cases, this will suffice but max should be len()-1 ??
+
+                """
+                Not currently using the given extras values,
+                but warn if they are not of valid type.
+                """
                 if not isinstance (extras[0][1], int):
-                    do_proceed_error(f"String literal valued extras are obsolete.")
+                    self._on_extras_error(f"String literals for extras are obsolete.")
+
                 min = 0
                 max = len(extras)
             else:
-                do_proceed_error("Missing extras")
+                self._on_extras_error("Missing extras")
         else:
-            do_proceed_error("Unhandled extras type")
+            # Could be missing code in GimpFu ?
+            self._on_extras_error("Unhandled extras type")
 
         return (min, max)
 

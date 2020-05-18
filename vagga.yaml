@@ -630,7 +630,7 @@ commands:
 
       echo "Copying test plugins"
       # all
-      # cp -r /work/plug-ins/* /work/.home/.config/GIMP/2.99/plug-ins
+      cp -r /work/plug-ins/* /work/.home/.config/GIMP/2.99/plug-ins
 
       # just a few
       # megaTestGimp

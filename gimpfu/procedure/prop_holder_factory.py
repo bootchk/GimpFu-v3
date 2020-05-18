@@ -13,6 +13,8 @@ from gi.repository import Gimp   # for Gimp enum RunMode
 
 import string
 
+import logging
+
 
 
 """
@@ -27,6 +29,8 @@ class PropHolderFactory():
 
     def __init__(self):
         self.counter = 1
+
+        self.logger = logging.getLogger("GimpFu.PropHolderFactory")
 
         """
         Template strings.
@@ -78,7 +82,7 @@ class Foo(GObject.GObject):
 
 
     def produce(self, type, default, min, max):
-        print(f"Producing property type: {type} default: {default}, min: {min}, max: {max}")
+
         unique_prop_name = self.get_unique_name()
 
         # substitute into template
@@ -98,9 +102,13 @@ class Foo(GObject.GObject):
             template = string.Template(self.template_string_gimp_value)
             # !!! Omit default
             code_string = template.substitute(type=type, name=unique_prop_name)
-            # print(code_string)
+
         else:
+            # fatal, useless to proceed if we can't convey args to Gimp
             raise RuntimeError(f"Unhandled property type: {type}")
+
+        self.logger.info(f"Producing property type: {type} default: {default}, min: {min}, max: {max}")
+        self.logger.info(f"exec( {code_string} )")
 
         # create class Foo in globals by exec template
         exec(code_string)

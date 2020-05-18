@@ -8,6 +8,7 @@ from adaption.marshal import Marshal
 from adaption.types import Types
 from adaption.generic_value import FuGenericValue
 
+import logging
 
 
 class FuProcedureConfig():
@@ -37,6 +38,8 @@ class FuProcedureConfig():
         self._config = procedure.create_config()
         # Save length, Gimp.ProcedureConfig does not expose it
         self._length = length
+
+        self.logger = logging.getLogger("GimpFu.FuProcedureConfig")
 
 
     def begin_run(self, image, run_mode, args):
@@ -116,7 +119,7 @@ class FuProcedureConfig():
         """ Put last values of args into self. """
         # require args is list of Python types for guiable args
         # TODO:
-        print("***************set_changed_settings")
+        self.logger.info("set_changed_settings called")
 
         array = Gimp.ValueArray.new(0)
         self._config.get_values(array)
@@ -124,11 +127,12 @@ class FuProcedureConfig():
         # !!! args is prefixed with (image, drawable) i.e. has more elements than self
         index = 2
         for arg in args:
-            print(f"changed setting {arg}")
+            self.logger.info(f"changed setting at index: {index} to value: {arg}")
             self._set_value_at_index(array, arg, index-2)
+            index += 1
 
         self._config.set_values(array)
-        pass
+
 
     def end_run(self, is_success):
         self._config.end_run (Gimp.PDBStatusType.SUCCESS)
