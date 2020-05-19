@@ -49,10 +49,12 @@ class Display:
         # assert display is-a Gimp.Display
 
         result = Gimp.ui_get_display_window(display)
+
+        # TODO this doesn't seem to print
+        # Not sure this is-a Gtk.Window
         print(result)
 
         #result = display.get_window_handle()
         # assert result is-a int ?
-
 
         return result

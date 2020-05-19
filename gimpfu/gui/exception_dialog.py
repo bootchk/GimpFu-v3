@@ -6,6 +6,8 @@ from gi.repository import Gimp
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
+from gui.dialog import Dialog
+
 
 """
 # TODO:
@@ -46,13 +48,21 @@ class ExceptionDialog:
         exc_str, exc_only_str =  ExceptionDialog.create_exception_str()
 
         title = _("An error occurred running %s") % proc_name
+
+        '''
+        This requires a parent, how to get???
         dlg = Gtk.MessageDialog(
-                                # parent,
+                                parent,
                                 0, # TODO Gtk.DIALOG_DESTROY_WITH_PARENT,
                                 Gtk.MessageType.ERROR,
                                 Gtk.ButtonsType.CLOSE,
                                 title)
-        dlg.format_secondary_text(exc_only_str)
+        '''
+        # A basic dialog from Gimp works, but is not as pretty as our custom widget
+        dlg = Dialog.get(proc_name)
+
+        # TODO this pertains only to Gtk.MessageDialog
+        # dlg.format_secondary_text(exc_only_str)
 
         '''
         #Since Gtk 3.14: Alignment deprecated.
