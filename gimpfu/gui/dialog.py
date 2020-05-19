@@ -1,11 +1,8 @@
 
 '''
-
 !!!
 This all should go away when Gimp support for auto plugin GUI lands in Gimp 3.
 Not well known that such support is on the roadmap.
-!!!
-
 '''
 
 
@@ -16,6 +13,7 @@ from gi.repository import Gimp
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
+#from gi.repository import GObject
 
 from gimpfu_enums import *  # PF_ enum
 
@@ -23,11 +21,12 @@ from gui.widgets import *
 
 from message.deprecation import Deprecation
 
+
 import gettext
 t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
 _ = t.gettext
 
-#from gi.repository import GObject
+
 
 
 
@@ -468,93 +467,6 @@ def warning_dialog(parent, primary, secondary=None):
     dlg.destroy()
 
 
-def _create_exception_str():
-    ''' Create two strings from latest exception.'''
-
-    import sys, traceback
-
-    exc_str = exc_only_str = _("Missing exception information")
-
-    try:
-        etype, value, tb = sys.exc_info()
-        exc_str = "".join(traceback.format_exception(etype, value, tb))
-        exc_only_str = "".join(traceback.format_exception_only(etype, value))
-    finally:
-        etype = value = tb = None
-
-    return exc_str, exc_only_str
-
-'''
-# TODO:
-Preferable to pass the exception string all the way back to Gimp
-as the result of the execution?
-TODO not tested
-'''
-def _create_error_dialog(proc_name, parent):
-    ''' Return error dialog containing Python trace for latest exception '''
-
-    exc_str, exc_only_str =  _create_exception_str()
-
-    title = _("An error occurred running %s") % proc_name
-    dlg = Gtk.MessageDialog(parent, 0, # TODO Gtk.DIALOG_DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR,
-                                    Gtk.ButtonsType.CLOSE,
-                                    title)
-    dlg.format_secondary_text(exc_only_str)
-
-    '''
-    #Since Gtk 3.14: Alignment deprecated.
-    #TODO use parent properties.
-
-    alignment = Gtk.Alignment(0.0, 0.0, 1.0, 1.0)
-    alignment.set_padding(0, 0, 12, 12)
-    dlg.vbox.pack_start(alignment)
-    alignment.show()
-
-    # TODO Since Gtk 3: broken
-    expander = Gtk.Expander(_("_More Information"));
-    expander.set_use_underline(True)
-    expander.set_spacing(6)
-    alignment.add(expander)
-    expander.show()
-    '''
-
-    scrolled = Gtk.ScrolledWindow()
-    scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-    scrolled.set_size_request(-1, 200)
-    dlg.vbox.pack_start(scrolled, expand=True, fill=True, padding=0)
-    # WAS expander.add(scrolled)
-    scrolled.show()
-
-    # add full traceback in scrolling window
-    label = Gtk.Label(exc_str)
-    label.set_alignment(0.0, 0.0)
-    label.set_padding(6, 6)
-    label.set_selectable(True)
-    # Since Gtk 3.8 add_with_viewport deprecated: use add()
-    scrolled.add(label)
-    label.show()
-
-    def response(widget, id):
-        widget.destroy()
-        Gtk.main_quit()
-
-    dlg.connect("response", response)
-    dlg.set_resizable(True)
-    return dlg
-
-
-# v3 exported.  v2 private
-def show_error_dialog(proc_name, image):
-    ''' Display error dialog, parented to main Gimp window. '''
-    # !!! GTK is not running.
-    Gimp.ui_init('foo') # TODO procedure.name()
-    parent = Gimp.ui_get_display_window(image)
-    error_dialog = _create_error_dialog(parent, proc_name)
-    error_dialog.show()
-    # Enter event loop, does not return until user chooses OK
-    Gtk.main()
-    # TODO who destroys, error_dialog.destroy()
 
 
 

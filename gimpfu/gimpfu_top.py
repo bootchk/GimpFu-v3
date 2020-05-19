@@ -344,29 +344,37 @@ def _query():
 """
 
 
-def _try_run_func(proc_name, function, args):
+def _try_run_func(proc_name, function, args, display):
     '''
     Run the plugin's run_func with args, catching exceptions.
+    Return result of run_func.
+
+    This is always non-headless (interactive.)
+    But not require an image open.
     Show dialog on exception.
-    Return result of run_func
     '''
     try:
         result = function(*args)
     except:
         # Show dialog here, or pass exception string back to Gimp???
-        import gui.dialog
+        from gui.exception_dialog import ExceptionDialog
 
-        # TODO this needs image
-        # gimpfu_dialog.show_error_dialog(proc_name, image)
-        logger.info(">>>>>>>>>>>TODO error dialog??")
-        exc_str, exc_only_str = gui.dialog._create_exception_str()
-        logger.info(f"{exc_str}, {exc_only_str}")
+        if display:
+            ExceptionDialog.show(proc_name, display)
+
+        exc_str, exc_only_str = ExceptionDialog.create_exception_str()
+
+        logger.critical(f"{exc_str}, {exc_only_str}")
         result = None
         # TODO either pass exc_str back so Gimp shows in dialog,
         # or reraise so Gimp shows a generic "plugin failed" dialog
         # or show our own dialog above
         raise
     return result
+
+
+
+
 
 
 
@@ -382,7 +390,13 @@ def _interact(procedure, list_gvalues_all_args, config):
     # get name from instance of Gimp.Procedure
     proc_name = procedure.get_name()
 
-    # get FuProcedure from container by name
+    # TODO assume first arg is likely an image
+    # display = Display.get(proc_name, list_gvalues_all_args[0])
+
+    from gui.display import Display
+    display = Display.get_window(proc_name)
+
+    # get FuProcedure from local cache by name
     gf_procedure = __local_registered_procedures__[proc_name]
 
     function = gf_procedure.metadata.FUNCTION
@@ -416,11 +430,11 @@ def _interact(procedure, list_gvalues_all_args, config):
 
 
     if len(guiable_formal_params) == 0:
-        #Just execute, don't open dialog.
+        # Just execute, don't open ControlDialog, but display ExceptionDialog
         logger.info("no guiable parameters")
         was_canceled = False
-        # !!! no gui can change in args
-        result = _try_run_func(proc_name, function, wrapped_in_actual_args)
+        # !!! no gui can change the in_args
+        result = _try_run_func(proc_name, function, wrapped_in_actual_args, display)
     else:
         # create GUI from guiable formal args, let user edit actual args
 
@@ -459,7 +473,7 @@ def _interact(procedure, list_gvalues_all_args, config):
             logger.info(f"Wrapped args to run_func, {wrapped_run_args}" )
 
             # !!! with args modified since passed in
-            result = _try_run_func(proc_name, function, wrapped_run_args)
+            result = _try_run_func(proc_name, function, wrapped_run_args, display)
         else:
             # Don't save any gui changes to args
             result = None

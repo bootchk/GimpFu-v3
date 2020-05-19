@@ -1,11 +1,8 @@
 
 '''
-
 !!!
 This all should go away when Gimp support for auto plugin GUI lands in Gimp 3.
 Not well known that such support is on the roadmap.
-!!!
-
 '''
 
 
