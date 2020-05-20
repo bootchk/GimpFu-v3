@@ -87,6 +87,7 @@ class FuFormalParam(GObject.Object):
         """
         return self.DESC
 
+
     def _get_property_name_to_convey(self):
        """ Returns the name of property.
        All attribues of property do not match properties of self.
@@ -98,7 +99,7 @@ class FuFormalParam(GObject.Object):
            result = "IntProp1"
        else:
            # get a property from a pool to convey.
-           type = map_PF_TYPE_to_type[self.PF_TYPE]
+           type = self._get_type()
            result = FuFormalParam.prop_holder.next_prop_name(type)
        # OR build a dynamic property that describes self
        return result
@@ -142,7 +143,7 @@ class FuFormalParam(GObject.Object):
 
     def convey_using_dynamic_class_property(self, procedure):
         """ convey implemented using a temp object having one property. """
-        type = map_PF_TYPE_to_type[self.PF_TYPE]
+        type = self._get_type()
         default = self.mangle_default()
         min, max = self.derive_min_max_from_extras()
 
@@ -233,6 +234,17 @@ class FuFormalParam(GObject.Object):
 
         return (min, max)
 
+
+    def _get_type(self):
+        result = map_PF_TYPE_to_type[self.PF_TYPE]
+
+        # special case FBC
+        if self.PF_TYPE == PF_RADIO and isinstance(self.DEFAULT_VALUE, str):
+            # author intends string valued radio buttons
+            result = str
+        return result
+
+
 """
 PF_TYPE enumerates a larger type
 that specifies widget kind and format of extras.
@@ -242,6 +254,10 @@ that specifies widget kind and format of extras.
 PF_TYPE >> python type or Gimp type
 Many to one.
 !!! We return a string for Gimp types, not an instance of Type.
+
+This is not entirely accurate.
+v2 allowed PF_RADIO to be str or int type.
+See special case
 """
 map_PF_TYPE_to_type = {
     PF_INT8:      int,

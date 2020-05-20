@@ -29,6 +29,7 @@ class WidgetFactory:
             raise Exception(exception_str)
 
         '''
+        # TODO:
         There is a default specified in the guiable_formal_params.
         But initial value is passed in,
         i.e. from the last value the user entered in the GUI.
@@ -114,6 +115,7 @@ The FuWidget class may convert types yielded by Gtk widgets.
 
 A PF_enum specifies both the look and feel of the widget,
 and the type yielded by the widget, back to GimpFu.
+(Except in v2, a PF_RADIO could yield either an int or str type.)
 
 Currently a PF_enum may describe a more restrictive type (E.G. INT8)
 than the FuWidget class yields (E.G. INT)

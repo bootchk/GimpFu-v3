@@ -83,12 +83,16 @@ class Foo(GObject.GObject):
 
     def produce(self, type, default, min, max):
 
+        # assert type is a Python type
+
         unique_prop_name = self.get_unique_name()
 
         # substitute into template
         # !!! need strings but str() and repr() don't work for type
         # dispatch on type
         if type is int:
+            if not (isinstance(default, int) or isinstance(default, bool)):
+                raise RuntimeError(f"default: {default} should be of type int.")
             template = string.Template(self.template_string_numeric)
             code_string = template.substitute(type="int", name=unique_prop_name, default=default, min=min, max=max)
         elif type is float:
