@@ -1,6 +1,6 @@
 
 
-
+import logging
 
 
 class AdaptedProperty():
@@ -53,6 +53,8 @@ class AdaptedProperty():
     (Alternatively we could traverse the MRO)
     '''
 
+    logger = logging.getLogger("GimpFu.AdaptedProperty")
+
     @classmethod
     def is_dynamic_writeable_property_name(cls, instance, name):
         ''' is name a writeable dynamic property on instance? '''
@@ -80,7 +82,7 @@ class AdaptedProperty():
         ''' Is <name> accessed like <name>() ? '''
         delegated_property_names = instance.DynamicTrueAdaptedProperties()
         result = name in delegated_property_names
-        print(f"is_dynamic_true_property_name: {result} for name: {name} on instance: {instance}")
+        AdaptedProperty.logger.debug(f"is_dynamic_true_property_name: {result} for name: {name} on instance: {instance}")
         return result
 
 
@@ -129,7 +131,6 @@ class AdaptedProperty():
         # Method on adaptee is like "[get,set]_name"
         # Method on adaptee is a callable having no arguments
         # eval occurs in current context, so formal args are in scope
-        print("Adapter: form statement")
         if prefix == 'set_':
             # setStatement is a call with arg
             statement = 'adaptee.set_' + name + '(setting_value)'
@@ -137,9 +138,8 @@ class AdaptedProperty():
             # is a get (prefix is 'get_') or a read (prefix is '')
             # getStatement is a call without arg
             statement = 'adaptee.' + prefix + name + '()'
-        print("AdaptedProperty statement:", statement)
         result = eval(statement)
-        print("AdaptedProperty eval result:", result)
+        AdaptedProperty.logger.debug(f"eval {statement} result: {result}")
         return result
 
 
