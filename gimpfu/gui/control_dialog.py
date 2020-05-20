@@ -15,10 +15,12 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 #from gi.repository import GObject
 
-from gimpfu_enums import *  # PF_ enum
 
-from gui.widgets import *
+
 from gui.dialog import Dialog
+from gui.warning_dialog import WarningDialog
+from gui.value_error import EntryValueError
+from gui.widget_factory import WidgetFactory
 
 from message.deprecation import Deprecation
 
@@ -32,8 +34,6 @@ _ = t.gettext
 
 
 
-class EntryValueError(Exception):
-    pass
 
 """
 Probably CRUFT
@@ -52,60 +52,19 @@ def show_plugin_procedure_dialog():
     procedureDialog.run()
   """
 
-def _get_args_for_widget_factory(formal_param, widget_initial_value):
-    ''' Get args from formal spec, but override default with widget_initial_value.  Returns list of args '''
-    print("_get_args_for_widget_factory", formal_param, widget_initial_value)
-    # This is a switch statement on  PF_TYPE
-    # Since data comes from , don't trust it
-    pf_type = formal_param.PF_TYPE
 
-
-    if pf_type == PF_COLOUR:
-        Deprecation.say("Use PF_COLOR instead of PF_COLOUR")
-
-    if pf_type in ( PF_RADIO, ):
-        args = [widget_initial_value, formal_param.EXTRAS]
-    elif pf_type in (PF_FILE, PF_FILENAME):
-        # TODO need keyword 'title'?
-        # args = [widget_initial_value, title= "%s - %s" % (proc_name, tooltip_text)]
-        # args = [widget_initial_value, "%s - %s" % (proc_name, tooltip_text)]
-        # TEMP: widget is omitted, use default defined by author
-
-        # TODO this should work, but its not
-        # args = [widget_initial_value,]
-        args = ["/tmp/lkkfoopluginout"]
-    elif pf_type in (PF_INT, PF_INT8, PF_INT16, PF_INT32, PF_STRING, PF_BOOL, PF_OPTION, PF_FONT, PF_TEXT ):
-        args = [widget_initial_value]
-    elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER, PF_ADJUSTMENT):
-        # Hack, we are using FloatEntry, should use Slider???
-        args = [widget_initial_value,]
-    elif pf_type in (PF_COLOR, PF_COLOUR):
-        # Omitted, use a constant color
-        color = Gimp.RGB()
-        color.parse_name("orange", 6)
-        args = [color,]
-    elif pf_type in (PF_PALETTE,):
-        # TODO hack, should not even be a control
-        # Omitted, use None
-        args = [None,]
-    else:
-        # PF_SPINNER,, PF_OPTION
-        if pf_type == PF_COLOUR:
-            Deprecation.say("Deprecated PF_COLOUR")
-        raise RuntimeError(f"Unhandled PF_ widget type {pf_type}.")
-
-    return args
 
 
 def _add_tooltip_to_widget(wid, a_formal_param ):
 
     tooltip_text = a_formal_param.tooltip_text
 
-    if a_formal_param.PF_TYPE != PF_TEXT:
-        wid.set_tooltip_text(tooltip_text)
-    else:
+    if WidgetFactory.does_widget_have_view(a_formal_param):
         # Attach tip to TextView, not to ScrolledWindow
         wid.view.set_tooltip_text(tooltip_text)
+    else:
+        # attach tooltip to entry box of control widget
+        wid.set_tooltip_text(tooltip_text)
 
 
 def _add_control_widgets_to_dialog(box, guiable_initial_values, guiable_formal_params):
@@ -149,37 +108,8 @@ def _add_control_widgets_to_dialog(box, guiable_initial_values, guiable_formal_p
         label.show()
 
         # Grid right hand side is control widget
+        control_widget = WidgetFactory.produce(a_formal_param, guiable_initial_values[i])
 
-        # widget types not range checked earlier
-        # author COULD err by specifying out of range widget type
-        try:
-            #  e.g. widget_factory = StringEntry
-            widget_factory = _edit_map[a_formal_param.PF_TYPE]
-        except KeyError:
-            exception_str = f"Invalid or not implemented PF_ widget type: {a_formal_param.PF_TYPE}"
-            raise Exception(exception_str)
-
-        '''
-        There is a default specified in the guiable_formal_params.
-        But initial value is passed in,
-        i.e. from the last value the user entered in the GUI.
-        This is a hack until FuProcedureConfig works, i.e.
-        until we can register args with Gimp using GProperty or GParamSpec
-        '''
-        is_use_defaults = True
-        if is_use_defaults:
-            widget_initial_value = a_formal_param.DEFAULT_VALUE
-        else:
-            widget_initial_value = guiable_initial_values[i]
-
-        proc_name = 'bar' # TODO procedure.procedure_name()
-
-        factory_specs = _get_args_for_widget_factory(a_formal_param, widget_initial_value)
-
-        # TODO pass tooltip_text
-        # tooltip_text = a_formal_param.tooltip_text)
-        print("Calling factory with specs", widget_factory, factory_specs)
-        control_widget = widget_factory(*factory_specs)
         # e.g. control_widget = StringEntry(widget_initial_value)
         label.set_mnemonic_widget(control_widget)
         grid.attach(control_widget, 2, i, 1, 1)
@@ -299,7 +229,7 @@ def show_plugin_dialog(procedure, guiable_initial_values, guiable_formal_params)
             except EntryValueError:
                 # Modal dialog whose parent is plugin dialog
                 # Note control has value from for loop
-                warning_dialog(dialog, _("Invalid input for '%s'") % control.desc)
+                WarningDialog.show(dialog, _("Invalid input for '%s'") % control.desc)
                 # abort response, dialog stays up, waiting for user to fix or cancel??
             else:   # executed when try succeeds
                 # assert control values valid
@@ -459,86 +389,3 @@ def show_plugin_dialog(procedure, guiable_initial_values, guiable_formal_params)
         dialog.destroy()
         raise CancelError
 '''
-
-# TODO this should just call Gimp.message ??
-def warning_dialog(parent, primary, secondary=None):
-    dlg = Gtk.MessageDialog(parent, Gtk.DIALOG_DESTROY_WITH_PARENT,
-                                    Gtk.MESSAGE_WARNING, Gtk.BUTTONS_CLOSE,
-                                    primary)
-    if secondary:
-        dlg.format_secondary_text(secondary)
-    dlg.run()
-    dlg.destroy()
-
-
-
-
-
-'''
-Map PF_ enum to Widget class
-
-Feb. 2020 status:
-complete keys, but hacked values (should implement more widgets)
-'''
-_edit_map = {
-        PF_INT         : IntEntry,
-        PF_INT8        : IntEntry,
-        PF_INT16       : IntEntry,
-        PF_INT32       : IntEntry,
-
-        # both return strings, just different widgets?
-        PF_STRING      : StringEntry,
-        PF_TEXT        : StringEntry,
-
-        # checkbox
-        # both return bool,  just different widgets?
-        PF_BOOL        : ToggleEntry,
-        PF_TOGGLE      : ToggleEntry,
-
-        # TODO slider and spinner floats, or int?
-        PF_FLOAT       : FloatEntry,
-        PF_SLIDER      : FloatEntry,
-        PF_SPINNER     : FloatEntry,
-        PF_ADJUSTMENT  : FloatEntry,
-
-        # radio buttons, set of choices
-        PF_RADIO       : RadioEntry,
-
-
-        # For omitted, subsequently GimpFu uses the default value
-        # which should be sane
-        PF_COLOR       : OmittedEntry,
-        PF_COLOUR      : OmittedEntry,
-
-        # Widgets provided by GTK ?
-        PF_FILE        : OmittedEntry,
-        PF_FILENAME    : OmittedEntry,
-        PF_DIRNAME     : OmittedEntry,
-
-        # meaning ?
-        PF_OPTION      : OmittedEntry,
-
-        # ??? meaning?
-        PF_VALUE       : OmittedEntry,
-
-        # Widgets provided by Gimp for Gimp ephemeral objects
-        PF_ITEM        : OmittedEntry,
-        PF_DISPLAY     : OmittedEntry,
-        PF_IMAGE       : OmittedEntry,
-        PF_LAYER       : OmittedEntry,
-        PF_CHANNEL     : OmittedEntry,
-        PF_DRAWABLE    : OmittedEntry,
-        PF_VECTORS     : OmittedEntry,
-
-        # Widgets provided by Gimp for Gimp data objects?
-        # "data" objects are loaded at run-time, not as ephemeral
-        # i.e. configured, static data of the app
-        PF_FONT        : StringEntry,
-        PF_BRUSH       : StringEntry,
-        PF_PATTERN     : StringEntry,
-        PF_GRADIENT    : StringEntry,
-        # formerly gimpui.palette_selector
-        # Now I think palette is a parameter, but should not have a control?
-        # since the currently selected palette in palette dialog is passed?
-        PF_PALETTE     : OmittedEntry,
-        }

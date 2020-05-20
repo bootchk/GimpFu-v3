@@ -2,9 +2,19 @@
 '''
 !!!
 This all should go away when Gimp support for auto plugin GUI lands in Gimp 3.
-Not well known that such support is on the roadmap.
+Not well known that such support is on the Gimp roadmap.
 '''
 
+
+"""
+Set of classes.
+Each class is a GUI widget.
+
+Each class ultimately inherits a Gtk widget.
+
+Each class implements get_value().  (ABC has get_value)
+get_value often converts type returned by Gtk widget to another type.
+"""
 
 
 import gi
@@ -14,6 +24,8 @@ from gi.repository import Gimp  # only for locale?
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
+
+from gui.value_error import EntryValueError
 
 
 import gettext

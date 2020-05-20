@@ -8,7 +8,10 @@ from gi.repository import Gtk
 
 
 """
-Understands how to initialize GUI framework.
+Understands:
+
+- how to initialize GUI framework.
+- window/display for a plugin procedure
 """
 
 
