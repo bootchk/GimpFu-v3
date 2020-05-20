@@ -156,11 +156,17 @@ class RadioEntry(Gtk.VBox):
         #group = Gtk.RadioButtonGroup()
         #group.show()
         # OLD Gtk API passed previous button instead of group
-        button = Gtk.RadioButton(None)
+        # button = None
+        #button = Gtk.RadioButton(None)
+        previous_widget = None
 
         for (label, value) in items:
             #button = Gtk.RadioButton(group, label)
-            button = Gtk.RadioButton(button, label)
+            # Note we are passing the previous button fo indicate group
+            # button = Gtk.RadioButton(button, label)
+            # button = Gtk.Button.new_with_label(label)
+            button = Gtk.RadioButton.new_with_label_from_widget(previous_widget, label)
+            previous_widget = button
             self.pack_start(button, expand=True, fill=True, padding=0)
             button.show()
 
