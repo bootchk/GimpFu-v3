@@ -53,207 +53,210 @@ def show_plugin_procedure_dialog():
   """
 
 
+class PluginControlDialog():
+
+    @staticmethod
+    def _add_tooltip_to_widget(wid, a_formal_param ):
+
+        tooltip_text = a_formal_param.tooltip_text
+
+        if WidgetFactory.does_widget_have_view(a_formal_param):
+            # Attach tip to TextView, not to ScrolledWindow
+            wid.view.set_tooltip_text(tooltip_text)
+        else:
+            # attach tooltip to entry box of control widget
+            wid.set_tooltip_text(tooltip_text)
 
 
-def _add_tooltip_to_widget(wid, a_formal_param ):
+    @staticmethod
+    def _add_control_widgets_to_dialog(box, guiable_initial_values, guiable_formal_params):
+        ''' add control widget for each formal param, returning tuple of controls'''
+        '''
+        guiable_initial_values: is-a Gimp.ValueArray, guiable_initial_values (could be defaults or last values)
+        as specified by how we registered with Gimp
 
-    tooltip_text = a_formal_param.tooltip_text
+        guiable_formal_params: a Python type, formal specs from author in GimpFu notation,
+        but just guiable (those that should have control widgets.)
+        '''
+        print(f"add_control_widgets: {guiable_initial_values}")
 
-    if WidgetFactory.does_widget_have_view(a_formal_param):
-        # Attach tip to TextView, not to ScrolledWindow
-        wid.view.set_tooltip_text(tooltip_text)
-    else:
-        # attach tooltip to entry box of control widget
-        wid.set_tooltip_text(tooltip_text)
-
-
-def _add_control_widgets_to_dialog(box, guiable_initial_values, guiable_formal_params):
-    ''' add control widget for each formal param, returning tuple of controls'''
-    '''
-    guiable_initial_values: is-a Gimp.ValueArray, guiable_initial_values (could be defaults or last values)
-    as specified by how we registered with Gimp
-
-    guiable_formal_params: a Python type, formal specs from author in GimpFu notation,
-    but just guiable (those that should have control widgets.)
-    '''
-    print(f"add_control_widgets: {guiable_initial_values}")
-
-    # This is a label above the column of value entry Widgets
-    # TODO what should it say?
-    label = Gtk.Label.new_with_mnemonic("Off_set")
-    box.pack_start(label, False, False, 1)
-    label.show()
-
-    # Keep reference so can query during response
-    control_widgets = []
-
-    # box layout is grid
-    grid = Gtk.Grid()
-    grid.set_row_spacing(6)
-    grid.set_column_spacing(6)
-    box.pack_start(grid, expand=False, fill=True, padding=0)
-    grid.show()
-
-    # assert leading 2 boilerplate params image and drawable hacked off earlier?
-    # TODO hacked to (2,
-    for i in range(0, len(guiable_formal_params)):
-        print("Create control, index: ", i)
-        a_formal_param = guiable_formal_params[i]
-
-        # Grid left hand side is LABEL
-        label = Gtk.Label(a_formal_param.label)
-        label.set_use_underline(True)
-        label.set_alignment(1.0, 0.5)
-        grid.attach(label, 1, i, 1, 1)
+        # This is a label above the column of value entry Widgets
+        # TODO what should it say?
+        label = Gtk.Label.new_with_mnemonic("Off_set")
+        box.pack_start(label, False, False, 1)
         label.show()
 
-        # Grid right hand side is control widget
-        control_widget = WidgetFactory.produce(a_formal_param, guiable_initial_values[i])
+        # Keep reference so can query during response
+        control_widgets = []
 
-        # e.g. control_widget = StringEntry(widget_initial_value)
-        label.set_mnemonic_widget(control_widget)
-        grid.attach(control_widget, 2, i, 1, 1)
+        # box layout is grid
+        grid = Gtk.Grid()
+        grid.set_row_spacing(6)
+        grid.set_column_spacing(6)
+        box.pack_start(grid, expand=False, fill=True, padding=0)
+        grid.show()
 
-        _add_tooltip_to_widget(control_widget, a_formal_param )
+        # assert leading 2 boilerplate params image and drawable hacked off earlier?
+        # TODO hacked to (2,
+        for i in range(0, len(guiable_formal_params)):
+            a_formal_param = guiable_formal_params[i]
 
-        control_widget.show()
-        control_widget.desc = a_formal_param.DESC
-        control_widgets.append(control_widget)
+            # Grid left hand side is LABEL
+            label = Gtk.Label(a_formal_param.label)
+            label.set_use_underline(True)
+            label.set_alignment(1.0, 0.5)
+            grid.attach(label, 1, i, 1, 1)
+            label.show()
 
-    return control_widgets
+            # Grid right hand side is control widget
+            control_widget = WidgetFactory.produce(a_formal_param, guiable_initial_values[i])
 
+            # e.g. control_widget = StringEntry(widget_initial_value)
+            label.set_mnemonic_widget(control_widget)
+            grid.attach(control_widget, 2, i, 1, 1)
 
-'''
-Cruft from pallette.py ?
-Illustrating using properties
+            PluginControlDialog._add_tooltip_to_widget(control_widget, a_formal_param )
 
-Create control widget using Gimp and property
+            control_widget.show()
+            control_widget.desc = a_formal_param.DESC
+            control_widgets.append(control_widget)
 
-amount = self.set_property("amount", amount)
+        return control_widgets
 
-spin = Gimp.prop_spin_button_new(self, "amount", 1.0, 5.0, 0)
-spin.set_activates_default(True)
-box.pack_end(spin, False, False, 1)
-spin.show()
-'''
-
-
-
-def _create_gimp_dialog(procname, guiable_initial_values, guiable_formal_params):
-    '''
-    Create plugin dialog
-
-    Returns list of control widgets and dialog
-    '''
-    print(f"_create_gimp_dialog:  {guiable_initial_values}: {guiable_formal_params} ")
-
-    dialog = Dialog.get(procname)
-
-    dialog.add_button("_Cancel", Gtk.ResponseType.CANCEL)
-    dialog.add_button("_OK", Gtk.ResponseType.OK)
-
-    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL,
-                  homogeneous=False, spacing=12)
-    dialog.get_content_area().add(box)
-    box.show()
-
-    controls = _add_control_widgets_to_dialog(box, guiable_initial_values, guiable_formal_params)
-
-    return controls, dialog
 
     '''
-    TODO Result from procedure exec
-        return procedure.new_return_values(Gimp.PDBStatusType.CANCEL,
-                                           GLib.Error())
+    Cruft from pallette.py ?
+    Illustrating using properties
+
+    Create control widget using Gimp and property
+
+    amount = self.set_property("amount", amount)
+
+    spin = Gimp.prop_spin_button_new(self, "amount", 1.0, 5.0, 0)
+    spin.set_activates_default(True)
+    box.pack_end(spin, False, False, 1)
+    spin.show()
     '''
 
 
 
-'''
-v2 this took a run_script and called it, returning its results.
-I presume so that the dialog would stay up with its progress bar.
+    @staticmethod
+    def _create_gimp_dialog(procname, guiable_initial_values, guiable_formal_params):
+        '''
+        Create plugin dialog
 
-v3 returns control_values and caller must invoke result=run_func(control_values)
-Progress is still shown, but in the image's display window's progress bar.
-'''
-def show_plugin_dialog(procedure, guiable_initial_values, guiable_formal_params):
-    '''
-    Present GUI.
-    Returns (was_canceled, tuple of result values) from running plugin
-    '''
-    print("show_plugin_dialog", procedure, guiable_initial_values, guiable_formal_params)
-    #assert type(procedure.__name == )
-    #assert len(guiable_initial_values) == len(guiable_formal_params )
-    #print("after assert")
+        Returns list of control widgets and dialog
+        '''
+        print(f"_create_gimp_dialog:  {guiable_initial_values}: {guiable_formal_params} ")
 
-    # This was done eariler:  Gimp.ui_init('foo') # TODO procedure.name()
+        dialog = Dialog.get(procname)
 
-    # choice of implementation
-    controls, dialog = _create_gimp_dialog(
-        procedure.get_name(),
-        guiable_initial_values,
-        guiable_formal_params)  # implemented by GimpFu in Python
-    # show_plugin_procedure_dialog() # implemented by Gimp in C
+        dialog.add_button("_Cancel", Gtk.ResponseType.CANCEL)
+        dialog.add_button("_OK", Gtk.ResponseType.OK)
 
-    # TODO transient
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL,
+                      homogeneous=False, spacing=12)
+        dialog.get_content_area().add(box)
+        box.show()
 
-    # Cancellation is not an error or exception, but part of result
-    # if was_canceled is True, result_values is tuple of unknown contents
-    # else result_values are the user edited args (values from controls)
-    control_values = []
-    was_canceled = False
+        controls = PluginControlDialog._add_control_widgets_to_dialog(box, guiable_initial_values, guiable_formal_params)
+
+        return controls, dialog
+
+        '''
+        TODO Result from procedure exec
+            return procedure.new_return_values(Gimp.PDBStatusType.CANCEL,
+                                               GLib.Error())
+        '''
+
+
 
     '''
-    Callback for responses.
-    Continuation is either with dialog still waiting for user, or after Gtk.main() call
-    Plugin func executes with dialog still shown, having progress bar.
+    v2 this took a run_script and called it, returning its results.
+    I presume so that the dialog would stay up with its progress bar.
+
+    v3 returns control_values and caller must invoke result=run_func(control_values)
+    Progress is still shown, but in the image's display window's progress bar.
     '''
-    def response(dialog, id):
-        nonlocal control_values
-        nonlocal was_canceled
-        nonlocal controls
-        nonlocal procedure
+    @classmethod
+    def show(cls, procedure, guiable_initial_values, guiable_formal_params):
+        '''
+        Present GUI.
+        Returns (was_canceled, tuple of result values) from running plugin
+        '''
+        print("show_plugin_dialog", procedure, guiable_initial_values, guiable_formal_params)
+        #assert type(procedure.__name == )
+        #assert len(guiable_initial_values) == len(guiable_formal_params )
+        #print("after assert")
 
-        if id == Gtk.ResponseType.OK:
-            # Ideal user feedback is disable buttons while working
-            #dlg.set_response_sensitive(Gtk.ResponseType.OK, False)
-            # TODO shouldn't Cancel remain true
-            #dlg.set_response_sensitive(Gtk.ResponseType.CANCEL, False)
+        # This was done eariler:  Gimp.ui_init('foo') # TODO procedure.name()
 
-            # clear, because prior response might have aborted with partial control_values
-            control_values = []
+        # choice of implementation
+        controls, dialog = PluginControlDialog._create_gimp_dialog(
+            procedure.get_name(),
+            guiable_initial_values,
+            guiable_formal_params)  # implemented by GimpFu in Python
+        # show_plugin_procedure_dialog() # implemented by Gimp in C
 
-            try:
-                for control in controls:
-                    control_values.append(control.get_value())
-            except EntryValueError:
-                # Modal dialog whose parent is plugin dialog
-                # Note control has value from for loop
-                WarningDialog.show(dialog, _("Invalid input for '%s'") % control.desc)
-                # abort response, dialog stays up, waiting for user to fix or cancel??
-            else:   # executed when try succeeds
-                # assert control values valid
-                was_canceled = False
+        # TODO transient
+
+        # Cancellation is not an error or exception, but part of result
+        # if was_canceled is True, result_values is tuple of unknown contents
+        # else result_values are the user edited args (values from controls)
+        control_values = []
+        was_canceled = False
+
+        '''
+        Callback for responses.
+        Continuation is either with dialog still waiting for user, or after Gtk.main() call
+        Plugin func executes with dialog still shown, having progress bar.
+        '''
+        def response(dialog, id):
+            nonlocal control_values
+            nonlocal was_canceled
+            nonlocal controls
+            nonlocal procedure
+
+            if id == Gtk.ResponseType.OK:
+                # Ideal user feedback is disable buttons while working
+                #dlg.set_response_sensitive(Gtk.ResponseType.OK, False)
+                # TODO shouldn't Cancel remain true
+                #dlg.set_response_sensitive(Gtk.ResponseType.CANCEL, False)
+
+                # clear, because prior response might have aborted with partial control_values
+                control_values = []
+
+                try:
+                    for control in controls:
+                        control_values.append(control.get_value())
+                except EntryValueError:
+                    # Modal dialog whose parent is plugin dialog
+                    # Note control has value from for loop
+                    WarningDialog.show(dialog, _("Invalid input for '%s'") % control.desc)
+                    # abort response, dialog stays up, waiting for user to fix or cancel??
+                else:   # executed when try succeeds
+                    # assert control values valid
+                    was_canceled = False
+                    Gtk.main_quit()
+                    # caller will execute run_func with control_values
+
+            elif id == Gtk.ResponseType.CANCEL:
+                was_canceled = True
+                control_values = []
                 Gtk.main_quit()
-                # caller will execute run_func with control_values
 
-        elif id == Gtk.ResponseType.CANCEL:
-            was_canceled = True
-            control_values = []
-            Gtk.main_quit()
+            else:
+                # TODO a RESET response??
+                raise RuntimeError("Unhandled dialog response.")
 
-        else:
-            # TODO a RESET response??
-            raise RuntimeError("Unhandled dialog response.")
+        dialog.connect("response", response)
+        dialog.show()
+        # enter event loop, does not return until main_quit()
+        Gtk.main()
+        dialog.destroy()
 
-    dialog.connect("response", response)
-    dialog.show()
-    # enter event loop, does not return until main_quit()
-    Gtk.main()
-    dialog.destroy()
-
-    print("Dialog returns", control_values)
-    return was_canceled, control_values
+        print("Dialog returns", control_values)
+        return was_canceled, control_values
 
 
 

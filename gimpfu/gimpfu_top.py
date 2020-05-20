@@ -441,7 +441,7 @@ def _interact(procedure, list_gvalues_all_args, config):
         #TODO duplicate??
         gf_procedure.on_run()
 
-        import gui.control_dialog
+        from gui.control_dialog import PluginControlDialog
 
         '''
         v2
@@ -460,7 +460,7 @@ def _interact(procedure, list_gvalues_all_args, config):
         # Wrong: config.get_initial_settings(guiable_actual_args)
         # TEMP: this is correct, but not working:  guiable_actual_args = config.get_initial_settings()
 
-        was_canceled, guied_args = gui.control_dialog.show_plugin_dialog(
+        was_canceled, guied_args = PluginControlDialog.show(
             procedure,
             guiable_actual_args,
             guiable_formal_params)
