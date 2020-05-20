@@ -24,6 +24,8 @@ from gui.widget_factory import WidgetFactory
 
 from message.deprecation import Deprecation
 
+import logging
+
 
 import gettext
 t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
@@ -55,6 +57,8 @@ def show_plugin_procedure_dialog():
 
 class PluginControlDialog():
 
+    logger = logging.getLogger("GimpFu.PluginControlDialog")
+
     @staticmethod
     def _add_tooltip_to_widget(wid, a_formal_param ):
 
@@ -78,7 +82,7 @@ class PluginControlDialog():
         guiable_formal_params: a Python type, formal specs from author in GimpFu notation,
         but just guiable (those that should have control widgets.)
         '''
-        print(f"add_control_widgets: {guiable_initial_values}")
+        PluginControlDialog.logger.debug(f"add_control_widgets: {guiable_initial_values}")
 
         # This is a label above the column of value entry Widgets
         # TODO what should it say?
@@ -147,7 +151,7 @@ class PluginControlDialog():
 
         Returns list of control widgets and dialog
         '''
-        print(f"_create_gimp_dialog:  {guiable_initial_values}: {guiable_formal_params} ")
+        PluginControlDialog.logger.debug(f"_create_gimp_dialog:  {guiable_initial_values}: {guiable_formal_params} ")
 
         dialog = Dialog.get(procname)
 
@@ -184,7 +188,7 @@ class PluginControlDialog():
         Present GUI.
         Returns (was_canceled, tuple of result values) from running plugin
         '''
-        print("show_plugin_dialog", procedure, guiable_initial_values, guiable_formal_params)
+        PluginControlDialog.logger.debug(f"show_plugin_dialog for {procedure} values: {guiable_initial_values} formal: {guiable_formal_params}")
         #assert type(procedure.__name == )
         #assert len(guiable_initial_values) == len(guiable_formal_params )
         #print("after assert")
@@ -255,7 +259,7 @@ class PluginControlDialog():
         Gtk.main()
         dialog.destroy()
 
-        print("Dialog returns", control_values)
+        PluginControlDialog.logger.debug(f"dialog returns: {control_values}")
         return was_canceled, control_values
 
 

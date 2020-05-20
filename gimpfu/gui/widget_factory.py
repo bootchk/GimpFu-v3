@@ -7,8 +7,11 @@ from gimpfu_enums import *
 # WidgetFactory is main use of Widget constructors
 from gui.widgets import *
 
+import logging
 
 class WidgetFactory:
+
+    logger = logging.getLogger("GimpFu.WidgetFactory")
 
     def does_widget_have_view(a_formal_param):
 
@@ -44,7 +47,7 @@ class WidgetFactory:
 
         # TODO pass tooltip_text
         # tooltip_text = a_formal_param.tooltip_text)
-        print("Calling factory with specs", widget_constructor, factory_specs)
+        WidgetFactory.logger.debug("produce: {widget_constructor} specs: {factory_specs}")
         result = widget_constructor(*factory_specs)
 
         return result
@@ -52,7 +55,7 @@ class WidgetFactory:
 
     def _get_args_for_widget_constructor(formal_param, widget_initial_value):
         ''' Get args from formal spec, but override default with widget_initial_value.  Returns list of args '''
-        print("_get_args_for_widget_constructor", formal_param, widget_initial_value)
+        WidgetFactory.logger.debug(f"_get_args_for_widget_constructor, {formal_param}, {widget_initial_value}")
         # This is a switch statement on  PF_TYPE
         # Since data comes from , don't trust it
         pf_type = formal_param.PF_TYPE
