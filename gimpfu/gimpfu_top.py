@@ -628,7 +628,7 @@ def _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
     '''
     Gimp.displays_flush()   # !!! Gimp, not gimp
 
-    did_suggest_or_deprecate = Suggestion.summarize()
+    did_suggest_or_deprecate = Suggest.summarize()
     did_suggest_or_deprecate = did_suggest_or_deprecate or Deprecation.summarize()
 
     if did_suggest_or_deprecate:

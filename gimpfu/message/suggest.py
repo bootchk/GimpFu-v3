@@ -4,22 +4,23 @@ suggestLog = []
 
 
 """
-Supports suggested improvements to Author code.
+GimpFu suggested improvements to Author code.
 Not deprecations.
 """
 
 class Suggest:
 
-    @classmethod
+    @staticmethod
     def say(message):
 
         # Not log to logger
 
-        suggestLog.append("Error: " + message)
+        suggestLog.append(message)
 
         # TODO need a context
 
-    @classmethod
+
+    @staticmethod
     def summarize():
         if not suggestLog:
             result = False
