@@ -20,7 +20,7 @@ class Framestack:
         framestack = inspect.stack(context=2)   # 2 means, save 2 lines of source code
 
         # FrameInfo(frame, filename, lineno, function, code_context, index)
-        source_text = "Unknown"
+        source_text = "empty framestack"
         '''
         Find the first line from the top whose filename is not a gimpfu source file.
         This works but is fragile with respect to naming and directory structures
@@ -42,7 +42,7 @@ class Framestack:
                 if context:
                     source_text = frameinfo.code_context[frameinfo.index]
                 else:
-                    source_text = "unknown"
+                    source_text = " unknown context"
                 break
 
         return source_text

@@ -1,8 +1,8 @@
 
 from message.framestack import Framestack
-from message.debug_log import DebugLog 
+from message.debug_log import DebugLog
 
-
+import logging
 
 
 '''
@@ -48,7 +48,7 @@ FUTURE this behaviour is configurable to raise an exception instead of proceedin
 # cumulative error messages, possibly many lines per error
 proceedLog = []
 
-
+module_logger = logging.getLogger('GimpFu.proceed')
 
 '''
 When do_proceed_error is called,
@@ -72,8 +72,11 @@ filename                                  code_context               what the co
 
 def do_proceed_error(message):
 
-    DebugLog.log(f"GimpFu continued past error: {message}", severity=True)
+    # Log to logger
+    # level=>error, not critical, since we can proceed to find other possible Author errors
+    module_logger.error(f"Continued past: {message}")
 
+    # Log to cummulative private log
     proceedLog.append("Error: " + message)
     source_text = Framestack.get_errant_source_code_line()
     proceedLog.append("Plugin author's source:" + source_text)

@@ -13,6 +13,7 @@ from adapters.image import GimpfuImage
 from adapters.layer import GimpfuLayer
 from adapters.vectors import GimpfuVectors
 from adapters.rgb import GimpfuRGB
+from adapters.display import GimpfuDisplay
 
 from message.proceed_error import *
 
