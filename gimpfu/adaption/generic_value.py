@@ -8,6 +8,7 @@ from gi.repository import Gimp
 from adapters.rgb import GimpfuRGB
 
 from message.proceed_error import *
+from message.suggest import Suggest
 
 
 
@@ -105,13 +106,11 @@ class FuGenericValue():
         Since the type_converter will do nothing in that case.
         But now, all callers insure the type IS different before they call.
         '''
-        # print(type_converter.__name__)
+        # TODO logger print(type_converter.__name__)
 
-        # TODO message module put all suggestions in a log
-        # ??? Tell author their code would be more clear if they used float() themselves
-        # ??? Usually the source construct is a literal such as "1" that might better be float literal "1.0"
-        print(f"GimpFu: Suggest: converting {self._actual_arg_type.__name__} to {type_converter.__name__}.")
-        print("Your code might be clearer if you use explicit conversions or literals that denote the type.")
+        # Usually the source construct is a literal such as "1" that might better be float literal "1.0"
+        # Except for float array conversions?
+        Suggest.say(f"converted {self._actual_arg_type.__name__} to {type_converter.__name__}.")
 
         self._result_arg = type_converter(self._actual_arg)  # type conversion
         self._result_arg_type = type(self._result_arg)
@@ -140,7 +139,7 @@ class FuGenericValue():
         '''
         # require self._actual_arg is-a sequence type
 
-        print(">>>>>>>>>>Converting float list")
+        # TODO use logger (">>>>>>>>>>Converting float list")
 
         # TODO not sure we need to float(), maybe PyGObject will do it
         #float_list = [float(item) for item in actual_arg]

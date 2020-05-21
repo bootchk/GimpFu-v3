@@ -146,6 +146,7 @@ from procedure.procedure_config import FuProcedureConfig
 
 from message.proceed_error import *
 from message.deprecation import Deprecation
+from message.suggest import Suggest
 
 '''
 Initialize logging.
@@ -627,9 +628,12 @@ def _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
     '''
     Gimp.displays_flush()   # !!! Gimp, not gimp
 
-    if Deprecation.summarize():
+    did_suggest_or_deprecate = Suggestion.summarize()
+    did_suggest_or_deprecate = did_suggest_or_deprecate or Deprecation.summarize()
+
+    if did_suggest_or_deprecate:
         # TODO make this go to the status bar, not a dialog
-        # Gimp.message("See console for deprecations.")
+        # Gimp.message("See console for suggestions and deprecations.")
         pass
 
     if summarize_proceed_errors():
