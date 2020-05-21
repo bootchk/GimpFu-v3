@@ -13,8 +13,29 @@ from megaGimpTestUtils import *
 
 import json
 
+import logging
 
+# logger for this plugin.  GimpFu has its own logger
+logger = logging.getLogger('megaGimpTest')
 
+# TODO make the level come from the command line or the environment
+logger.setLevel(logging.INFO)
+#logger.setLevel(logging.WARNING)
+
+# create file handler which logs even debug messages
+#fh = logging.FileHandler('spam.log')
+#fh.setLevel(logging.DEBUG)
+# create console handler with same log level
+ch = logging.StreamHandler()
+# possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
+ch.setLevel(logging.INFO)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+#fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# add the handlers to the logger
+#logger.addHandler(fh)
+logger.addHandler(ch)
 
 
 gettext.install("gimp30-python", gimp.locale_directory)
@@ -119,7 +140,7 @@ def testProcHavingStringParam(procName):
 def testPluginWith3Params():
     # Since in GimpFu, no need to pass run mode
     if len(inParamList)==3:
-        print("..................test plugin", procName)
+        logger.info(f"test plugin: {procName}")
         evalCatchingExceptions(procName, '(image, drawable)', image, drawable)
     else:
         TestLog.say(f"omit test plugin: {procName}")
@@ -173,7 +194,7 @@ def testProcGivenInParams(procName, inParamList,  image, drawable):
     Dispatch on various flavors of procedure signature.
     """
     if not len(inParamList):
-        print("No in", procName)
+        logger.debug(f"No in params: {procName}")
         testProcHavingNoParams(procName)
     elif (len(inParamList) == 1) and inParamList[0] == "GimpParamString":
         testProcHavingStringParam(procName)
@@ -183,7 +204,7 @@ def testProcGivenInParams(procName, inParamList,  image, drawable):
         pass
     else:
         # Omitted: unhandled signature or unhandled parameter type or is interactive
-        print(f".....................Omitting test of {procName}")
+        logger.info(f"Omitting test of {procName}")
 
 
 
@@ -254,5 +275,5 @@ register(
     menu=N_("<Image>/Filters"), # menupath
     domain=("gimp30-python", gimp.locale_directory))
 
-print("Starting Megatest Gimp")
+logger.debug(f"Starting")
 main()
