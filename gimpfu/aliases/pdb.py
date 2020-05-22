@@ -121,7 +121,10 @@ class GimpfuPDB():
             # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
             error_str = Gimp.get_pdb().get_last_error()
             if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
-                do_proceed_error(f"PDB procedure call failed: {proc_name} {marshaled_args} Gimp says: {error_str}")
+                # TODO  log something better than {marshaled_args}, which is a Gimp.ValueArray without a good __repr__
+                # TODO i.e. { {*args} } ?, but that leaves braces in the output
+                # TODO  { {*args} } throws "unhashable type GimpfuImage"
+                do_proceed_error(f"PDB procedure call fail: {proc_name} Gimp says: {error_str}")
                 result = None
             else:
                 result = MarshalPDB.unmarshal_results(inner_result)

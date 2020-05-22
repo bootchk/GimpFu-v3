@@ -73,7 +73,7 @@ def do_proceed_error(message):
 
     # Log to logger
     # level=>error, not critical, since we can proceed to find other possible Author errors
-    module_logger.error(f"Continued past: {message}")
+    module_logger.error(f"Continue past: {message}")
 
     # Log to cummulative private log
     proceedLog.append("Error: " + message)

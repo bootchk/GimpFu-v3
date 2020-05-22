@@ -9,102 +9,22 @@ Generates test cases from PDB.
 from gimpfu import *
 
 from megaGimpTestUtils import *
+from testHarness import *
+from params import *
+from testLog import TestLog
+
 
 
 import json
 
-import logging
 
-# logger for this plugin.  GimpFu has its own logger
-logger = logging.getLogger('megaGimpTest')
-
-# TODO make the level come from the command line or the environment
-logger.setLevel(logging.INFO)
-#logger.setLevel(logging.WARNING)
-
-# create file handler which logs even debug messages
-#fh = logging.FileHandler('spam.log')
-#fh.setLevel(logging.DEBUG)
-# create console handler with same log level
-ch = logging.StreamHandler()
-# possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
-ch.setLevel(logging.INFO)
-# create formatter and add it to the handlers
-formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-#fh.setFormatter(formatter)
-ch.setFormatter(formatter)
-# add the handlers to the logger
-#logger.addHandler(fh)
-logger.addHandler(ch)
 
 
 gettext.install("gimp30-python", gimp.locale_directory)
 
 
 
-def appendParameter(paramString, parameter):
-    # trailing comma will be OK to Python
-    result = paramString + parameter + ','
-    return result
 
-def generateQuotedIntegerLiteral():
-    """ Choose an integer with certain testing goals e.g. stress test or not.
-
-    0 is out of range for many tested procedures
-    1 tests the least
-    """
-    return '1'
-
-def generateParamString(procName, inParamList,  image, drawable):
-    # TODO why GParam and GimpParam ??
-    result = "("
-    for aType in inParamList:
-        if aType == "GimpParamString" or aType == "GParamString" :
-            result = appendParameter(result, '"foo"')
-        elif aType == "GParamInt" :
-            result = appendParameter(result, generateQuotedIntegerLiteral())
-        elif aType == "GParamUInt" :
-            # TODO this does not suffice.  Change gimpfu to cast to GParamUint
-            result = appendParameter(result, generateQuotedIntegerLiteral())
-        elif aType == "GParamDouble" :
-            result = appendParameter(result, '1.0003')
-        elif aType == "GParamBoolean" :
-            # bool is int ??
-            result = appendParameter(result, generateQuotedIntegerLiteral())
-        elif aType == "GimpParamItem" :
-            # Item is superclass of Drawable, etc.
-            # Use a convenient one
-            result = appendParameter(result, 'drawable')
-        elif aType == "GParamEnum" or aType == "GimpParamEnum" :
-            # enums are ints
-            result = appendParameter(result, generateQuotedIntegerLiteral())
-        elif aType == "GimpParamImage" :
-            # reference a symbol in Python context at time of eval
-            result = appendParameter(result, 'image')
-        elif aType == "GimpParamDrawable" :
-            # reference a symbol in Python context at time of eval
-            result = appendParameter(result, 'drawable')
-        elif aType == "GimpParamLayer" :
-            # reference a symbol in Python context at time of eval
-            # assert drawable is-a Layer
-            result = appendParameter(result, 'drawable')
-        elif aType == "GimpParamRGB" :
-            # a 3-tuple suffices
-            result = appendParameter(result, '(12, 13, 14)')
-
-        # TODO more types
-        # TODO GimpParamParasite
-        # GimpParamUInt8Array
-        # GimpParamChannel
-        # GParamObject
-        # GimpParamUnit
-        else:
-            # some type we don't handle, abandon
-            TestLog.say(f"unhandled type {aType} for {procName}")
-            return ""
-
-    result = result + ')'
-    return result
 
 
 
@@ -119,6 +39,8 @@ def evalCatchingExceptions(procName, params, image=None, drawable=None):
     newName = procName.replace("-", "_")
     testStmt = "pdb." + newName + params
 
+    TestLog.say(f"test: {testStmt}")
+
     try:
         eval(testStmt)
 
@@ -127,8 +49,12 @@ def evalCatchingExceptions(procName, params, image=None, drawable=None):
         An exception here emanates from faulty Gimpfu code.
         Since Gimpfu catches and proceeds past exceptions while doing
         its own eval of author source.
+        That is, GimpFu will log exceptions that the tested procedure throws.
         """
         TestLog.say(f"exception in Gimpfu code: {err} for test: {testStmt}")
+
+    # TODO get the pdb status, it is a weak form of passing
+    # TODO stronger form of passing, test effects are as expected
 
 
 def testProcHavingStringParam(procName):
@@ -140,7 +66,7 @@ def testProcHavingStringParam(procName):
 def testPluginWith3Params():
     # Since in GimpFu, no need to pass run mode
     if len(inParamList)==3:
-        logger.info(f"test plugin: {procName}")
+        TestLog.say(f"test plugin: {procName}")
         evalCatchingExceptions(procName, '(image, drawable)', image, drawable)
     else:
         TestLog.say(f"omit test plugin: {procName}")
@@ -194,7 +120,7 @@ def testProcGivenInParams(procName, inParamList,  image, drawable):
     Dispatch on various flavors of procedure signature.
     """
     if not len(inParamList):
-        logger.debug(f"No in params: {procName}")
+        TestLog.say(f"No in params: {procName}")
         testProcHavingNoParams(procName)
     elif (len(inParamList) == 1) and inParamList[0] == "GimpParamString":
         testProcHavingStringParam(procName)
@@ -204,7 +130,7 @@ def testProcGivenInParams(procName, inParamList,  image, drawable):
         pass
     else:
         # Omitted: unhandled signature or unhandled parameter type or is interactive
-        logger.info(f"Omitting test of {procName}")
+        TestLog.say(f"Omitting test of {procName}")
 
 
 
@@ -218,8 +144,18 @@ def testAProc(procName, paramsDict,  image, drawable):
 
 
 def testProcs(data,  image, drawable):
-    """ Iterate over procs, and wrap each test in various contexts e.g. a test image. """
-    for key in data.keys():
+    """ Iterate over procedures, testing them.
+
+    TODO sort so that procedures that delete global test data come last?
+
+    Setup each test in various contexts e.g. a test image.
+    """
+
+    # unsorted: for key in data.keys():
+
+    # sort the data by procedure name
+    for key in sorted(data):
+
         # print(key)
 
         """
@@ -241,9 +177,13 @@ def testProcs(data,  image, drawable):
 def plugin_main(image, drawable):
     """
     """
+    generateNamedItems()
+
     # get dictionary of PDB signatures
     with open("testPDB/pdb.json", "r") as read_file:
         data = json.load(read_file)
+
+        # assert data is-a dictionary
 
         # run tests
         testProcs(data, image, drawable)
@@ -275,5 +215,5 @@ register(
     menu=N_("<Image>/Filters"), # menupath
     domain=("gimp30-python", gimp.locale_directory))
 
-logger.debug(f"Starting")
+TestLog.say(f"Starting")
 main()
