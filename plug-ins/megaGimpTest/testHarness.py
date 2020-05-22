@@ -1,10 +1,12 @@
 
 from gimpfu import *
 
-def generateNamedItems():
+def generateFooGimpData():
     """ Generate into Gimp, instances of various kinds, each instance named "foo"
 
     To be used as data for testing.
+    Data chosen is arbitrary, we only care that it exists with name 'foo'.
+    Arbitrary: get from the current Gimp context.
 
     The object model, from GIMP App Ref Manual:
     GimpData
@@ -38,20 +40,42 @@ def generateNamedItems():
     """
 
     """
-    The pattern is:
+    The code pattern is:
     context_get
     duplicate
     rename
     """
-    current_palette_name = gimp.context_get_palette()
-    print(current_palette_name)
-    duplicate_palette_name = gimp.palette_duplicate(current_palette_name)
-    print(duplicate_palette_name)
-    gimp.palette_rename(duplicate_palette_name, "foo")
 
-    # TODO brush has same API
-    # TODO gradient has same API
-    # TODO curve, dynamics, pattern NOT
+    # palette
+    current_name = gimp.context_get_palette()
+    duplicate_name = gimp.palette_duplicate(current_name)
+    gimp.palette_rename(duplicate_name, "foo")
+    print(f"Created 'foo' palette instance from {duplicate_name}")
+
+    #brush
+    current_name = gimp.context_get_brush()
+    duplicate_name = gimp.brush_duplicate(current_name)
+    gimp.brush_rename(duplicate_name, "foo")
+    print(f"Created 'foo' brush instance from {duplicate_name}")
+
+    # gradient
+    current_name = gimp.context_get_gradient()
+    duplicate_name = gimp.gradient_duplicate(current_name)
+    gimp.gradient_rename(duplicate_name, "foo")
+    print(f"Created 'foo' gradient instance from {duplicate_name}")
+
+    # channel
+    # layer mask
+    # selection
+    # text layer
+    # vectors
+    # tattoo
+
+    # buffer
+    # TODO gimp_drawable_get_buffer
+    # gimp_buffer_rename buffer_rename(buffer_name, new_name):
+
+    # TODO curve, dynamics, pattern NOT have same approximation
 
     # for pattern, GUI allows duplicate and delete, but not rename, name is e.g. "Amethyst copy"
     # no API for duplicate, rename, or delete

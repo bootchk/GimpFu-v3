@@ -9,12 +9,23 @@ def isPlugin(procName):
         or procName.find("python-fu-")==0
         )
 
+def isDeleting(procName):
+    return procName.find("-delete")>0
 
 
 def shouldTestProcedure(procName):
-    """ Decides to NOT test certain procedures. """
-    # Plugins already excluded
-    # Those that are interactive, open windows and hang test waiting on user Input
+    """ Decides to NOT test certain procedures.
+
+    Generally, any that prevent lights-out testing.
+    Reasons:
+    - infinite recursion
+    - quitting
+    - interactive, open windows and hang test waiting on user Input
+    - delete test objects (they should be run last)
+    """
+
+    if isDeleting(procName):
+        return False
 
     # !!! Not test self, infinite recursion
     if procName in ("python-fu-mega-test-gimp"):
