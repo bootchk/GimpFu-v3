@@ -60,17 +60,14 @@ def evalCatchingExceptions(procName, params, image=None, drawable=None):
         its own eval of author source.
         That is, GimpFu will log exceptions that the tested procedure throws.
         """
-        TestStats.sample("GimpFu exception" )
-        TestStats.sample("GimpFu exception: " + err)
+        TestStats.sample("GimpFu exception", str(err) )
         TestLog.say(f"exception in Gimpfu code: {err} for test: {testStmt}")
 
     # get the pdb status, it is a weak form of pass/fail
     error_str = Gimp.get_pdb().get_last_error()
     TestLog.say(f"test: {testStmt} PDB status: {error_str}")
     if error_str != "success":
-        TestStats.sample("fail")
-        # sub category
-        TestStats.sample("fail: " + error_str)
+        TestStats.sample("fail", error_str)
 
 
     else:
