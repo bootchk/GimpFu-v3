@@ -246,7 +246,11 @@ class Types():
         return list_of_gvalue
 
 
-
+    # TODO this whole routine is misguided?  We can't convert anything
+    # All we can do is warn of GBoxed?
+    # An Author can subsequently use the instances of GBoxed, but only as parameters to other Gimp calls
+    # i.e. GBoxed can only be dealt with by GObject methods, and not python
+    # and GObject methods don't let you do much with it.
     '''
     Only certain Gimp types need conversion.
     E.G. Gimp.StringArray => list(str).
@@ -259,16 +263,27 @@ class Types():
     '''
     @staticmethod
     def convert_list_elements_to_python_types(list):
-        ''' Walk (recursive descent) converting elements to Python types. '''
+        ''' Walk (recursive descent) Python list of GValues, converting elements to Python types. '''
         ''' !!! This is converting, but not wrapping. '''
         ''' list comprises fundamental objects, and GArray-like objects that need conversion to lists. '''
-        if len(list) > 0:
-            Types.logger.info(f"Type of items in list: {type(list[0])}" )
-            # TODO dispatch on type
-            result = [Types.try_convert_string_array_to_list_of_str(item) for item in list]
-        else:
-            result = []
-        Types.logger.info(f"convert_list_elements_to_python_types returns: {result}")
+
+        '''
+        TODO this should be driven by formal return type
+        Some formal return types take many elements from the list???
+        '''
+        result = []
+        for item in list:
+            Types.logger.info(f"Type of item in list: {type(item)}" )
+            result.append(item)
+
+            if isinstance(item, GObject.GBoxed):
+                Types.logger.warn(f"PDB procedure returned an item of type GObject.GBoxed")
+
+            # OLD result = [Types.try_convert_string_array_to_list_of_str(item) ]
+            # TODO get type: gobject.GBoxed
+
+        # Can't use this because it throws an exception for GBoxed
+        # Types.logger.info(f"convert_list_elements_to_python_types returns: {result}")
         return result
 
 

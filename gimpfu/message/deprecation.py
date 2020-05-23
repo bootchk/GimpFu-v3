@@ -49,7 +49,8 @@ class Deprecation():
 
         Deprecation.log.append(message)
 
-        Deprecation.logger.warning(message)
+        # Not a warning, just info
+        Deprecation.logger.info(message)
 
 
 

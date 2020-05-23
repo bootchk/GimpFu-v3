@@ -118,6 +118,9 @@ class GimpfuPDB():
             # Not a try: except????
             inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
 
+            # The first element of result is the PDB status
+            self.logger.debug(f"run_procedure result is: {inner_result.index(0)}")
+
             # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
             error_str = Gimp.get_pdb().get_last_error()
             if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
@@ -136,7 +139,8 @@ class GimpfuPDB():
 
         # Most PDB calls have side_effects on image, but few return values?
         # ensure result is defined and (is-a list OR None)
-        self.logger.debug(f"_adaptor_func for: {proc_name}  returns: {result}")
+        # TODO throws for GBoxed, so log the types and not the values
+        # self.logger.debug(f"_adaptor_func for: {proc_name}  returns: {result}")
         return result
 
 

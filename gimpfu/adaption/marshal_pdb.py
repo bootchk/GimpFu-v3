@@ -166,7 +166,7 @@ class MarshalPDB():
 
         For all returned objects, wrap as necessary.
         '''
-        MarshalPDB.logger.debug(f"PDB status result is: {values.index(0)}")
+        MarshalPDB.logger.debug(f"unmarshal_results called: {values}")
 
         # caller should have previously checked that values is not a Gimp.PDBStatusType.FAIL
         if values:
@@ -194,8 +194,13 @@ class MarshalPDB():
             result = None
 
         # ensure result is None or result is list or result is one object
-        # TODO ensure wrapped?
-        MarshalPDB.logger.debug(f"unmarshal_results returns: {result}")
+        # NOT ensure each element is a fundamental Python type: some are opaque gobject.GBoxed
+        # TODO ensure certain Gimp types are wrapped?
+
+        # This throws exception for GBoxed
+        # MarshalPDB.logger.debug(f"unmarshal_results returns: {result}")
+        # TODO log the types, not the values???
+
         return result
 
 
