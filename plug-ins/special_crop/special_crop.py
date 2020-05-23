@@ -2,7 +2,7 @@
 from gimpfu import *
 
 def special_crop(image):
-        #lkk add parens
+        #lkk add parens on print
         print("Start")
         pdb = gimp.pdb
         top = pdb.gimp_image_find_next_guide(image, 0)
@@ -13,7 +13,7 @@ def special_crop(image):
                 temp_y = top_y
                 top_y = bottom_y
                 bottom_y = temp_y
-        print "Cutting from", top_y,"to",bottom_y
+        print ("Cutting from", top_y,"to",bottom_y)
         pdb.gimp_rect_select(image, 0, top_y, image.width, bottom_y-top_y, CHANNEL_OP_REPLACE, FALSE, 0)
         pdb.gimp_edit_copy(image.active_drawable)
         image2 = pdb.gimp_edit_paste_as_new()

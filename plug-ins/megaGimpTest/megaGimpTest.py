@@ -2,7 +2,23 @@
 
 """
 Plugin that mega tests Gimp.
-Generates test cases from PDB.
+
+Test calling procedures in PDB.
+Some procedures are omitted.
+
+Test via GimpFu
+
+Goals:
+- stress test GimpFu
+- find crashes in Gimp
+
+Parameters to PDB procedures are arbitrary.
+
+Tests do NOT test semantics:
+- don't know the expected result,
+- mostly that a procedure should not crash
+
+FUTURE more fuzzy: pass edge case values
 """
 
 
@@ -12,17 +28,12 @@ from megaGimpTestUtils import *
 from testHarness import *
 from params import *
 from testLog import TestLog
-
-
+from stats import TestStats
 
 import json
 
-
-
-
+# Plugin is not i18n ???
 gettext.install("gimp30-python", gimp.locale_directory)
-
-
 
 
 
@@ -49,11 +60,21 @@ def evalCatchingExceptions(procName, params, image=None, drawable=None):
         its own eval of author source.
         That is, GimpFu will log exceptions that the tested procedure throws.
         """
+        TestStats.sample("GimpFu exception" )
+        TestStats.sample("GimpFu exception: " + err)
         TestLog.say(f"exception in Gimpfu code: {err} for test: {testStmt}")
 
     # get the pdb status, it is a weak form of pass/fail
     error_str = Gimp.get_pdb().get_last_error()
     TestLog.say(f"test: {testStmt} PDB status: {error_str}")
+    if error_str != "success":
+        TestStats.sample("fail")
+        # sub category
+        TestStats.sample("fail: " + error_str)
+
+
+    else:
+        TestStats.sample("pass")
 
     # TODO stronger form of pass, test effects are as expected
 
@@ -64,6 +85,8 @@ def testProcHavingStringParam(procName):
 
 
 
+"""
+OLD
 def testPluginWith3Params():
     # Since in GimpFu, no need to pass run mode
     if len(inParamList)==3:
@@ -71,6 +94,7 @@ def testPluginWith3Params():
         evalCatchingExceptions(procName, '(image, drawable)', image, drawable)
     else:
         TestLog.say(f"omit test plugin: {procName}")
+"""
 
 
 
@@ -89,6 +113,7 @@ def testProcThatIsPlugin(procName, inParamList, image, drawable):
         result = True
     else:
         # already logged why we could not generate params
+        TestStats.sample("omit for param types")
         result = False
 
 
@@ -102,6 +127,7 @@ def testGeneralProc(procName, inParamList,  image, drawable):
         result = True
     else:
         # already logged why we could not generate params
+        TestStats.sample("omit for param types")
         result = False
 
     # success means we tested it, not that it succeeded
@@ -114,6 +140,7 @@ def testProcGivenInParams(procName, inParamList,  image, drawable):
 
     # Exclude certain procs
     if not shouldTestProcedure(procName):
+        TestStats.sample("omit bad actor")
         TestLog.say(f"omit certain: {procName}")
         return
 
@@ -158,6 +185,7 @@ def testProcs(data,  image, drawable):
     for key in sorted(data):
 
         # print(key)
+        TestStats.sample("procedures")
 
         """
         So testing is always from a known base, test on a copy of original image
@@ -199,6 +227,7 @@ def plugin_main(image, drawable):
     # Otherwise, they accumulate in Gimp settings
     # Alternative, delete gimp config/settings regularly
 
+    TestStats.summarize()
     TestLog.summarize()
 
     # regex for procedure_type as given from PDBBrowser
