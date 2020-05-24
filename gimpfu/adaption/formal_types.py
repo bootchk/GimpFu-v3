@@ -1,7 +1,11 @@
 
+from gimppdb.gimppdb import GimpPDB
+'''
+OLD
 import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
+'''
 
 from message.proceed_error import do_proceed_error
 import logging
@@ -28,7 +32,8 @@ class FormalTypes():
         Another implementation: Gimp.get_pdb().run_procedure( proc_name , 'gimp-pdb-get-proc-argument', args)
         '''
         # require procedure in PDB, it was checked earlier
-        procedure = Gimp.get_pdb().lookup_procedure(proc_name)
+        procedure = GimpPDB.get_procedure_by_name(proc_name)
+        # OLD Gimp.get_pdb().lookup_procedure(proc_name)
 
         arg_specs = procedure.get_arguments()    # some docs say it returns a count, it returns a list of GParam??
         # assert arg_specs is-a list

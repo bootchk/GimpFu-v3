@@ -25,7 +25,10 @@ And pdb and gimp symbols are not defined.
 
 class FuProcedure():
     '''
-    Understands and wraps Gimp.Procedure.
+    Understands GimpFu local representation of a plugin procedure,
+    the one(s) being defined by the current Author's source.
+
+    Does NOT wrap Gimp.Procedure, only knows how to create one, for the current sourc.e
 
     GimpFu procedure is slightly different from Gimp PluginProcedure.
     This hides the differences.
