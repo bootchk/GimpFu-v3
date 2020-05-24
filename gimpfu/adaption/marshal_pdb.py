@@ -10,6 +10,8 @@ from adaption.types import Types
 from adaption.value_array import FuValueArray
 from adaption.generic_value import FuGenericValue
 
+from gimppdb.gimppdb import GimpPDB
+
 from message.proceed_error import *
 
 import logging
@@ -93,10 +95,7 @@ class MarshalPDB():
 
         formal_args_index = 0
 
-        # TODO extract method to FuProcedure class
-        # TODO python-fu- ?? What procedure names signify need run_mode?
-        # Better to introspect ??
-        if proc_name.startswith('plug-in-'):
+        if GimpPDB.does_procedure_take_runmode(proc_name):
             # no GUI, this is a call from a plugin
 
             a_gvalue = FuGenericValue.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)

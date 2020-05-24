@@ -1,7 +1,7 @@
 This directory is about PDB procedures declared and defined in GimpFu.
 Defines class GimpfuProcedure.
 
-IOW, an abstraction or parallel implemention of Gimp.Procedure.
+IOW, an abstraction or parallel implementation of Gimp.Procedure.
 
 The classes here are about the current procedure(s) being defined and declared,
 by the Author, in the current Python source file that GimpFu is processing.

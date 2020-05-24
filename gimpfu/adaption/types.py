@@ -8,6 +8,8 @@ from gi.repository import GObject    # GObject type constants
 from adaption.wrappable import *    # is_subclass_of_type
 from adaption.formal_types import FormalTypes
 
+from gimppdb.gimppdb import GimpPDB
+
 from message.proceed_error import *
 
 import logging
@@ -63,7 +65,7 @@ class Types():
 
         Types.logger.info(f"try_float_array_conversion {gen_value}")
         if isinstance(gen_value.actual_arg, list):
-            formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
+            formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
             if formal_arg_type is not None:
                 # Types.logger.info(formal_arg_type)
                 if FormalTypes.is_float_array_type(formal_arg_type):
@@ -103,7 +105,7 @@ class Types():
         float => int, str
         TODO str => float, int ???
         '''
-        formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
+        formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
         # ("     Formal arg type ", formal_arg_type.name )
         if formal_arg_type is not None:
             if gen_value.actual_arg_type is int:
@@ -177,7 +179,7 @@ class Types():
 
         Types.logger.info(f"Attempt upcast: {gen_value} to : {cast_to_type.__name__}")
 
-        formal_arg_type = FormalTypes._get_formal_argument_type(proc_name, index)
+        formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
         # TODO exception index out of range
 
         if Types._should_upcast_or_convert(gen_value.actual_arg_type, formal_arg_type, cast_to_type):
