@@ -5,6 +5,8 @@ from gi.repository import GObject
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
+from gi.repository import GLib  # GLib.guint ???
+
 from adapters.rgb import GimpfuRGB
 
 from message.proceed_error import *
@@ -119,6 +121,10 @@ class FuGenericValue():
     '''
     To convert, pass built-in type converter method to self.convert()
     I.E. below is functional programming, passing a func as an arg.
+
+    Note this often converts to a different Python type,
+    and PyGObject subsequently converts to the appropriate GType.
+    In upcast cases we convert the declared type to a GType.
     '''
     def float(self):
         self.convert(float)
@@ -128,6 +134,17 @@ class FuGenericValue():
 
     def int(self):
         self.convert(int)
+
+    def unsigned_int(self):
+        # Not a conversion, an upcast only?
+        # TODO need to check for negative value?
+        # Gimp.ParamUInt does not exist (to take its .__gtype__) so use a gtype directly
+        # Failed names for gtypes: GLib.guint, GObject.G_TYPE_UINT, GObject.GType.G_TYPE_UNIT
+        self.upcast(GObject.TYPE_UINT)
+
+    def unsigned_char(self):
+        # Not a conversion, an upcast only
+        self.upcast(GObject.TYPE_UCHAR)
 
 
     def float_array(self):

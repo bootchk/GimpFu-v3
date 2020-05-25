@@ -95,17 +95,22 @@ class Types():
         '''
         # require type(actual_arg_type) is Python type or a GType
 
-        Types.logger.info(f"Actual arg type: {gen_value}")
-
         # TODO faster if we short circuit where actual == formal
         # TODO make the converter log what the conversion was
         '''
-        The matrix of conversions:
-        int => float, str
+        A table of conversions:
+        Python type => Gimp C types
+        ---------------------------
+        int => float, str, unsigned int, unsigned char, unsigned 64
         float => int, str
         TODO str => float, int ???
+        TODO True/False => int
+        TODO unsigned 64
         '''
         formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
+
+        Types.logger.info(f" try_usual_python_conversion: actual type: {gen_value} formal type: {formal_arg_type}")
+
         # ("     Formal arg type ", formal_arg_type.name )
         if formal_arg_type is not None:
             if gen_value.actual_arg_type is int:
@@ -113,6 +118,10 @@ class Types():
                     gen_value.float()
                 elif FormalTypes.is_str_type(formal_arg_type):
                     gen_value.str()
+                elif FormalTypes.is_unsigned_int_type(formal_arg_type):
+                    gen_value.unsigned_int()
+                elif FormalTypes.is_unsigned_char_type(formal_arg_type):
+                    gen_value.unsigned_char()
             elif gen_value.actual_arg_type is float:
                 if FormalTypes.is_int_type(formal_arg_type):
                     gen_value.int()

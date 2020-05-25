@@ -39,6 +39,10 @@ def generateParamString(procName, inParamList,  image, drawable):
         elif aType == "GParamUInt" :
             # TODO this does not suffice.  Change gimpfu to cast to GParamUint
             result = appendParameter(result, generateQuotedIntegerLiteral())
+        elif aType == "GParamUChar" :
+            # GParamUChar usually used as an int-valued enum, often True/False
+            # TODO this does not suffice.  Change gimpfu to cast to GParamUint
+            result = appendParameter(result, generateQuotedIntegerLiteral())
         elif aType == "GParamDouble" :
             result = appendParameter(result, '1.0003')
         elif aType == "GParamBoolean" :
@@ -64,13 +68,18 @@ def generateParamString(procName, inParamList,  image, drawable):
         elif aType == "GimpParamRGB" :
             # a 3-tuple suffices
             result = appendParameter(result, '(12, 13, 14)')
+        elif aType == "GimpParamFloatArray" :
+            # a 4-tuple often suffices
+            result = appendParameter(result, '(1.0, 1.0, 5.0, 5.0)')
 
         # TODO more types
         # TODO GimpParamParasite
         # GimpParamUInt8Array
         # GimpParamChannel
-        # GParamObject
+        # GParamObject usually a file
         # GimpParamUnit
+        # GimpParamVectors
+        # GParamUChar
         else:
             # some type we don't handle, abandon
             TestLog.say(f"unhandled type {aType} for {procName}")

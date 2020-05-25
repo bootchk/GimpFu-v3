@@ -50,6 +50,8 @@ def evalCatchingExceptions(procName, params, image=None, drawable=None):
     newName = procName.replace("-", "_")
     testStmt = "pdb." + newName + params
 
+    # Log start of test so we know what test hangs (takes too long time)
+    TestLog.say(f"Begin test: {testStmt}")
     try:
         eval(testStmt)
 
@@ -63,13 +65,12 @@ def evalCatchingExceptions(procName, params, image=None, drawable=None):
         TestStats.sample("GimpFu exception", str(err) )
         TestLog.say(f"exception in Gimpfu code: {err} for test: {testStmt}")
 
+    # Log end of test, with weak result.
     # get the pdb status, it is a weak form of pass/fail
     error_str = Gimp.get_pdb().get_last_error()
-    TestLog.say(f"test: {testStmt} PDB status: {error_str}")
+    TestLog.say(f"End test, PDB status: {error_str}")
     if error_str != "success":
         TestStats.sample("fail", error_str)
-
-
     else:
         TestStats.sample("pass")
 

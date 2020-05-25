@@ -44,9 +44,10 @@ def shouldTestProcedure(procName):
     Some open windows, impeding lights-out testing.
     We *can* test them interactively, optionally.  TODO
 
-    Others are known bad actors.
+    Others are known bad actors, usually they hang or take too long.
     """
     if procName in (
+       # TODO why are these excluded?
        "plug-in-animationplay",
        "python-fu-console",
        # ??? These are opening windows despite run mode NONINTERACTIVE ???
@@ -56,9 +57,11 @@ def shouldTestProcedure(procName):
        "plug-in-unit-editor",
        "plug-in-screenshot",
        "plug-in-metadata-viewer",
-       # Known bad actors?  Seems to lock the test, with many Gtk errors
+       # Hang, with many Gtk errors
        "plug-in-metadata-editor",
        "plug-in-plug-in-details",
+       # Hang, without error messages
+       "script-fu-ripply-anim",
        # ??
        "extension-script-fu",
        #
@@ -81,6 +84,20 @@ def shouldTestProcedure(procName):
        "gimp-help-using-simpleobjects",
        "gimp-help-using-fileformats",
        "gimp-help-using-docks",
+       # Spawn a browser, which could be tested, does not stop test.
+       # This one takes a URL parameter, but also throws missing run-mode
+       # since we pass runmode to every 'plug-in-'
+       "plug-in-web-browser",
+       # Bookmarks.  Authors Henrik Brix Andersen or Roman Joost or A. Prokoudine
+       # These all use plug-in-web-browser, and Gimp throws "operation not supported"
+       # meaning they cannot be called procedurally
+       "gimp-online-main-web-site",
+       "gimp-online-docs-web-site",
+       "gimp-online-developer-web-site",
+       "gimp-online-wiki",
+       "gimp-online-bugs-features",
+       "gimp-online-roadmap",
+       # gimp-web
         ):
         result = False
     else:
