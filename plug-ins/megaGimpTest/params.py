@@ -1,7 +1,7 @@
 
 
 from testLog import TestLog
-
+from stats import TestStats
 
 
 
@@ -66,22 +66,30 @@ def generateParamString(procName, inParamList,  image, drawable):
             # assert drawable is-a Layer
             result = appendParameter(result, 'drawable')
         elif aType == "GimpParamRGB" :
-            # a 3-tuple suffices
+            # a 3-tuple suffices, GimpFu marshals to a Gimp.RGB
             result = appendParameter(result, '(12, 13, 14)')
         elif aType == "GimpParamFloatArray" :
             # a 4-tuple often suffices
+            # TODO  prefixed with len ?? result = appendParameter(result, '4, (1.0, 1.0, 5.0, 5.0)')
             result = appendParameter(result, '(1.0, 1.0, 5.0, 5.0)')
+        elif aType == "GimpParamVectors" :
+            # refer to test harness object
+            result = appendParameter(result, 'fooVectors')
 
         # TODO more types
-        # TODO GimpParamParasite
-        # GimpParamUInt8Array
-        # GimpParamChannel
-        # GParamObject usually a file
-        # GimpParamUnit
-        # GimpParamVectors
-        # GParamUChar
+        # GimpParamParasite
+        # GimpParamUInt8Array 10
+        # GimpParamChannel 12
+        # GParamObject 132 usually a file
+        # GimpParamUnit 13
+        # GimpParamVectors 23
+        # GimpParamDisplay 2
+        # GimpParamStringArray
         else:
-            # some type we don't handle, abandon
+            # some type we don't handle, omit test
+            TestStats.sample("omit for param type")
+            TestStats.sample(f"omit for param type: {aType}")
+
             TestLog.say(f"unhandled type {aType} for {procName}")
             return ""
 

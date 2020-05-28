@@ -110,8 +110,6 @@ def testProcThatIsPlugin(procName, inParamList, image, drawable):
         evalCatchingExceptions(procName, paramString, image, drawable)
         result = True
     else:
-        # already logged why we could not generate params
-        TestStats.sample("omit for param types")
         result = False
 
 
@@ -124,8 +122,6 @@ def testGeneralProc(procName, inParamList,  image, drawable):
         evalCatchingExceptions(procName, paramString, image, drawable)
         result = True
     else:
-        # already logged why we could not generate params
-        TestStats.sample("omit for param types")
         result = False
 
     # success means we tested it, not that it succeeded
@@ -187,11 +183,14 @@ def testProcs(data,  image, drawable):
 
         """
         So testing is always from a known base, test on a copy of original image
-        Note there is no undo() operation in the PDB.
+        Note there is no undo() operation in the PDB, to undo the previous test.
         Alternatively, use the same image over and over, but errors will be different?
         """
         testImage = pdb.gimp_image_duplicate(image)
         testDrawable = pdb.gimp_image_get_active_drawable(testImage)
+
+        # Not testing undo. Disable it for speed.
+        pdb.gimp_image_undo_disable(testImage)
 
         # pass procName, its paramDict
         testAProc(key, data[key],  testImage, testDrawable)
@@ -205,7 +204,20 @@ def plugin_main(image, drawable):
     """
     """
 
+    # Generate named data in Gimp
     generateFooGimpData()
+
+    """
+    Generate instances (passed as args to PDB procedures, not by a name known to Gimp).
+    Used like 'image', 'drawable', instances passed into the tests,
+    but here it is global.
+    """
+    global fooVectors   # declare global so can assign to global
+    # GimpFu notation, not gi
+    fooVectors = gimp.Vectors()
+
+    # Note testing undo.  Disable it for speed.
+    pdb.gimp_image_undo_disable(image)
 
     # Success on many tested procedures depends on existence of certain things
     # Person running the test should also insure:
