@@ -214,7 +214,7 @@ def plugin_main(image, drawable):
     """
     global fooVectors   # declare global so can assign to global
     # GimpFu notation, not gi
-    fooVectors = gimp.Vectors()
+    fooVectors = gimp.Vectors(image, "foo")
 
     # Note testing undo.  Disable it for speed.
     pdb.gimp_image_undo_disable(image)

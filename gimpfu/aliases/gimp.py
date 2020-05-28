@@ -164,13 +164,13 @@ class GimpfuGimp():
                 '''
                 # Call callable (could be in Gimp, or GimpFu)
                 result = func(*args)
-            except:
+            except Exception as err:
                 '''
                 TODO does Gimp return, or remember, an error message?
                 TODO result is a GObject , maybe Gimp.StatusType as for PDB??
                 TODO assert result is None or is_wrapper
                 '''
-                do_proceed_error(f"Error executing {callable_name}")
+                do_proceed_error(f"Error executing: {callable_name}, err: {err}")
                 result = None
 
 
