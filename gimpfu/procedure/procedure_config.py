@@ -49,12 +49,20 @@ class FuProcedureConfig():
         Later, use get_initial_settings().
         """
         # require args is-a GValueArray
+
+        """
+        TODO, do we need to check runmode, or does Gimp check it and do nothing?
+        """
+        if run_mode == Gimp.RunMode.NONINTERACTIVE:
+            return
+
         '''
         args is either:
         - values for case: passed from a caller
         - default values (at registration time) for case: invoked interactively
         '''
         self._config.begin_run (image, run_mode, args)
+
 
     # TODO move this to FuValueArray
     def _get_empty_value_array(self):

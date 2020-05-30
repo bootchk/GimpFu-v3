@@ -529,7 +529,10 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, original_args, dat
     '''
     list_gvalues_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, drawable)
 
-    _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
+    result = _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
+    # ensure result is-a GValueArray whose first element is a PDB_STATUS
+    # and whose other elements have types matching registered return value types
+    return result
 
 
 
@@ -559,7 +562,8 @@ def _run_context_procedure(procedure, original_args, data):
     # TODO this type of procedure always passed image in the first element of GimpValueArray
     image = list_gvalues_all_args[0]
 
-    _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
+    result = _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
+    return result
 
 
 

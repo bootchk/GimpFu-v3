@@ -132,18 +132,21 @@ class FuProcedureMetadata():
     @property
     def is_image_procedure_type(self):
         '''
-        !!! ImageType does not mean that args necessarily include (image, drawable)
+        !!! ImageType mean that args necessarily include (image, drawable)
         '''
         assert self.MENUPATH is not None
-        return self.MENUPATH.startswith("<Image>")
+        result = ( self.MENUPATH.startswith("<Image>") )
+        return result
 
     @property
     def is_context_procedure_type(self):
         ''' Installs to context menu for Path (Vectors), receives current selected Vectors
         '''
         assert self.MENUPATH is not None
-        return self.MENUPATH.startswith("<Vectors>")
-        #TODO: other gimp_data monikers
+        result = ( self.MENUPATH.startswith("<Vectors>")
+                or self.MENUPATH.startswith("<Layers>")  )
+        return result
+        #TODO: other gimp_data monikers e.g. Brush
 
     @property
     def is_save_procedure_type(self):
