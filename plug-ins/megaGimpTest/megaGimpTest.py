@@ -1,5 +1,6 @@
 
 
+
 """
 Plugin that mega tests Gimp.
 

@@ -1,6 +1,7 @@
 
 
 from procedure.metadata import FuProcedureMetadata
+from procedure.prop_holder import PropHolder
 
 import logging
 
@@ -28,7 +29,7 @@ class FuProcedure():
     Understands GimpFu local representation of a plugin procedure,
     the one(s) being defined by the current Author's source.
 
-    Does NOT wrap Gimp.Procedure, only knows how to create one, for the current sourc.e
+    Does NOT wrap Gimp.Procedure, only knows how to create one, for the current source
 
     GimpFu procedure is slightly different from Gimp PluginProcedure.
     This hides the differences.
@@ -43,7 +44,7 @@ class FuProcedure():
      -- the specs for a procedure
      -- the return values for a procedure
      - types of procedure
-     - the callbacks for the plugin: on_query, on_run
+     - the callbacks for the plugin: function, on_query, on_run
 
 
     Note that FuProcedure does not understand last values, see FuProcedureConfig
@@ -61,7 +62,7 @@ class FuProcedure():
         self.logger = logging.getLogger("GimpFu.FuProcedure")
 
         '''
-        Takes metadata authored by .
+        Takes metadata created by plugin Author .
         Which is wild, so sanity test.
 
         Fix self for compatibility with Gimp.
@@ -172,20 +173,24 @@ class FuProcedure():
 
     '''
 
+    ''' Delegate: Metatdata knows the type of procedure. '''
+
     @property
-    def is_image_procedure_type(self):
-        ''' Metatdata knows the type of procedure. '''
-        return self.metadata.is_image_procedure_type
-        """
-        OLD
-        '''
-        An ImageProcedure must have signature (Image, Drawable, ...)
-        and a non-null IMAGETYPES
-        TODO could be stricter, i.e. check args prefix is image and drawable
-        '''
-        # not empty string is True
-        return self.metadata.IMAGETYPES
-        """
+    def is_image_procedure_type(self):  return self.metadata.is_image_procedure_type
+    @property
+    # OLD def is_vectors_procedure_type(self):  return self.metadata.is_vectors_procedure_type
+    def is_context_procedure_type(self):  return self.metadata.is_context_procedure_type
+
+    """
+    OLD
+    '''
+    An ImageProcedure must have signature (Image, Drawable, ...)
+    and a non-null IMAGETYPES
+    TODO could be stricter, i.e. check args prefix is image and drawable
+    '''
+    # not empty string is True
+    return self.metadata.IMAGETYPES
+    """
 
     """
     Cruft
@@ -228,6 +233,12 @@ class FuProcedure():
         self.metadata.convey_to_gimp(self._wrapped_gimp_procedure, self.name);
 
     def convey_runmode_arg_declaration_to_gimp(self):
+        self.logger.debug("convey run mode")
+
+        # get an instance that has a RunmodeProp
+        prop_holder = PropHolder()
+
+        # Gimp.Procedure will add args from named properties of any given instance
         self._wrapped_gimp_procedure.add_argument_from_property(prop_holder, "RunmodeProp")
 
 
@@ -254,6 +265,7 @@ class FuProcedure():
             a_callback = self.metadata.ON_RUN
             a_callback()
 
+    #TODO: on_query
 
 
     '''

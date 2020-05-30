@@ -3,6 +3,8 @@ from procedure.formal_param import FuFormalParam
 from gimpfu_enums import *  # PF_ enums
 from message.deprecation import Deprecation
 
+#import logging
+
 
 class FuFormalParams():
     '''
@@ -24,7 +26,7 @@ class FuFormalParams():
     image_param = FuFormalParam(PF_IMAGE, "image", "Input image", None)
     drawable_param = FuFormalParam(PF_DRAWABLE, "drawable", "Input drawable", None)
 
-
+    #logger = logging.getLogger("GimpFu.FuFormalParams")
 
 
 
@@ -140,13 +142,15 @@ class FuFormalParams():
         Convey  to Gimp a declaration of args to the procedure.
 
         This implementation uses one property on self many times.
-        Requires a hack to Gimp, which otherwise refuses to add are many times from same named property.
+        Requires a hack to Gimp, which otherwise refuses to add arg many times from same named property.
         '''
 
         if prefix_with_run_mode :
-            pass
-            # WIP
-            # procedure.add_argument_from_property(prop_holder, "intprop")
+            # TODO WIP
+            # gf_procedure.convey_runmode_arg_declaration_to_gimp()
+            # procedure.add_argument_from_property(prop_holder, "RunmodeProp")
+            raise NotImplementedError
 
         for i in range(count_omitted_leading_args, len(self.PARAMS)):
+            # FuFormalParams.logger.debug(f"Convey arg type {self.PARAMS[i]}")
             self.PARAMS[i].convey_to_gimp(procedure, i)

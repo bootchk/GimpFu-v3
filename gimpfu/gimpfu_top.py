@@ -20,7 +20,7 @@
 """
 Simple interface to write GIMP plug-ins in Python.
 An alternative is to use GObject Introspection
-and a template plugin that does not import GimpFu."
+and a template plugin that does not import GimpFu.
 
 GimpFu provides a simple register() function that registers your plug-in.
 
@@ -107,7 +107,7 @@ Notations used in the comments:
 
 "FBC" denotes 'For Backward Compatibility' of v2 plugins
 
-'author' denotes a writer of plugins, not a programmer of this code
+'Author' denotes a writer of plugins, not a programmer of this code
 """
 
 # Using GI, convention is first letter capital e.g. "Gimp."
@@ -143,6 +143,7 @@ from gi.repository import GObject   # for g_param_spec and properties
 from adaption.marshal import Marshal
 from procedure.procedure import FuProcedure
 from procedure.procedure_config import FuProcedureConfig
+from procedure.procedure_creator import FuProcedureCreator
 
 from message.proceed_error import *
 from message.deprecation import Deprecation
@@ -157,8 +158,8 @@ import logging
 logger = logging.getLogger('GimpFu')
 
 # TODO make the level come from the command line or the environment
-#logger.setLevel(logging.DEBUG)
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.WARNING)
 
 # create file handler which logs even debug messages
 #fh = logging.FileHandler('spam.log')
@@ -265,7 +266,7 @@ The GimpFu API:
 # TODO should warn() be in the API?  gimp.message will already work.
 
 '''
-Register locally, not with Gimp.
+Register locally with GimpFu, not with Gimp.
 
 Each Authors source may contain many calls to register.
 '''
@@ -527,6 +528,28 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, original_args, dat
 
     _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
 
+
+
+def _run_context_procedure(procedure, run_mode, image, gimp_data_instance, original_args, data):
+    ''' GimpFu wrapper of the Authors "main" function, aka run_func
+    For a procedure invoked from a context menu, operating on an instance of "Gimp data" e.g. Vectors, Brush, ...
+    '''
+
+    logger.info(f"_run_context_procedure , {procedure}, {run_mode}, {image}, {gimp_data_instance}, {original_args}")
+    # logger.info("_run_imageprocedure count original_args", original_args.length())
+
+    '''
+    Create GimpValueArray of *most* args.
+    !!! We  pass GimpValueArray of Gimp types to lower level methods.
+    That might change when the lower level methods are fleshed out to persist values.
+    *most* means (image, drawable, *original_args), but not run_mode!
+    '''
+    list_gvalues_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, gimp_data_instance)
+
+    _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
+
+
+
 """
 cruft?
 #def _run_imagelessprocedure(procedure, run_mode, actual_args, data):
@@ -745,9 +768,11 @@ class GimpFu (Gimp.PlugIn):
 
     In the GimpFu source code: at a call to main(), which calls Gimp.main(), which calls back.
     Thus in the source code AFTER the calls to GimpFu register().
-    Thus the GimpFu plugin is GimpFu register'ed in the local cache.
+    Thus the GimpFu plugin is GimpFu registered in the local cache.
     It also was registered with Gimp (at installation time.)
     '''
+
+
     def do_create_procedure(self, name):
 
         logger.info (f"do_create_procedure: {name}")
@@ -755,78 +780,8 @@ class GimpFu (Gimp.PlugIn):
         # We need the kind of plugin, and to ensure the passed name is know to us
         gf_procedure = __local_registered_procedures__[name]
 
-        # TODO different plug_type LoadProcedure for loaders???
-        '''
-        Create subclass of Gimp.Procedure dispatching
-        on the locally determined kind i.e. by the signature of the formal args.
-        And use a different wrapper _run for each subclass.
-        '''
-
-        """
-        # TEMP hack, always a GimpImageProcedure
-        procedure = Gimp.ImageProcedure.new(self,
-                                name,
-                                Gimp.PDBProcType.PLUGIN,
-                                _run_imageprocedure, 	# wrapped plugin method
-                                None)
-        """
-
-        if gf_procedure.is_image_procedure_type :
-            # ImageProcedure
-            procedure = Gimp.ImageProcedure.new(self,
-                                            name,
-                                            Gimp.PDBProcType.PLUGIN,
-                                            _run_imageprocedure, 	# wrapped plugin method
-                                            None)
-
-            gf_procedure.set_wrapped_procedure(procedure)
-
-            gf_procedure.convey_metadata_to_gimp()
-            '''
-            ImageProcedure:
-            Gimpfu does not tell Gimp about run_mode (Gimp knows already that parameter exists) ???
-            Gimpfu does not tell Gimp about first two formal args (Gimp knows already).
-            Gimpfu only conveys the "extra" args.
-
-            !!! But when Gimp calls, it passes more args.
-            TODO move these comments to where the call lands.
-            run_func takes img, drw as first two params
-            Gimp passes run_mode, image, drawable, otherArgArray to Gimpfu when run() callback is called.
-            Gimpfu massages image, drawable, otherArgArray (but omits run_mode) into args to run_func
-            '''
-            gf_procedure.convey_procedure_arg_declarations_to_gimp(count_omitted_leading_args=2)
-
-            gf_procedure.convey_return_value_declarations_to_gimp()
-
-        else:
-            # TODO Better message, since this error depends on authored code
-            # TODO preflight this at registration time.
-            raise Exception("Unknown type of Gimp.Procedure")
-
-        """
-                logger.info("Create imageless procedure")
-                procedure = Gimp.Procedure.new(self,
-                                                name,
-                                                Gimp.PDBProcType.PLUGIN,
-                                                _run_imagelessprocedure, 	# wrapped plugin method
-                                                None)
-                gf_procedure.convey_metadata_to_gimp(procedure)
-
-                gf_procedure.convey_runmode_arg_declaration_to_gimp(procedure)
-                gf_procedure.convey_procedure_arg_declarations_to_gimp(
-                    procedure,
-                    count_omitted_leading_args=0)
-            else:
-        """
+        # pass all the flavors of wrapped_run_funcs
+        procedure = FuProcedureCreator.create(self, name, gf_procedure, _run_imageprocedure, _run_context_procedure)
 
         # ensure result is-a Gimp.Procedure
         return procedure
-
-"""
-elif gf_procedure.is_a_loadprocedure_subclass :
-    procedure = Gimp.LoadProcedure.new(self,
-                                    name,
-                                    Gimp.PDBProcType.PLUGIN,
-                                    _run_loadprocedure, 	# wrapped plugin method
-                                    None)
-"""

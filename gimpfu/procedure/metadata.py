@@ -138,6 +138,14 @@ class FuProcedureMetadata():
         return self.MENUPATH.startswith("<Image>")
 
     @property
+    def is_context_procedure_type(self):
+        ''' Installs to context menu for Path (Vectors), receives current selected Vectors
+        '''
+        assert self.MENUPATH is not None
+        return self.MENUPATH.startswith("<Vectors>")
+        #TODO: other gimp_data monikers
+
+    @property
     def is_save_procedure_type(self):
         assert self.MENUPATH is not None
         return self.MENUPATH.startswith("<Save>")

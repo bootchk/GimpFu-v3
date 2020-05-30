@@ -142,11 +142,15 @@ class FuFormalParam(GObject.Object):
 
 
     def convey_using_dynamic_class_property(self, procedure):
-        """ convey implemented using a temp object having one property. """
+        """ convey implemented using a temp object having one property.
+
+        Gimp docs say the instance should be a 'config' but it only needs to be any GObject
+        """
         type = self._get_type()
         default = self.mangle_default()
         min, max = self.derive_min_max_from_extras()
 
+        # produce an instance having a property with an arbitrary name, of given type
         instance, property_name = FuFormalParam.prop_holder_factory.produce(type, default, min, max)
         procedure.add_argument_from_property(instance, property_name)
         #instance and property go out of scope
