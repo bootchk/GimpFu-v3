@@ -268,7 +268,7 @@ The GimpFu API:
 '''
 Register locally with GimpFu, not with Gimp.
 
-Each Authors source may contain many calls to register.
+Each Authors source may contain many calls to register(), i.e. many procedures.
 '''
 # A primary phrase in GimpFu language
 def register(proc_name, blurb, help, author, copyright,
@@ -513,7 +513,10 @@ Now it is of C type GimpImageProcedure or Python type ImageProcedure
 !!! Args are Gimp types, not Python types
 '''
 def _run_imageprocedure(procedure, run_mode, image, drawable, original_args, data):
-    ''' GimpFu wrapper of the Authors "main" function, aka run_func '''
+    ''' Callback from Gimp.
+
+    GimpFu wrapper of the Authors "main" function, aka run_func
+    '''
 
     logger.info(f"_run_imageprocedure , {procedure}, {run_mode}, {image}, {drawable}, {original_args}")
     # logger.info("_run_imageprocedure count original_args", original_args.length())
@@ -530,37 +533,34 @@ def _run_imageprocedure(procedure, run_mode, image, drawable, original_args, dat
 
 
 
-def _run_context_procedure(procedure, run_mode, image, gimp_data_instance, original_args, data):
-    ''' GimpFu wrapper of the Authors "main" function, aka run_func
+def _run_context_procedure(procedure, original_args, data):
+    ''' Callback from Gimp for a Gimp.Procedure class of procedure.
+
     For a procedure invoked from a context menu, operating on an instance of "Gimp data" e.g. Vectors, Brush, ...
-    '''
 
-    logger.info(f"_run_context_procedure , {procedure}, {run_mode}, {image}, {gimp_data_instance}, {original_args}")
-    # logger.info("_run_imageprocedure count original_args", original_args.length())
+    GimpFu wrapper of the Authors "main" function, aka run_func
+
+    The signature is as defined by Gimp C code.
+    '''
+    logger.info(f"_run_context_procedure , {procedure}, {original_args}, {data}")
 
     '''
-    Create GimpValueArray of *most* args.
-    !!! We  pass GimpValueArray of Gimp types to lower level methods.
-    That might change when the lower level methods are fleshed out to persist values.
-    *most* means (image, drawable, *original_args), but not run_mode!
+    Rearrange args to fit _run()
     '''
-    list_gvalues_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, gimp_data_instance)
+    list_gvalues_all_args = Marshal.convert_gimpvaluearray_to_list_of_gvalue(original_args)
+    # assert is (runmode, image, <Gimp data object>)
+
+    # GimpFu always hides run mode, delete first element
+    list_gvalues_all_args.pop(0)
+
+    # this type of procedure always NONINTERACTIVE
+    run_mode = Gimp.RunMode.NONINTERACTIVE
+
+    # TODO this type of procedure always passed image in the first element of GimpValueArray
+    image = list_gvalues_all_args[0]
 
     _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
 
-
-
-"""
-cruft?
-#def _run_imagelessprocedure(procedure, run_mode, actual_args, data):
-#def _run_imagelessprocedure(procedure, run_mode, actual_args):
-def _run_imagelessprocedure(procedure, actual_args, data):
-    ''' GimpFu wrapper of the Authors "main" function, aka run_func '''
-    logger.info("_run_imagelessprocedure ", procedure, actual_args)
-    #run_mode = Gimp.RunMode.INTERACTIVE
-    all_args = Marshal.prefix_image_drawable_to_run_args(actual_args, image=None, drawable=None)
-    _run(procedure, run_mode, all_args, data)
-"""
 
 
 def _run(procedure, run_mode, image, list_gvalues_all_args, original_args, data):
@@ -718,7 +718,7 @@ def _run(proc_name, params):
 
 
 '''
-See header comments for type Gimp.Plugin.
+See header comments for type Gimp.Plugin in Gimp docs or Gimp C code.
 
 A plugin must define (but not instantiate) a subclass of Gimp.Plugin.
 GimpFu is a subclass of Gimp.Plugin.
@@ -730,6 +730,23 @@ More generally (unwrapped) properties  represent params (sic arguments) to ultim
 
 _run() above wraps Authors "function" i.e. ultimate plugin method,
 which is referred to as "run_func" here and in Gimp documents.
+
+All methods are invoked (callbacks) from Gimp.
+Callbacks occur:
+- at Gimp startup: do_query_procedures() and do_create_procedure()
+- at Gimp execution time:  the <run method chain>
+   - when user interacts with Gimp GUI (INTERACTIVE)
+   - when another plugin calls a plugin (NONINTERACTIVE)
+
+ The <run method chain>:
+    Gimp invokes the run_func registered for the procedure.
+    That is some method that Gimpfu has registered such as _run_imageprocedure.
+    Thus the call chain is:  Gimp => _run_imageprocedure() or similar => _run()  => <the Authors function>()
+    The middle two are wrappers of the Authors function, and manipulate the args for GimpFu purposes.
+
+TODO: Gimp calls all methods from C code using GI after starting the Gimp interpreter?
+
+TODO: why do we not provide concrete implementation of virtual methods: init_procedures() and quit() ?
 '''
 
 class GimpFu (Gimp.PlugIn):

@@ -73,7 +73,9 @@ class Marshal():
         # ensure result is-a list, but might be empty
         return args_list
 
-
+    def convert_gimpvaluearray_to_list_of_gvalue(actual_args):
+        """ Delegate to Types """
+        return Types.convert_gimpvaluearray_to_list_of_gvalue(actual_args)
 
 
 
