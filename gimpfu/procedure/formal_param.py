@@ -113,7 +113,21 @@ class FuFormalParam(GObject.Object):
          pass
 
 
+    """
+    Choices of implementation. Most of this is cruft, and might change in the future.
 
+    Static property implementation uses one property on self many times.
+    Requires a hack to Gimp, which otherwise refuses to add arg many times from same named property.
+
+    The essential problem is that GObject GParamSpec is not fully implemented.
+    Gimp has an alternative implementation that adds args from GParamSpec.
+    But that can't be used because of broken PyGObject.
+
+    Gimp has an alternative implementation to add args from property.
+    But GimpFu doesn't know the properties ahead of time (like a GI implemented plugin does.)
+    The best solution here is to create the properties dynamically,
+    and tell Gimp to add args from those dynamically created properties.
+    """
     # This just conveys a sequence of undescribed args
     # TODO the intended design of Gimp is to convey types, but this doesn't
     # and the Gimp design is bogus
@@ -141,8 +155,8 @@ class FuFormalParam(GObject.Object):
         procedure.add_argument_from_property(self, "spacing")
 
 
-    def convey_using_dynamic_class_property(self, procedure):
-        """ convey implemented using a temp object having one property.
+    def convey_using_dynamic_class_property(self, procedure, is_in_arg):
+        """ convey self implemented using a temp object having one property.
 
         Gimp docs say the instance should be a 'config' but it only needs to be any GObject
         """
@@ -152,16 +166,23 @@ class FuFormalParam(GObject.Object):
 
         # produce an instance having a property with an arbitrary name, of given type
         instance, property_name = FuFormalParam.prop_holder_factory.produce(type, default, min, max)
-        procedure.add_argument_from_property(instance, property_name)
+
+        if is_in_arg:
+            procedure.add_argument_from_property(instance, property_name)
+        else:
+            procedure.add_return_value_from_property(instance, property_name)
+
         #instance and property go out of scope
 
 
-    def convey_to_gimp(self, procedure, index):
-        """ Convey self as formal arg to GimpProcedure procedure. """
+    def convey_to_gimp(self, procedure, index, is_in_arg):
+        """ Convey self as part of the signature of a GimpProcedure procedure.
+        is_in_arg: whether formal arg is IN (an arg) or OUT (a return value)
+        """
         self.logger.debug(f"Convey: {self}")
         # TODO choice of implementation
         #self.convey_using_static_property(procedure)
-        self.convey_using_dynamic_class_property(procedure)
+        self.convey_using_dynamic_class_property(procedure, is_in_arg)
         #self.convey_using_dynamic_property(procedure, index)
 
 

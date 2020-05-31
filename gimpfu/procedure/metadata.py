@@ -76,10 +76,17 @@ class FuProcedureMetadata():
         self.ON_QUERY= on_query
         self.ON_RUN= on_run
 
+        # Retain the old, but not very descriptive, names "params" and "results"
+        # IN formal args
         self.params = FuFormalParams()
         for param in params:
              # assert param is a tuple, unpack when passing
              self.params.append(*param)
+        # OUT formal args
+        self.results = FuFormalParams()
+        for param in results:
+             # assert param is a tuple, unpack when passing
+             self.results.append(*param)
 
         '''
         Fix author's mistakes and allow deprecated constructs.
@@ -122,6 +129,11 @@ class FuProcedureMetadata():
         procedure.add_menu_path (self.MENUPATH)
 
 
+    def convey_in_args_to_gimp(self, procedure, count_omitted_leading_args):
+        #    ******                                                                 ****
+        self.params.convey_to_gimp(procedure, count_omitted_leading_args, is_in_arg=True)
+    def convey_out_args_to_gimp(self, procedure):
+        self.results.convey_to_gimp(procedure, count_omitted_leading_args=0, is_in_arg=False)
 
 
     '''

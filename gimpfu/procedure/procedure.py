@@ -242,17 +242,14 @@ class FuProcedure():
         self._wrapped_gimp_procedure.add_argument_from_property(prop_holder, "RunmodeProp")
 
 
-    def convey_procedure_arg_declarations_to_gimp(self,
-        count_omitted_leading_args=0,
-        prefix_with_run_mode=False):
-
-        # TODO metadata.params should be hidden
-        self.metadata.params.convey_to_gimp(self._wrapped_gimp_procedure, count_omitted_leading_args, prefix_with_run_mode);
+    def convey_procedure_arg_declarations_to_gimp(self, count_omitted_leading_args=0 ):
+        self.metadata.convey_in_args_to_gimp(self._wrapped_gimp_procedure, count_omitted_leading_args)
 
 
     def convey_return_value_declarations_to_gimp(self):
         """ Declare to Gimp return value types of this plugin procedure. """
-        self.logger.warning("convey_return_value_declarations_to_gimp NOT IMPLEMENTED")
+        self.metadata.convey_out_args_to_gimp(self._wrapped_gimp_procedure)
+        # self.logger.warning("convey_return_value_declarations_to_gimp NOT IMPLEMENTED")
         # procedure.add_return_value_from_property(self, "new-palette")
 
     '''

@@ -18,9 +18,7 @@ class FuFormalParams():
     - convey self to Gimp
     '''
 
-    '''
-    Constant class data
-    '''
+    # Constant class data
     file_params = [FuFormalParam(PF_STRING, "filename", "The name of the file", ""),
                    FuFormalParam(PF_STRING, "raw-filename", "The name of the file", "")]
     image_param = FuFormalParam(PF_IMAGE, "image", "Input image", None)
@@ -32,6 +30,7 @@ class FuFormalParams():
 
     def __init__(self):
         self.PARAMS= []
+
 
     def append(self, *args):
         self.PARAMS.append(FuFormalParam(*args))
@@ -136,21 +135,10 @@ class FuFormalParams():
         return result
 
 
-    def convey_to_gimp(self, procedure, count_omitted_leading_args, prefix_with_run_mode):
-        ''' convey self to Gimp '''
+    def convey_to_gimp(self, procedure, count_omitted_leading_args, is_in_arg):
+        ''' Convey  to Gimp a formal declaration of args to/from the procedure.
         '''
-        Convey  to Gimp a declaration of args to the procedure.
-
-        This implementation uses one property on self many times.
-        Requires a hack to Gimp, which otherwise refuses to add arg many times from same named property.
-        '''
-
-        if prefix_with_run_mode :
-            # TODO WIP
-            # gf_procedure.convey_runmode_arg_declaration_to_gimp()
-            # procedure.add_argument_from_property(prop_holder, "RunmodeProp")
-            raise NotImplementedError
 
         for i in range(count_omitted_leading_args, len(self.PARAMS)):
             # FuFormalParams.logger.debug(f"Convey arg type {self.PARAMS[i]}")
-            self.PARAMS[i].convey_to_gimp(procedure, i)
+            self.PARAMS[i].convey_to_gimp(procedure, i, is_in_arg)
