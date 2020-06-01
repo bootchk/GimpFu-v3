@@ -300,7 +300,12 @@ class FuRunner:
 
         func = gf_procedure.get_authors_function()
 
-        config = FuProcedureConfig(procedure, len(list_gvalues_all_args)-2 )
+        """
+        The ProcedureConfig should have length equal to ????
+        original_args is-a GimpValueArray
+        """
+        # config = FuProcedureConfig(procedure, len(list_gvalues_all_args)-2 )
+        config = FuProcedureConfig(procedure, original_args.length() )
         config.begin_run(image, run_mode, original_args)
 
         if isBatch:

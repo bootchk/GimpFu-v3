@@ -3,7 +3,7 @@ from procedure.formal_param import FuFormalParam
 from gimpfu_enums import *  # PF_ enums
 from message.deprecation import Deprecation
 
-#import logging
+import logging
 
 
 class FuFormalParams():
@@ -24,7 +24,7 @@ class FuFormalParams():
     image_param = FuFormalParam(PF_IMAGE, "image", "Input image", None)
     drawable_param = FuFormalParam(PF_DRAWABLE, "drawable", "Input drawable", None)
 
-    #logger = logging.getLogger("GimpFu.FuFormalParams")
+    logger = logging.getLogger("GimpFu.FuFormalParams")
 
 
 
@@ -139,6 +139,9 @@ class FuFormalParams():
         ''' Convey  to Gimp a formal declaration of args to/from the procedure.
         '''
 
+        count = 0
         for i in range(count_omitted_leading_args, len(self.PARAMS)):
             # FuFormalParams.logger.debug(f"Convey arg type {self.PARAMS[i]}")
             self.PARAMS[i].convey_to_gimp(procedure, i, is_in_arg)
+            count += 1
+        FuFormalParams.logger.debug(f"Conveyed args, count: {count}")

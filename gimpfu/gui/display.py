@@ -5,6 +5,7 @@ from gi.repository import Gimp
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
+import logging
 
 
 """
@@ -43,6 +44,8 @@ class Display:
                 result = Gimp.ui_get_display_window(maybe_image)
     '''
 
+    logger = logging.getLogger('GimpFu.Display')
+
     def get_window(proc_name):
         """ Get the parent window (transient-for window) for a plugin procedure. """
 
@@ -53,11 +56,10 @@ class Display:
 
         result = Gimp.ui_get_display_window(display)
 
-        # TODO this doesn't seem to print
-        # Not sure this is-a Gtk.Window
-        print(result)
+
+        Display.logger.debug(f"get_window returns: {result}")
 
         #result = display.get_window_handle()
-        # assert result is-a int ?
+        # assert result is-a GdkX11.X11Window or None??
 
         return result
