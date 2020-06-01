@@ -152,7 +152,10 @@ class FuRunner:
             using actual_args, which will be defaults in many cases.
             '''
             # Wrong: config.get_initial_settings(guiable_actual_args)
-            # TEMP: this is correct, but not working:  guiable_actual_args = config.get_initial_settings()
+            # TEMP: this is correct, but not working:
+            print(guiable_actual_args)
+            guiable_actual_args = config.get_initial_settings()
+            print(guiable_actual_args)
 
             was_canceled, guied_args = PluginControlDialog.show(
                 procedure,

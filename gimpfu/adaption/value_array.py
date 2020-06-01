@@ -103,7 +103,6 @@ class FuValueArray():
         Having unspecified/don't care GValues in it.
         """
         # !!! pre-allocated length, but will have length 0
-
         result = Gimp.ValueArray.new(length)
 
         cls._fill_with_nonce(result, length)

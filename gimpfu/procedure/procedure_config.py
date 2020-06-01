@@ -105,14 +105,12 @@ class FuProcedureConfig():
 
         value_array = self._get_values()
 
-        self._config.get_values(value_array)
-        # Require non-empty config returns non-empty values
+        # Assert config length > 0.  Should not be called unless there one or more guiable args.
         assert value_array.length() > 0
 
         values_list = Types.convert_gimpvaluearray_to_list_of_gvalue(value_array)
         wrapped_arg_list = Marshal.wrap_args(values_list)
         # assert values_list is a list of GValues, not prefixed with image, drawable
-
 
         return wrapped_arg_list
 

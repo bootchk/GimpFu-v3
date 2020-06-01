@@ -19,8 +19,11 @@ class WidgetFactory:
 
 
     def produce(a_formal_param, guiable_initial_value):
-        # widget types not range checked earlier
+        """ Produce a widget described by formal_param, having initial value. """
+
+        # TODO widget types not range checked earlier
         # author COULD err by specifying out of range widget type
+
         try:
             #  e.g. widget_constructor = StringEntry
             widget_constructor = _edit_map[a_formal_param.PF_TYPE]
@@ -28,19 +31,7 @@ class WidgetFactory:
             exception_str = f"Invalid or not implemented PF_ widget type: {a_formal_param.PF_TYPE}"
             raise Exception(exception_str)
 
-        '''
-        # TODO:
-        There is a default specified in the guiable_formal_params.
-        But initial value is passed in,
-        i.e. from the last value the user entered in the GUI.
-        This is a hack until FuProcedureConfig works, i.e.
-        until we can register args with Gimp using GProperty or GParamSpec
-        '''
-        is_use_defaults = True
-        if is_use_defaults:
-            widget_initial_value = a_formal_param.DEFAULT_VALUE
-        else:
-            widget_initial_value = guiable_initial_values[i]
+        widget_initial_value = guiable_initial_value
 
         proc_name = 'bar' # TODO procedure.procedure_name()
 
@@ -48,6 +39,7 @@ class WidgetFactory:
 
         # TODO pass tooltip_text
         # tooltip_text = a_formal_param.tooltip_text)
+
         WidgetFactory.logger.debug("produce: {widget_constructor} specs: {factory_specs}")
         result = widget_constructor(*factory_specs)
 
