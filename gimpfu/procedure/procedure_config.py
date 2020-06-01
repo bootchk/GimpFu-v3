@@ -89,8 +89,14 @@ class FuProcedureConfig():
         Must pass a GimpValueArray of same length as self
         """
         # TODO magic number 3 accounts for runmode, image, drawable
-        value_array = FuValueArray.get_empty_gvalue_array(self._length + 3)
+        # magic number 1 allows for first element *procedure* returned by get_values()
+        value_array = FuValueArray.get_empty_gvalue_array(self._length + 1)
         self._config.get_values(value_array)
+
+        # hack off first element, the *procedure*
+        value_array.remove(0)
+
+        # assert is same size as can be passed to set_values()
         return value_array
 
 
@@ -142,6 +148,9 @@ class FuProcedureConfig():
         args = self._procedure.get_arguments()
         self.logger.info(f"length args: {len(args)}")
         self.logger.info(f"args: {args}")
+        # DEBUG, get properties of ProcedureConfig
+        # FAIL: print(self._procedure.type_name_from_class())
+        print(self._config.list_properties())
 
         """
         Get the current values in the Gimp.ProcedureConfig.
@@ -149,10 +158,14 @@ class FuProcedureConfig():
         """
         value_array = self._get_values()
 
-        # Fill with user's values, offset appropriately
+        # assert value_array same size as registered args
+        # and is appropriate length for set_values()
+
+        # Fill with user's values
         # !!! users_args is NOT prefixed with (runmode, image, drawable)
+
         configurable_args_values = users_args
-        dest_index = 3
+        dest_index = 0
 
         for value in configurable_args_values:
             self.logger.info(f"changed setting at index: {dest_index} to value: {value}")
