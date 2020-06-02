@@ -117,6 +117,7 @@ class GimpfuRGB(Adapter):
         elif isinstance(value, tuple):
             result = GimpfuRGB.create_RGB_from_tuple(value)
         else:
-            do_proceed_error("Illegal Python type for color.")
-            result = None
+            do_proceed_error(f"Illegal Python type: {type(value)} for color: {value}.")
+            # return an arbitrary color so we can proceed
+            result = GimpfuRGB.create_RGB_from_string("orange")
         return result

@@ -6,8 +6,13 @@ from gimpfu_enums import *
 
 # WidgetFactory is main use of Widget constructors
 from gui.widgets import *
+from gui.gimp_widgets import *
+
+from adapters.rgb import GimpfuRGB
 
 import logging
+
+
 
 class WidgetFactory:
 
@@ -40,14 +45,18 @@ class WidgetFactory:
         # TODO pass tooltip_text
         # tooltip_text = a_formal_param.tooltip_text)
 
-        WidgetFactory.logger.debug("produce: {widget_constructor} specs: {factory_specs}")
+        WidgetFactory.logger.debug(f"produce: {widget_constructor} specs: {factory_specs}")
         result = widget_constructor(*factory_specs)
 
         return result
 
 
     def _get_args_for_widget_constructor(formal_param, widget_initial_value):
-        ''' Get args from formal spec, but override default with widget_initial_value.  Returns list of args '''
+        ''' Get args for a widget constructor from formal spec.
+        Override formal declaration of default with widget_initial_value.
+        Returns list of args.
+        Args are (<initial value>, <title>, <extras i.e. constraints> )
+        '''
         WidgetFactory.logger.debug(f"_get_args_for_widget_constructor, {formal_param}, {widget_initial_value}")
         # This is a switch statement on  PF_TYPE
         # Since data comes from , don't trust it
@@ -74,10 +83,15 @@ class WidgetFactory:
             # Hack, we are using FloatEntry, should use Slider???
             args = [widget_initial_value,]
         elif pf_type in (PF_COLOR, PF_COLOUR):
-            # Omitted, use a constant color
-            color = Gimp.RGB()
-            color.parse_name("orange", 6)
-            args = [color,]
+            # require widget_initial_value is-a string, name of color, or is-a 3-tuple of RGB ints
+            # TODO, if initial_value came from ProcedureConfig, could be wrong
+            # TODO Widget omitted
+            # color = GimpfuRGB.color_from_python_type(widget_initial_value)
+
+            # temporarily using a constant color
+            color = GimpfuRGB.color_from_python_type("orange")
+            # title is DESC, not LABEL
+            args = [color, formal_param.DESC]
         elif pf_type in (PF_PALETTE,):
             # TODO hack, should not even be a control
             # Omitted, use None
@@ -147,7 +161,8 @@ _edit_map = {
 
         # For omitted, subsequently GimpFu uses the default value
         # which should be sane
-        PF_COLOR       : OmittedEntry,
+
+        PF_COLOR       : ColorEntry,
         PF_COLOUR      : OmittedEntry,
 
         # Widgets provided by GTK ?

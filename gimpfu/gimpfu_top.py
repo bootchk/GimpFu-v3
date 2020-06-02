@@ -222,7 +222,6 @@ gettext.install = override_gettext_install
 The GimpFu API:
    - register()
    - main()
-   - fail()
    - pdb instance
    - gimp instance
 """
@@ -259,12 +258,7 @@ def main():
     logger.info('GimpFu main called')
     Gimp.main(GimpFu.__gtype__, sys.argv)
 
-
-# A primary phrase in GimpFu language
-def fail(msg):
-    """Display an error message and quit"""
-    Gimp.message(msg)
-    raise Exception(msg)
+# TODO fail() is primary phrase???
 
 
 

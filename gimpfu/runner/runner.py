@@ -366,8 +366,15 @@ class FuRunner:
             # Gimp.message("See console for suggestions and deprecations.")
             pass
 
-        if summarize_proceed_errors():
-            fail("GimpFu detected errors.  See console for a summary.")
+        if summarize_proceed_errors():  # side effect is writing to console
+            """ Gimpfu proceeded past earlier exceptions.
+            Display a dialog.
+            Then raise a final exception.
+            """
+            msg = "GimpFu detected errors.  See console for a summary."
+            Gimp.message(msg)
+            raise Exception(msg)
+
 
         # ensure final_result is type GimpValueArray
         return final_result

@@ -57,8 +57,7 @@ class GimpfuGimp():
         self.logger = logging.getLogger("GimpFu.GimpfuGimp")
 
     """
-    If experience shows this would be helpful,
-    resurrect it.
+    WIP If experience shows this would be helpful,  resurrect it.
     For now, just wrap all methods that have signaturge changes.
 
     def _adapt_signature(self, name, *args):
@@ -72,8 +71,7 @@ class GimpfuGimp():
         if name is "set_background":
             # TODO create a color
             # TEMP return a constant color
-            color = Gimp.RGB()
-            color.parse_name("orange", 6)
+            color = ...something...
             args = [color,]
             result = (color,)
         else:
