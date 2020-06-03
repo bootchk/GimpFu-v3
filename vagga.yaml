@@ -175,6 +175,9 @@ containers:
     # optional for browsing API docs
     - !Install [ yelp ]
 
+    # Ubuntu requires this else Gimp..Gtk crashes with:  Icon 'image-missing' not present in theme Symbolic
+    - !Install [ gnome-icon-theme ]
+
     environ:
       HOME: /work/.home
 
@@ -683,3 +686,9 @@ commands:
     run: |
       cd /home/gimp
       make
+
+  runUbuntuBug: !Command
+    description: Run ubuntu-bug in the container
+    container: gimpAMDev
+    run: |
+      ubuntu-bug gkt3

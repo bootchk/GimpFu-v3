@@ -67,16 +67,20 @@ class WidgetFactory:
             Deprecation.say("Use PF_COLOR instead of PF_COLOUR")
 
         if pf_type in ( PF_RADIO, ):
+            """
+            widget_initial_value is-a int?? Allow string values???
+            """
             args = [widget_initial_value, formal_param.EXTRAS]
         elif pf_type in (PF_FILE, PF_FILENAME):
-            # TODO need keyword 'title'?
-            # args = [widget_initial_value, title= "%s - %s" % (proc_name, tooltip_text)]
-            # args = [widget_initial_value, "%s - %s" % (proc_name, tooltip_text)]
-            # TEMP: widget is omitted, use default defined by author
+            # args template [<title>, <default>]
 
-            # TODO this should work, but its not
+            # TEMP: when widget is omitted, use default defined by author
             # args = [widget_initial_value,]
-            args = ["/tmp/lkkfoopluginout"]
+
+            # TEMP: when ProcedureConfig broken, use a string default here
+            # args = [formal_param.LABEL, "/tmp/lkkfoopluginout"]
+
+            args = [formal_param.LABEL, widget_initial_value]
         elif pf_type in (PF_INT, PF_INT8, PF_INT16, PF_INT32, PF_STRING, PF_BOOL, PF_OPTION, PF_FONT, PF_TEXT ):
             args = [widget_initial_value]
         elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER, PF_ADJUSTMENT):
@@ -98,8 +102,6 @@ class WidgetFactory:
             args = [None,]
         else:
             # PF_SPINNER,, PF_OPTION
-            if pf_type == PF_COLOUR:
-                Deprecation.say("Deprecated PF_COLOUR")
             raise RuntimeError(f"Unhandled PF_ widget type {pf_type}.")
 
         return args
@@ -132,7 +134,8 @@ EXTRAS further specifies parameters of the FuWidget class,
 and the widget enforces that type restriction at GUI time.
 
 Feb. 2020 status:
-complete keys, but hacked values (should implement more widgets)
+complete keys, but using OmitteEntry for not implemented widgets.
+For omitted, subsequently GimpFu uses the default value which should be sane.
 '''
 _edit_map = {
         PF_INT         : IntEntry,
@@ -158,17 +161,15 @@ _edit_map = {
         # radio buttons, set of choices
         PF_RADIO       : RadioEntry,
 
-
-        # For omitted, subsequently GimpFu uses the default value
-        # which should be sane
-
+        # PF_COLOUR is deprecated alias for PF_COLOR
         PF_COLOR       : ColorEntry,
         PF_COLOUR      : OmittedEntry,
 
-        # Widgets provided by GTK ?
-        PF_FILE        : OmittedEntry,
-        PF_FILENAME    : OmittedEntry,
-        PF_DIRNAME     : OmittedEntry,
+        # TODO is PF_FILENAME deprecated alias for PF_FILE?
+        PF_FILE        : FuFileEntry,
+        PF_FILENAME    : FuFileEntry,
+        # TODO how specialize to directory
+        PF_DIRNAME     : FuFileEntry,
 
         # meaning ?
         PF_OPTION      : OmittedEntry,

@@ -91,6 +91,8 @@ class FuProcedureConfig():
         # TODO magic number 3 accounts for runmode, image, drawable
         # magic number 1 allows for first element *procedure* returned by get_values()
         value_array = FuValueArray.get_empty_gvalue_array(self._length + 1)
+        # TODO the types of the GValues must match the types of the registered args
+        # and the first type must match the type Gimp.Procedure ?
         self._config.get_values(value_array)
 
         # hack off first element, the *procedure*

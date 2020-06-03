@@ -33,9 +33,9 @@ t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
 _ = t.gettext
 
 
+import logging
 
-
-
+module_logger = logging.getLogger("GimpFu.widgets")
 
 
 class StringEntry(Gtk.Entry):
@@ -149,7 +149,12 @@ class ToggleEntry(Gtk.ToggleButton):
 
 class RadioEntry(Gtk.VBox):
     def __init__(self, default=0, items=((_("Yes"), 1), (_("No"), 0))):
+
+        module_logger.debug(f"RadioEntry: default: {default} items: {items}")
+
         Gtk.VBox.__init__(self, homogeneous=False, spacing=2)
+
+        self.chosen_value = None
 
         # TODO this is not correct
 
@@ -174,14 +179,17 @@ class RadioEntry(Gtk.VBox):
 
             if value == default:
                 button.set_active(True)
-                self.active_value = value
+                self.chosen_value = value
+
+        # require local variable set, i.e. the default matches one of the shown values
+        assert self.chosen_value is not None
 
     def changed(self, radio, value):
         if radio.get_active():
-            self.active_value = value
+            self.chosen_value = value
 
     def get_value(self):
-        return self.active_value
+        return self.chosen_value
 
 
 '''
