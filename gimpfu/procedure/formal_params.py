@@ -16,6 +16,8 @@ class FuFormalParams():
     - keep a list of FuFormalParams
     - fixups on self
     - convey self to Gimp
+
+    A thin wrapper around a list of FuFormalParam
     '''
 
     # Constant class data
@@ -30,6 +32,16 @@ class FuFormalParams():
 
     def __init__(self):
         self.PARAMS= []
+
+
+    # Iterator protocol: delegated to owned list
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        # Python 3, use builtin next(iterator), except Python list is not an iterator
+        return next(iter(self.PARAMS))
+
 
 
     def append(self, *args):

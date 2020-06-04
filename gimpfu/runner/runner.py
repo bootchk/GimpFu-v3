@@ -281,7 +281,7 @@ class FuRunner:
         # args have already been marshalled into native types
         assert isinstance(list_gvalues_all_args, list)
 
-        # To get the Python name of a Gimp.Procedure method,
+        # To know the Python name of a Gimp.Procedure method (e.g. gimp_procedure_get_name)
         # see gimp/libgimp/gimpprocedure.h, and then remove the prefix gimp_procedure_
         name = procedure.get_name()
 
@@ -308,7 +308,7 @@ class FuRunner:
         original_args is-a GimpValueArray
         """
         # config = FuProcedureConfig(procedure, len(list_gvalues_all_args)-2 )
-        config = FuProcedureConfig(procedure, original_args.length() )
+        config = FuProcedureConfig(gf_procedure, procedure, original_args.length() )
         config.begin_run(image, run_mode, original_args)
 
         if isBatch:

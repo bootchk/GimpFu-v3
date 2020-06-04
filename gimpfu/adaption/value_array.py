@@ -92,7 +92,9 @@ class FuValueArray():
             # value_array.append(None)    generates TypeError: unknown type (null) later???
             # Although docs say this creates an uninitialized GValue
 
-            gen_value = FuGenericValue.new_int_gvalue()
+            # TEMP try of type Gimp.Procedure
+            gen_value = FuGenericValue.new_procedure_gvalue()
+            #gen_value = FuGenericValue.new_int_gvalue()
             array.append(gen_value)
 
 

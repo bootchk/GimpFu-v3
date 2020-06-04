@@ -65,7 +65,8 @@ class FuProcedureCreator:
         Author's run_func takes img, drw as first two params
         Gimpfu massages image, drawable, otherArgArray (but omits run_mode) into args to run_func
         '''
-        gf_procedure.convey_procedure_arg_declarations_to_gimp(count_omitted_leading_args=2)
+        gf_procedure.set_nonguiable_arg_count(2)
+        gf_procedure.convey_procedure_guiable_arg_declarations_to_gimp()
         return procedure
 
 
@@ -79,7 +80,8 @@ class FuProcedureCreator:
         '''
         gf_procedure.convey_runmode_arg_declaration_to_gimp()
         # Author formally declared params (image, <gimp_data>)
-        gf_procedure.convey_procedure_arg_declarations_to_gimp()
+        gf_procedure.set_nonguiable_arg_count(0)    # TODO 1 ???
+        gf_procedure.convey_procedure_guiable_arg_declarations_to_gimp()
         return procedure
 
 

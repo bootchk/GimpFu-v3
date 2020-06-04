@@ -79,6 +79,7 @@ class FuFormalParam(GObject.Object):
         """
         v2 LABEL was used.
         v2 LABEL typically, but not required, matches run_func actual arg name.
+        v2 LABEL was a Python symbol (no whitespace or -, allow _ )
 
         Since v3, LABEL is now a gproperty name and can't have spaces.
         Use DESC instead.
@@ -87,7 +88,25 @@ class FuFormalParam(GObject.Object):
         """
         return self.DESC
 
+    @property
+    def gimp_name(self):
+        """ Return a name suiting Gimp/GObject requirement for property name:
+        alphanumeric only, no (space, _, -).
 
+        Implementation: Use LABEL, suitably altered.
+        GimpFu v2 did NOT require LABEL to be a Python symbol (merely a convention.)
+        GimpFu allows almost any string.
+        We allow, and fixup: (space, -, _) but not (tab)
+        """
+
+        result = self.LABEL.replace("_", "")
+        result = result.replace("-", "") # fixup
+        result = result.replace(" ", "") # fixup
+        return result
+
+
+    '''
+    Cruft
     def _get_property_name_to_convey(self):
        """ Returns the name of property.
        All attribues of property do not match properties of self.
@@ -103,6 +122,7 @@ class FuFormalParam(GObject.Object):
            result = FuFormalParam.prop_holder.next_prop_name(type)
        # OR build a dynamic property that describes self
        return result
+   '''
 
     def _set_property_attributes_to_match_self(self, prop_name):
          """
@@ -156,23 +176,28 @@ class FuFormalParam(GObject.Object):
 
 
     def convey_using_dynamic_class_property(self, procedure, is_in_arg):
-        """ convey self implemented using a temp object having one property.
+        """ convey self implemented using a short-lived instance having one property.
 
         Gimp docs say the instance should be a 'config' but it only needs to be any GObject
         """
         type = self._get_type()
         default = self.mangle_default()
         min, max = self.derive_min_max_from_extras()
+        property_name = self.gimp_name
 
+        # OLD
         # produce an instance having a property with an arbitrary name, of given type
-        instance, property_name = FuFormalParam.prop_holder_factory.produce(type, default, min, max)
+        # instance, property_name = FuFormalParam.prop_holder_factory.produce(type, default, min, max)
+
+        # produce an instance having a property with the given attributes
+        instance = FuFormalParam.prop_holder_factory.produce(property_name, type, default, min, max)
 
         if is_in_arg:
             procedure.add_argument_from_property(instance, property_name)
         else:
             procedure.add_return_value_from_property(instance, property_name)
 
-        #instance and property go out of scope
+        #instance and property go out of scope i.e. they were short-lived
 
 
     def convey_to_gimp(self, procedure, index, is_in_arg):

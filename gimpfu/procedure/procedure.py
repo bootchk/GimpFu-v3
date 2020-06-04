@@ -98,7 +98,11 @@ class FuProcedure():
     '''
     Methods that understand what parameters are guiable.
     '''
+    def set_nonguiable_arg_count(self, count):
+        self.metadata.set_nonguiable_arg_count(count)
 
+    # TODO: not used uniformly, see FuFormalParams.get_guiable_params
+    # TODO magic number 2 below duplicated elsewhere, should be in one place
     @property
     def guiable_formal_params(self):
         # computable property
@@ -242,8 +246,8 @@ class FuProcedure():
         self._wrapped_gimp_procedure.add_argument_from_property(prop_holder, "RunmodeProp")
 
 
-    def convey_procedure_arg_declarations_to_gimp(self, count_omitted_leading_args=0 ):
-        self.metadata.convey_in_args_to_gimp(self._wrapped_gimp_procedure, count_omitted_leading_args)
+    def convey_procedure_guiable_arg_declarations_to_gimp(self ):
+        self.metadata.convey_in_args_to_gimp(self._wrapped_gimp_procedure)
 
 
     def convey_return_value_declarations_to_gimp(self):

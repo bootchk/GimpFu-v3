@@ -112,7 +112,8 @@ class FuProcedureMetadata():
         if not self.does_gimpfu_signature_differ_from_gimp_signature:
             self.does_gimpfu_signature_differ_from_gimp_signature = self.params.deriveMissingImageParams(self)
 
-
+    def set_nonguiable_arg_count(self, count):
+        self._nonguiable_arg_count = count
 
     def convey_to_gimp(self, procedure, name):
         ''' convey self to procedure (is-a Gimp.PluginProcedure) '''
@@ -129,9 +130,9 @@ class FuProcedureMetadata():
         procedure.add_menu_path (self.MENUPATH)
 
 
-    def convey_in_args_to_gimp(self, procedure, count_omitted_leading_args):
+    def convey_in_args_to_gimp(self, procedure):
         #    ******                                                                 ****
-        self.params.convey_to_gimp(procedure, count_omitted_leading_args, is_in_arg=True)
+        self.params.convey_to_gimp(procedure, count_omitted_leading_args=self._nonguiable_arg_count, is_in_arg=True)
     def convey_out_args_to_gimp(self, procedure):
         self.results.convey_to_gimp(procedure, count_omitted_leading_args=0, is_in_arg=False)
 
@@ -384,6 +385,12 @@ class FuProcedureMetadata():
     from difference between 2. and 3.
     """
 
+    '''
+    CRUFT see method in FuProcedure
+    def get_guiable_params(self):
+        """ Return list of guiable FuFormalParam. """
+        return self.params[self._nonguiable_arg_count:]
+    '''
 
 
     def get_authors_function(self):

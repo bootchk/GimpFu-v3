@@ -27,7 +27,9 @@ class FuProcedureConfig():
     Persists it at least over a Gimp session,
     so that the user can "Repeat" or "Re-show" a plugin
     and it will use the persisted settings (the last values.)
-    ??? Does Gimp persist across Gimp sessions?
+    Gimp also persists ProcedureConfig across Gimp sessions,
+    so that next time a user uses a plugin, the initial dialog settings match
+    the last use of the dialog in the last session of Gimp.
 
     The algebra of calls is:
         <create a procedure and register its args>
@@ -40,9 +42,9 @@ class FuProcedureConfig():
     A ProcedureConfig owns a GimpValueArray, will get() and set() it.
     """
 
-    # TODO something broken, Gimp throws n_psecs == n_values....
 
-    def __init__(self, procedure, length):
+    def __init__(self, gimpfu_procedure, procedure, length):
+        self._gf_procedure = gimpfu_procedure
         self._procedure = procedure
         self._config = procedure.create_config()
         # Save length, Gimp.ProcedureConfig does not expose it
@@ -55,10 +57,6 @@ class FuProcedureConfig():
         self.logger.debug(f"__init__, length: {length}")
 
 
-    """
-    @property
-    def length():
-    """
 
     def begin_run(self, image, run_mode, args):
         """ Tell Gimp to set self with last values when run_mode is interactive.
@@ -69,10 +67,15 @@ class FuProcedureConfig():
         # require args is-a GValueArray
 
         """
-        TODO, do we need to check runmode, or does Gimp check it and do nothing?
-        """
+        See despeckle.c.  Apparently, you can/should call begin_run no matter the mode.
+        When you call end-run, you will just pass a config that is unchanged by a dialog.
+
         if run_mode == Gimp.RunMode.NONINTERACTIVE:
             return
+
+        TODO what if this procedure is called by another procedure,
+        does that change the settings?
+        """
 
         '''
         args is either:
@@ -82,9 +85,9 @@ class FuProcedureConfig():
         self._config.begin_run (image, run_mode, args)
 
 
-    def _get_values(self):
-        """ Get current values out of self.
-
+    #OLD Abandoned because of difficulties with getting matching types for GValueArray
+    def _get_values_using_config_get_values(self):
+        """
         Implementation: Gimp.ProcedureConfig.get_values is not a getter() but takes mutable arg
         Must pass a GimpValueArray of same length as self
         """
@@ -100,6 +103,36 @@ class FuProcedureConfig():
 
         # assert is same size as can be passed to set_values()
         return value_array
+
+
+    def _get_values_using_config_properties(self):
+        """
+        Return GValueArray of values for *guiable* arguments/properties
+
+        A Gimp.ProcedureConfig has property for each *guiable* arg of procedure.
+
+        Code derived from gimp/plug-ins/common/despeckle.c, which accesses config properties
+        not in a batch, but just whenever dialog widgets have events.
+
+        Implementation: GimpFuProcedure knows GimpFu's metadata for procedure.
+        Iterate over GimpFu metadata, since ProcedureConfig has extra property "procedure"
+        """
+        length = len(self._gf_procedure.guiable_formal_params)
+        result = Gimp.ValueArray.new(length)
+        for formal_param in self._gf_procedure.guiable_formal_params :
+            name = formal_param.gimp_name
+            self.logger.debug(f"get value from property name: {name}")
+            value = self._config.get_property(name)
+            # assert value is-a GValue
+            result.append(value)
+        return result
+
+
+
+    def _get_values(self):
+        """ Get current values out of self. """
+        return self._get_values_using_config_properties()
+
 
 
     def get_initial_settings(self):
@@ -136,9 +169,8 @@ class FuProcedureConfig():
 
 
     def set_changed_settings(self, users_args):
-        """ Put last values of users_args into self. """
+        """ Put last values of users_args (guiable) into self. """
         # require users_args is list of Python typed elements, for guiable args
-        # TODO:
         self.logger.info(f"set_changed_settings, length: {self._length}, len users_args: {len(users_args)}")
 
         # DEBUG
@@ -154,7 +186,7 @@ class FuProcedureConfig():
 
         """
         Get the current values in the Gimp.ProcedureConfig.
-        The values are what existed when Gimp invoked the plugin.
+        The values are still what existed when Gimp invoked the plugin.
         """
         value_array = self._get_values()
 

@@ -265,5 +265,11 @@ class FuGenericValue():
 
     @staticmethod
     def new_int_gvalue():
-        """ Returns a gvalue of type INT and value 1. """
+        """ Return a gvalue of type INT and value 1. """
         return GObject.Value( GObject.TYPE_INT, 1 )
+
+    @staticmethod
+    def new_procedure_gvalue():
+        """ Return a gvalue of type Gimp.Procedure and value 1. """
+        # ??? doesn't work, value must be a procedure?
+        return GObject.Value( Gimp.Procedure, 1 )

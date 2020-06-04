@@ -28,7 +28,6 @@ class PropHolderFactory():
 
 
     def __init__(self):
-        self.counter = 1
 
         self.logger = logging.getLogger("GimpFu.PropHolderFactory")
 
@@ -74,18 +73,15 @@ class Foo(GObject.GObject):
 '''
 
 
-    def get_unique_name(self):
-        """ Generate unique property name, unique over life of factory """
-        result = "DummyProp" + str(self.counter)
-        self.counter += 1
-        return result
 
 
-    def produce(self, type, default, min, max):
+
+    def produce(self, unique_prop_name, type, default, min, max):
 
         # assert type is a Python type
 
-        unique_prop_name = self.get_unique_name()
+        # OLD generate a name
+        # unique_prop_name = name_generator.get_unique_name()
 
         # substitute into template
         # !!! need strings but str() and repr() don't work for type
@@ -121,4 +117,5 @@ class Foo(GObject.GObject):
         instance = Foo()
         # assert instance is-a GObject with property as specified
 
-        return instance, unique_prop_name
+        # OLD also return generated name
+        return instance
