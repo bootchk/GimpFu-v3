@@ -88,7 +88,9 @@ def py_random_shapes(svg_filename, width, height, interation, shape_position, pa
         mySVG.addShape()
 
     del mySVG
-    svgdata = pdb.gimp_file_load(svg_filename, svg_filename)
+    #lkk signature is just (svg_filename)
+    # svgdata = pdb.gimp_file_load(svg_filename, svg_filename)
+    svgdata = pdb.gimp_file_load(svg_filename)
 #    svgdata = pdb.file_svg_load(svg_filename, svg_filename, 72, 400, 400, 0)
 #    svgdata = pdb.gimp_vectors_import_from_string
     disp1 = gimp.Display(svgdata)

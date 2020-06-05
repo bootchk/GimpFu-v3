@@ -91,11 +91,16 @@ class GimpfuPDB():
 
 
     def _adaptor_func(self, *args, **kwargs):
-        ''' run a PDB procedure whose name was used like "pdb.name()" e.g. like a method call of pdb object '''
-        '''
-        args are from author.  That is, they are external (like i/o, beyond our control).
+        """
+        Run a PDB procedure whose name was used like "pdb.name()" e.g. like a method call of pdb object.
+
+        Crux: wrap a call to PDB.run_procedure()
+        Wrapping requires marshalling args from Python types to GObject types.
+        Wrapping also requires inserting run_mode arg (GimpFu hides that from Authors.)
+
+        Args are from Author.  That is, they are external (like i/o, beyond our control).
         Thus we catch exceptions (and check for other errors) and proceed.
-        '''
+        """
 
         self.logger.debug(f"_adaptor_func called, args: {args}")
 
