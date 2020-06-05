@@ -32,34 +32,27 @@ class FormalTypes():
     !!! *G* versus *Gimp*
 
     !!! Not formal_arg_type == GObject.TYPE_FLOAT or formal_arg_type == GObject.TYPE_DOUBLE
+
+    ???? @staticmethod
     '''
-    @staticmethod
-    def is_float_type(formal_arg_type):
-        # use the short name
-        return formal_arg_type.name in ('GParamFloat', 'GParamDouble')
 
-    # TODO missing @staticmethod ?
-    def is_str_type(formal_arg_type):
-        return formal_arg_type.name in ('GParamString', )
-
-    def is_int_type(formal_arg_type):
-        return formal_arg_type.name in ('GParamInt', )
-
-    def is_unsigned_int_type(formal_arg_type):
-        return formal_arg_type.name in ('GParamUInt', )
-
-    def is_unsigned_char_type(formal_arg_type):
-        return formal_arg_type.name in ('GParamUChar', )
-
-    # !!!! GimpParam...
-    def is_float_array_type(formal_arg_type):
-        return formal_arg_type.name in ('GimpParamFloatArray', )
-
+    def is_float_type(formal_arg_type):        return formal_arg_type.name in ('GParamFloat', 'GParamDouble')
+    def is_str_type(formal_arg_type):          return formal_arg_type.name in ('GParamString', )
+    def is_int_type(formal_arg_type):          return formal_arg_type.name in ('GParamInt', )
+    def is_unsigned_int_type(formal_arg_type): return formal_arg_type.name in ('GParamUInt', )
+    def is_unsigned_char_type(formal_arg_type): return formal_arg_type.name in ('GParamUChar', )
+    # !!!! GimpParam... not GParam...
+    def is_float_array_type(formal_arg_type):   return formal_arg_type.name in ('GimpParamFloatArray', )
+    def is_file_descriptor_type(formal_arg_type):
+        # ??? PDB Browser says 'GFile' but is 'GParamObject'
+        # TODO this might be too general, could catch other param types?
+        result = (formal_arg_type.name in ('GParamObject', ))
+        FormalTypes.logger.debug(f"is_file_descriptor_type: {formal_arg_type.name} is: {result}")
+        return result
 
     # TODO rename is_drawable_formal_type
     @staticmethod
     def is_drawable_type(formal_arg_type):
-        # use the short name
         result = formal_arg_type.name in ('GimpParamDrawable', )
         FormalTypes.logger.debug(f"is_drawable_type formal arg name: {formal_arg_type.name} ")
         return result

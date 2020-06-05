@@ -74,7 +74,9 @@ class Types():
 
     @staticmethod
     def try_file_descriptor_conversion(formal_arg_type, gen_value, index):
-        pass # NOT IMPLEMENTED
+        if isinstance(gen_value.actual_arg, str):
+            if FormalTypes.is_file_descriptor_type(formal_arg_type):
+                gen_value.file_descriptor()
 
 
     @staticmethod

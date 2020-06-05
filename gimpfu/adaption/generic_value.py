@@ -6,6 +6,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 from gi.repository import GLib  # GLib.guint ???
+from gi.repository import Gio   # Gio.File
 
 from adapters.rgb import GimpfuRGB
 
@@ -183,6 +184,19 @@ class FuGenericValue():
         # result_arg_type = Gimp.GimpParamFloatArray
 
 
+    def file_descriptor(self):
+        assert isinstance(self._actual_arg, str)
+
+        # create a GObject file descriptor
+        gfile =  Gio.file_new_for_path(self._actual_arg)
+        if gfile is None:
+            proceed_error(f"Failed to create GFile for filename: {self._actual_arg}.")
+        else:
+            self._result_arg = gfile
+            self._result_arg_type = Gio.File
+            self._did_convert = True
+
+
 
 
     def color(self):
@@ -193,7 +207,7 @@ class FuGenericValue():
         # assert RGB_result is-a Gimp.RGB or None
         if not RGB_result:
             # formal arg type is Gimp.RGB but could not convert actual_arg
-            proceed_error("Not convertable to color: {self._actual_arg}.")
+            proceed_error(f"Not convertable to color: {self._actual_arg}.")
             self._did_convert = False
         else:
             self._result_arg = RGB_result
