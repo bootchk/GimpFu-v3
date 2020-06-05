@@ -60,26 +60,25 @@ class Types():
 
 
     @staticmethod
-    def try_float_array_conversion(proc_name, gen_value, index):
+    def try_float_array_conversion(formal_arg_type, gen_value, index):
         ''' Convert list of int to list of float when formal_arg_type requires FloatArray. '''
+        assert formal_arg_type is not None
 
         Types.logger.info(f"try_float_array_conversion {gen_value}")
         if isinstance(gen_value.actual_arg, list):
-            formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
-            if formal_arg_type is not None:
-                # Types.logger.info(formal_arg_type)
-                if FormalTypes.is_float_array_type(formal_arg_type):
-                    gen_value.float_array()
-            else:
-                # Probably too many actual args.
-                # Do not convert type.
-                do_proceed_error(f"Failed to get formal argument type for index: {index}.")
+            # Types.logger.info(formal_arg_type)
+            if FormalTypes.is_float_array_type(formal_arg_type):
+                gen_value.float_array()
         # else not a list i.e. not a Gimp array
 
 
+    @staticmethod
+    def try_file_descriptor_conversion(formal_arg_type, gen_value, index):
+        pass # NOT IMPLEMENTED
+
 
     @staticmethod
-    def try_usual_python_conversion(proc_name, gen_value, index):
+    def try_usual_python_conversion(formal_arg_type, gen_value, index):
         '''
         Perform the usual automatic Python conversion from int to (str, float).
 
@@ -107,31 +106,27 @@ class Types():
         TODO True/False => int
         TODO unsigned 64
         '''
-        formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
 
         Types.logger.info(f" try_usual_python_conversion: actual type: {gen_value} formal type: {formal_arg_type}")
-
         # ("     Formal arg type ", formal_arg_type.name )
-        if formal_arg_type is not None:
-            if gen_value.actual_arg_type is int:
-                if FormalTypes.is_float_type(formal_arg_type):
-                    gen_value.float()
-                elif FormalTypes.is_str_type(formal_arg_type):
-                    gen_value.str()
-                elif FormalTypes.is_unsigned_int_type(formal_arg_type):
-                    gen_value.unsigned_int()
-                elif FormalTypes.is_unsigned_char_type(formal_arg_type):
-                    gen_value.unsigned_char()
-            elif gen_value.actual_arg_type is float:
-                if FormalTypes.is_int_type(formal_arg_type):
-                    gen_value.int()
-                elif FormalTypes.is_str_type(formal_arg_type):
-                    gen_value.str()
-            # else not a usual Python conversion, or doesn't need conversion
-        else:
-            # Probably too many actual args.
-            # Do not convert type.
-            do_proceed_error(f"Failed to get formal argument type for index: {index}.")
+        assert formal_arg_type is not None
+
+        if gen_value.actual_arg_type is int:
+            if FormalTypes.is_float_type(formal_arg_type):
+                gen_value.float()
+            elif FormalTypes.is_str_type(formal_arg_type):
+                gen_value.str()
+            elif FormalTypes.is_unsigned_int_type(formal_arg_type):
+                gen_value.unsigned_int()
+            elif FormalTypes.is_unsigned_char_type(formal_arg_type):
+                gen_value.unsigned_char()
+        elif gen_value.actual_arg_type is float:
+            if FormalTypes.is_int_type(formal_arg_type):
+                gen_value.int()
+            elif FormalTypes.is_str_type(formal_arg_type):
+                gen_value.str()
+        # else not a usual Python conversion, or doesn't need conversion
+
 
 
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
@@ -174,22 +169,19 @@ class Types():
     so that many plugs don't need to do it.
     '''
     @staticmethod
-    def try_upcast_to_type(proc_name, gen_value, index, cast_to_type):
+    def try_upcast_to_type(formal_arg_type, gen_value, index, cast_to_type):
         '''
         When gen_value.actual_arg_type is subclass of cast_to_type
-        and proc_name expects cast_to_type at index,
+        and procedure has signature with formal_arg_type at index (proc expects cast_to_type at index)
         return cast_to_type, else return original type.
         Does not actually change type i.e. no conversion, just casting.
 
         Require gen_value a GObject (not wrapped).
-        Require proc_name a PDB procedure name.
+        Require formal_arg_type is-a GType.
         '''
         # assert type is like Gimp.Drawable, cast_to_type has name like Drawable
 
         Types.logger.info(f"Attempt upcast: {gen_value} to : {cast_to_type.__name__}")
-
-        formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
-        # TODO exception index out of range
 
         if Types._should_upcast_or_convert(gen_value.actual_arg_type, formal_arg_type, cast_to_type):
             if is_subclass_of_type(gen_value.actual_arg, cast_to_type):
@@ -218,20 +210,20 @@ class Types():
 
     # TODO replace this with data driven single procedure
     @staticmethod
-    def try_upcast_to_drawable(proc_name, gen_value, index):
-        Types.try_upcast_to_type(proc_name, gen_value, index, Gimp.Drawable)
+    def try_upcast_to_drawable(formal_arg_type, gen_value, index):
+        Types.try_upcast_to_type(formal_arg_type, gen_value, index, Gimp.Drawable)
 
     @staticmethod
-    def try_upcast_to_item(proc_name, gen_value, index):
-        Types.try_upcast_to_type(proc_name, gen_value, index, Gimp.Item)
+    def try_upcast_to_item(formal_arg_type, gen_value, index):
+        Types.try_upcast_to_type(formal_arg_type, gen_value, index, Gimp.Item)
 
     @staticmethod
-    def try_upcast_to_layer(proc_name, gen_value, index):
-        Types.try_upcast_to_type(proc_name, gen_value, index, Gimp.Layer)
+    def try_upcast_to_layer(formal_arg_type, gen_value, index):
+        Types.try_upcast_to_type(formal_arg_type, gen_value, index, Gimp.Layer)
 
     @staticmethod
-    def try_upcast_to_color(proc_name, gen_value, index):
-        Types.try_upcast_to_type(proc_name, gen_value, index, Gimp.RGB)
+    def try_upcast_to_color(formal_arg_type, gen_value, index):
+        Types.try_upcast_to_type(formal_arg_type, gen_value, index, Gimp.RGB)
         if gen_value.did_upcast:
             # also convert value
             try:

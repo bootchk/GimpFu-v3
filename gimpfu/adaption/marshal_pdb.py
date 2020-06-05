@@ -55,19 +55,28 @@ class MarshalPDB():
         Try a sequence of upcasts and conversions.
         TODO just get the formal argument type and dispatch on it???
         '''
-        Types.try_upcast_to_drawable(proc_name, gen_value, index)
+
+        formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
+        if formal_arg_type is None:
+            # Probably too many actual args.
+            do_proceed_error(f"Failed to get formal argument type for index: {index}.")
+            return
+
+        Types.try_upcast_to_drawable(formal_arg_type, gen_value, index)
         if not gen_value.did_upcast:
-            Types.try_upcast_to_item(proc_name, gen_value, index)
+            Types.try_upcast_to_item(formal_arg_type, gen_value, index)
         if not gen_value.did_upcast:
-            Types.try_upcast_to_layer(proc_name, gen_value, index)
+            Types.try_upcast_to_layer(formal_arg_type, gen_value, index)
         if not gen_value.did_upcast:
-            Types.try_upcast_to_color(proc_name, gen_value, index)
+            Types.try_upcast_to_color(formal_arg_type, gen_value, index)
         if not gen_value.did_upcast:
 
             # Continue trying conversions
-            Types.try_usual_python_conversion(proc_name, gen_value, index)
+            Types.try_usual_python_conversion(formal_arg_type, gen_value, index)
         if not gen_value.did_convert:
-            Types.try_float_array_conversion(proc_name, gen_value, index)
+            Types.try_float_array_conversion(formal_arg_type, gen_value, index)
+        if not gen_value.did_convert:
+            Types.try_file_descriptor_conversion(formal_arg_type, gen_value, index)
 
         # !!! We don't upcast deprecated constant TRUE to G_TYPE_BOOLEAN
 
