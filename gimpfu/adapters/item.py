@@ -48,7 +48,8 @@ class GimpfuItem( Adapter ) :
     Properties
     '''
 
-    # Reason:alias, upper case to lower case
+    # FBC Reason:alias, upper case to lower case
+    # FBC Reason: make readonly.  No setter
     def ID(self):
-        # !!! id is property of Item
+        # !!! id is true property of Item, accessed without parens
         return self._adaptee.id

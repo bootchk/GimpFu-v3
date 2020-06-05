@@ -89,7 +89,8 @@ class FuProcedureConfig():
     def _get_values_using_config_get_values(self):
         """
         Implementation: Gimp.ProcedureConfig.get_values is not a getter() but takes mutable arg
-        Must pass a GimpValueArray of same length as self
+        Must pass a GimpValueArray of same length as self,
+        having GTypes that match formal params
         """
         # TODO magic number 3 accounts for runmode, image, drawable
         # magic number 1 allows for first element *procedure* returned by get_values()

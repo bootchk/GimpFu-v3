@@ -30,9 +30,13 @@ class GimpfuRGB(Adapter):
     '''
 
     """
-    Properties: has none.
-    Inherits dynamic adapted properties from Adapter
+    Properties: r,g,b,a , the same as the Gimp fields.
+    !!! However these are NOT dynamically adapted properties.
     """
+    #@classmethod
+    #def DynamicWriteableAdaptedProperties(cls):
+    #    return ('r', 'g', 'b', 'a' ) + super().DynamicWriteableAdaptedProperties()
+
 
 
     def __init__(self, r=None, g=None, b=None, name=None, a_tuple=None, adaptee=None):
@@ -121,3 +125,21 @@ class GimpfuRGB(Adapter):
             # return an arbitrary color so we can proceed
             result = GimpfuRGB.create_RGB_from_string("orange")
         return result
+
+
+
+
+    '''
+    Properties
+    '''
+
+    # FBC reason: adapt C field to Python property
+    # TODO setters?
+    @property
+    def r(self):  return self._adaptee.r
+    @property 
+    def g(self):  return self._adaptee.g
+    @property
+    def b(self):  return self._adaptee.b
+    @property
+    def a(self):  return self._adaptee.a

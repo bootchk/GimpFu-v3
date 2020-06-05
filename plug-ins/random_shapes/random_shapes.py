@@ -67,7 +67,8 @@ class randomSVG:
         else:
             style = self.get_random_color()
 
-        for i in xrange(0,pdatacount):
+        # lkk xrange->range
+        for i in range(0,pdatacount):
             path_data+=" %s %i %i" % (self.get_random_command(), random.randint(0,self.shape_position), random.randint(0,self.shape_position))
 
         self.data+= "<path d=\"%s\" %s/>\n" % (path_data, style)
@@ -83,7 +84,7 @@ class randomSVG:
 
 def py_random_shapes(svg_filename, width, height, interation, shape_position, palette_colors):
     mySVG = randomSVG(svg_filename, width, height, interation, shape_position, palette_colors)
-    for i in xrange(0,int(interation)):
+    for i in range(0,int(interation)):
         mySVG.addShape()
 
     del mySVG

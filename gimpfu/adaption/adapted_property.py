@@ -31,9 +31,13 @@ class AdaptedProperty():
 
     '''
     Kinds of adapted properties:
-    ReadOnly: get_<property>() defined by adaptee
-    Writeable: set_ and get_<property>() defined by adaptee
-    True:   <property>() defined by adaptee
+      ReadOnly: get_<property>() defined by adaptee
+      Writeable: set_ and get_<property>() defined by adaptee
+      True:   <property>() defined by adaptee
+
+    !!! An AdaptedProperty is NOT an access to a *field* of the adaptee, but a *method* of the adaptee.
+    An AdaptedAdaptee may define properties that give r/w access to fields of property.
+    But it is so rare (see GimpfuRGB) we don't do it programatically.
     '''
 
     '''

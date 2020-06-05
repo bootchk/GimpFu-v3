@@ -84,7 +84,7 @@ class FuValueArray():
             index += 1
         return result
 
-
+    # NOT USED ??
     @classmethod
     def _fill_with_nonce(cls, array, length):
         """ Fill the array with don't care GValues. """
@@ -97,7 +97,7 @@ class FuValueArray():
             #gen_value = FuGenericValue.new_int_gvalue()
             array.append(gen_value)
 
-
+    # NOT USED ??
     @classmethod
     def get_empty_gvalue_array(cls, length):
         """ Return an empty ValueArray.
