@@ -63,29 +63,17 @@ class ColorEntry(Gimp.ColorButton):
 
 
 class FuFontEntry(Gimp.FontSelectButton):
-    def __init__(self, default="", title = "Foo", ):
-        module_logger.debug(f"FuFontEntry: default: {default} title: {title}")
+    def __init__(self, default="" ):
+        module_logger.debug(f"FuFontEntry: default: {default}")
 
-        # ColorButton has no init() method but GTK expects its __init__ to be called ???
-        Gtk.Button.__init__(self)
+        # Gimp.FontSelectButton has no init() method but GTK expects its __init__ to be called ???
+        # Gimp.FontSelectButton inherits Gtk.Widget
+        Gtk.Widget.__init__(self)
 
-        # Gimp requires title, so the pop-up ColorSelector can be titled.
-        # Otherwise, at click time:  gimp_dialog_new: assertion 'title != NULL' failed
-
-        # Here, title is same as label of button
-
-        # ??? Gimp constructor has already thrown
-        # critical : gimp_color_button_set_title: assertion 'title != NULL' failed but works anyway?
-        # We will ignore it.
-
-        self.set_title(title)
-        # self.set_title("Border")
+        # Has no set_title
 
         # set default
         self.set_font(default)
-
-        # cruft from StringEntry
-        #self.set_activates_default(True)
 
     def get_value(self):
         return self.get_font()

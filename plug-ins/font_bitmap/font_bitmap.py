@@ -9,7 +9,9 @@ def prepare_character_array():
     for i in range(0, 16):
         chars = [None] * 16
         for j in range(0, 16):
-            chars[j] = str(unichr(i*16 + j))
+            # lkk python 2 unichr() => python 3 chr()
+            # chars[j] = str(unichr(i*16 + j))
+            chars[j] = str(chr(i*16 + j))
         lines[i] = ''.join(chars);
     return lines
 

@@ -126,7 +126,7 @@ class FuProcedureConfig():
 
             Permanently: return arbitrary GValue so we can proceed.
             """
-            do_proceed_error("Fixing up ProcedureConfig properties")
+            do_proceed_error(f"Fix up ProcedureConfig property name: {name}")
             if name == 'color':
                 result = FuGenericValue.new_rgb_value()
             else:
