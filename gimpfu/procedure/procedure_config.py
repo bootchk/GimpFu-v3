@@ -8,6 +8,9 @@ from adaption.marshal import Marshal
 from adaption.types import Types
 
 from adaption.value_array import FuValueArray
+from adaption.generic_value import FuGenericValue
+
+from message.proceed_error import do_proceed_error
 
 import logging
 
@@ -105,6 +108,34 @@ class FuProcedureConfig():
         # assert is same size as can be passed to set_values()
         return value_array
 
+    def _get_property_value(self, name):
+        """ Get value of property of self.
+
+        Catching exceptions with fixup and proceed.
+        """
+        self.logger.debug(f"_get_property_value name: {name}")
+        try:
+            result = self._config.get_property(name)
+        except TypeError:
+            """ Usually property not exist.
+            Because failed to convey args to Gimp.
+            Because of current limitations of patches to Gimp.
+            "GParamBoxed is not handled"
+
+            Temporarily: fix Gimp.RGB for 'color' arg/property.
+
+            Permanently: return arbitrary GValue so we can proceed.
+            """
+            do_proceed_error("Fixing up ProcedureConfig properties")
+            if name == 'color':
+                result = FuGenericValue.new_rgb_value()
+            else:
+                result = FuGenericValue.new_int_gvalue()
+        # ensure result is-a GValue
+        return result
+
+
+
 
     def _get_values_using_config_properties(self):
         """
@@ -122,8 +153,7 @@ class FuProcedureConfig():
         result = Gimp.ValueArray.new(length)
         for formal_param in self._gf_procedure.guiable_formal_params :
             name = formal_param.gimp_name
-            self.logger.debug(f"get value from property name: {name}")
-            value = self._config.get_property(name)
+            value = self._get_property_value(name)
             # assert value is-a GValue
             result.append(value)
         return result

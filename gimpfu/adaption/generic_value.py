@@ -283,6 +283,12 @@ class FuGenericValue():
         return GObject.Value( GObject.TYPE_INT, 1 )
 
     @staticmethod
+    def new_rgb_value():
+        """ Return a gvalue of type Gimp.RGB and value black. """
+        color = GimpfuRGB.color_from_python_type("black")
+        return GObject.Value( Gimp.RGB, color )
+
+    @staticmethod
     def new_procedure_gvalue():
         """ Return a gvalue of type Gimp.Procedure and value 1. """
         # ??? doesn't work, value must be a procedure?

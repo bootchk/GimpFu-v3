@@ -189,7 +189,7 @@ _edit_map = {
         # Widgets provided by Gimp for Gimp data objects?
         # "data" objects are loaded at run-time, not as ephemeral
         # i.e. configured, static data of the app
-        PF_FONT        : StringEntry,
+        PF_FONT        : FuFontEntry,
         PF_BRUSH       : StringEntry,
         PF_PATTERN     : StringEntry,
         PF_GRADIENT    : StringEntry,

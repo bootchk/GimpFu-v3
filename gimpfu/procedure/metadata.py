@@ -285,8 +285,10 @@ class FuProcedureMetadata():
 
         # Deprecated Since 2.8.
         # No longer the case that they should be in <File>/New as some docs say???
-
-        if self.MENUPATH.startswith("<Toolbox>/Xtns") :
+        if self.MENUPATH.startswith("<Toolbox>/Xtns/Languages/Python-Fu") :
+            self.MENUPATH = self.MENUPATH.replace("<Toolbox>/Xtns/Languages/Python-Fu", "<Image>/Filters/Extensions")
+            Deprecation.say("Replaced menu path <Toolbox>/Xtns/Languages/Python-Fu with: <Image>/Filters/Extensions")
+        elif self.MENUPATH.startswith("<Toolbox>/Xtns") :
             self.MENUPATH = self.MENUPATH.replace("<Toolbox>/Xtns", "<Image>/Filters/Extensions")
             Deprecation.say("Replaced menu path <Toolbox>/Xtns with: <Image>/Filters/Extensions")
         elif self.MENUPATH.startswith("<Toolbox>") :
