@@ -22,6 +22,10 @@ Tests do NOT test semantics:
 FUTURE more fuzzy: pass edge case values
 """
 
+import gi
+from gi.repository import GObject
+from gi.repository import Gio   # Gio.File
+
 
 from gimpfu import *
 
@@ -206,7 +210,7 @@ def plugin_main(image, drawable):
     """
 
     # Generate named data in Gimp
-    generateFooGimpData()
+    generateFooGimpData(drawable)
 
     """
     Generate instances (passed as args to PDB procedures, not by a name known to Gimp).
@@ -217,7 +221,21 @@ def plugin_main(image, drawable):
     # GimpFu notation, not gi
     fooVectors = gimp.Vectors(image, "foo")
 
-    # Note testing undo.  Disable it for speed.
+    global fooFile
+     # create a GObject file descriptor
+
+    # create a named file
+    # fooFile = Gio.file_new_for_path("/work/foo")
+
+    fooFile, stream = Gio.file_new_tmp(None)
+    assert fooFile is not None
+
+    # fooFile is-a GLocalFile, i.e. file doesn't exist yet if path is malformed
+    # create the file?
+    print(fooFile.__gtype__, stream.__gtype__)
+    #raise Exception
+
+    # Not testing undo.  Disable it for speed.
     pdb.gimp_image_undo_disable(image)
 
     # Success on many tested procedures depends on existence of certain things

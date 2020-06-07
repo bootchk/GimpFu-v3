@@ -75,12 +75,15 @@ def generateParamString(procName, inParamList,  image, drawable):
         elif aType == "GimpParamVectors" :
             # refer to test harness object
             result = appendParameter(result, 'fooVectors')
+        elif aType == "GParamObject" :
+            # Usually a GFile
+            # refer to test harness object
+            result = appendParameter(result, 'fooFile')
 
         # TODO more types
         # GimpParamParasite
         # GimpParamUInt8Array 10
         # GimpParamChannel 12
-        # GParamObject 132 usually a file
         # GimpParamUnit 13
         # GimpParamVectors 23
         # GimpParamDisplay 2

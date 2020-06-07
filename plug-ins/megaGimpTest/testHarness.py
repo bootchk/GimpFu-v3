@@ -1,7 +1,7 @@
 
 from gimpfu import *
 
-def generateFooGimpData():
+def generateFooGimpData(drawable):
     """ Generate into Gimp, instances of various kinds, each instance named "foo"
 
     To be used as data for testing.
@@ -71,9 +71,13 @@ def generateFooGimpData():
     # vectors
     # tattoo
 
-    # buffer
-    # TODO gimp_drawable_get_buffer
-    # gimp_buffer_rename buffer_rename(buffer_name, new_name):
+    # buffer: this is a edit buffer from a cut/copy
+    # FAIL: gone in v3?  buffer = pdb.gimp_drawable_get_buffer(drawable)
+    result = pdb.gimp_edit_copy(drawable)   # buffer from selection
+    buffers = pdb.gimp_buffers_get_list("")
+    print(f"Buffers: {buffers}")
+    # TODO is returning a list of length 0 of type GimpStringArray which GimpFu doesn't handle
+    #pdb.gimp_buffer_rename(old, "foo")
 
     # TODO curve, dynamics, pattern NOT have same approximation
 
