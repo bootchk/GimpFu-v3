@@ -74,12 +74,13 @@ register(
 	"2016",
 	_("<Image>/Image/Trim to size"),
 	"*",
+    # lkk give unique names to formal parameters, number2 and option2
 	[
 		(PF_INT, "number", _("Width"), 1280),
-		(PF_INT, "number", _("Height"), 625),
+		(PF_INT, "number2", _("Height"), 625),
 		(PF_BOOL, "scale", _("Allow scaling"), True),
 		(PF_OPTION, "option", _("Horizontal alignment:"), 1, (_("Left"), _("Center"), _("Right") )),
-		(PF_OPTION, "option", _("Vertical alignment:"), 1, (_("Top"), _("Middle"), _("Bottom") ))
+		(PF_OPTION, "option2", _("Vertical alignment:"), 1, (_("Top"), _("Middle"), _("Bottom") ))
 	],
 	[],
 	trim_to_size,

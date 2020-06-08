@@ -188,8 +188,18 @@ Note that the first uses "HSL" instead of "HSV" colorspace (it always has, even 
 TODO other model changes
 
 
+Changes to GimpFu formal declaration of plugin characteristics.
+---------------------------------------------------------------
+
+Using GimpFu, a plugin author formally declares the characteristics of a plugin
+in arguments to the register() function.
+
+One argument is a list of tuples formally declaring the parameters to a plugin,
+each tuple starting with a PF_xxx constant.
+
+
 Gimp Menu Path Names
---------------------
+=====================
 
 A plugin declares a MenuItem name and a MenuPath name
 
@@ -201,6 +211,38 @@ But <Filters> also works.  And <Filters/Foo>
 
 Note that e.g. Layers is not the "Layer" menu in the menubar, but the popup menu in Gimp's "Layers" dockable dialog.
 Use RMB to popup the menu.
+
+The best reference explaining menu paths is this document:  TODO
+
+Plugin formal parameter names
+=============================
+
+In GimpFu v2, the name of a formal parameter (the second element of the declaring tuple)
+could contain spaces, and was not required to be unique.
+The names were not used in GimpFu.
+The formal parameters were required to be in the same order as
+the actual parameters of the plugin run_func
+but the formal and actual names did not need to match.
+(Also Gimp one-to-one correspondence
+
+In GimpFu v3, the name of a formal parameter *should* not contain spaces
+but FBC GimpFu v3 allows spaces, and fixes them.
+
+In GimpFu v3, the name of a plugin's formal parameter *must* be unique.
+(Since Gimp uses the names to create GObject properties on the plugin.)
+(an enhancement to GimpFu v3 could change this.)
+
+GimpFu v3 still does not require the formal (in register())
+match the actual (in the run_func) parameter names
+(but there is no reason for an author not to match the names.)
+
+(
+GimpFu v2 and v3 also allow some mandatory formal parameters (image and drawable) to be omitted.
+
+GimpFu v2 and v3 always hide the need for the run_mode parameter to plugins.
+)
+
+
 
 
 The gimp and pdb aliases
@@ -301,7 +343,8 @@ The attributes of GimpFu objects can still be accessed using property notation
 without parens
 e.g. timg.width
 Using GI, Gimp object properties are accessed using getter call notation
-e.g. if timg has type Gimp.Image, use timg.width() , with parenthesis.
+e.g. if timg has type Gimp.Image, use timg.width(), *with parenthesis*,
+or even timg.get_width(), *with 'get_' prefix and parenthesis.*
 
 
 Nested calls to gimp
