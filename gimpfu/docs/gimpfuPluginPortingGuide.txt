@@ -281,6 +281,12 @@ In short, GimpFu v3 supports most the enums of v2.  You need to change little.
 
 GimpFu v2 and v3 define enums to be used with Gimp.
 They are all caps, e.g. FILL_TRANSPARENT.
+They can be used without a prefix e.g. don't use gimp.FILL_TRANSPARENT
+
+The enums TRUE and FALSE are obsolete in GimpFu v3.
+Use the Python literals True and False.
+(TRUE and FALSE have ancestry in ancient C code.
+It is better to convert to modern usage now, than to continue with confusing symbols.)
 
 Their spelling does not always correspond to the spelling used in the Gimp API.
 For example, Gimp defines BACKGROUND but GimpFu defines BACKGROUND_FILL.

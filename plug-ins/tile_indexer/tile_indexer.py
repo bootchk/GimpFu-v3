@@ -97,10 +97,11 @@ register(
     '*',
     [
         # lkk default tile size larger for testing convenience
+        # lkk TRUE => True
         (PF_SPINNER, 'tileWidth', 'Tile Width:', 512, (1, 512, 1)),
         (PF_SPINNER, 'tileHeight', 'Tile Height:', 512, (1, 512, 1)),
         (PF_COLOR, 'color', 'Color:', (255, 255, 255)),
-        (PF_TOGGLE, 'shouldAddIndices', 'Add Indices:', TRUE),
+        (PF_TOGGLE, 'shouldAddIndices', 'Add Indices:', True),
         (PF_FONT, 'font', 'Font:', 'Sans Bold'),
         (PF_SPINNER, 'fontSize', 'Font Size (Pixels):', 16, (1, 48, 1))
     ],

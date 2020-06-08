@@ -80,6 +80,8 @@ class Foo(GObject.GObject):
 
         # assert type is a Python type
 
+        self.logger.info(f"Producing property type: {type} default: {default}, min: {min}, max: {max}")
+
         # OLD generate a name
         # unique_prop_name = name_generator.get_unique_name()
 
@@ -88,7 +90,7 @@ class Foo(GObject.GObject):
         # dispatch on type
         if type is int:
             if not (isinstance(default, int) or isinstance(default, bool)):
-                raise RuntimeError(f"default: {default} should be of type int.")
+                raise RuntimeError(f"default: {default} having type: {type(default)} class: {default.__class__}, should be of type int.")
             template = string.Template(self.template_string_numeric)
             code_string = template.substitute(type="int", name=unique_prop_name, default=default, min=min, max=max)
         elif type is float:
@@ -107,7 +109,6 @@ class Foo(GObject.GObject):
             # fatal, useless to proceed if we can't convey args to Gimp
             raise RuntimeError(f"Unhandled property type: {type}")
 
-        self.logger.info(f"Producing property type: {type} default: {default}, min: {min}, max: {max}")
         self.logger.info(f"exec( {code_string} )")
 
         # create class Foo in globals by exec template
