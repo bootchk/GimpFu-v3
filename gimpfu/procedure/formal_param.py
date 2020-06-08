@@ -352,7 +352,7 @@ extras type   example
 0            no extras (typically string or other non-ordered types)
 1            (min, max, default)
 2            (("label", min), ("label", max))
-3            ("label", ...)
+3            ("label", ...)  each label is name of an int-valued choice
 """
 map_PF_TYPE_to_extras_type = {
     PF_INT8:      1,
@@ -371,8 +371,8 @@ map_PF_TYPE_to_extras_type = {
     PF_CHANNEL:   int,
     PF_DRAWABLE:  int,
     PF_VECTORS:   int,
-    PF_TOGGLE:    int,
-    PF_BOOL:      2,
+    PF_TOGGLE:    int, # int/bool valued checkbox or toggle widget
+    PF_BOOL:      2,  # alias for TOGGLE
     PF_SLIDER:    1,
     PF_SPINNER:   1,
     PF_ADJUSTMENT: 1,
@@ -386,5 +386,5 @@ map_PF_TYPE_to_extras_type = {
     PF_PALETTE:   int,
     PF_FILENAME:  0,
     PF_DIRNAME:   0,
-    PF_OPTION:    3,    # checkboxes?
+    PF_OPTION:    3,    # alias for RADIO
 }

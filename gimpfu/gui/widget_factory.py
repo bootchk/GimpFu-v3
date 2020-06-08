@@ -51,6 +51,12 @@ class WidgetFactory:
         return result
 
 
+    def _enumerate_names(names_tuple):
+        result = [(count, name) for name, count in enumerate(names_tuple)]
+        # assert result like [(name1, 0), (name2, 1), ...]
+        return result
+
+
     def _get_args_for_widget_constructor(formal_param, widget_initial_value):
         ''' Get args for a widget constructor from formal spec.
         Override formal declaration of default with widget_initial_value.
@@ -69,8 +75,16 @@ class WidgetFactory:
         if pf_type in ( PF_RADIO, ):
             """
             widget_initial_value is-a int?? Allow string values???
+
+            EXTRAS is tuple of tuples: ((name, value), ...)
             """
             args = [widget_initial_value, formal_param.EXTRAS]
+        elif pf_type in ( PF_OPTION, ):
+            """
+            EXTRAS is tuple of names without values: (name, ...)
+            """
+            # Enumerate the names into tuple of name/value pairs
+            args = [widget_initial_value, WidgetFactory._enumerate_names(formal_param.EXTRAS)]
         elif pf_type in (PF_FILE, PF_FILENAME):
             # args template [<title>, <default>]
 
@@ -81,7 +95,7 @@ class WidgetFactory:
             # args = [formal_param.LABEL, "/tmp/lkkfoopluginout"]
 
             args = [formal_param.LABEL, widget_initial_value]
-        elif pf_type in (PF_INT, PF_INT8, PF_INT16, PF_INT32, PF_STRING, PF_BOOL, PF_OPTION, PF_FONT, PF_TEXT ):
+        elif pf_type in (PF_INT, PF_INT8, PF_INT16, PF_INT32, PF_STRING, PF_BOOL, PF_FONT, PF_TEXT ):
             args = [widget_initial_value]
         elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER, PF_ADJUSTMENT):
             # Hack, we are using FloatEntry, should use Slider???
@@ -150,7 +164,7 @@ _edit_map = {
         # checkbox
         # both return bool,  just different widgets?
         PF_BOOL        : ToggleEntry,
-        PF_TOGGLE      : ToggleEntry,
+        PF_TOGGLE      : ToggleEntry,  # alias for PF_BOOL
 
         # TODO slider and spinner floats, or int?
         PF_FLOAT       : FloatEntry,
@@ -159,20 +173,20 @@ _edit_map = {
         PF_ADJUSTMENT  : FloatEntry,
 
         # radio buttons, set of choices
-        PF_RADIO       : RadioEntry,
+        PF_RADIO       : RadioEntry,  # radio button group where values are declared
+        # pull down option menu widget
+        # TODO Now look-and-feel is radio button group, should be a different look-and-feel
+        PF_OPTION      : RadioEntry,  # alias for PF_RADIO, but values not declared, always int-valued
 
         # PF_COLOUR is deprecated alias for PF_COLOR
         PF_COLOR       : ColorEntry,
-        PF_COLOUR      : OmittedEntry,
+        PF_COLOUR      : ColorEntry,
 
         # TODO is PF_FILENAME deprecated alias for PF_FILE?
         PF_FILE        : FuFileEntry,
         PF_FILENAME    : FuFileEntry,
         # TODO how specialize to directory
         PF_DIRNAME     : FuFileEntry,
-
-        # meaning ?
-        PF_OPTION      : OmittedEntry,
 
         # ??? meaning?
         PF_VALUE       : OmittedEntry,
