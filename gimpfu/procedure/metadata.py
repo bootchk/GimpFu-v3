@@ -153,11 +153,17 @@ class FuProcedureMetadata():
 
     @property
     def is_context_procedure_type(self):
-        ''' Installs to context menu for Path (Vectors), receives current selected Vectors
+        ''' Installs to a context menu, receives current selected item from said menu.
+        where context menu for items:
+        - Gimp data not specific to an image e.g. Brush
+        - data created on a specific image, but not pixel data e.g. Vectors
+        - structures of a specific image e.g. Layer
         '''
         assert self.MENUPATH is not None
         result = ( self.MENUPATH.startswith("<Vectors>")
-                or self.MENUPATH.startswith("<Layers>")  )
+                or self.MENUPATH.startswith("<Layers>")
+                or self.MENUPATH.startswith("<Palettes>")
+                )
         return result
         #TODO: other gimp_data monikers e.g. Brush
 

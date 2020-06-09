@@ -30,7 +30,7 @@ Hides:
 - GimpFu's hiding of runmode
 - GimpFu's messaging
 
-Class was developed to extract code formerly in gimpfu_top
+Class was extracted from code formerly in gimpfu_top
 """
 
 class FuRunner:
@@ -38,7 +38,7 @@ class FuRunner:
     logger = logging.getLogger('GimpFu.FuRunner')
 
     @staticmethod
-    def _try_run_func(proc_name, function, args, display):
+    def _try_run_func(proc_name, function, args):
         '''
         Run the plugin's run_func with args, catching exceptions.
         Return result of run_func.
@@ -53,8 +53,7 @@ class FuRunner:
             # Show dialog here, or pass exception string back to Gimp???
             from gui.exception_dialog import ExceptionDialog
 
-            if display:
-                ExceptionDialog.show(proc_name, display)
+            ExceptionDialog.show(proc_name)
 
             exc_str, exc_only_str = ExceptionDialog.create_exception_str()
 
@@ -80,16 +79,18 @@ class FuRunner:
 
         Returns (was_canceled, (results of run_func or None))
         '''
-        FuRunner.logger.info(f"_interact, {procedure}, {list_gvalues_all_args}")
-
-        # get name from instance of Gimp.Procedure
-        proc_name = procedure.get_name()
-
+        '''
+        Note display/window is global state, not passed.
         # TODO assume first arg is likely an image
         # display = Display.get(proc_name, list_gvalues_all_args[0])
 
         from gui.display import Display
         display = Display.get_window(proc_name)
+        '''
+        FuRunner.logger.info(f"_interact, {procedure}, {list_gvalues_all_args}")
+
+        # get name from instance of Gimp.Procedure
+        proc_name = procedure.get_name()
 
         gf_procedure = FuProcedures.get_by_name(proc_name)
 
@@ -124,11 +125,11 @@ class FuRunner:
 
 
         if len(guiable_formal_params) == 0:
-            # Just execute, don't open ControlDialog, but display ExceptionDialog
+            # Just execute, don't open ControlDialog, but may show ExceptionDialog
             FuRunner.logger.info("no guiable parameters")
             was_canceled = False
             # !!! no gui can change the in_args
-            result = FuRunner._try_run_func(proc_name, function, wrapped_in_actual_args, display)
+            result = FuRunner._try_run_func(proc_name, function, wrapped_in_actual_args)
         else:
             # create GUI from guiable formal args, let user edit actual args
 
@@ -170,7 +171,7 @@ class FuRunner:
                 FuRunner.logger.info(f"Wrapped args to run_func, {wrapped_run_args}" )
 
                 # !!! with args modified since passed in
-                result = FuRunner._try_run_func(proc_name, function, wrapped_run_args, display)
+                result = FuRunner._try_run_func(proc_name, function, wrapped_run_args)
             else:
                 # Don't save any gui changes to args
                 result = None
@@ -249,18 +250,22 @@ class FuRunner:
         Rearrange args to fit _run_procedure_in_mode()
         '''
         list_gvalues_all_args = Marshal.convert_gimpvaluearray_to_list_of_gvalue(original_args)
-        # assert is (runmode, image, <Gimp data object>)
+        # assert is (runmode, image, <Gimp data object>, guiable_args)
+        FuRunner.logger.info(f"run_context_procedure, args: {list_gvalues_all_args}")
+
+        # context_procedure may have a run-mode
+        run_mode = list_gvalues_all_args[0]  # Gimp.RunMode.NONINTERACTIVE
 
         # GimpFu always hides run mode, delete first element
         list_gvalues_all_args.pop(0)
 
-        # this type of procedure always NONINTERACTIVE
-        run_mode = Gimp.RunMode.NONINTERACTIVE
-
-        # TODO this type of procedure always passed image in the first element of GimpValueArray
         image = list_gvalues_all_args[0]
+        assert ((image is None) or isinstance(image, Gimp.Image))
 
-        result = FuRunner.FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
+        # assert list_gvalues_all_args[1] is an instance or name of isinstance
+        # that was selected by user from a context menu e.g. Vectors or Brush
+
+        result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
         return result
 
 

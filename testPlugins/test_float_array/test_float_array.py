@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 
 import gi
 gi.require_version('Gimp', '3.0')

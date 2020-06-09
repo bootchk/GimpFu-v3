@@ -329,6 +329,8 @@ register(
     N_("_Sort Palette v3..."),
     "",
     [
+        # lkk add image param
+        (PF_IMAGE, "img", "Selected Image", None),
         (PF_PALETTE, "palette",  _("Palette"), ""),
         (PF_OPTION, "selections", _("Se_lections"), SELECT_ALL,
                     (_("All"), _("Slice / Array"), _("Autoslice (fg->bg)"),

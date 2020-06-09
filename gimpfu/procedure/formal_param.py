@@ -310,6 +310,7 @@ v2 allowed PF_RADIO to be str or int type.
 See special case
 """
 map_PF_TYPE_to_type = {
+    # fundamental types, with simple look-and-feel widgets
     PF_INT8:      int,
     PF_INT16:     int,
     PF_INT32:     int,
@@ -317,6 +318,9 @@ map_PF_TYPE_to_type = {
     PF_FLOAT:     float,
     PF_STRING:    str,
     PF_VALUE:     int,
+    PF_TEXT:      str,
+    PF_BOOL:      int,
+    # Gimp types, with chooser widgets, often Gimp widgets
     PF_COLOR:     "Gimp.RGB",  # tuple?
     PF_COLOUR:    "Gimp.RGB",
     PF_ITEM:      "Gimp.Item",
@@ -326,22 +330,29 @@ map_PF_TYPE_to_type = {
     PF_CHANNEL:   "Gimp.Channel",
     PF_DRAWABLE:  "Gimp.Drawable",
     PF_VECTORS:   "Gimp.Vectors",
+    # constrained (by EXTRAS) fundamental types,
+    # but with sophisticated look-and feel widgets
+    # that do the constraining
     PF_TOGGLE:    int,
-    PF_BOOL:      int,
     PF_SLIDER:    float,
     PF_SPINNER:   float,
     PF_ADJUSTMENT: int,
-    PF_FONT:      str,
-    PF_FILE:      str,  # ??? GFile?
-    PF_BRUSH:     int,  # ???
-    PF_PATTERN:   int,  # ???
-    PF_GRADIENT:  int,  # ???
+    PF_OPTION:    int,
     PF_RADIO:     int,
-    PF_TEXT:      str,
-    PF_PALETTE:   int,  # ???
+    # Gimp resource objects, identified by name of type str
+    # !!! No Gimp type.
+    # Sophisticated look-and_feel widgets provided by Gimp
+    # Widgets all have .get_<foo> methods returning str
+    PF_BRUSH:     str,
+    PF_FONT:      str,
+    PF_GRADIENT:  str,
+    PF_PALETTE:   str,
+    PF_PATTERN:   str,
+
+    PF_FILE:      str,  # ??? GFile?
     PF_FILENAME:  str,
     PF_DIRNAME:   str,
-    PF_OPTION:    int,
+
 }
 
 """

@@ -52,7 +52,8 @@ class Display:
         Gimp.ui_init(proc_name)
 
         display = Gimp.default_display()
-        # assert display is-a Gimp.Display
+        assert display is not None
+        assert isinstance(display, Gimp.Display)
 
         result = Gimp.ui_get_display_window(display)
 

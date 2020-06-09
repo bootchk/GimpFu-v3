@@ -209,6 +209,7 @@ _edit_map = {
         PF_GRADIENT    : StringEntry,
         # formerly gimpui.palette_selector
         # Now I think palette is a parameter, but should not have a control?
-        # since the currently selected palette in palette dialog is passed?
+        # since the currently selected palette in palette dialog is passed for context menu plugins?
+        # Still could have a use by other plugins?
         PF_PALETTE     : OmittedEntry,
         }

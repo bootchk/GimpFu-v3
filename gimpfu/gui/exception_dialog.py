@@ -42,7 +42,7 @@ class ExceptionDialog:
     TODO not tested
     '''
     @staticmethod
-    def _create_error_dialog(proc_name, parent):
+    def _create_error_dialog(proc_name):
         ''' Return error dialog containing Python trace for latest exception '''
 
         exc_str, exc_only_str =  ExceptionDialog.create_exception_str()
@@ -108,11 +108,11 @@ class ExceptionDialog:
 
     # v3 exported.  v2 private
     @staticmethod
-    def show(proc_name, parent_window):
+    def show(proc_name):
         ''' Display error dialog, parented. '''
         # require GTK is running.
 
-        error_dialog = ExceptionDialog._create_error_dialog(proc_name, parent_window,)
+        error_dialog = ExceptionDialog._create_error_dialog(proc_name)
         error_dialog.show()
 
         # Enter event loop, does not return until user chooses OK

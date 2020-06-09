@@ -79,8 +79,8 @@ class FuProcedureCreator:
         Gimp plugin operating on a gimp-data instance requires (runmode, image, gimp_data)
         '''
         gf_procedure.convey_runmode_arg_declaration_to_gimp()
-        # Author formally declared params (image, <gimp_data>)
-        gf_procedure.set_nonguiable_arg_count(0)    # TODO 1 ???
+        # Author formally declared params (image, <gimp_data>, guiable_args)
+        gf_procedure.set_nonguiable_arg_count(0)    # TODO 0, 1 ???
         gf_procedure.convey_procedure_guiable_arg_declarations_to_gimp()
         return procedure
 
