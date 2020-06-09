@@ -113,6 +113,8 @@ class WidgetFactory:
         elif pf_type in (PF_PALETTE,):
             # TODO hack, should not even be a control
             # Omitted, use None
+            args = [widget_initial_value,]
+        elif pf_type in (PF_IMAGE,):
             args = [None,]
         else:
             # PF_SPINNER,, PF_OPTION
@@ -194,7 +196,7 @@ _edit_map = {
         # Widgets provided by Gimp for Gimp ephemeral objects
         PF_ITEM        : OmittedEntry,
         PF_DISPLAY     : OmittedEntry,
-        PF_IMAGE       : OmittedEntry,
+        PF_IMAGE       : FuImageEntry,
         PF_LAYER       : OmittedEntry,
         PF_CHANNEL     : OmittedEntry,
         PF_DRAWABLE    : OmittedEntry,
@@ -211,5 +213,5 @@ _edit_map = {
         # Now I think palette is a parameter, but should not have a control?
         # since the currently selected palette in palette dialog is passed for context menu plugins?
         # Still could have a use by other plugins?
-        PF_PALETTE     : OmittedEntry,
+        PF_PALETTE     : FuPaletteEntry,
         }

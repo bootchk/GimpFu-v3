@@ -78,6 +78,40 @@ class FuFontEntry(Gimp.FontSelectButton):
     def get_value(self):
         return self.get_font()
 
+class FuImageEntry(Gimp.ImageComboBox):
+    def __init__(self, default="" ):
+        module_logger.debug(f"FuImageEntry: default: {default}")
+
+        # Gimp.FontSelectButton has no init() method but GTK expects its __init__ to be called ???
+        # Gimp.FontSelectButton inherits Gtk.Widget
+        Gtk.Widget.__init__(self)
+
+        # Has no set_title
+
+        # TODO self.set_font(default)
+
+    def get_value(self):
+        # TODO gir shows no methods??
+        # return self.get_image()
+        return None
+
+
+class FuPaletteEntry(Gimp.PaletteSelectButton):
+    def __init__(self, default="" ):
+        module_logger.debug(f"FuPaletteEntry: default: {default}")
+
+        # Gimp.FontSelectButton has no init() method but GTK expects its __init__ to be called ???
+        # Gimp.FontSelectButton inherits Gtk.Widget
+        Gtk.Widget.__init__(self)
+
+        # Has no set_title
+
+        self.set_palette(default)
+
+    def get_value(self):
+        return self.get_palette()
+
+
 
 
 

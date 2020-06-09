@@ -56,6 +56,7 @@ def to_hsl(v, i):
 
 
 def to_yiq(v, i):
+    # lkk v is-a GimpfuRGB
     return rgb_to_yiq(*v[:-1])
 
 
@@ -180,8 +181,8 @@ def quantization_grain(channel, g):
         g = max(0.00001, GRAIN_SCALE[channel] / g)
     return g
 
-
-def palette_sort(palette, selection, slice_expr, channel1, ascending1,
+# lkk add image parameter temporarily?
+def palette_sort(image, palette, selection, slice_expr, channel1, ascending1,
                  channel2, ascending2, quantize, pchannel, pquantize):
 
     grain1 = quantization_grain(channel1, quantize)

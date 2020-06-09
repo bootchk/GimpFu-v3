@@ -80,11 +80,23 @@ class GimpfuRGB(Adapter):
         # TODO field alpha?
         return f"GimpfuRGB {self._adaptee.r} {self._adaptee.g} {self._adaptee.b}"
 
+    # subscriptable protocol
+    def __getitem__(self, key):
+        if key==0: result = self.r
+        elif key==1: result = self.g
+        elif key==2: result = self.b
+        elif key==3: result = self.a
+        else: raise RuntimeError(f"GimpfuRGB: Subscript out of range: {key}")
+        return result
+
+
+
+
 
     @classmethod
     def create_RGB_from_string(cls, colorName):
         """ Create a Gimp.RGB from a string. """
-        result = Gimp.RGB()
+        Gimp.RGB()
         # TODO Gimp.RGB.parse_name does what when colorName invalid?
         # the GIR doc does not say what
         # result.parse_name(colorName, -1)  # -1 means null terminated
@@ -100,8 +112,7 @@ class GimpfuRGB(Adapter):
         Expects a 3-tuple.
         If tuple has less than three items, will raise Exception
         If tuple has more than three items, will use the first three.
-
-
+        TODO alpha?
         """
         result = Gimp.RGB()
         # upcast to type float when type int was passed
@@ -137,7 +148,7 @@ class GimpfuRGB(Adapter):
     # TODO setters?
     @property
     def r(self):  return self._adaptee.r
-    @property 
+    @property
     def g(self):  return self._adaptee.g
     @property
     def b(self):  return self._adaptee.b
