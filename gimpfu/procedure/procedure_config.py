@@ -122,11 +122,14 @@ class FuProcedureConfig():
             Because of current limitations of patches to Gimp.
             "GParamBoxed is not handled"
 
-            Temporarily: fix Gimp.RGB for 'color' arg/property.
+            Temporarily:
+            Most often it the property is type Gimp.RGB for 'color' arg/property,
+            so patch it.
+            But also the property type may be Gimp.Image and others, unfixed.
 
             Permanently: return arbitrary GValue so we can proceed.
             """
-            do_proceed_error(f"Fix up ProcedureConfig property name: {name}")
+            do_proceed_error(f"GimpFu failed to register with Gimp property name: {name}.")
             if name == 'color':
                 result = FuGenericValue.new_rgb_value()
             else:

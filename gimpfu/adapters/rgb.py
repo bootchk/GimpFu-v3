@@ -17,10 +17,18 @@ An author can use Gimp.RGB directly.
 But if we find any wild plugins that refer to gimp.Color??
 """
 
+"""
+# TODO:
+Adapt Gimp.HSV and Gimp.HSL
+Test case: palette_sort.py can use Gimp.HSV
+"""
 
 class GimpfuRGB(Adapter):
     '''
-    RGB aka Color is mostly for parameters to PDB.
+    Adapts Gimp.RGB
+
+    aka Color
+    Mostly used for parameters to PDB.
 
     Author CAN instantiate.
     But has no methods or properties.
@@ -76,17 +84,29 @@ class GimpfuRGB(Adapter):
 
 
     def __repr__(self):
-        # Gimp.RGB has no name() method, so return the fields
-        # TODO field alpha?
-        return f"GimpfuRGB {self._adaptee.r} {self._adaptee.g} {self._adaptee.b}"
+        # Gimp.RGB has no name() method, so return the fields instead
+        return f"GimpfuRGB {self._adaptee.r} {self._adaptee.g} {self._adaptee.b} {self._adaptee.a}"
 
-    # subscriptable protocol
+    """
+    subscriptable/slicing protocol
+
+    Refer to "implementing slicing in __get-item__"
+
+    Test case: palette_sort.py
+    """
     def __getitem__(self, key):
-        if key==0: result = self.r
-        elif key==1: result = self.g
-        elif key==2: result = self.b
-        elif key==3: result = self.a
-        else: raise RuntimeError(f"GimpfuRGB: Subscript out of range: {key}")
+        if isinstance(key, int):
+            if key==0: result = self.r
+            elif key==1: result = self.g
+            elif key==2: result = self.b
+            elif key==3: result = self.a
+            else: raise RuntimeError(f"GimpfuRGB: Subscript out of range: {key}")
+        elif isinstance(key, slice):
+            start, stop, step = key.indices(4)
+            # return sliced list
+            result = [self[i] for i in range(start, stop, step)]
+        else:
+            raise TypeError(f'Invalid argument type: {type(key)}')
         return result
 
 
