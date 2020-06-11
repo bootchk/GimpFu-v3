@@ -154,6 +154,7 @@ complete keys, but using OmitteEntry for not implemented widgets.
 For omitted, subsequently GimpFu uses the default value which should be sane.
 '''
 _edit_map = {
+        # Single-valued, simple widgets
         PF_INT         : IntEntry,
         PF_INT8        : IntEntry,
         PF_INT16       : IntEntry,
@@ -174,15 +175,15 @@ _edit_map = {
         PF_SPINNER     : FloatEntry,
         PF_ADJUSTMENT  : FloatEntry,
 
-        # radio buttons, set of choices
-        PF_RADIO       : RadioEntry,  # radio button group where values are declared
-        # pull down option menu widget
-        # TODO Now look-and-feel is radio button group, should be a different look-and-feel
-        PF_OPTION      : RadioEntry,  # alias for PF_RADIO, but values not declared, always int-valued
+        # finite set of choices: two look-and-feels
+        # radio button group, wvalues are declared
+        PF_RADIO       : RadioButtonsEntry,
+        # pull down option menu widget,  values not declared, always int-valued
+        PF_OPTION      : OptionMenuEntry,
 
         # PF_COLOUR is deprecated alias for PF_COLOR
-        PF_COLOR       : ColorEntry,
-        PF_COLOUR      : ColorEntry,
+        PF_COLOR       : FuColorEntry,
+        PF_COLOUR      : FuColorEntry,
 
         # TODO is PF_FILENAME deprecated alias for PF_FILE?
         PF_FILE        : FuFileEntry,

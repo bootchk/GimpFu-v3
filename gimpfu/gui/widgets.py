@@ -147,7 +147,7 @@ class ToggleEntry(Gtk.ToggleButton):
 
 
 
-class RadioEntry(Gtk.VBox):
+class RadioButtonsEntry(Gtk.VBox):
     def __init__(self, default=0, items=((_("Yes"), 1), (_("No"), 0))):
 
         module_logger.debug(f"RadioEntry: default: {default} items: {items}")
@@ -207,7 +207,54 @@ class OmittedEntry(Gtk.Label):
         return self.value
 
 
+"""
+ComboBoxText is simpler but only delivers a string value.
+ComboBox takes a more sophisticated model and delivers an int value.
+
+Copied from Gtk3 tutorial for combo box
+and from GimpFu v2 code.
+"""
+class OptionMenuEntry(Gtk.ComboBox):
+    def __init__(self, default=0, items=()):
+        # assert items is a tuple of tuples ((label, value), ...)
+
+        """
+        Now, the values are just the ordinals (index) of the labels.
+        See the caller, which enumerates.
+        FUTURE: Author can assign values that are not the index.
+        """
+
+        # create a model having two columns
+        store = Gtk.ListStore(int, str)
+        for item in items:
+            # pass a list
+            # having two elements: [value, label]
+            store.append([item[1], item[0]])
+            # store.append([item[0]])
+
+        Gtk.ComboBox.__init__(self, model=store)
+
+        cell = Gtk.CellRendererText()
+        # Gtk3 CellLayout takes arg 'expand'
+        self.pack_start(cell, expand=False)
+
+        # Tell Gtk which column of model to display: the second column, the label
+        self.add_attribute(cell, "text", 1)
+
+        self.set_active(default)
+
+    def get_value(self):
+        result = self.get_active()
+        module_logger.debug(f"OptionMenuEntry returns: {result}")
+        # assert result is the index of the label in the model
+        # FUTURE result is the value of the label in the model
+        return result
+
+
+
 '''
+v2
+
 class ComboEntry(Gtk.ComboBox):
     def __init__(self, default=0, items=()):
         store = Gtk.ListStore(str)
@@ -224,74 +271,4 @@ class ComboEntry(Gtk.ComboBox):
 
     def get_value(self):
         return self.get_active()
-
-def FileSelector(default="", title=None):
-    # FIXME: should this be os.path.separator?  If not, perhaps explain why?
-    if default and default.endswith("/"):
-        if default == "/": default = ""
-        return DirnameSelector(default)
-    else:
-        return FilenameSelector(default, title=title, save_mode=False)
-
-class FilenameSelector(Gtk.HBox):
-    #gimpfu.FileChooserButton
-    def __init__(self, default, save_mode=True, title=None):
-        super(FilenameSelector, self).__init__()
-        if not title:
-            self.title = _("Python-Fu File Selection")
-        else:
-            self.title = title
-        self.save_mode = save_mode
-        box = self
-        self.entry = Gtk.Entry()
-        image = Gtk.Image()
-        image.set_from_stock(Gtk.STOCK_FILE, Gtk.ICON_SIZE_BUTTON)
-        self.button = Gtk.Button()
-        self.button.set_image(image)
-        box.pack_start(self.entry)
-        box.pack_start(self.button, expand=False)
-        self.button.connect("clicked", self.pick_file)
-        if default:
-            self.entry.set_text(default)
-
-    def show(self):
-        super(FilenameSelector, self).show()
-        self.button.show()
-        self.entry.show()
-
-    def pick_file(self, widget):
-        entry = self.entry
-        dialog = Gtk.FileChooserDialog(
-                     title=self.title,
-                     action=(Gtk.FILE_CHOOSER_ACTION_SAVE
-                                 if self.save_mode else
-                             Gtk.FILE_CHOOSER_ACTION_OPEN),
-                     buttons=(Gtk.STOCK_CANCEL,
-                            Gtk.RESPONSE_CANCEL,
-                            Gtk.STOCK_SAVE
-                                 if self.save_mode else
-                            Gtk.STOCK_OPEN,
-                            Gtk.RESPONSE_OK)
-                    )
-        dialog.set_alternative_button_order ((Gtk.RESPONSE_OK, Gtk.RESPONSE_CANCEL))
-        dialog.show_all()
-        response = dialog.run()
-        if response == Gtk.RESPONSE_OK:
-            entry.set_text(dialog.get_filename())
-        dialog.destroy()
-
-    def get_value(self):
-        return self.entry.get_text()
-
-
-class DirnameSelector(Gtk.FileChooserButton):
-    def __init__(self, default=""):
-        Gtk.FileChooserButton.__init__(self,
-                                       _("Python-Fu Folder Selection"))
-        self.set_action(Gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
-        if default:
-            self.set_filename(default)
-
-    def get_value(self):
-        return self.get_filename()
 '''
