@@ -10,7 +10,7 @@ from adaption.formal_types import FormalTypes
 
 from gimppdb.gimppdb import GimpPDB
 
-from message.proceed_error import do_proceed_error
+from message.proceed_error import proceed
 
 import logging
 
@@ -200,7 +200,7 @@ class Types():
                 gen_value.upcast(cast_to_type)
             else:
                 # Note case Drawable == Drawable will get here, but Author cannot create instance of Drawable.
-                do_proceed_error(f"Require type: {formal_arg_type} , but got {gen_value} not castable.")
+                proceed(f"Require type: {formal_arg_type} , but got {gen_value} not castable.")
 
         else:
             # No upcast was done
@@ -231,7 +231,7 @@ class Types():
             try:
                 gen_value.color()
             except Exception as err:
-                do_proceed_error(f"Converting to color: {err}")
+                proceed(f"Converting to color: {err}")
             #Types.logger.info(type(result))
 
 

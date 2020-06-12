@@ -16,25 +16,25 @@ The language includes statements (or phrases) from:
 
 This module handles certain errors in interpretation
 returned mostly at points of contact with Gimp.
-Referred to as proceedErrors.
-GimpFu can continue past proceedErrors,
+Referred to as proceeds.
+GimpFu can continue past proceeds,
 so that more errors can be detected in one interpretation run.
-ProceedErrors are often the author's mistaken use of GimpFu API or Gimp API.
+proceeds are often the author's mistaken use of GimpFu API or Gimp API.
 
-Bugs in GimpFu source can also be erroneously declared as ProceedErrors.
+Bugs in GimpFu source can also be erroneously declared as proceeds.
 
-These are NOT ProceedErrors:
+These are NOT proceeds:
    - errors in Python syntax in the author's code
    - severe GimpFu API errors (not calling register(), main())
 These raise Python Exceptions that terminate the plugin.
 
-The GimpFu code, when it discovers a proceedError() at a statement,
+The GimpFu code, when it discovers a proceed() at a statement,
 attempts to continue i.e. to proceed,
 returning for example None for results of the erroneous author's statement.
-Any following author's statements may generate spurious proceedErrors.
+Any following author's statements may generate spurious proceeds.
 
 The results of a plugin (on the Gimp state, e.g. open image)
-after a proceedError can be very garbled.
+after a proceed can be very garbled.
 Usually Gimp announces this fact.
 Any effects on existing images should still be undoable.
 
@@ -50,7 +50,7 @@ proceedLog = []
 module_logger = logging.getLogger('GimpFu.proceed')
 
 '''
-When do_proceed_error is called,
+When proceed is called,
 framestack is usually a sequence of frameinfo's like this:
 (this for the case where plugin source and gimpfu source all in /plug-ins/ directory)
 filename                                  code_context               what the code is
@@ -70,15 +70,20 @@ filename                                  code_context               what the co
 
 
 def proceed(message):
+    """ Proceed past an error (logging the fact.) """
 
     # Log to logger
     # level=>error, not critical, since we can proceed to find other possible Author errors
-    module_logger.error(f"Continue past: {message}")
+    module_logger.error(f"Proceed past error: {message}")
 
     # Log to cummulative private log
     proceedLog.append("Error: " + message)
     source_text = Framestack.get_errant_source_code_line()
     proceedLog.append("Plugin author's source:" + source_text)
+
+    # For debugging inexplicable calls to proceed(), uncomment this line
+    # It will print the stack trace at the exception
+    # Framestack.print_trace()
 
 
 
@@ -90,7 +95,7 @@ def summarize_proceed_errors():
 
     In general, GimpFu calls this if the plugin finishes,
     but GimpFu does NOT call this if the plugin ends
-    with an exception (that is NOT turned into a ProceedError.)
+    with an exception (that is NOT turned into a proceed.)
     Such an exception may be:
       - in ordinary (not GimpFu-related) Python code written by the author
       - in GimpFu code, written by .

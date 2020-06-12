@@ -80,7 +80,7 @@ def try_convert_to_float(proc_name, actual_arg, actual_arg_type, index):
         else:
             # Failed to get formal argument type.  Probably too many actual args.
             # Do not convert type.
-            do_proceed_error(f"Failed to get formal argument type for index: {index}.")
+            proceed(f"Failed to get formal argument type for index: {index}.")
 
     # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
     # likewise for value of result_arg

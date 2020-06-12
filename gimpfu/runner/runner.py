@@ -353,7 +353,7 @@ class FuRunner:
                According to GLib docs, should be a warning, since this is not recoverable.
                But it might be author programming code (e.g. invalid PARAMS)
                '''
-               do_proceed_error(f"Exception opening plugin dialog: {err}")
+               proceed(f"Exception opening plugin dialog: {err}")
                final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
            """
 

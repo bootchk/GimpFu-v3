@@ -118,10 +118,10 @@ class Marshal():
                 result = eval(statement)
             except Exception as err:
                 """ Exception in Gimpfu code e.g. missing wrapper. """
-                do_proceed_error(f"Wrapping: {err}")
+                proceed(f"Wrapping: {err}")
         else:
             exception_str = f"GimpFu: can't wrap gimp type {gimp_type_name}"
-            do_proceed_error(exception_str)
+            proceed(exception_str)
         return result
 
 

@@ -75,7 +75,7 @@ class GimpfuRGB(Adapter):
             else:
                 raise RuntimeError("Illegal call to GimpfuRGB constructor")
         except Exception as err:
-            do_proceed_error(f"Creating GimpfuRGB: {err}")
+            proceed(f"Creating GimpfuRGB: {err}")
 
         # Adapter
         super().__init__(a_adaptee)
@@ -152,7 +152,7 @@ class GimpfuRGB(Adapter):
         elif isinstance(value, tuple):
             result = GimpfuRGB.create_RGB_from_tuple(value)
         else:
-            do_proceed_error(f"Illegal Python type: {type(value)} for color: {value}.")
+            proceed(f"Illegal Python type: {type(value)} for color: {value}.")
             # return an arbitrary color so we can proceed
             result = GimpfuRGB.create_RGB_from_string("orange")
         return result

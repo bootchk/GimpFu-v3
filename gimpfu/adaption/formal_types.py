@@ -7,7 +7,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 '''
 
-# from message.proceed_error import do_proceed_error
+# from message.proceed_error import proceed
 
 import logging
 

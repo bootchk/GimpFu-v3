@@ -143,11 +143,11 @@ class GimpfuGimp():
         except AttributeError:
             # callable_name is not adapted by GimpFu or known to Gimp
             # Probable  (i.e. user) error
-            do_proceed_error(f"unknown Gimp method {callable_name}")
+            proceed(f"unknown Gimp method {callable_name}")
             result = None
         except Exception as err:
             # Probable bug in this code
-            do_proceed_error(f"error getting {callable_name}:{err}")
+            proceed(f"error getting {callable_name}:{err}")
             result = None
         else:
             # assert Callable is in Gimp, or in GimpFu<Foo>-then-Gimp.
@@ -168,7 +168,7 @@ class GimpfuGimp():
                 TODO result is a GObject , maybe Gimp.StatusType as for PDB??
                 TODO assert result is None or is_wrapper
                 '''
-                do_proceed_error(f"Error executing: {callable_name}, err: {err}")
+                proceed(f"Error executing: {callable_name}, err: {err}")
                 result = None
 
 
@@ -223,7 +223,7 @@ class GimpfuGimp():
         self.adapted_gimp_object_name = name
 
         if name is "pdb":
-            do_proceed_error("Use 'pdb', not 'gimp.pdb'.")
+            proceed("Use 'pdb', not 'gimp.pdb'.")
             # do more so that GimpFu really can proceed without more exceptions
 
         self.logger.info("__getattr__ returns callable _adaptor_func")

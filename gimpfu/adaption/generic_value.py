@@ -10,7 +10,7 @@ from gi.repository import Gio   # Gio.File
 
 from adapters.rgb import GimpfuRGB
 
-from message.proceed_error import do_proceed_error
+from message.proceed_error import proceed
 from message.suggest import Suggest
 
 
@@ -174,7 +174,7 @@ class FuGenericValue():
 
             # OLD result_gvalue = FuFloatArray.new_gimp_float_array_gvalue(float_list)
         except Exception as err:
-            do_proceed_error(f"Failed to create Gimp.FloatArray: {err}.")
+            proceed(f"Failed to create Gimp.FloatArray: {err}.")
 
         # Cruft?
         #>>>>GimpFu continued past error: Exception in type conversion of: [1536, 0, 1536, 1984], type: <class 'list'>, index: 2
@@ -191,9 +191,9 @@ class FuGenericValue():
         try:
             gfile =  Gio.file_new_for_path(self._actual_arg)
         except Exception as err:
-            do_proceed_error(f"Failed  Gio.file_new_for_path: {self._actual_arg}.")
+            proceed(f"Failed  Gio.file_new_for_path: {self._actual_arg}.")
         if gfile is None:
-            do_proceed_error(f"Failed to create GFile for filename: {self._actual_arg}.")
+            proceed(f"Failed to create GFile for filename: {self._actual_arg}.")
         else:
             self._result_arg = gfile
             self._result_arg_type = Gio.File
@@ -210,7 +210,7 @@ class FuGenericValue():
         # assert RGB_result is-a Gimp.RGB or None
         if not RGB_result:
             # formal arg type is Gimp.RGB but could not convert actual_arg
-            do_proceed_error(f"Not convertable to color: {self._actual_arg}.")
+            proceed(f"Not convertable to color: {self._actual_arg}.")
             self._did_convert = False
         else:
             self._result_arg = RGB_result
@@ -272,7 +272,7 @@ class FuGenericValue():
         try:
             result = GObject.Value(gvalue_type, value)
         except Exception as err:
-            do_proceed_error(f"Creating GValue for type: {gvalue_type}, value: {value}, err: {err}")
+            proceed(f"Creating GValue for type: {gvalue_type}, value: {value}, err: {err}")
             # Return some bogus value so can proceed
             result = FuGenericValue.new_int_gvalue()
             # TODO would this work??

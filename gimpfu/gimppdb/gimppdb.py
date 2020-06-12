@@ -4,6 +4,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 from gi.repository import GObject   # types
 
+from message.proceed_error import proceed
 import logging
 
 
@@ -69,6 +70,9 @@ class GimpPDB:
             # result = (gtype == GObject.TYPE_ENUM)
             # result = (gtype == GObject.GParamEnum)
 
+            # TODO file-gbr-save is aberrant, name is "dummy-param"
+            # TODO compare type to "GimpRunMode" ???
+
             # Examine the name of the ParamSpec, not the type
             param_name = arg_specs[0].name
             GimpPDB.logger.debug(f"first arg name: {param_name}")
@@ -131,7 +135,7 @@ class GimpPDB:
             formal_arg_type = arg_spec.__gtype__
 
         except IndexError:
-            do_proceed_error("Formal argument not found, probably too many actual args.")
+            proceed("Formal argument not found, probably too many actual args.")
             formal_arg_type = None
 
         GimpPDB.logger.debug(f"get_formal_argument_type returns: {formal_arg_type}")

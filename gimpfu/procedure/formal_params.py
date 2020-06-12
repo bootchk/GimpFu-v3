@@ -1,7 +1,9 @@
 
 from procedure.formal_param import FuFormalParam
 from gimpfu_enums import *  # PF_ enums
+
 from message.deprecation import Deprecation
+from message.proceed_error import proceed
 
 import logging
 
@@ -70,7 +72,7 @@ class FuFormalParams():
                 # Not fatal since we don't use it, args are a sequence, not by keyword
                 # But Gimp may yet complain.
                 # TODO transliterate space to underbar
-                do_proceed_error(f"parameter name '{param.LABEL}'' contains illegal characters")
+                proceed(f"parameter name '{param.LABEL}'' contains illegal characters")
 
 
     def deriveMissingParams(self, metadata):

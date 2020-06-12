@@ -43,5 +43,5 @@ class GimpfuDisplay( Adapter) :
     Displays should not be copied.
     '''
     def copy(self):
-        do_proceed_error("Cannot copy Display")
+        proceed("Cannot copy Display")
         return None

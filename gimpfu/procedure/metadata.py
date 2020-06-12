@@ -1,7 +1,7 @@
 
 import string   # v2 as _string to hide from authors
 
-from message.proceed_error import  do_proceed_error
+from message.proceed_error import  proceed
 from message.deprecation import Deprecation
 
 from procedure.formal_params import FuFormalParams
@@ -369,7 +369,7 @@ class FuProcedureMetadata():
 
             if not self.letterCheck(ent[1], self.param_name_allowed):
                 # not fatal unless we use it?
-                do_proceed_error(f"result name '{ent[1]}' contains illegal characters")
+                proceed(f"result name '{ent[1]}' contains illegal characters")
 
 
     """

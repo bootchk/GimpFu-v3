@@ -105,7 +105,7 @@ class GimpfuPDB():
         self.logger.debug(f"_adaptor_func called, args: {args}")
 
         if kwargs:
-            do_proceed_error(f"PDB procedures do not take keyword args.")
+            proceed(f"PDB procedures do not take keyword args.")
 
         # !!! avoid infinite recursion
         proc_name = object.__getattribute__(self, "adapted_proc_name")
@@ -114,7 +114,7 @@ class GimpfuPDB():
         try:
             marshaled_args = MarshalPDB.marshal_args(proc_name, *args)
         except Exception as err: # TODO catch only MarshalError ???
-            do_proceed_error(f"marshalling args to pdb.{proc_name} {err}")
+            proceed(f"marshalling args to pdb.{proc_name} {err}")
             marshaled_args = None
 
         if marshaled_args is not None:
@@ -132,7 +132,7 @@ class GimpfuPDB():
                 # TODO  log something better than {marshaled_args}, which is a Gimp.ValueArray without a good __repr__
                 # TODO i.e. { {*args} } ?, but that leaves braces in the output
                 # TODO  { {*args} } throws "unhashable type GimpfuImage"
-                do_proceed_error(f"PDB procedure call fail: {proc_name} Gimp says: {error_str}")
+                proceed(f"PDB procedure call fail: {proc_name} Gimp says: {error_str}")
                 result = None
             else:
                 result = MarshalPDB.unmarshal_results(inner_result)
@@ -192,7 +192,7 @@ class GimpfuPDB():
             else:
                 # Can proceed if we catch the forthcoming call
                 # by returning a do_nothing_intercept_func
-                do_proceed_error(f"unknown pdb procedure {mangled_proc_name}")
+                proceed(f"unknown pdb procedure {mangled_proc_name}")
                 result = object.__getattribute__(self, "_nothing_adaptor_func")
 
             return result

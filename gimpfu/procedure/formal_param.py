@@ -11,7 +11,7 @@ from procedure.prop_holder_factory import PropHolderFactory
 import sys
 
 from message.deprecation import Deprecation
-#from message.proceed_error import *
+from message.proceed_error import proceed
 
 
 import logging
@@ -231,7 +231,7 @@ class FuFormalParam(GObject.Object):
     def _on_extras_error(self, message):
         """ Log an Author's error in source, in the Params
 
-        Don't use do_proceed_error(), don't need its stack trace.
+        Don't use proceed(), don't need its stack trace.
         But the user's code was not fixed so this should be more severe than a warning?
         """
         Deprecation.say("Error in plugin author's source: " + message)
@@ -246,7 +246,7 @@ class FuFormalParam(GObject.Object):
         max = None
         if extras_type == 0:
             if extras:
-                do_proceed_error("Unexpected extras on parameter spec.")
+                proceed("Unexpected extras on parameter spec.")
             pass
         elif extras_type == 1:
             if extras:

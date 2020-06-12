@@ -12,7 +12,7 @@ from adaption.generic_value import FuGenericValue
 
 from gimppdb.gimppdb import GimpPDB
 
-from message.proceed_error import *
+from message.proceed_error import proceed
 
 import logging
 
@@ -55,11 +55,12 @@ class MarshalPDB():
         Try a sequence of upcasts and conversions.
         TODO just get the formal argument type and dispatch on it???
         '''
+        MarshalPDB.logger.debug(f"_try_type_conversions: index {index}" )
 
         formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
         if formal_arg_type is None:
             # Probably too many actual args.
-            do_proceed_error(f"Failed to get formal argument type for index: {index}.")
+            proceed(f"Failed to get formal argument type for index: {index}.")
             return
 
         MarshalPDB.logger.debug(f"_try_type_conversions: index {index} formal type: {formal_arg_type}" )
@@ -146,11 +147,11 @@ class MarshalPDB():
             try:
                 MarshalPDB._try_type_conversions(proc_name, gen_value, formal_args_index)
             except Exception as err:
-                do_proceed_error(f"Exception in _try_type_conversions: {gen_value}, formal_args_index: {formal_args_index}, {err}")
+                proceed(f"Exception in _try_type_conversions: {gen_value}, formal_args_index: {formal_args_index}, {err}")
 
 
             if is_wrapped_function(go_arg):
-                do_proceed_error("Passing function as argument to PDB.")
+                proceed("Passing function as argument to PDB.")
 
             a_gvalue = gen_value.get_gvalue()
             FuValueArray.push_gvalue(a_gvalue)
@@ -162,7 +163,7 @@ class MarshalPDB():
             try:
                 marshalled_args.insert(index, gvalue)
             except Exception as err:
-                do_proceed_error(f"Exception inserting {gvalue}, index {index}, to pdb, {err}")
+                proceed(f"Exception inserting {gvalue}, index {index}, to pdb, {err}")
                 # ??? After this exception, often get: LibGimpBase-CRITICAL **: ...
                 # gimp_value_array_insert: assertion 'index <= value_array->n_values' failed
                 # The PDB procedure call is usually going to fail anyway.

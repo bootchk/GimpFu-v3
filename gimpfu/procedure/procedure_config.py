@@ -10,7 +10,7 @@ from adaption.types import Types
 from adaption.value_array import FuValueArray
 from adaption.generic_value import FuGenericValue
 
-from message.proceed_error import do_proceed_error
+from message.proceed_error import proceed
 
 import logging
 
@@ -129,7 +129,7 @@ class FuProcedureConfig():
 
             Permanently: return arbitrary GValue so we can proceed.
             """
-            do_proceed_error(f"GimpFu failed to register with Gimp property name: {name}.")
+            proceed(f"GimpFu failed to register with Gimp property name: {name}.")
             if name == 'color':
                 result = FuGenericValue.new_rgb_value()
             else:
