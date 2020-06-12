@@ -10,11 +10,11 @@ from gi.repository import Gio   # Gio.File
 
 from adapters.rgb import GimpfuRGB
 
-from message.proceed_error import *
+from message.proceed_error import do_proceed_error
 from message.suggest import Suggest
 
 
-
+# TODO foo_type getters should be computed properties, not mutable
 
 class FuGenericValue():
     '''
@@ -188,9 +188,12 @@ class FuGenericValue():
         assert isinstance(self._actual_arg, str)
 
         # create a GObject file descriptor
-        gfile =  Gio.file_new_for_path(self._actual_arg)
+        try:
+            gfile =  Gio.file_new_for_path(self._actual_arg)
+        except Exception as err:
+            do_proceed_error(f"Failed  Gio.file_new_for_path: {self._actual_arg}.")
         if gfile is None:
-            proceed_error(f"Failed to create GFile for filename: {self._actual_arg}.")
+            do_proceed_error(f"Failed to create GFile for filename: {self._actual_arg}.")
         else:
             self._result_arg = gfile
             self._result_arg_type = Gio.File
@@ -207,7 +210,7 @@ class FuGenericValue():
         # assert RGB_result is-a Gimp.RGB or None
         if not RGB_result:
             # formal arg type is Gimp.RGB but could not convert actual_arg
-            proceed_error(f"Not convertable to color: {self._actual_arg}.")
+            do_proceed_error(f"Not convertable to color: {self._actual_arg}.")
             self._did_convert = False
         else:
             self._result_arg = RGB_result

@@ -69,7 +69,7 @@ filename                                  code_context               what the co
 
 
 
-def do_proceed_error(message):
+def proceed(message):
 
     # Log to logger
     # level=>error, not critical, since we can proceed to find other possible Author errors

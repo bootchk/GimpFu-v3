@@ -10,7 +10,7 @@ from adaption.formal_types import FormalTypes
 
 from gimppdb.gimppdb import GimpPDB
 
-from message.proceed_error import *
+from message.proceed_error import do_proceed_error
 
 import logging
 

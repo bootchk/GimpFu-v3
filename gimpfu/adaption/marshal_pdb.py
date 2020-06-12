@@ -62,26 +62,38 @@ class MarshalPDB():
             do_proceed_error(f"Failed to get formal argument type for index: {index}.")
             return
 
-        Types.try_upcast_to_drawable(formal_arg_type, gen_value, index)
-        if not gen_value.did_upcast:
-            Types.try_upcast_to_item(formal_arg_type, gen_value, index)
-        if not gen_value.did_upcast:
-            Types.try_upcast_to_layer(formal_arg_type, gen_value, index)
-        if not gen_value.did_upcast:
-            Types.try_upcast_to_color(formal_arg_type, gen_value, index)
-        if not gen_value.did_upcast:
+        MarshalPDB.logger.debug(f"_try_type_conversions: index {index} formal type: {formal_arg_type}" )
 
-            # Continue trying conversions
-            Types.try_usual_python_conversion(formal_arg_type, gen_value, index)
+        Types.try_upcast_to_drawable(formal_arg_type, gen_value, index)
+        if gen_value.did_upcast:
+            return
+        Types.try_upcast_to_item(formal_arg_type, gen_value, index)
+        if gen_value.did_upcast:
+            return
+        Types.try_upcast_to_layer(formal_arg_type, gen_value, index)
+        if gen_value.did_upcast:
+            return
+        Types.try_upcast_to_color(formal_arg_type, gen_value, index)
+        if gen_value.did_upcast:
+            return
+
+        # Continue trying conversions
+        Types.try_usual_python_conversion(formal_arg_type, gen_value, index)
+        if gen_value.did_convert:
+            return
+        Types.try_float_array_conversion(formal_arg_type, gen_value, index)
+        if gen_value.did_convert:
+            return
+        Types.try_file_descriptor_conversion(formal_arg_type, gen_value, index)
         if not gen_value.did_convert:
-            Types.try_float_array_conversion(formal_arg_type, gen_value, index)
-        if not gen_value.did_convert:
-            Types.try_file_descriptor_conversion(formal_arg_type, gen_value, index)
+            MarshalPDB.logger.debug(f"No type conversions: index {index} formal type: {formal_arg_type}" )
 
         # !!! We don't upcast deprecated constant TRUE to G_TYPE_BOOLEAN
 
         # TODO is this necessary? I think it is only drawable that gets passed None
         # Types.try_convert_to_null(proc_name, gen_value, index)
+
+
 
 
 
@@ -134,7 +146,7 @@ class MarshalPDB():
             try:
                 MarshalPDB._try_type_conversions(proc_name, gen_value, formal_args_index)
             except Exception as err:
-                do_proceed_error(f"Exception in type conversion of: {gen_value}, formal_args_index: {formal_args_index}, {err}")
+                do_proceed_error(f"Exception in _try_type_conversions: {gen_value}, formal_args_index: {formal_args_index}, {err}")
 
 
             if is_wrapped_function(go_arg):
