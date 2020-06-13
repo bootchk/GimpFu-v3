@@ -25,6 +25,7 @@ class GimpProcedure:
 
     @property
     def argument_specs(self):
+        # Another implementation: Gimp.get_pdb().run_procedure( proc_name , 'gimp-pdb-get-proc-argument', args)
         return self._procedure.get_arguments()
 
     @property
@@ -63,40 +64,20 @@ class GimpProcedure:
         """
 
         arg_specs = self.argument_specs
+        # assert arg_specs is-a list of GObject.GParamSpec or subclass thereof
         if len(arg_specs) > 0:
-            # assert arg_specs is-a list of GObject.GParamSpec or subclass thereof
+            # run-mode is the first arg
+            type_name = self.get_formal_argument_type_name(0)
+            result = (type_name == 'GimpRunMode')
 
             """
-            to dump a GParamSpec:    print(dir(arg_specs[0]))
-            We find that it has attributes 'name' and 'value_type' and '__gtype__'
-            __gtype__ is GParamSpec, not what we want
-            Also, type(arg_specs[0]) is <class gobject.GParamSpec>, also not what we want.
-            value_type is the formal type of the parameter, what we want
-
-            to dump a type: dir(param_type)
-            We find that it has attribute 'name'
-            We want to compare name to 'GimpRunMode'
-            Fails: str(param_type) is not succint
-            Fails: type comparison param_type == Gimp.RunMode  ???
-            !!! Gimp.RunMode is-a class, i.e. a type, why can't we compare types?
-            """
-
-            # examine the type field of the GParamSpec
-            param_type = arg_specs[0].value_type
-
-            #self.logger.debug(f"first arg type is: {param_type}")
-            #self.logger.debug(f"str of first arg type is: {str(param_type)}")
-            result = (param_type.name == 'GimpRunMode')
-
-            """
-            We cannot examine the name of the ParamSpec, instead of the type
+            We cannot examine the name of the ParamSpec, instead of the type,
             because some are named 'run-mode' and some 'dummy-param'.
             file-gbr-save is aberrant, first arg name is "dummy-param"
+
+            param_name = arg_specs[0].name
+            result = ( param_name == 'run-mode')
             """
-            # OLD
-            #param_name = arg_specs[0].name
-            #self.logger.debug(f"first arg name: {param_name}")
-            #result = ( param_name == 'run-mode')    # !!! - not _
         else:
             result = False
         return result
@@ -114,52 +95,95 @@ class GimpProcedure:
         self.logger.debug(f"{self.name}: takes_runmode: {result}")
         return result
 
-
-
-
-
     # TODO optimized, cache result from Gimp instead of getting it each call
+
+    """
+    to dump a GParamSpec:    print(dir(arg_specs[0]))
+    We find that it has attributes 'name' and 'value_type' and '__gtype__'
+    __gtype__ is GParamSpec, not what we want
+    Also, type(arg_specs[0]) is <class gobject.GParamSpec>, also not what we want.
+    value_type is the formal type of the parameter, what we want
+
+    to dump a type: dir(param_type)
+    We find that it has attribute 'name'
+    We want to compare name to 'GimpRunMode'
+    Fails: str(param_type) is not succint
+    Fails: type comparison param_type == Gimp.RunMode  ???
+    !!! Gimp.RunMode is-a class, i.e. a type, why can't we compare types?
+    """
+
+    def get_formal_argument_type_name(self, index):
+        '''
+        Get the formal argument's type's name for a PDB procedure
+        for argument with ordinal: index.
+        Returns an instance of str
+        '''
+        arg_spec = self.get_formal_argument_spec(index)
+        if arg_spec is None:
+            result = None
+        else:
+            result = arg_spec.value_type.name
+        # ensure result is-a str or None
+        return result
+
+
+    def get_formal_argument_spec(self, index):
+        '''
+        Get the formal argument spec for a PDB procedure
+        for argument with ordinal: index.
+        Returns an instance of GParamSpec
+        '''
+        # not require index is in range (will proceed_error)
+
+        arg_specs = self.argument_specs    # some docs say it returns a count
+        # assert arg_specs is-a list of GParamSpec
+
+        ## arg_specs = Gimp.ValueArray.new(arg_count)
+        ##config.get_values(arg_specs)
+        # assert arg_specs is Gimp.ValueArray, sequence describing args of procedure
+        try:
+            result = arg_specs[index]   # .index(index) ??
+            # assert is-a GObject.GParamSpec or subclass thereof
+            ## OLD assert arg_spec is GObject.Value, describes arg of procedure (its GType is the arg's type)
+
+        except IndexError:
+            proceed("Formal argument not found, probably too many actual args.")
+            result = None
+
+        self.logger.debug(f"get_formal_argument_spec returns: {result}")
+
+        # assert result is-a GParamSpec
+        return result
+
 
     def get_formal_argument_type(self, index):
         '''
         Get the formal argument type for a PDB procedure
         for argument with ordinal: index.
         Returns an instance of GType e.g. GObject.TYPE_INT
-
-        Another implementation: Gimp.get_pdb().run_procedure( proc_name , 'gimp-pdb-get-proc-argument', args)
         '''
         # not require index is in range (will proceed_error)
 
-        arg_specs = self.argument_specs    # some docs say it returns a count, it returns a list of GParam??
-        # assert arg_specs is-a list
+        arg_spec = self.get_formal_argument_spec(index)
 
-        ## arg_specs = Gimp.ValueArray.new(arg_count)
-        ##config.get_values(arg_specs)
+        '''
+        Documenting various things I tried, which we may need to try again.
 
-        # assert arg_specs is Gimp.ValueArray, sequence describing args of procedure
-        # index may be out of range,  may have provided too many args
-        try:
-            arg_spec = arg_specs[index]   # .index(index) ??
-            # assert is-a GObject.GParamSpec or subclass thereof
-            ## OLD assert arg_spec is GObject.Value, describes arg of procedure (its GType is the arg's type)
+        (dir(arg_spec)) at this point shows attributes of arg_spec
 
-            '''
-            Documenting various things I tried, which we may need to try again.
+        1) formal_arg_type = type(arg_spec)
 
-            (dir(arg_spec)) at this point shows attributes of arg_spec
+        2) formal_default_value = arg_spec.get_default_value()
+           formal_arg_type = formal_default_value.get_gtype()
 
-            1) formal_arg_type = type(arg_spec)
+        ??? Why not arg_spec.value_type
+        '''
+        if arg_spec is None:
+            result = None
+        else:
+            result = arg_spec.__gtype__
 
-            2) formal_default_value = arg_spec.get_default_value()
-               formal_arg_type = formal_default_value.get_gtype()
-            '''
-            formal_arg_type = arg_spec.__gtype__
+        self.logger.debug(f"get_formal_argument_type returns: {result}")
 
-        except IndexError:
-            proceed("Formal argument not found, probably too many actual args.")
-            formal_arg_type = None
-
-        self.logger.debug(f"get_formal_argument_type returns: {formal_arg_type}")
-
-        # assert type of formal_arg_type is-a GObject.GType
-        return formal_arg_type
+        # assert result is-a GObject.GType
+        return result
