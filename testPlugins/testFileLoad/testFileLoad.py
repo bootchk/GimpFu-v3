@@ -45,6 +45,7 @@ def create_file_for_filename(image, drawable, file_format_name, filename):
     """ Tell Gimp to create file of given: filename having format: file_format_name from: image, drawable. """
     # like: pdb.file_bmp_save(image, drawable, filename)
     eval("pdb.file_" + file_format_name + "_save(image, drawable, filename)")
+    # if the pdb procedure does not exist, this fails quietly and file still not exist
 
 
 def ensure_test_file(image, drawable, file_format_name):
@@ -54,14 +55,15 @@ def ensure_test_file(image, drawable, file_format_name):
 
     If file already exists, return it.
     Else try create, from given image, drawable.
-    Raise exception if file not exist and cannot create it.
-    TODO return bool, not raise exception
+
+    If file not exist and cannot create it, return None.
     """
     filename = create_test_filename_for_format(file_format_name)
     if not os.path.isfile(filename):
         create_file_for_filename(image, drawable, file_format_name, filename)
     if not os.path.isfile(filename):
-        raise Exception(f"Could not create test file for format: {file_format_name}.")
+        filename = None
+        # raise Exception(f"Could not create test file for format: {file_format_name}.")
     print(f"Test file: {filename}")
     return filename
 
@@ -75,12 +77,21 @@ def load_file(image, drawable, file_format_name):
     Will try create file from image, drawable
     """
     filename = ensure_test_file(image, drawable, file_format_name)
-    # Like test_pdb.file_jpeg_load(filename)
-    image = eval("pdb.file_" + file_format_name + "_load(filename)")
+    if filename is None:
+        image = None
+    else:
+        # Like test_pdb.file_jpeg_load(filename)
+        image = eval("pdb.file_" + file_format_name + "_load(filename)")
     return image
 
 
 def plugin_func(image, drawable, file_format_index):
+    """ Attempt to load test file of given format.
+
+    Try create the file if it does not exist.
+    If cannot create (when there is no Gimp.PDB.file_foo_save procedure of kind "save")
+    show a message.
+    """
 
     # get name from same list we showed in GUI
     file_format_name = all_file_formats[file_format_index]
@@ -88,15 +99,22 @@ def plugin_func(image, drawable, file_format_index):
     if file_format_name in two_arg_file_formats :
         # load procedure has args (GFile, str) e.g. pdf
         filename = ensure_test_file(image, drawable, file_format_name)
-        # GimpFu will convert filename to GFile
-        test_image =  pdb.file_pdf_load(filename, filename)
+        if filename is None:
+            test_image = None
+        else:
+            # GimpFu will convert filename to GFile
+            test_image =  pdb.file_pdf_load(filename, filename)
     elif file_format_name in one_arg_file_formats :
         # load procedure has args (GFile)
         test_image = load_file(image, drawable, file_format_name)
     else:
-      raise Exception("Unhandled format case")
+      raise Exception("Not implemented format case")
 
-    image_display = pdb.gimp_display_new (test_image)
+    if test_image is not None:
+        image_display = pdb.gimp_display_new (test_image)
+    else:
+        gimp.message("File to load doesn't exist and there is no Gimp PDB procedure to create one.")
+        # OR other errror?
     gimp.displays_flush()
 
 register(

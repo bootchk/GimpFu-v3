@@ -21,7 +21,7 @@ class GimpProcedure:
 
     def __init__(self, gimp_procedure):
         self._procedure = gimp_procedure
-        self.logger = logging.getLogger("GimpProcedure")
+        self.logger = logging.getLogger("GimpFu.GimpProcedure")
 
     @property
     def argument_specs(self):
@@ -54,34 +54,49 @@ class GimpProcedure:
                 )
         return result
 
+
     def _does_procedure_take_runmode_from_signature(self):
-        """ Examine signature of proc to determine whether it takes run_mode arg. """
+        """ Examine signature of proc to determine whether it takes run_mode arg.
+
+        The most reliable implementation:
+        Get GParamSpec, and compare its type.name to 'GimpRunMode'
+        """
 
         arg_specs = self.argument_specs
         if len(arg_specs) > 0:
             # assert arg_specs is-a list of GObject.GParamSpec or subclass thereof
-            # TODO this is not specific enough, can we compare to Gimp type GimpRunMode ??
 
+            """
+            to dump a GParamSpec:    print(dir(arg_specs[0]))
+            We find that it has attributes 'name' and 'value_type' and '__gtype__'
+            __gtype__ is GParamSpec, not what we want
+            Also, type(arg_specs[0]) is <class gobject.GParamSpec>, also not what we want.
+            value_type is the formal type of the parameter, what we want
 
-            # DEBUG dump a GParamSpec
-            #print(dir(arg_specs[0]))
-            #print(arg_specs[0].name)
+            to dump a type: dir(param_type)
+            We find that it has attribute 'name'
+            We want to compare name to 'GimpRunMode'
+            Fails: str(param_type) is not succint
+            Fails: type comparison param_type == Gimp.RunMode  ???
+            !!! Gimp.RunMode is-a class, i.e. a type, why can't we compare types?
+            """
 
+            # examine the type field of the GParamSpec
+            param_type = arg_specs[0].value_type
 
-            # FAIL: examine the type of the GParamSpec
-            # gtype = arg_specs[0].__gtype__
-            # self.logger.debug(f"first arg gtype: {gtype}")
-            # result = (gtype.is_a(GObject.TYPE_ENUM))
-            # result = (gtype == GObject.TYPE_ENUM)
-            # result = (gtype == GObject.GParamEnum)
+            #self.logger.debug(f"first arg type is: {param_type}")
+            #self.logger.debug(f"str of first arg type is: {str(param_type)}")
+            result = (param_type.name == 'GimpRunMode')
 
-            # TODO file-gbr-save is aberrant, name is "dummy-param"
-            # TODO compare type to "GimpRunMode" ???
-
-            # Examine the name of the ParamSpec, not the type
-            param_name = arg_specs[0].name
-            self.logger.debug(f"first arg name: {param_name}")
-            result = ( param_name == 'run-mode')    # !!! - not _
+            """
+            We cannot examine the name of the ParamSpec, instead of the type
+            because some are named 'run-mode' and some 'dummy-param'.
+            file-gbr-save is aberrant, first arg name is "dummy-param"
+            """
+            # OLD
+            #param_name = arg_specs[0].name
+            #self.logger.debug(f"first arg name: {param_name}")
+            #result = ( param_name == 'run-mode')    # !!! - not _
         else:
             result = False
         return result

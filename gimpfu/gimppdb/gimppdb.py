@@ -27,7 +27,7 @@ class GimpPDB:
     def get_procedure_by_name(proc_name):
         """ Returns Gimp.Procedure for procname, else None.
 
-        The returned type is GimpProcedure, a GimpFu type,
+        The returned type is GimpProcedure, a wrapper GimpFu type,
         not Gimp.Procedure, a Gimp type.
         """
         result = Gimp.get_pdb().lookup_procedure(proc_name)
