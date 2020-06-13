@@ -30,7 +30,7 @@ class MarshalPDB():
     logger = logging.getLogger("GimpFu.MarshalPDB")
 
     @staticmethod
-    def _try_type_conversions(proc_name, gen_value, index):
+    def _try_type_conversions(procedure, gen_value, index):
         '''
         Attempt type conversions and upcast when passing to Gimp procedures.
         Conversion: changes Python type of fundamental types, i.e. int to float
@@ -57,7 +57,7 @@ class MarshalPDB():
         '''
         MarshalPDB.logger.debug(f"_try_type_conversions: index {index}" )
 
-        formal_arg_type = GimpPDB.get_formal_argument_type(proc_name, index)
+        formal_arg_type = procedure.get_formal_argument_type(index)
         if formal_arg_type is None:
             # Probably too many actual args.
             proceed(f"Failed to get formal argument type for index: {index}.")
@@ -117,7 +117,8 @@ class MarshalPDB():
 
         formal_args_index = 0
 
-        if GimpPDB.does_procedure_take_runmode(proc_name):
+        procedure =  GimpPDB.get_procedure_by_name(proc_name)
+        if procedure.takes_runmode:
             # no GUI, this is a call from a plugin
 
             a_gvalue = FuGenericValue.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)
@@ -145,7 +146,7 @@ class MarshalPDB():
             """
             """
             try:
-                MarshalPDB._try_type_conversions(proc_name, gen_value, formal_args_index)
+                MarshalPDB._try_type_conversions(procedure, gen_value, formal_args_index)
             except Exception as err:
                 proceed(f"Exception in _try_type_conversions: {gen_value}, formal_args_index: {formal_args_index}, {err}")
 
