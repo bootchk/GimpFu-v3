@@ -67,7 +67,8 @@ class Types():
         Types.logger.info(f"try_float_array_conversion {gen_value}")
         if isinstance(gen_value.actual_arg, list):
             # Types.logger.info(formal_arg_type)
-            if FormalTypes.is_float_array_type(formal_arg_type):
+            formal_arg_type_name = formal_arg_type.name
+            if FormalTypes.is_float_array_type(formal_arg_type_name):
                 gen_value.float_array()
         # else not a list i.e. not a Gimp array
 
@@ -75,7 +76,8 @@ class Types():
     @staticmethod
     def try_file_descriptor_conversion(formal_arg_type, gen_value, index):
         if isinstance(gen_value.actual_arg, str):
-            if FormalTypes.is_file_descriptor_type(formal_arg_type):
+            formal_arg_type_name = formal_arg_type.name
+            if FormalTypes.is_file_descriptor_type(formal_arg_type_name):
                 gen_value.file_descriptor()
 
 
@@ -113,19 +115,23 @@ class Types():
         # ("     Formal arg type ", formal_arg_type.name )
         assert formal_arg_type is not None
 
+        # FormalTypes.is_foo() wants a str
+        formal_arg_type_name = formal_arg_type.name
+        assert isinstance(formal_arg_type_name, str)
+
         if gen_value.actual_arg_type is int:
-            if FormalTypes.is_float_type(formal_arg_type):
+            if FormalTypes.is_float_type(formal_arg_type_name):
                 gen_value.float()
-            elif FormalTypes.is_str_type(formal_arg_type):
+            elif FormalTypes.is_str_type(formal_arg_type_name):
                 gen_value.str()
-            elif FormalTypes.is_unsigned_int_type(formal_arg_type):
+            elif FormalTypes.is_unsigned_int_type(formal_arg_type_name):
                 gen_value.unsigned_int()
-            elif FormalTypes.is_unsigned_char_type(formal_arg_type):
+            elif FormalTypes.is_unsigned_char_type(formal_arg_type_name):
                 gen_value.unsigned_char()
         elif gen_value.actual_arg_type is float:
-            if FormalTypes.is_int_type(formal_arg_type):
+            if FormalTypes.is_int_type(formal_arg_type_name):
                 gen_value.int()
-            elif FormalTypes.is_str_type(formal_arg_type):
+            elif FormalTypes.is_str_type(formal_arg_type_name):
                 gen_value.str()
         # else not a usual Python conversion, or doesn't need conversion
 

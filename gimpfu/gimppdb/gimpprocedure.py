@@ -97,6 +97,12 @@ class GimpProcedure:
 
     # TODO optimized, cache result from Gimp instead of getting it each call
 
+
+
+
+
+
+
     """
     to dump a GParamSpec:    print(dir(arg_specs[0]))
     We find that it has attributes 'name' and 'value_type' and '__gtype__'
@@ -112,18 +118,27 @@ class GimpProcedure:
     !!! Gimp.RunMode is-a class, i.e. a type, why can't we compare types?
     """
 
+
     def get_formal_argument_type_name(self, index):
+        value_type = self.get_formal_argument_value_type(index)
+        # assert value_type is-a ???
+        return value_type.name
+
+
+    def get_formal_argument_value_type(self, index):
         '''
-        Get the formal argument's type's name for a PDB procedure
+        Get the formal argument's type for a PDB procedure
         for argument with ordinal: index.
-        Returns an instance of str
+
+        Returns an instance of ??? not a str
         '''
         arg_spec = self.get_formal_argument_spec(index)
         if arg_spec is None:
             result = None
         else:
-            result = arg_spec.value_type.name
-        # ensure result is-a str or None
+            result = arg_spec.value_type
+        # ensure result is-a ??? or None
+        self.logger.debug(f"get_formal_argument_value_type returns: {result}")
         return result
 
 
@@ -156,6 +171,11 @@ class GimpProcedure:
         return result
 
 
+    """
+    TODO this works, but why?  the __gtype__ of a GParamSpec signifies what???
+
+    It logs e.g. as <GType GimpRunMode (39624048)> or <GType GimpParamDrawable (40117744)>
+    """
     def get_formal_argument_type(self, index):
         '''
         Get the formal argument type for a PDB procedure
