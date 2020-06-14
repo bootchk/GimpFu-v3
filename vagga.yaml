@@ -448,7 +448,7 @@ containers:
     - !Container gimpMesonDev
 
     # rebuild container if test plugin source (in /work i.e. project directory ) changes
-    - !Depends plug-ins
+    - !Depends plugins
 
     # create container user's .config for GIMP, to hold locally installed plug-ins
     - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins
@@ -463,7 +463,7 @@ containers:
     # Can't use the originals, since they have hash bang #! python2
 
     - !Copy
-      source: /work/plug-ins/
+      source: /work/plugins/wild
       path: /work/.home/.config/GIMP/2.99/plug-ins
 
     # make test plugins executable, Gimp requires it
@@ -632,10 +632,10 @@ commands:
       rm -rf /work/.home/.config/GIMP/2.99/plug-ins/*
 
       echo "Copying all wild test plugins"
-      cp -r /work/plug-ins/* /work/.home/.config/GIMP/2.99/plug-ins
+      cp -r /work/plugins/wild/* /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Copying all my test plugins"
-      cp -r /work/testPlugins/* /work/.home/.config/GIMP/2.99/plug-ins
+      cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
 
       # Scraps for copying selected plugins, if not all are copied
       # megaTestGimp
