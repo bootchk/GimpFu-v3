@@ -178,6 +178,9 @@ containers:
     # Ubuntu requires this else Gimp..Gtk crashes with:  Icon 'image-missing' not present in theme Symbolic
     - !Install [ gnome-icon-theme ]
 
+    # Since 2.99.2, Gimp requires vala compiler
+    - !Install [ valac ]
+
     environ:
       HOME: /work/.home
 
@@ -203,23 +206,27 @@ containers:
     #   git clone https://gitlab.gnome.org/GNOME/babl.git /home/babl
 
     # OR most most recent release archive
-    # 1.72=>1.74
+    # 1.72=>1.74=>1.78
     - !Tar
-      url: https://download.gimp.org/pub/babl/0.1/babl-0.1.74.tar.xz
+      url: https://download.gimp.org/pub/babl/0.1/babl-0.1.78.tar.xz
       path: /home
 
 
 
 
-    # Gimp depends on gegl 4.23 which is not released
+    # Gimp depends on latest gegl which is not released
     #- !Tar
     #  url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.18.tar.xz
     #  path: /home
 
     # latest, bleeding, from shared, bare repository
-    - !Git
-      url: https://gitlab.gnome.org/GNOME/gegl.git
-      path: /home/gegl
+    #- !Git
+    #  url: https://gitlab.gnome.org/GNOME/gegl.git
+    #  path: /home/gegl
+
+    - !Tar
+      url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.24.tar.xz
+      path: /home
 
 
 
@@ -254,10 +261,10 @@ containers:
 
 
     # Note babl and gegl build the same
-    # WAS: cd /home/babl-0.1.74
+    # WAS: cd /home/babl-0.1.74 => 1.78
 
     - !Sh |
-        cd /home/babl-0.1.74
+        cd /home/babl-0.1.78
         meson _build \
          --buildtype=release \
           -Db_lto=true
@@ -279,18 +286,20 @@ containers:
     # gegl builds its introspection data.
     # To do so, it must find Babl-0.1.gir
     # was  XDG_DATA_DIRS: "/home/share:/usr/share:$XDG_DATA_DIRS"
+    # was  XDG_DATA_DIRS: "/usr/local/shared"
 
     - !Env
-      XDG_DATA_DIRS: "/usr/local/share"
+      XDG_DATA_DIRS: "/usr/local/share:/usr/share"
 
     - !Sh echo ">>>>>>  XDG_DATA_DIRS"
     - !Sh echo $XDG_DATA_DIRS
     - !Sh echo ">>>>>>"
 
     # !!! Not using     --prefix=${GIMP_PREFIX} \
-    # WAS  cd /home/gegl-0.4.18
+    # WAS  cd /home/gegl-0.4.18 for a tar pull
+    # WAS cd /home/gegl for a git pull
     - !Sh |
-        cd /home/gegl
+        cd /home/gegl-0.4.24
         meson _build \
          --buildtype=release \
           -Db_lto=true
@@ -429,6 +438,7 @@ containers:
     # Generate documentation for Python language bindings to Gimp, etc.
     # Same documents for GLib, GObj, Gio webbed at "PyGObject API Reference"
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimpui-doc /usr/local/share/gir-1.0/GimpUi-3.0.gir
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
 
@@ -508,18 +518,28 @@ commands:
 
   testSource: !Command
     description: List contents of cloned source
-    container: gimpSource
+    container: gimpDepsSource
     run: |
       echo "Contents of /babl"
       ls /home/babl
       which git
+      echo "trying: pkg-config gegl"
+      pkg-config gegl-0.4 --modversion
 
-  testBabl: !Command
+
+  testBablGegl: !Command
     description: Test build babl and gegl
     container: bablGeglDev
     run: |
       ls /home/babl
       ls /home/gegl
+      echo "$PKG_CONFIG_PATH is:" $PKG_CONFIG_PATH
+      export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
+      echo "$PKG_CONFIG_PATH is:" $PKG_CONFIG_PATH
+      echo "trying: pkg-config gegl"
+      pkg-config gegl-0.4 --modversion
+      cd /home/gegl
+      git status
 
   #   cd /home/gegl-0.4.18/_build
   #    ninja test
@@ -609,9 +629,10 @@ commands:
       /usr/local/bin/gimp-2.99 --verbose
 
   # quicker startup
+  # often switch between gimpAMDev and gimpMesonDev
   gimpTestGUI: !Command
     description: Run gimp GUI in gimpDev container, with user's plugins in home
-    container:  gimpAMDev
+    container:  gimpMesonDev
     run: |
       export HOME=/work/.home
       echo "HOME" $HOME
