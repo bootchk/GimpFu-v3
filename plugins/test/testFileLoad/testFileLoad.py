@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# lkk add hashbang
+
 '''
 A test Gimp plugin
 that:
@@ -51,11 +54,15 @@ all_file_formats = two_arg_file_formats + one_arg_file_formats + noncanonical_ex
 def create_test_filename_for_format(file_format_name):
     return "/work/test/test." + file_format_name
 
-def create_file_for_filename(image, drawable, loader_name, filename):
+def create_file_for_filename(image, drawable, saver_name, filename):
     """ Tell Gimp to create file of given: filename having format: file_format_name from: image, drawable. """
     # like: pdb.file_bmp_save(image, drawable, filename)
     # TODO is actually saver_name
-    eval("pdb.file_" + loader_name + "_save(image, drawable, filename)")
+    if saver_name in ('gz', 'bz2'):
+        # has different signature
+        eval("pdb.file_" + saver_name + "_save(image, 1, drawable, filename)")
+    else:
+        eval("pdb.file_" + saver_name + "_save(image, drawable, filename)")
     # if the pdb procedure does not exist, this fails quietly and file still not exist
 
 

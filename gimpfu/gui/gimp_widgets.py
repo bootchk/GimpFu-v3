@@ -2,8 +2,9 @@
 
 import gi
 
-gi.require_version("Gimp", "3.0")
-from gi.repository import Gimp
+# !!! Even though docs generated from .gir say widgets are in Gimp, they are in GimpUi
+gi.require_version("GimpUi", "3.0")
+from gi.repository import GimpUi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
@@ -34,7 +35,7 @@ module_logger = logging.getLogger("GimpFu.gimp_widgets")
 """
 A Gimp.ColorButton displays a color, and pops up a Gimp.ColorSelector dialog when clicked.
 """
-class FuColorEntry(Gimp.ColorButton):
+class FuColorEntry(GimpUi.ColorButton):
     def __init__(self, default="", title = "Foo", ):
         module_logger.debug(f"ColorButton: default: {default} title: {title}")
 
@@ -68,7 +69,7 @@ class FuColorEntry(Gimp.ColorButton):
 
 
 
-class FuFontEntry(Gimp.FontSelectButton):
+class FuFontEntry(GimpUi.FontSelectButton):
     def __init__(self, default="" ):
         module_logger.debug(f"FuFontEntry: default: {default}")
 
@@ -84,7 +85,7 @@ class FuFontEntry(Gimp.FontSelectButton):
     def get_value(self):
         return self.get_font()
 
-class FuImageEntry(Gimp.ImageComboBox):
+class FuImageEntry(GimpUi.ImageComboBox):
     def __init__(self, default="" ):
         module_logger.debug(f"FuImageEntry: default: {default}")
 
@@ -102,7 +103,7 @@ class FuImageEntry(Gimp.ImageComboBox):
         return None
 
 
-class FuPaletteEntry(Gimp.PaletteSelectButton):
+class FuPaletteEntry(GimpUi.PaletteSelectButton):
     def __init__(self, default="" ):
         module_logger.debug(f"FuPaletteEntry: default: {default}")
 

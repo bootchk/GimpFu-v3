@@ -116,7 +116,7 @@ class GimpfuRGB(Adapter):
     @classmethod
     def create_RGB_from_string(cls, colorName):
         """ Create a Gimp.RGB from a string. """
-        Gimp.RGB()
+        result = Gimp.RGB()
         # TODO Gimp.RGB.parse_name does what when colorName invalid?
         # the GIR doc does not say what
         # result.parse_name(colorName, -1)  # -1 means null terminated

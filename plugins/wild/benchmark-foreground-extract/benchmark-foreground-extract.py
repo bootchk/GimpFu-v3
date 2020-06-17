@@ -1,4 +1,5 @@
-
+#!/usr/bin/env python
+# lkk add hashbang
 
 #   Foreground Extraction Benchmark
 #   Copyright 2005  Sven Neumann <sven@gimp.org>

@@ -1,4 +1,6 @@
-# This is the original from Gimp, without a hash bang
+#!/usr/bin/env python3
+# lkk add hashbang
+
 
 import math
 from gimpfu import *

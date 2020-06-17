@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# lkk add hashbang
 '''
 Created on Apr 20, 2013
 @author: github.com/pablojvarela

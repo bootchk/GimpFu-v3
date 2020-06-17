@@ -5,7 +5,6 @@ from gi.repository import Gimp
 
 from gi.repository import GObject    # GObject type constants
 
-from adaption.wrappable import *    # is_subclass_of_type
 from adaption.formal_types import FormalTypes
 
 from gimppdb.gimppdb import GimpPDB
@@ -171,74 +170,6 @@ class Types():
 
 
 
-    '''
-    Seems like need for upcast is inherent in GObj.
-    But probably Gimp should be doing most of the upcasting,
-    so that many plugs don't need to do it.
-    '''
-    @staticmethod
-    def try_upcast_to_type(formal_arg_type, gen_value, index, cast_to_type):
-        '''
-        When gen_value.actual_arg_type is subclass of cast_to_type
-        and procedure has signature with formal_arg_type at index (proc expects cast_to_type at index)
-        return cast_to_type, else return original type.
-        Does not actually change type i.e. no conversion, just casting.
-
-        Require gen_value a GObject (not wrapped).
-        Require formal_arg_type is-a GType.
-        '''
-        # assert type is like Gimp.Drawable, cast_to_type has name like Drawable
-
-        Types.logger.info(f"Attempt upcast: {gen_value} to : {cast_to_type.__name__}")
-
-        if Types._should_upcast_or_convert(gen_value.actual_arg_type, formal_arg_type, cast_to_type):
-            if is_subclass_of_type(gen_value.actual_arg, cast_to_type):
-                gen_value.upcast(cast_to_type)
-            elif gen_value.actual_arg == -1:
-                # v2 allowed -1 as arg for optional drawables
-                # # !!! convert arg given by Author
-                gen_value.upcast_to_None(cast_to_type)
-            elif gen_value.actual_arg is None:
-                # TODO migrate to create_nonetype_drawable or create_none_for_type(type)
-                # Gimp wants GValue( Gimp.Drawable, None), apparently
-                # This does not work: result = -1
-                # But we can upcast NoneType, None is in every type???
-                gen_value.upcast(cast_to_type)
-            else:
-                # Note case Drawable == Drawable will get here, but Author cannot create instance of Drawable.
-                proceed(f"Require type: {formal_arg_type} , but got {gen_value} not castable.")
-
-        else:
-            # No upcast was done
-            pass
-
-        # assert result_type is-a type (a Gimp type, a GObject type)
-        Types.logger.info(f"try_upcast_to_type returns: {gen_value}")
-
-
-    # TODO replace this with data driven single procedure
-    @staticmethod
-    def try_upcast_to_drawable(formal_arg_type, gen_value, index):
-        Types.try_upcast_to_type(formal_arg_type, gen_value, index, Gimp.Drawable)
-
-    @staticmethod
-    def try_upcast_to_item(formal_arg_type, gen_value, index):
-        Types.try_upcast_to_type(formal_arg_type, gen_value, index, Gimp.Item)
-
-    @staticmethod
-    def try_upcast_to_layer(formal_arg_type, gen_value, index):
-        Types.try_upcast_to_type(formal_arg_type, gen_value, index, Gimp.Layer)
-
-    @staticmethod
-    def try_upcast_to_color(formal_arg_type, gen_value, index):
-        Types.try_upcast_to_type(formal_arg_type, gen_value, index, Gimp.RGB)
-        if gen_value.did_upcast:
-            # also convert value
-            try:
-                gen_value.color()
-            except Exception as err:
-                proceed(f"Converting to color: {err}")
-            #Types.logger.info(type(result))
 
 
 
@@ -325,3 +256,8 @@ class Types():
         else:
             result = item
         return result
+
+    # TODO to support gimp_gz_save
+    def try_convert_drawable_to_drawable_array(item):
+        # is_object_array_type
+        pass

@@ -1,4 +1,5 @@
-
+#!/usr/bin/env python3
+# lkk add hashbang
 
 #   Gimp-Python - allows the writing of Gimp plugins in Python.
 #   Copyright (C) 1997  James Henstridge <james@daa.com.au>

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# lkk add hashbang
+
 # lkk omit   #![path to Gimp application]/GIMP-2.10.app/Contents/MacOS/python
 from gimpfu import *
 # lkk omit     import gimp

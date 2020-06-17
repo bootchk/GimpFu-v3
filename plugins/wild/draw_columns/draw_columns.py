@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
+# lkk add hashbang
 '''
 Created on 11/04/2012
 @author: Kedde
 '''
-#!/usr/bin/env python
 
 from gimpfu import *
 

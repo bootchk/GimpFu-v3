@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# lkk add hashbang
+
 '''
 A test Gimp plugin that:
 - dumps the PDB to a file

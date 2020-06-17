@@ -1,4 +1,5 @@
-
+#!/usr/bin/env python3
+# lkk add hashbang
 """Restore faded slides.
 
 Restores scanned slides that have deteriorated with age.

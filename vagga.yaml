@@ -27,7 +27,8 @@ containers:
     # ubuntu 19.10, which has meson 51
     - !Ubuntu eoan
     # 20.4 LTS
-    #- !Ubuntu fossa
+    # - !Ubuntu focal
+    # June 16, 2020 focal fails at dbus_cil package from glib2_test package
 
     # enable universe repository (where gimp lives)
     - !UbuntuUniverse
@@ -684,12 +685,19 @@ commands:
 
   # quicker startup
   generateGIDocs: !Command
-    description: Generate GI docs from  gimpAMDev container to work/.home
-    container:  gimpAMDev
+    description: Generate GI docs from  gimpMesonDev container to work/.home
+    container:  gimpMesonDev
     run: |
-       g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+       g-ir-doc-tool --language=Python -o /work/.home/gimp-doc   /usr/local/share/gir-1.0/Gimp-3.0.gir
+       g-ir-doc-tool --language=Python -o /work/.home/gimpui-doc /usr/local/share/gir-1.0/GimpUi-3.0.gir
+       g-ir-doc-tool --language=Python -o /work/.home/glib-doc   /usr/share/gir-1.0/GLib-2.0.gir
+       g-ir-doc-tool --language=Python -o /work/.home/gobj-doc   /usr/share/gir-1.0/GObject-2.0.gir
        echo "Generated to .home/gimp-doc"
 
+  showEnv: !Command
+    description: env in gimpMesonDev
+    container:  gimpMesonDev
+    run: env
 
   gimpListPlugins: !Command
     description: List local plugins in gimpdev container
@@ -698,7 +706,7 @@ commands:
       ls -alR $HOME/.config/GIMP/2.99/plug-ins
       cat $HOME/.config/GIMP/2.99/plug-ins/test/test.py
 
-
+  # CRUFT, pygimp is obsolete
   # uncomment ## in gimp/plug-ins/Makefile.am
   # not working, read-only file system
   makePyGimp: !Command
