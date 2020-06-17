@@ -13,6 +13,10 @@ from adapters.rgb import GimpfuRGB
 from message.proceed_error import proceed
 from message.suggest import Suggest
 
+import collections.abc      # ABC for sequences
+
+
+
 
 # TODO foo_type getters should be computed properties, not mutable
 
@@ -146,6 +150,44 @@ class FuGenericValue():
     def unsigned_char(self):
         # Not a conversion, an upcast only
         self.upcast(GObject.TYPE_UCHAR)
+
+
+
+
+    def is_tuple_or_list(self, obj):
+        if isinstance(obj, str):
+            # Python thinks a str is a sequence, but we treat it as a single element
+            return False
+        return isinstance(obj, collections.Sequence)
+
+    def object_array(self):
+        ''' Make self own a GValue holding a GimpObjectArray created from native list.
+
+        Also allow Author to pass single instance, convert it to a list.
+        '''
+
+        if self.is_tuple_or_list(self._actual_arg):
+            list = self._actual_arg
+        else:
+            list = [self._actual_arg,]
+
+        try:
+            self._gvalue = GObject.Value (Gimp.ObjectArray.__gtype__)
+
+            # PyGObject will convert using sequence and len(sequence)
+            # Note that the previous arg (length) is still also passed to the PDB procedure
+
+            # ??? we don't need to pass len(list)
+            # Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
+            # we do need to pass type of elements in list
+            # TODO Layer is a hack, need gtype of list elements
+            Gimp.value_set_object_array(self._gvalue, Gimp.Layer, list)
+            self._did_create_gvalue = True
+            self._did_convert = True
+
+        except Exception as err:
+            proceed(f"Failed to create Gimp.ObjectArray: {err}.")
+
 
 
     def float_array(self):

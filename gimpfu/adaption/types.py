@@ -71,6 +71,18 @@ class Types():
                 gen_value.float_array()
         # else not a list i.e. not a Gimp array
 
+    # TODO to support gimp_gz_save
+    def try_object_array_conversion(formal_arg_type, gen_value, index):
+        Types.logger.info(f"try_object_array_conversion {gen_value}")
+        # Allow a list, or a single element of desired type
+        # if isinstance(gen_value.actual_arg, list):
+
+        formal_arg_type_name = formal_arg_type.name
+        #Types.logger.info(f"type: {formal_arg_type_name}")
+        if FormalTypes.is_object_array_type(formal_arg_type_name):
+            gen_value.object_array()
+        # else not convertable to Gimp.ObjectArray
+
 
     @staticmethod
     def try_file_descriptor_conversion(formal_arg_type, gen_value, index):
@@ -157,6 +169,10 @@ class Types():
     Note that Layer is-a Drawable is-a Item
     and we may call this with (Layer, Drawable, Item)
     but we don't upcast since the procedure wants Drawable
+
+    TODO this is only used by Upcast, should be there.
+    Only for upcasts combined with a conversion??
+    Other conversions don't use this method???
     '''
     @staticmethod
     def _should_upcast_or_convert(instance_type, formal_arg_type, cast_to_type):
@@ -169,7 +185,14 @@ class Types():
 
 
 
-
+    def try_array_conversions(formal_arg_type, gen_value, index):
+        """
+        Try convert Python sequences to GObject arrays.
+        """
+        Types.try_float_array_conversion(formal_arg_type, gen_value, index)
+        if gen_value.did_convert:
+            return
+        Types.try_object_array_conversion(formal_arg_type, gen_value, index)
 
 
 
@@ -256,8 +279,3 @@ class Types():
         else:
             result = item
         return result
-
-    # TODO to support gimp_gz_save
-    def try_convert_drawable_to_drawable_array(item):
-        # is_object_array_type
-        pass

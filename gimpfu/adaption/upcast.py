@@ -22,6 +22,23 @@ class Upcast():
 
     logger = logging.getLogger("GimpFu.Upcast")
 
+    @staticmethod
+    def try_gimp_upcasts(formal_arg_type, gen_value, index):
+        """
+        Try the upcasts required by Gimp PDB.
+        """
+        Upcast.try_to_drawable(formal_arg_type, gen_value, index)
+        if gen_value.did_upcast:
+            return
+        Upcast.try_to_item(formal_arg_type, gen_value, index)
+        if gen_value.did_upcast:
+            return
+        Upcast.try_to_layer(formal_arg_type, gen_value, index)
+        if gen_value.did_upcast:
+            return
+        Upcast.try_to_color(formal_arg_type, gen_value, index)
+
+
 
     @staticmethod
     def _try_to_type(formal_arg_type, gen_value, index, cast_to_type):

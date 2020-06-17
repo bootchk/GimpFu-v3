@@ -61,34 +61,23 @@ class MarshalPDB():
         formal_arg_type = procedure.get_formal_argument_type(index)
         if formal_arg_type is None:
             # Probably too many actual args.
-            proceed(f"Failed to get formal argument type for index: {index}.")
+            proceed(f"Failed to get formal arg type for index: {index}.")
             return
 
         MarshalPDB.logger.debug(f"_try_type_conversions: index {index} formal type: {formal_arg_type}" )
 
-        Upcast.try_to_drawable(formal_arg_type, gen_value, index)
-        if gen_value.did_upcast:
-            return
-        Upcast.try_to_item(formal_arg_type, gen_value, index)
-        if gen_value.did_upcast:
-            return
-        Upcast.try_to_layer(formal_arg_type, gen_value, index)
-        if gen_value.did_upcast:
-            return
-        Upcast.try_to_color(formal_arg_type, gen_value, index)
+        Upcast.try_gimp_upcasts(formal_arg_type, gen_value, index)
         if gen_value.did_upcast:
             return
 
-        # Continue trying conversions
         Types.try_usual_python_conversion(formal_arg_type, gen_value, index)
         if gen_value.did_convert:
             return
-        Types.try_float_array_conversion(formal_arg_type, gen_value, index)
+
+        Types.try_array_conversions(formal_arg_type, gen_value, index)
         if gen_value.did_convert:
             return
-        #Types.try_object_array_conversion(formal_arg_type, gen_value, index)
-        #if gen_value.did_convert:
-        #    return
+
         Types.try_file_descriptor_conversion(formal_arg_type, gen_value, index)
         if not gen_value.did_convert:
             MarshalPDB.logger.debug(f"No type conversions: index {index} formal type: {formal_arg_type}" )

@@ -41,9 +41,11 @@ class FormalTypes():
     def is_int_type(type_name):          return type_name in ('GParamInt', )
     def is_unsigned_int_type(type_name): return type_name in ('GParamUInt', )
     def is_unsigned_char_type(type_name): return type_name in ('GParamUChar', )
-    def is_object_array_type(type_name): return type_name in ('GimpObjectArray', )
+
     # !!!! GimpParam... not GParam...
+    def is_object_array_type(type_name): return type_name in ('GimpParamObjectArray', )
     def is_float_array_type(type_name):   return type_name in ('GimpParamFloatArray', )
+
     def is_file_descriptor_type(type_name):
         # ??? PDB Browser says 'GFile' but is 'GParamObject'
         # TODO this might be too general, could catch other param types?
