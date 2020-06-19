@@ -2,72 +2,54 @@
 # lkk add hashbang
 
 '''
-A test Gimp plugin
-that:
-- tests pdb procedures that load files named file_foo_load()
+A Gimp plugin that:
+- tests PDB procedures that save and load image files
 
-!!! All should be named according to a forumula.
-!!! They have different signatures.
+!!! See ImageFormat in image_format.py which hides many vagaries of the PDB.
 
 Depends on specific test directory existing.
 Does NOT depend on test files existing.
-You can empty the test directory, and it will create test files
+You can empty the test directory, and it can create test files (using save procedure)
 (effectively testing both save and load procedures.)
+
+Cannot create IN test files (no save procedure in Gimp)
+so to test load only,
+manually create such files in the test directory.
+
+Optionally will omit testing file formats known to crash the test harness.
 '''
 import os
 from gimpfu import *
 
-"""
-These tuples separate file formats into classes
-according to signature of file save/load procedures.
+from image_format import ImageFormat
 
-Some have defaulted args that are not tested.
-"""
 
-# For aberrant cases, where loader not have extension embedded in name
-map_format_to_extension = {
-"sunras" : "ras",
-"openraster" : "ora"    # or .sun, etc.
-}
 
-two_arg_file_formats = ("pdf", )
-one_arg_file_formats = ( "bmp", "bz2", "dds", "dicom", "fits", "fli", "gbr",
-                    "gif", "gih", "gz", "ico", "jpeg", "pat", "pcx", "pix",
-                    "png", "pnm", "psd", "raw", "sgi",
-                    "tga", "tiff", "xbm", "xmc", "xwd", "xz")
-# where the file extension is not embedded in the loader name
-noncanonical_ext_file_formats = ("sunras", "openraster")
 
-# TODO "cel" )
-# TODO "faxg3", "gex", "hgt", "psp", "svg" has no save procedure, thus we cannot create
-# TODO Gimp names use "jpeg" so we won't open .jpg files.
-# TODO rgbe is file-load-rgbe, named non-canonically
-# TODO sunras is file-sunras-load but extensions are many e.g. .sun, .ras, etc.
-# TODO ora is file-openraster-load
-# TODO xcf is gimp-xcf-load
-# TODO unknown i.e. using magic is gimp-file-load
+def create_file_for_filename(image, drawable, format_moniker, filename):
+    """ Tell Gimp to create file named: *filename* having format: *format_moniker* from: image, drawable.
+    """
+    # assert filename already has format's extension
+    # typical evaluated string: pdb.file_bmp_save(image, drawable, filename)
 
-# TODO also thumbs???
+    saver_name = ImageFormat.saver_name(format_moniker)
 
-all_file_formats = two_arg_file_formats + one_arg_file_formats + noncanonical_ext_file_formats
-
-def create_test_filename_for_format(file_format_name):
-    return "/work/test/test." + file_format_name
-
-def create_file_for_filename(image, drawable, saver_name, filename):
-    """ Tell Gimp to create file of given: filename having format: file_format_name from: image, drawable. """
-    # like: pdb.file_bmp_save(image, drawable, filename)
-    # TODO is actually saver_name
-    if saver_name in ('gz', 'bz2'):
-        # has different signature
-        eval("pdb.file_" + saver_name + "_save(image, 1, drawable, filename)")
+    if ImageFormat.saver_takes_single_drawable(format_moniker):
+        arg_string = "(image, drawable, filename)"
     else:
-        eval("pdb.file_" + saver_name + "_save(image, drawable, filename)")
+        # has signature image, drawable_count, GObjectArray, filename
+        # GimpFu will convert single drawable instance to GObjectArray
+        arg_string = "(image, 1, drawable, filename)"
+
+    eval_string = "pdb." + saver_name + arg_string
+    print(eval_string)
+    eval(eval_string)
     # if the pdb procedure does not exist, this fails quietly and file still not exist
 
 
-def ensure_test_file(image, drawable, loader_name, file_format_name):
-    """ Ensure exists a file having canonical filename of given format: file_format_name.
+
+def ensure_test_file(image, drawable, format_moniker):
+    """ Ensure exists a file having canonical filename for given format: format_moniker.
 
     Return canonical filename (like /work/test/test.jpeg)
 
@@ -76,71 +58,105 @@ def ensure_test_file(image, drawable, loader_name, file_format_name):
 
     If file not exist and cannot create it, return None.
     """
-    filename = create_test_filename_for_format(file_format_name)
-    if not os.path.isfile(filename):
-        # pass loader_name, not file_format_name
-        create_file_for_filename(image, drawable, loader_name, filename)
-    if not os.path.isfile(filename):
-        filename = None
-        # raise Exception(f"Could not create test file for format: {file_format_name}.")
-    print(f"Test file: {filename}")
-    return filename
+    filename = ImageFormat.canned_filename(format_moniker)
+
+    if os.path.isfile(filename):
+        # file already exists
+        did_saver_run = False
+    else:
+        create_file_for_filename(image, drawable, format_moniker, filename)
+        did_saver_run = True
+        # Saver ran but might have failed to create file
+        if not os.path.isfile(filename):
+            filename = None
+
+    # assert file exists or filename is None
+    return filename, did_saver_run
 
 
-def load_file(image, drawable, loader_name, file_format_name):
-    """ Tell Gimp to load test file of given file_format_name.
+def load_file(image, drawable, filename, format_moniker):
+    """ Tell Gimp to load test_file of given format_moniker.
 
-    Return new image.
+    Return new image or None.
+    None means loading failed.
 
-    File need not exist.
-    Will try create file from image, drawable
+    File must exist.
+
+    Understands loader signatures.
     """
-    filename = ensure_test_file(image, drawable, loader_name, file_format_name)
+    # filename = ensure_test_file(image, drawable, loader_name, format_moniker)
+    assert filename is not None
+
+    loader_name = ImageFormat.loader_name(format_moniker)
+    if ImageFormat.has_two_arg_loader(format_moniker) :
+        # args (GFile, filename) filename typically a password for pdf?
+        arg_string = "(filename, filename)"
+    elif  ImageFormat.has_one_arg_loader(format_moniker) :
+        # load procedure has args (GFile)
+        arg_string = "(filename)"
+    else:
+      raise Exception(f"Not implemented loader args case: {format_moniker}")
+
+    # GimpFu will convert filename to GFile for first arg
+    test_image = eval("pdb." + loader_name + arg_string)
+    return test_image
+
+
+
+def test_file_format(image, drawable, format_moniker):
+    """ Test loading and sometimes saving of format_moniker.
+
+    Try create a test file if it does not exist.
+    When cannot create show a message
+    (when there is no Gimp.PDB.file_foo_save procedure of kind "save")
+
+    Return a string describing result.
+    """
+    filename, did_saver_run = ensure_test_file(image, drawable, format_moniker)
+
     if filename is None:
-        image = None
-    else:
-        # Like test_pdb.file_jpeg_load(filename)
-        image = eval("pdb.file_" + loader_name + "_load(filename)")
-    return image
-
-
-def plugin_func(image, drawable, file_format_index):
-    """ Attempt to load test file of given format.
-
-    Try create the file if it does not exist.
-    If cannot create (when there is no Gimp.PDB.file_foo_save procedure of kind "save")
-    show a message.
-    """
-
-    # get name from same list we showed in GUI
-    file_format_name = all_file_formats[file_format_index]
-
-    if file_format_name in two_arg_file_formats :
-        # load procedure has args (GFile, str) e.g. pdf
-        filename = ensure_test_file(image, drawable, file_format_name)
-        if filename is None:
-            test_image = None
+        # gimp.message("File to load doesn't exist and there is no Gimp PDB procedure to create one.")
+        if did_saver_run:
+            result = "Test file not exist and save procedure failed.)"
         else:
-            # GimpFu will convert filename to GFile
-            test_image =  pdb.file_pdf_load(filename, filename)
-    elif file_format_name in one_arg_file_formats :
-        # load procedure has args (GFile)
-        # loader name is canonical with file_format_name embedded
-        test_image = load_file(image, drawable, file_format_name, file_format_name)
-    elif file_format_name in noncanonical_ext_file_formats :
-        # load procedure has args (GFile)
-        # get file ext from dictionary
-        file_ext = map_format_to_extension[file_format_name]
-        test_image = load_file(image, drawable, file_format_name, file_ext )
+            result = "Test file not exist and no save procedure to create it."
     else:
-      raise Exception("Not implemented format case")
+        test_image = load_file(image, drawable, filename, format_moniker)
+        if test_image is not None:
+            image_display = pdb.gimp_display_new (test_image)
+            # TODO say whether the saver ran
+            result = "Passed"
+        else:
+            result = "Loader failed."
+    return result
 
-    if test_image is not None:
-        image_display = pdb.gimp_display_new (test_image)
+
+def test_all_file_formats(image, drawable):
+    log = []
+    for format_moniker in ImageFormat.all_format_monikers:
+        if ImageFormat.excludeFromTests(format_moniker):
+            result = "Omitted test."
+        else:
+            result = test_file_format(image, drawable, format_moniker)
+        log.append(format_moniker + ": " + result + "\n")
+    print(log)
+
+
+
+def plugin_func(image, drawable, run_all, file_format_index):
+    """ Run one or all save/load tests of file formats.
+    """
+    if run_all:
+        test_all_file_formats(image, drawable)
     else:
-        gimp.message("File to load doesn't exist and there is no Gimp PDB procedure to create one.")
-        # OR other errror?
+        # get moniker from same list we showed in GUI
+        format_moniker = ImageFormat.all_format_monikers[file_format_index]
+        result = test_file_format(image, drawable, format_moniker)
+        print(f"Test>File save/load: {format_moniker} result: {result}")
+
+    # show the test images we saved/loaded
     gimp.displays_flush()
+
 
 register(
       "python-fu-test-file-load",
@@ -154,7 +170,8 @@ register(
       [
           (PF_IMAGE, "image", "Input image", None),
           (PF_DRAWABLE, "drawable", "Input drawable", None),
-          (PF_OPTION, "format", "Format", 0, all_file_formats),
+          (PF_TOGGLE, "run_all", "Run all?", 1),
+          (PF_OPTION, "format", "Format", 0, ImageFormat.all_format_monikers),
       ],
       [],
       plugin_func,

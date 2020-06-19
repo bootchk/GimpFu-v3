@@ -34,6 +34,7 @@ containers:
     - !UbuntuUniverse
     # tools for dev (C compiler)
     - !Install [build-essential]
+    - !Install [gdb]
 
 
 
@@ -445,11 +446,14 @@ containers:
 
     ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
 
+  # with gdb.  TODO move higher
+  gimpMesonGdb:
+    setup:
+    - !Container gimpMesonDev
+
+    - !Install [meson]
 
 
-  # With local customized GIMP
-  # We install test plug-ins locally (for user).  This is common practice.
-  # We install gimpfu locally (for user).  This is uncommon, eventually gimpfu installs w Gimp.
 
   # Faster if a command does this.  See gimpTestGUI which runs on gimpAMDev
   gimpLocal:
@@ -636,19 +640,21 @@ commands:
     container:  gimpMesonDev
     run: |
       export HOME=/work/.home
-      echo "HOME" $HOME
       export GIMP_PREFIX="/usr/local"
       export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      echo $LD_LIBRARY_PATH
       export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
-      echo $XDG_DATA_DIRS
       export PATH="/usr/local/bin:$PATH"
       export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
-      echo "GEGL_PATH" $GEGL_PATH
-      which gegl
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-      echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
       export NO_AT_BRIDGE=1
+
+      echo "HOME"            $HOME
+      echo "GIMP_PREFIX"     $GIMP_PREFIX
+      echo "LD_LIBRARY_PATH" $LD_LIBRARY_PATH
+      echo "XDG_DATA_DIRS"   $XDG_DATA_DIRS
+      echo "PATH"            $PATH
+      echo "GEGL_PATH"       $GEGL_PATH
+      echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
 
       echo "Removing old plugins and gimpfu source"
       rm -rf /work/.home/.config/GIMP/2.99/plug-ins/*
@@ -721,3 +727,17 @@ commands:
     container: gimpAMDev
     run: |
       ubuntu-bug gkt3
+
+  gdbGimp: !Command
+    description: Run gdb on gimp in container gimpMesonDev
+    container: gimpMesonDev
+    run: |
+      export HOME=/work/.home
+      export GIMP_PREFIX="/usr/local"
+      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
+      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
+      export PATH="/usr/local/bin:$PATH"
+      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
+      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      export NO_AT_BRIDGE=1
+      gdb gimp-2.99

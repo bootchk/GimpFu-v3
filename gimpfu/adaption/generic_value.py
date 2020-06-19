@@ -181,7 +181,9 @@ class FuGenericValue():
             # Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
             # we do need to pass type of elements in list
             # TODO Layer is a hack, need gtype of list elements
-            Gimp.value_set_object_array(self._gvalue, Gimp.Layer, list)
+            print(self._actual_arg.__gtype__)
+            #Gimp.value_set_object_array(self._gvalue, Gimp.Layer, list)
+            Gimp.value_set_object_array(self._gvalue, self._actual_arg.__gtype__, list)
             self._did_create_gvalue = True
             self._did_convert = True
 
