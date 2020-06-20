@@ -12,11 +12,17 @@ Does NOT depend on test files existing.
 You can empty the test directory, and it can create test files (using save procedure)
 (effectively testing both save and load procedures.)
 
-Cannot create IN test files (no save procedure in Gimp)
-so to test load only,
-manually create such files in the test directory.
+When this plugin cannot create IN test files (since there is no save procedure in Gimp)
+you can still test loading but
+you must manually create such files in the test directory.
 
 Optionally will omit testing file formats known to crash the test harness.
+
+Some format loader/savers have defaulted args that are not tested.
+I.E. this does not understand the details about a format,
+and does not stress test all possibilities for a format.
+I.E. only does basic sanity test: creates or reads a file.
+Does not compare resulting images or files with known good result images or files.
 '''
 import os
 from gimpfu import *
@@ -24,16 +30,12 @@ from gimpfu import *
 from image_format import ImageFormat
 
 
+def call_save_procedure(saver_name, image, drawable, format_moniker, filename):
+    """ Invoke save procedure given by saver_name.
 
-
-def create_file_for_filename(image, drawable, format_moniker, filename):
-    """ Tell Gimp to create file named: *filename* having format: *format_moniker* from: image, drawable.
+    assert saver_name is a string, but save procedure might not exist
+    If the pdb procedure does not exist, this fails quietly and file still not exist
     """
-    # assert filename already has format's extension
-    # typical evaluated string: pdb.file_bmp_save(image, drawable, filename)
-
-    saver_name = ImageFormat.saver_name(format_moniker)
-
     if ImageFormat.saver_takes_single_drawable(format_moniker):
         arg_string = "(image, drawable, filename)"
     else:
@@ -44,34 +46,26 @@ def create_file_for_filename(image, drawable, format_moniker, filename):
     eval_string = "pdb." + saver_name + arg_string
     print(eval_string)
     eval(eval_string)
-    # if the pdb procedure does not exist, this fails quietly and file still not exist
 
 
 
-def ensure_test_file(image, drawable, format_moniker):
-    """ Ensure exists a file having canonical filename for given format: format_moniker.
+# TODO shouldn't save_file and load_file be symmetrical?
 
-    Return canonical filename (like /work/test/test.jpeg)
-
-    If file already exists, return it.
-    Else try create, from given image, drawable.
-
-    If file not exist and cannot create it, return None.
+def save_file(image, drawable, format_moniker, filename):
+    """ Tell Gimp to save file named: *filename* having format: *format_moniker* from: image, drawable.
     """
-    filename = ImageFormat.canned_filename(format_moniker)
+    # assert filename already has format's extension
+    # typical evaluated string: pdb.file_bmp_save(image, drawable, filename)
 
-    if os.path.isfile(filename):
-        # file already exists
-        did_saver_run = False
+    if ImageFormat.exists_saver(format_moniker):
+        saver_name = ImageFormat.saver_name(format_moniker)
+        call_save_procedure(saver_name, image, drawable, format_moniker, filename)
+        did_saver_run = True  # at least we tried to run it
+        did_saver_pass = os.path.isfile(filename)  # At least it created a file
     else:
-        create_file_for_filename(image, drawable, format_moniker, filename)
-        did_saver_run = True
-        # Saver ran but might have failed to create file
-        if not os.path.isfile(filename):
-            filename = None
-
-    # assert file exists or filename is None
-    return filename, did_saver_run
+        did_saver_run = False
+        did_saver_pass = False
+    return did_saver_run, did_saver_pass
 
 
 def load_file(image, drawable, filename, format_moniker):
@@ -103,31 +97,91 @@ def load_file(image, drawable, filename, format_moniker):
 
 
 
-def test_file_format(image, drawable, format_moniker):
-    """ Test loading and sometimes saving of format_moniker.
 
-    Try create a test file if it does not exist.
-    When cannot create show a message
+def ensure_test_file(image, drawable, format_moniker):
+    """ Ensure exists a file having canonical filename for given format: format_moniker.
+
+    Return canonical filename (like /work/test/test.jpeg)
+
+    If file already exists, return filename.
+    Else try create, from given image, drawable.
+
+    Return whether save_procedure ran, and whether it succeeded.
+    """
+    filename = ImageFormat.canned_filename(format_moniker)
+
+    if os.path.isfile(filename):
+        # file already exists
+        did_saver_run = False
+        did_saver_pass = False
+    else:
+        # If save procedure exists, invoke it
+        did_saver_run, did_saver_pass = save_file(image, drawable, format_moniker, filename)
+
+
+    if not os.path.isfile(filename):
+        filename = None
+    # assert file exists or filename is None
+
+    return filename, did_saver_run, did_saver_pass
+
+
+
+
+
+def format_result(did_saver_run, did_saver_pass, did_loader_run, did_loader_pass):
+    """ Return string describing test results. """
+    # TODO say something about file preexists?
+    result = ""
+    if did_saver_run:
+        if did_saver_pass:
+            result += "Save procedure PASS. "
+        else:
+            result += "Save procedure FAIL. "
+    else:
+        result += "Save procedure NO TEST: test file exists or save procedure not exist. "
+    if did_loader_run:
+        if did_loader_pass:
+            result += "Load procedure PASS. "
+        else:
+            result += "Load procedure FAIL. "
+    else:
+        result += "Load procedure NO TEST: no test file exists or load procedure not exist. "
+    return result
+
+
+def test_file_format(image, drawable, format_moniker):
+    """ Test loading and/or saving of format_moniker.
+
+    Try create a test file if saver exists.
+    When cannot create
     (when there is no Gimp.PDB.file_foo_save procedure of kind "save")
 
+    TODO when file already exists, do we test the saver?
+
+    Then try loading.
+    When c
     Return a string describing result.
     """
-    filename, did_saver_run = ensure_test_file(image, drawable, format_moniker)
+    filename, did_saver_run, did_saver_pass = ensure_test_file(image, drawable, format_moniker)
 
-    if filename is None:
-        # gimp.message("File to load doesn't exist and there is no Gimp PDB procedure to create one.")
-        if did_saver_run:
-            result = "Test file not exist and save procedure failed.)"
+    if filename is not None:
+        if ImageFormat.exists_loader(format_moniker):
+            did_loader_run = True
+            test_image = load_file(image, drawable, filename, format_moniker)
+            if test_image is not None:
+                image_display = pdb.gimp_display_new (test_image)
+                did_loader_pass = True
+            else:
+                did_loader_pass = False
         else:
-            result = "Test file not exist and no save procedure to create it."
+            did_loader_run = False
+            did_loader_pass = False
     else:
-        test_image = load_file(image, drawable, filename, format_moniker)
-        if test_image is not None:
-            image_display = pdb.gimp_display_new (test_image)
-            # TODO say whether the saver ran
-            result = "Passed"
-        else:
-            result = "Loader failed."
+        did_loader_run = False
+        did_loader_pass = False
+
+    result =  format_result(did_saver_run, did_saver_pass,  did_loader_run, did_loader_pass)
     return result
 
 
@@ -138,8 +192,12 @@ def test_all_file_formats(image, drawable):
             result = "Omitted test."
         else:
             result = test_file_format(image, drawable, format_moniker)
-        log.append(format_moniker + ": " + result + "\n")
-    print(log)
+        # append line to logger
+        log.append(format_moniker + ": " + result)
+
+    print("testFileLoad summary of 'Test All' ")
+    for line in log: print(line)
+    # This is a GimpFu plugin so other GimpFu messages may precede or follow, and might be pertinent
 
 
 
@@ -160,7 +218,7 @@ def plugin_func(image, drawable, run_all, file_format_index):
 
 register(
       "python-fu-test-file-load",
-      "Test load and save images of various file formats",
+      "Test load and/or save images of various file formats",
       "No help",
       "Lloyd Konneker",
       "Lloyd Konneker",

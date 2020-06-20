@@ -2,7 +2,7 @@
 
 
 """
-Understands image file formats.
+Understands Gimp capabilities re image file formats.
 
 Moniker: name embedded in save/load procedure.
 
@@ -10,53 +10,76 @@ Understands and hides:
 - Moniker is not always the same as file format extension.
 - save and load procedure names not always named canonically e.g. file_moniker_save
 - signatures differ among save and load procedures
+- formats can be: save-only, load-only, or load-or-save
 """
 class ImageFormat:
     """
-    These tuples separate file formats into classes
-    according to signature of file save/load procedures.
+    This class data is metadata about file formats
+    and the signature of file save/load procedures.
 
-    Some have defaulted args that are not tested.
+    This was derived manually.
+    It could be automated by querying the PDB ?
     """
 
-    # Exclude formats from test
-    # Where we know they crash the plugin and want the plugin to test everything else
-    excluded_from_test = ("openraster")
+    # TODO heif plugin? was in 2.10.2
 
-    # For aberrant cases, where load procedure name not have extension embedded in name
+    # Exclude formats from test all
+    # Where we know they crash the test plugin and want the plugin to test everything else
+    # You can still test individually, just not using "test all"
+    excluded_from_test = ("cel", "openraster", "gih", "colorxhtml" )
+
+
+    # Aberrant cases, where load/save procedure moniker not have extension embedded in name
+    # loader named canonically but extension not embedded in name
+    # sunras is file-sunras-load but extensions are many e.g. .sun, .ras, etc.
+    # openraster is file-openraster-load but extension is ora
     map_moniker_to_extension = {
-    "sunras" : "ras",
-    "openraster" : "ora"    # or .sun, etc.
+    "sunras"     : "ras",
+    "openraster" : "ora",    # or .sun, etc.
+    "rgbe"       : "hdr",
+    "colorxhtml" : "xhtml",
+    "csource"    : "c",    # C source
+    "header"     : "h",     # C header source
+    "html-table" : "html",
     }
+    #  "exr", "pbm", "pfm", "pgm", "ppm", )
 
-    # separate moniker classes by loader signature
+
+    # moniker classes by loader signature
     two_arg_file_formats = ("pdf", )
-    one_arg_file_formats = ( "bmp", "bz2", "dds", "dicom", "fits", "fli", "gbr",
+    one_arg_file_formats = ( "bmp", "bz2", "cel", "dds", "dicom", "fits", "fli", "gbr",
                         "gif", "gih", "gz", "ico", "jpeg", "openraster", "pat", "pcx", "pix",
-                        "png", "pnm", "psd", "raw", "sgi", "sunras",
-                        "tga", "tiff", "xbm", "xmc", "xwd", "xz")
+                        "png", "pnm", "psd", "raw", "rgbe", "sgi", "sunras",
+                        "tga", "tiff", "xbm", "xcf", "xmc", "xwd", "xz")
+    no_loader_formats = ("colorxhtml", "csource", "exr", "header", "html_table",
+                        "pbm", "pfm", "pgm", "ppm", )
 
-    # formats whose save procedure take (num_drawables int, drawable GimpObjectArray)
+    # !!! Note procedure is named file-html-table_save, but we transliterate - to _ since this is Python GimpFu
+
+    # formats whose save procedure take (drawable) and not (num_drawabled, GimpObjectArray of drawables)
     single_drawable_save_formats = ( )
-    # "bmp", "bz2", "dds", "dicom", "gz", "pdf")
 
+    no_saver_formats = ("faxg3", "gex", "hgt", "psp", "svg")
 
+    # Savers that require image of specific mode:
+    # gif, indexed color
+    # flic, indexed or gray
+    # TODO
 
-    # TODO "cel" )
-    # TODO "faxg3", "gex", "hgt", "psp", "svg" has no save procedure, thus we cannot create
     # TODO Gimp names use "jpeg" so we won't open .jpg files.
+
     # loader named non-canonically
-    # TODO rgbe is file-load-rgbe,
-    # TODO xcf is gimp-xcf-load
-    # loader named semi-canonically but extension not embedded in name
-    # TODO sunras is file-sunras-load but extensions are many e.g. .sun, .ras, etc.
-    # TODO ora is file-openraster-load
+    # handled in code below, not metadata
+    # rgbe is file-load-rgbe
+    # xcf is gimp-xcf-load
 
     # TODO unknown i.e. using magic is gimp-file-load
 
     # TODO also thumbs???
 
-    all_format_monikers = two_arg_file_formats + one_arg_file_formats
+
+    all_format_monikers = two_arg_file_formats + one_arg_file_formats + no_loader_formats + no_saver_formats
+
 
     def excludeFromTests(format_moniker):
         return format_moniker in ImageFormat.excluded_from_test
@@ -77,21 +100,32 @@ class ImageFormat:
     """
     Knows name of PDB save  and load procedures.
     """
+    def exists_loader(format_moniker):
+        return not format_moniker in ImageFormat.no_loader_formats
+
+    def exists_saver(format_moniker):
+        return not format_moniker in ImageFormat.no_saver_formats
+
+
     def saver_name(format_moniker):
-        # TODO aberrant cases
-        return "file_" + format_moniker + "_save"
+        # abberations
+        if format_moniker == "rgbe":
+            return "file_save_rgbe"
+        elif format_moniker == "xcf":
+            return "gimp_xcf_save"
+        else:
+            # canonical
+            return "file_" + format_moniker + "_save"
 
     def loader_name(format_moniker):
-        # TODO aberrant cases
-        """
-        elif ImageFormat.has_noncanonical_loader(format_moniker):
-            format_moniker in noncanonical_ext_file_formats :
-            # load procedure has args (GFile)
-            # get file ext from dictionary
-            file_ext = map_format_to_extension[format_moniker]
-            test_image = load_file(image, drawable, format_moniker, file_ext )
-        """
-        return "file_" + format_moniker + "_load"
+        # aberrations
+        if format_moniker == "rgbe":
+            return "file_load_rgbe"
+        elif format_moniker == "xcf":
+            return "gimp_xcf_save"
+        else:
+            # canonical
+            return "file_" + format_moniker + "_load"
 
 
     """
