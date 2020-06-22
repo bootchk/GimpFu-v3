@@ -160,7 +160,8 @@ class FuGenericValue():
             return False
         return isinstance(obj, collections.Sequence)
 
-    def object_array(self):
+
+    def to_object_array(self):
         ''' Make self own a GValue holding a GimpObjectArray created from native list.
 
         Also allow Author to pass single instance, convert it to a list.
@@ -192,7 +193,7 @@ class FuGenericValue():
 
 
 
-    def float_array(self):
+    def to_float_array(self):
         ''' Make self own a GValue holding a GimpFloatArray created from native list'''
         '''
         For now, use Gimp.value_set_float_array,
@@ -219,6 +220,9 @@ class FuGenericValue():
             # OLD result_gvalue = FuFloatArray.new_gimp_float_array_gvalue(float_list)
         except Exception as err:
             proceed(f"Failed to create Gimp.FloatArray: {err}.")
+
+    def to_string_array(self):
+        raise NotImplementedError
 
         # Cruft?
         #>>>>GimpFu continued past error: Exception in type conversion of: [1536, 0, 1536, 1984], type: <class 'list'>, index: 2

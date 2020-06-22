@@ -6,6 +6,7 @@ from gi.repository import Gimp
 from gi.repository import GObject    # GObject type constants
 
 from adaption.formal_types import FormalTypes
+from adaption.generic_value import FuGenericValue
 
 from gimppdb.gimppdb import GimpPDB
 
@@ -43,7 +44,7 @@ class Types():
 
     # not used????
     @staticmethod
-    def try_convert_to_null(proc_name, actual_arg, actual_arg_type, index):
+    def try_convert_to_null(proc_name, actual_arg, actual_arg_type):
         '''
         When actual arg is None, convert to GValue that represents None
         '''
@@ -57,22 +58,45 @@ class Types():
 
 
 
+    """
+    array conversions
+
+    Convert Python sequences to Gimp<foo>Array type in a generic value.
+    Also can convert Python type of list elements to type implied by the Gimp<foo>Array type,
+    e.g. convert Python int to float for GimpFloatArray.
+    Also will accept a non-sequence (one element) and will cons it, i.e. wrap in a list
+
+    Needed because PyGObject does not do this for us.
+    """
 
     @staticmethod
-    def try_float_array_conversion(formal_arg_type, gen_value, index):
-        ''' Convert list of int to list of float when formal_arg_type requires FloatArray. '''
+    def try_array_conversion(formal_arg_type, gen_value, type_id_method, type_converter_method):
+        """ Try array conversion on gen_value as specified by the passed methods.
+
+        type_id_method takes type name like GimpFloatArray.
+        type_converter_method is a method of FuGenericValue
+        """
         assert formal_arg_type is not None
-
-        Types.logger.info(f"try_float_array_conversion {gen_value}")
         if isinstance(gen_value.actual_arg, list):
-            # Types.logger.info(formal_arg_type)
             formal_arg_type_name = formal_arg_type.name
-            if FormalTypes.is_float_array_type(formal_arg_type_name):
-                gen_value.float_array()
-        # else not a list i.e. not a Gimp array
+            if type_id_method(formal_arg_type_name):
+                gen_value.type_converter_method()
+        # else not a Python sequence so cannot be converted to a Gimp array
 
-    # TODO to support gimp_gz_save
-    def try_object_array_conversion(formal_arg_type, gen_value, index):
+    @staticmethod
+    def try_float_array_conversion(formal_arg_type, gen_value):
+        ''' Convert list of int to GimpFloatArray when formal_arg_type requires FloatArray. '''
+        Types.try_array_conversion(formal_arg_type, gen_value,
+            FormalTypes.is_float_array_type,
+            FuGenericValue.to_float_array)
+
+    # Test case: gimp_gz_save
+    def try_object_array_conversion(formal_arg_type, gen_value):
+        Types.try_array_conversion(formal_arg_type, gen_value,
+            FormalTypes.is_object_array_type,
+            FuGenericValue.to_object_array)
+        """
+        OLD
         Types.logger.info(f"try_object_array_conversion {gen_value}")
         # Allow a list, or a single element of desired type
         # if isinstance(gen_value.actual_arg, list):
@@ -80,12 +104,20 @@ class Types():
         formal_arg_type_name = formal_arg_type.name
         #Types.logger.info(f"type: {formal_arg_type_name}")
         if FormalTypes.is_object_array_type(formal_arg_type_name):
-            gen_value.object_array()
+            gen_value.to_object_array()
         # else not convertable to Gimp.ObjectArray
+        """
+
+    def try_string_array_conversion(formal_arg_type, gen_value):
+        Types.try_array_conversion(formal_arg_type, gen_value,
+            FormalTypes.is_string_array_type,
+            FuGenericValue.to_string_array)
+
+
 
 
     @staticmethod
-    def try_file_descriptor_conversion(formal_arg_type, gen_value, index):
+    def try_file_descriptor_conversion(formal_arg_type, gen_value):
         if isinstance(gen_value.actual_arg, str):
             formal_arg_type_name = formal_arg_type.name
             if FormalTypes.is_file_descriptor_type(formal_arg_type_name):
@@ -93,7 +125,7 @@ class Types():
 
 
     @staticmethod
-    def try_usual_python_conversion(formal_arg_type, gen_value, index):
+    def try_usual_python_conversion(formal_arg_type, gen_value):
         '''
         Perform the usual automatic Python conversion from int to (str, float).
 
@@ -185,14 +217,24 @@ class Types():
 
 
 
-    def try_array_conversions(formal_arg_type, gen_value, index):
+    def try_array_conversions(formal_arg_type, gen_value):
         """
         Try convert Python sequences to GObject arrays.
+
+        These are only the array types currently used in the PDB for IN params to PDB procedures.
+        TODO needed for marshalling to lib gimp calls (alias gimp adaptor)?
+
+        Ordered by prevalence in PDB signatures.
         """
-        Types.try_float_array_conversion(formal_arg_type, gen_value, index)
-        if gen_value.did_convert:
-            return
-        Types.try_object_array_conversion(formal_arg_type, gen_value, index)
+        Types.try_float_array_conversion(formal_arg_type, gen_value)
+        if gen_value.did_convert:  return
+        Types.try_object_array_conversion(formal_arg_type, gen_value)
+        if gen_value.did_convert:  return
+        Types.try_string_array_conversion(formal_arg_type, gen_value)
+        #if gen_value.did_convert:  return
+        #Types.try_uint8_array_conversion(formal_arg_type, gen_value)
+        #if gen_value.did_convert:  return
+        #Types.try_int32_array_conversion(formal_arg_type, gen_value)
 
 
 

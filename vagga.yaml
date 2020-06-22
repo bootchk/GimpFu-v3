@@ -322,6 +322,8 @@ containers:
 
 
 
+
+
   # With gimp source and built gimp
   # Uses automake variant of build system for Gimp
   gimpAMDev:
@@ -400,9 +402,9 @@ containers:
 
 
 
+
+
   # build gimp using meson
-  # Not used because it doesn't build gimpfu anyway?
-  # Can't remember why I don't use this
   gimpMesonDev:
     setup:
     - !Container bablGeglDev
@@ -583,32 +585,34 @@ commands:
   # GEGL_PATH should point to the .so parent directory
   # gegl -v
 
-  # gimp typelib in /usr/local/lib/gi...
+  # gimp typelib in /usr/local/lib/girepository-1.0
   # gegl, babl typelib in /usr/local/lib/x86_64-linux-gnu/gi...
 
-  # export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-  # squelch warnings
-  # export NO_AT_BRIDGE=1
-  gimpRunGUI: !Command
-    description: Run gimp GUI in gimpLocal container
-    container: gimpLocal
+  gimpAMGUI: !Command
+    description: Run gimp GUI in gimpAMDev container, with locally installed plugins
+    container: gimpAMDev
     run: |
       export HOME=/work/.home
-      echo "HOME" $HOME
       export GIMP_PREFIX="/usr/local"
       export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      echo $LD_LIBRARY_PATH
       export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
-      echo $XDG_DATA_DIRS
       export PATH="/usr/local/bin:$PATH"
       export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu"
-      echo "GEGL_PATH" $GEGL_PATH
-      which gegl
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-      echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
       export NO_AT_BRIDGE=1
 
+      # local plugins in /work/.home/.config/GIMP/2.99/plug-ins
+      # !!! outside the container
+
+      echo "Altering PYTHONPATH to point to local plug-ins"
+      export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
+      echo $PYTHONPATH
+
+
       /usr/local/bin/gimp-2.99 --verbose
+
+
+
 
   # export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
 
@@ -633,10 +637,10 @@ commands:
 
       /usr/local/bin/gimp-2.99 --verbose
 
-  # quicker startup
-  # often switch between gimpAMDev and gimpMesonDev
-  gimpTestGUI: !Command
-    description: Run gimp GUI in gimpDev container, with user's plugins in home
+
+
+  gimpMesonTestGUI: !Command
+    description: Run gimp GUI in gimpMesonDev container, creating user's plugins in home
     container:  gimpMesonDev
     run: |
       export HOME=/work/.home

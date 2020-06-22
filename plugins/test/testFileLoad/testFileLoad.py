@@ -118,7 +118,6 @@ def ensure_test_file(image, drawable, format_moniker):
         # If save procedure exists, invoke it
         did_saver_run, did_saver_pass = save_file(image, drawable, format_moniker, filename)
 
-
     if not os.path.isfile(filename):
         filename = None
     # assert file exists or filename is None
@@ -129,10 +128,12 @@ def ensure_test_file(image, drawable, format_moniker):
 
 
 
-def format_result(did_saver_run, did_saver_pass, did_loader_run, did_loader_pass):
+def format_result(format_moniker, did_saver_run, did_saver_pass, did_loader_run, did_loader_pass):
     """ Return string describing test results. """
     # TODO say something about file preexists?
-    result = ""
+
+    result = format_moniker.ljust(10) + ": "
+
     if did_saver_run:
         if did_saver_pass:
             result += "Save procedure PASS. "
@@ -181,7 +182,7 @@ def test_file_format(image, drawable, format_moniker):
         did_loader_run = False
         did_loader_pass = False
 
-    result =  format_result(did_saver_run, did_saver_pass,  did_loader_run, did_loader_pass)
+    result =  format_result(format_moniker, did_saver_run, did_saver_pass,  did_loader_run, did_loader_pass)
     return result
 
 
@@ -189,11 +190,11 @@ def test_all_file_formats(image, drawable):
     log = []
     for format_moniker in ImageFormat.all_format_monikers:
         if ImageFormat.excludeFromTests(format_moniker):
-            result = "Omitted test."
+            result = f"{format_moniker}: Omitted test."
         else:
             result = test_file_format(image, drawable, format_moniker)
         # append line to logger
-        log.append(format_moniker + ": " + result)
+        log.append(result)
 
     print("testFileLoad summary of 'Test All' ")
     for line in log: print(line)
@@ -210,7 +211,7 @@ def plugin_func(image, drawable, run_all, file_format_index):
         # get moniker from same list we showed in GUI
         format_moniker = ImageFormat.all_format_monikers[file_format_index]
         result = test_file_format(image, drawable, format_moniker)
-        print(f"Test>File save/load: {format_moniker} result: {result}")
+        print(f"Test>File save/load: {result}")
 
     # show the test images we saved/loaded
     gimp.displays_flush()
@@ -219,7 +220,7 @@ def plugin_func(image, drawable, run_all, file_format_index):
 register(
       "python-fu-test-file-load",
       "Test load and/or save images of various file formats",
-      "No help",
+      "See console for results.",
       "Lloyd Konneker",
       "Lloyd Konneker",
       "2020",

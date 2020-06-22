@@ -70,22 +70,22 @@ class MarshalPDB():
         if gen_value.did_upcast:
             return
 
-        Types.try_usual_python_conversion(formal_arg_type, gen_value, index)
+        Types.try_usual_python_conversion(formal_arg_type, gen_value)
         if gen_value.did_convert:
             return
 
-        Types.try_array_conversions(formal_arg_type, gen_value, index)
+        Types.try_array_conversions(formal_arg_type, gen_value)
         if gen_value.did_convert:
             return
 
-        Types.try_file_descriptor_conversion(formal_arg_type, gen_value, index)
+        Types.try_file_descriptor_conversion(formal_arg_type, gen_value)
         if not gen_value.did_convert:
             MarshalPDB.logger.debug(f"No type conversions: index {index} formal type: {formal_arg_type}" )
 
         # !!! We don't upcast deprecated constant TRUE to G_TYPE_BOOLEAN
 
         # TODO is this necessary? I think it is only drawable that gets passed None
-        # Types.try_convert_to_null(proc_name, gen_value, index)
+        # Types.try_convert_to_null(proc_name, gen_value)
 
 
 
