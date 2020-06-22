@@ -14,7 +14,7 @@ from message.proceed_error import proceed
 from message.suggest import Suggest
 
 import collections.abc      # ABC for sequences
-
+import logging
 
 
 
@@ -54,6 +54,8 @@ class FuGenericValue():
         self._did_convert = False
         self._did_upcast = False
         self._did_create_gvalue = False
+
+        self.logger = logging.getLogger("GimpFu.FuGenericValue")
 
 
     def __repr__(self):
@@ -160,17 +162,60 @@ class FuGenericValue():
             return False
         return isinstance(obj, collections.Sequence)
 
+    def list_for_actual_arg(self):
+        """ Return list for self.actual_arg. """
+        if self.is_tuple_or_list(self._actual_arg):
+            result = self._actual_arg
+        else:
+            result = [self._actual_arg,]
+        return result
+
+
+    """
+    For now, use e.g. Gimp.value_set_float_array,
+    which might be the only way to do it.
+    But possibly there is a simpler implementation.
+    """
+    def to_gimp_array(self, to_gtype, gvalue_setter ):
+        """ Make self's GValue hold a Gimp<foo>Array specified by to_gtype, created from Python native sequences.
+
+        gvalue_setter is a method of Gimp e.g. Gimp.value_set_object_array
+
+        Allow Author to pass single instance, convert it to a list and then an array.
+
+        TODO type convert elements of sequence.
+        """
+        self.logger.info(f"to_gimp_array {to_gtype}")
+
+        list = self.list_for_actual_arg()
+
+        try:
+            self._gvalue = GObject.Value (to_gtype)
+
+            """
+            PyGObject will convert list using len(list)
+            The length is still also passed to the PDB procedure
+            Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
+            We do need to pass type of elements in list.
+            TODO do we need to convert list elements by passing a type other than actual_arg.__gtype__ ?
+            """
+            gvalue_setter(self._gvalue, self._actual_arg.__gtype__, list)
+            self._did_create_gvalue = True
+            self._did_convert = True
+
+        except Exception as err:
+            proceed(f"Failed to create Gimp.<foo>Array: {err}.")
+
 
     def to_object_array(self):
-        ''' Make self own a GValue holding a GimpObjectArray created from native list.
+        """ Make self own a GValue holding a GimpObjectArray """
+        self.to_gimp_array(Gimp.ObjectArray.__gtype__, Gimp.value_set_object_array )
 
-        Also allow Author to pass single instance, convert it to a list.
-        '''
+        """
+        OLD
+        self.logger.info(f"to_object_array")
 
-        if self.is_tuple_or_list(self._actual_arg):
-            list = self._actual_arg
-        else:
-            list = [self._actual_arg,]
+        list = self.list_for_actual_arg()
 
         try:
             self._gvalue = GObject.Value (Gimp.ObjectArray.__gtype__)
@@ -190,16 +235,14 @@ class FuGenericValue():
 
         except Exception as err:
             proceed(f"Failed to create Gimp.ObjectArray: {err}.")
-
-
+        """
 
     def to_float_array(self):
-        ''' Make self own a GValue holding a GimpFloatArray created from native list'''
-        '''
-        For now, use Gimp.value_set_float_array,
-        which might be the only way to do it.
-        But possibly there is a simpler implementation.
-        '''
+        """ Make self's GValue hold a GimpFloatArray created from self.actual_arg"""
+        self.to_gimp_array(Gimp.FloatArray.__gtype__, Gimp.value_set_float_array )
+
+        """
+        OLD
         # require self._actual_arg is-a sequence type
 
         # TODO use logger (">>>>>>>>>>Converting float list")
@@ -220,9 +263,21 @@ class FuGenericValue():
             # OLD result_gvalue = FuFloatArray.new_gimp_float_array_gvalue(float_list)
         except Exception as err:
             proceed(f"Failed to create Gimp.FloatArray: {err}.")
+        """
 
     def to_string_array(self):
-        raise NotImplementedError
+        """ Make self's GValue hold a GimpStringArray created from self.actual_arg"""
+        self.to_gimp_array(Gimp.StringArray.__gtype__, Gimp.value_set_string_array )
+        # raise NotImplementedError
+
+    def to_uint8_array(self):
+        """ Make self's GValue hold a GimpUint8Array created from self.actual_arg"""
+        self.to_gimp_array(Gimp.Uint8Array.__gtype__, Gimp.gimp_value_set_uint8_array )
+
+    def to_int32_array(self):
+        """ Make self's GValue hold a GimpInt32Array created from self.actual_arg"""
+        self.to_gimp_array(Gimp.Int32Array.__gtype__, Gimp.gimp_value_set_int32_array )
+
 
         # Cruft?
         #>>>>GimpFu continued past error: Exception in type conversion of: [1536, 0, 1536, 1984], type: <class 'list'>, index: 2

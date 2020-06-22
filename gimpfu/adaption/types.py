@@ -77,10 +77,13 @@ class Types():
         type_converter_method is a method of FuGenericValue
         """
         assert formal_arg_type is not None
-        if isinstance(gen_value.actual_arg, list):
-            formal_arg_type_name = formal_arg_type.name
-            if type_id_method(formal_arg_type_name):
-                gen_value.type_converter_method()
+        # OLD if isinstance(gen_value.actual_arg, list):
+        # NEW actual_arg only required to be convertible to sequence of base type
+
+        formal_arg_type_name = formal_arg_type.name
+        if type_id_method(formal_arg_type_name):
+            # Invoke method on instance gen_value (Fail: gen_value.type_converter_method())
+            type_converter_method(gen_value)
         # else not a Python sequence so cannot be converted to a Gimp array
 
     @staticmethod
@@ -225,16 +228,21 @@ class Types():
         TODO needed for marshalling to lib gimp calls (alias gimp adaptor)?
 
         Ordered by prevalence in PDB signatures.
+
+        TODO invert the logic, dispatch on formal_arg_type
         """
         Types.try_float_array_conversion(formal_arg_type, gen_value)
         if gen_value.did_convert:  return
         Types.try_object_array_conversion(formal_arg_type, gen_value)
         if gen_value.did_convert:  return
         Types.try_string_array_conversion(formal_arg_type, gen_value)
-        #if gen_value.did_convert:  return
+        if gen_value.did_convert:  return
         #Types.try_uint8_array_conversion(formal_arg_type, gen_value)
         #if gen_value.did_convert:  return
         #Types.try_int32_array_conversion(formal_arg_type, gen_value)
+        Types.logger.info(f"try_array_conversions did NOT convert")
+
+
 
 
 
