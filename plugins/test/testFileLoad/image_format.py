@@ -1,5 +1,6 @@
 
 
+from gimpfu import *   # pdb and enums for mode conversions
 
 """
 Understands Gimp capabilities re image file formats.
@@ -138,3 +139,37 @@ class ImageFormat:
 
     def saver_takes_single_drawable(format_moniker):
         return format_moniker in ImageFormat.single_drawable_save_formats
+
+    """
+    Down moding.
+    Understands what modes some format_monikers require.
+
+    TODO extract to ModeConverter class
+    """
+    def compatible_mode_image(format_moniker, image, drawable):
+        """ Return a down-moded image of mode that moniker accepts.  """
+        if format_moniker in ("gif", "flic") :
+            # indexed.  Convert to one-bit B&W mono
+            new_image = pdb.gimp_image_duplicate(image)
+            # TODO defaults not working
+            pdb.gimp_image_convert_indexed(new_image, DITHER_NONE, PALETTE_MONO, 0, False, False, "foo")
+            new_drawable = pdb.gimp_image_get_active_layer(new_image)
+            result = new_image, new_drawable
+        elif format_moniker in ("dicom", "fits"):
+            # no alpha
+            if pdb.gimp_drawable_has_alpha(drawable):
+                # TODO copy  image, get alpha channel, remove it
+                new_image = pdb.gimp_image_duplicate(image )
+                # new_drawable = pdb.gimp_get_active_layer(image)
+                pdb.gimp_image_flatten(new_image)
+                new_drawable = pdb.gimp_image_get_active_layer(new_image)
+                result = new_image, new_drawable
+            else:
+                result = image, drawable
+        elif format_moniker in ("xbm",):
+            # 1 bit indexed
+            # TODO
+            result = image, drawable
+        else:
+            result = image, drawable
+        return result

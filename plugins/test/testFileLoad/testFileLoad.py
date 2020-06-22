@@ -23,6 +23,16 @@ I.E. this does not understand the details about a format,
 and does not stress test all possibilities for a format.
 I.E. only does basic sanity test: creates or reads a file.
 Does not compare resulting images or files with known good result images or files.
+
+You should first open an image.
+Typically image is of a sophisticated mode, and has alpha.
+The image is then repeatedly saved in test formats, and reloaded.
+This plugin automatically down converts mode for some formats.
+This plugin automatically removes alpha for some formats.
+IOW this plugin tries hard to make a minimal conversion succeed.
+
+You should first open an unsophisticated mode image, say gray or 1-bit B&W.
+This plugin does NOT yet up convert mode.
 '''
 import os
 from gimpfu import *
@@ -36,6 +46,8 @@ def call_save_procedure(saver_name, image, drawable, format_moniker, filename):
     assert saver_name is a string, but save procedure might not exist
     If the pdb procedure does not exist, this fails quietly and file still not exist
     """
+    image, drawable = ImageFormat.compatible_mode_image(format_moniker, image, drawable)
+
     if ImageFormat.saver_takes_single_drawable(format_moniker):
         arg_string = "(image, drawable, filename)"
     else:

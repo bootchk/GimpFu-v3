@@ -173,6 +173,12 @@ define_symbols_for_enum(Gimp.HueRange, prefix='HUE_RANGE_')
 define_symbols_for_enum(Gimp.DesaturateMode, prefix='DESATURATE_')
 # DESATURATE_LIGHNTESS = Gimp.DesaturateMode.LIGHTNESS
 
+# For mode conversions
+define_symbols_for_enum(Gimp.ConvertDitherType, prefix='DITHER_')
+# DITHER_NONE = Gimp.ConvertDitherType.None
+define_symbols_for_enum(Gimp.ConvertPaletteType, prefix='PALETTE_')
+# PALETTE_MONO = Gimp.ConvertPaletteType.MONO
+
 
 
 # Cruft exploring how to get enum names from properties of enum class
