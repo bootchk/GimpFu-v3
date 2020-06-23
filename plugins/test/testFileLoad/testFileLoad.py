@@ -24,7 +24,8 @@ I.E. only does basic sanity test: creates or reads a file.
 Does not compare resulting images or files with known good result images or files.
 
 
-VARYING THE TEST CONDITIONS
+Varying the test conditions
+---------------------------
 
 You should first open an image.
 Typically image is of a sophisticated mode, and has alpha.
@@ -42,6 +43,32 @@ Then you can test whether load/save procedures handle such modes.
 This plugin does NOT up convert mode.
 
 The sample test files are also all known to pass, minimally.
+
+Expect for test all
+-------------------
+
+Summary: Gimp should create many images (across the image browser bar)
+that look like the original, with some images being special cases.
+
+Assume you first clear out the test directory, start Gimp, and open an image.
+
+From the image that was open prior (the original),
+for every format that has a save procedure,
+'test all' will save (export) the original image to a new file in the test directory.
+(Else this plugin will simply copy a sample file to the test directory, for load testing.)
+
+If the format has a load procedure, this plugin will attempt to load (open),
+creating a new image that you will see in Gimp.
+Expect the visible image looks similar to the original.
+(Except when the format has no save procedure, then expect the image to look like the sample.)
+
+Except when the format requires down moding of the image to save it,
+then expect the visible image to look down moded.
+
+Reading the summary of tests in the console.
+--------------------------------------------
+
+TODO
 '''
 import os
 from shutil import copyfile
@@ -215,13 +242,17 @@ def populate_sample_files():
     Files named sample.<foo> should have no save procedure.
     Alternatively, we could iterate over the format extensions having no save procedure.
     """
-    directory = os.fsencode("/work/test/in")
+    directory_name = "/work/test/in"
+    directory = os.fsencode(directory_name)
 
     for file in os.listdir(directory):
          filename = os.fsdecode(file)
+         # filepath = os.fspath(file)
          if filename.startswith("sample."):
-             path = Path(filename)
-             copyfile(filename, "/work/test/test" + path.suffix)
+             root_and_extension = os.path.splitext(filename)
+             print(directory_name, filename, root_and_extension[1])
+             filepath = directory_name + "/" + filename
+             copyfile(filepath, "/work/test/test" + root_and_extension[1])
 
 
 def test_all_file_formats(image, drawable):
