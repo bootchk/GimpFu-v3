@@ -5,16 +5,15 @@
 A Gimp plugin that:
 - tests PDB procedures that save and load image files
 
-!!! See ImageFormat in image_format.py which hides many vagaries of the PDB.
+!!! See ImageFormat in image_format.py which hides details of image format support by Gimp.
 
 Depends on specific test directory existing.
 Does NOT depend on test files existing.
 You can empty the test directory, and it can create test files (using save procedure)
 (effectively testing both save and load procedures.)
 
-When this plugin cannot create IN test files (since there is no save procedure in Gimp)
-you can still test loading but
-you must manually create such files in the test directory.
+When this plugin cannot dynamically create IN test files (since there is no save procedure in Gimp)
+the plugin copies sample files into the test directory.
 
 Optionally will omit testing file formats known to crash the test harness.
 
@@ -24,17 +23,29 @@ and does not stress test all possibilities for a format.
 I.E. only does basic sanity test: creates or reads a file.
 Does not compare resulting images or files with known good result images or files.
 
+
+VARYING THE TEST CONDITIONS
+
 You should first open an image.
 Typically image is of a sophisticated mode, and has alpha.
-The image is then repeatedly saved in test formats, and reloaded.
-This plugin automatically down converts mode for some formats.
-This plugin automatically removes alpha for some formats.
-IOW this plugin tries hard to make a minimal conversion succeed.
+The plugin then repeatedly saves and loads the image in test formats.
 
-You should first open an unsophisticated mode image, say gray or 1-bit B&W.
-This plugin does NOT yet up convert mode.
+This plugin automatically down converts image mode for some formats.
+This plugin automatically removes alpha for some formats.
+IOW this plugin tries hard to make a minimal conversion succeed,
+using its knowledge of the capabilities of the save/load procedures.
+So you can't test the features of a save/load procedure that accomodate or reject variant formats.
+
+You can first open an unsophisticated mode image, say gray or 1-bit B&W.
+Then you can test whether load/save procedures handle such modes.
+
+This plugin does NOT up convert mode.
+
+The sample test files are also all known to pass, minimally.
 '''
 import os
+from shutil import copyfile
+
 from gimpfu import *
 
 from image_format import ImageFormat
@@ -56,7 +67,7 @@ def call_save_procedure(saver_name, image, drawable, format_moniker, filename):
         arg_string = "(image, 1, drawable, filename)"
 
     eval_string = "pdb." + saver_name + arg_string
-    print(eval_string)
+    print(f"Invoking: {eval_string}")
     eval(eval_string)
 
 
@@ -198,8 +209,27 @@ def test_file_format(image, drawable, format_moniker):
     return result
 
 
+def populate_sample_files():
+    """ Copy test/in/sample.<foo> to test/test.<foo> for all formats that have no save procedure.
+
+    Files named sample.<foo> should have no save procedure.
+    Alternatively, we could iterate over the format extensions having no save procedure.
+    """
+    directory = os.fsencode("/work/test/in")
+
+    for file in os.listdir(directory):
+         filename = os.fsdecode(file)
+         if filename.startswith("sample."):
+             path = Path(filename)
+             copyfile(filename, "/work/test/test" + path.suffix)
+
+
 def test_all_file_formats(image, drawable):
     log = []
+
+    # For
+    populate_sample_files()
+
     for format_moniker in ImageFormat.all_format_monikers:
         if ImageFormat.excludeFromTests(format_moniker):
             result = f"{format_moniker}: Omitted test."
