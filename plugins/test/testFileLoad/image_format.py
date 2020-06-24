@@ -2,6 +2,9 @@
 
 from gimpfu import *   # pdb and enums for mode conversions
 
+
+
+
 """
 Understands Gimp capabilities re image file formats.
 
@@ -12,6 +15,7 @@ Understands and hides:
 - save and load procedure names not always named canonically e.g. file_moniker_save
 - signatures differ among save and load procedures
 - formats can be: save-only, load-only, or load-or-save
+- formats omitted from testing, usually known bad
 
 To find sample test files, see filestar.com or search github.
 """
@@ -100,6 +104,14 @@ class ImageFormat:
     # Note that no_saver_formats are not included, since they are in the loader_formats
     all_format_monikers = two_arg_file_formats + one_arg_file_formats + no_loader_formats
 
+    # formats whose saver requires downmode image
+    # to mode indexed or less
+    downmode_to_BW_formats = ("gif", "flic", "xbm")
+    # remove alpha i.e. flatten
+    downmode_to_sans_alpha_formats = ("dicom", "fits")
+    # TODO restrict image size xmc
+
+
 
     def excludeFromTests(format_moniker):
         return format_moniker in ImageFormat.excluded_from_test
@@ -170,7 +182,7 @@ class ImageFormat:
     """
     def compatible_mode_image(format_moniker, image, drawable):
         """ Return a down-moded image of mode that moniker accepts.  """
-        if format_moniker in ("gif", "flic", "xbm") :
+        if format_moniker in ImageFormat.downmode_to_BW_formats :
             print("Down moding to B&W")
             # format requires indexed.  Convert to lowest common denominator: one-bit B&W mono
             # TODO convert only xbm to B&W, convert others to pallete
@@ -180,7 +192,7 @@ class ImageFormat:
             new_drawable = pdb.gimp_image_get_active_layer(new_image)
             result = new_image, new_drawable
         # TODO flic requires indexed or gray but fails on B&W ?
-        elif format_moniker in ("dicom", "fits"):
+        elif format_moniker in ImageFormat.downmode_to_sans_alpha_formats:
             # format requires without alpha
             if pdb.gimp_drawable_has_alpha(drawable):
                 print("Down moding to sans alpha")

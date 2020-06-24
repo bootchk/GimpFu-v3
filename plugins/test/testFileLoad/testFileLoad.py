@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-# lkk add hashbang
 
 '''
 A Gimp plugin that:
-- tests PDB procedures that save and load image files
+- tests Gimp import/export: PDB procedures that save and load image files
 
 !!! See ImageFormat in image_format.py which hides details of image format support by Gimp.
 
@@ -63,12 +62,19 @@ Expect the visible image looks similar to the original.
 (Except when the format has no save procedure, then expect the image to look like the sample.)
 
 Except when the format requires down moding of the image to save it,
-then expect the visible image to look down moded.
+then expect the reloaded, visible image to look down moded from the original.
+(Say a black and white of the original.)
 
 Reading the summary of tests in the console.
 --------------------------------------------
 
-TODO
+FAIL for a save procedure means: failed to create a file.
+Probably the procedure returned an error code, but it could also have crashed hard.
+
+FAIL for a load procedure means: failed to create an image.
+Probably the procedure returned an error code, but it could also have crashed hard.
+
+
 '''
 import os
 from shutil import copyfile
@@ -76,6 +82,7 @@ from shutil import copyfile
 from gimpfu import *
 
 from image_format import ImageFormat
+from all_test_result import AllTestResult, KnownGoodAllTestResult
 
 
 def call_save_procedure(saver_name, image, drawable, format_moniker, filename):
@@ -94,7 +101,7 @@ def call_save_procedure(saver_name, image, drawable, format_moniker, filename):
         arg_string = "(image, 1, drawable, filename)"
 
     eval_string = "pdb." + saver_name + arg_string
-    print(f"Invoking: {eval_string}")
+    #print(f"Invoking: {eval_string}")
     eval(eval_string)
 
 
@@ -177,7 +184,27 @@ def ensure_test_file(image, drawable, format_moniker):
 
 
 
+def condense_results_to_tuple_pair(format_moniker, did_saver_run, did_saver_pass, did_loader_run, did_loader_pass):
+    result = []
+    if did_saver_run:
+        if did_saver_pass:
+            result.append("Pass")
+        else:
+            result.append("Fail")
+    else:
+        result.append("NoTest")
+    if did_loader_run:
+        if did_loader_pass:
+            result.append("Pass")
+        else:
+            result.append("Fail")
+    else:
+        result.append("NoTest")
+    return tuple(result)
 
+
+'''
+OLD
 def format_result(format_moniker, did_saver_run, did_saver_pass, did_loader_run, did_loader_pass):
     """ Return string describing test results. """
     # TODO say something about file preexists?
@@ -198,6 +225,21 @@ def format_result(format_moniker, did_saver_run, did_saver_pass, did_loader_run,
             result += "Load procedure FAIL. "
     else:
         result += "Load procedure NO TEST: no test file exists or load procedure not exist. "
+    return result
+'''
+
+def test_result_to_str(format_moniker, test_result):
+    """ Return string describing individual test results. """
+    # TODO say something about file preexists?
+
+    # The ideal result if test setup is correct, i.e. empty test directory
+    expected_result = KnownGoodAllTestResult.expected_result(format_moniker)
+
+    result = format_moniker.ljust(10) + ": " + test_result[0].ljust(10) + "," + test_result[1].ljust(10)
+    #print(test_result, expected_result, test_result==expected_result)
+    if test_result != expected_result :
+        # test of the format failed in one or more aspects, from the ideal
+        result += " Ideal: " + str(expected_result)
     return result
 
 
@@ -232,14 +274,14 @@ def test_file_format(image, drawable, format_moniker):
         did_loader_run = False
         did_loader_pass = False
 
-    result =  format_result(format_moniker, did_saver_run, did_saver_pass,  did_loader_run, did_loader_pass)
+    result = condense_results_to_tuple_pair(format_moniker, did_saver_run, did_saver_pass,  did_loader_run, did_loader_pass)
     return result
 
 
 def populate_sample_files():
     """ Copy test/in/sample.<foo> to test/test.<foo> for all formats that have no save procedure.
 
-    Files named sample.<foo> should have no save procedure.
+    Files in test/in named sample.<foo> should have no save procedure.
     Alternatively, we could iterate over the format extensions having no save procedure.
     """
     directory_name = "/work/test/in"
@@ -250,7 +292,7 @@ def populate_sample_files():
          # filepath = os.fspath(file)
          if filename.startswith("sample."):
              root_and_extension = os.path.splitext(filename)
-             print(directory_name, filename, root_and_extension[1])
+             # print(directory_name, filename, root_and_extension[1])
              filepath = directory_name + "/" + filename
              copyfile(filepath, "/work/test/test" + root_and_extension[1])
 
@@ -258,41 +300,54 @@ def populate_sample_files():
 def test_all_file_formats(image, drawable):
     log = []
 
-    # For
     populate_sample_files()
+
+    all_result = AllTestResult()
 
     for format_moniker in ImageFormat.all_format_monikers:
         if ImageFormat.excludeFromTests(format_moniker):
-            result = f"{format_moniker}: Omitted test."
+            single_result = ("Omit", "Omit" )
         else:
-            result = test_file_format(image, drawable, format_moniker)
-        # append line to logger
-        log.append(result)
+            single_result = test_file_format(image, drawable, format_moniker)
+
+        log.append(test_result_to_str(format_moniker, single_result))
+        all_result[format_moniker] = single_result
 
     print("testFileLoad summary of 'Test All' ")
     for line in log: print(line)
     # This is a GimpFu plugin so other GimpFu messages may precede or follow, and might be pertinent
 
+    # return boolean: did all individual tests match known good result?
+    go_nogo_result = (all_result == KnownGoodAllTestResult.known_good_all_test_result)
+    print(f"If test result is unexpectedly False, insure test directory is empty before starting.")
+    print(f"testFileLoad go/nogo: {go_nogo_result}")
+    return go_nogo_result
+
 
 
 def plugin_func(image, drawable, run_all, file_format_index):
     """ Run one or all save/load tests of file formats.
+
+    Can be run non-interactive.
     """
     if run_all:
-        test_all_file_formats(image, drawable)
+        result = test_all_file_formats(image, drawable)
     else:
         # get moniker from same list we showed in GUI
         format_moniker = ImageFormat.all_format_monikers[file_format_index]
         result = test_file_format(image, drawable, format_moniker)
-        print(f"Test>File save/load: {result}")
+        print(f"Test>File save/load: {test_result_to_str(format_moniker, result)}")
 
-    # show the test images we saved/loaded
+    # when interactive, show the test images we saved/loaded
     gimp.displays_flush()
+
+    # return boolean result of individual test, or test all
+    return result
 
 
 register(
-      "python-fu-test-file-load",
-      "Test load and/or save images of various file formats",
+      "python-fu-test-file-save-load",
+      "Test load and/or save images of any/all file formats",
       "See console for results.",
       "Lloyd Konneker",
       "Lloyd Konneker",
@@ -305,7 +360,7 @@ register(
           (PF_TOGGLE, "run_all", "Run all?", 1),
           (PF_OPTION, "format", "Format", 0, ImageFormat.all_format_monikers),
       ],
-      [],
+      [(PF_BOOL, "result", "Whether test passed.", True)],
       plugin_func,
       menu="<Image>/Test")
 main()

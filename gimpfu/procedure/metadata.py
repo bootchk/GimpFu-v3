@@ -83,6 +83,8 @@ class FuProcedureMetadata():
              # assert param is a tuple, unpack when passing
              self.params.append(*param)
         # OUT formal args
+        # TODO some docs say (type, name, description) but other docs say ...default_value
+        # Why would there be a default value for a return value?
         self.results = FuFormalParams()
         for param in results:
              # assert param is a tuple, unpack when passing

@@ -1,9 +1,14 @@
 This is result of dumping the PDB
 then grep "\-load" pdb.txt | sort
 then grep "\-save" pdb.txt | sort
-then cut and past the results
+then cut and paste the results
 
-Table of all formats with their save and load procedures
+Some aberrations marked with <<<<<
+Other aberrations are coded into ImageFormat
+(e.g. aberrations in naming, mode restrictions)
+ImageFormat is definitive.
+
+Table of all save and load procedures
 
 "file-bmp-save"    "file-bmp-load"
 "file-bz2-save"   "file-bz2-load"
