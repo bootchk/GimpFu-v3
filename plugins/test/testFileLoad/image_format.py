@@ -4,7 +4,6 @@ from gimpfu import *   # pdb and enums for mode conversions
 
 
 
-
 """
 Understands Gimp capabilities re image file formats.
 
@@ -65,6 +64,7 @@ class ImageFormat:
 
 
     # moniker classes by loader signature
+    # pdf signature is (filename, filename as a password?)
     two_arg_file_formats = ("pdf", )
     one_arg_file_formats = ( "bmp", "bz2", "cel", "dds", "dicom", "faxg3", "fits", "fli",
                         "gbr", "gif", "gih", "gz",
@@ -73,12 +73,13 @@ class ImageFormat:
                         "raw", "rgbe", "sgi", "sunras", "svg",
                         "tga", "tiff", "xbm",
                         "xcf", "xmc", "xwd", "xz")
+    # Gimp can save but not load
     no_loader_formats = ("colorxhtml", "csource", "exr", "header", "html_table",
                         "pbm", "pfm", "pgm", "ppm", )
 
     # !!! Note procedure is named file-html-table_save, but we transliterate - to _ since this is Python GimpFu
 
-    # formats whose save procedure take (drawable) and not (num_drawabled, GimpObjectArray of drawables)
+    # formats whose save procedure take (drawable) and not (num_drawables, GimpObjectArray of drawables)
     single_drawable_save_formats = ( )
 
     # formats which Gimp can load but not save.
@@ -88,44 +89,44 @@ class ImageFormat:
     # psp Paintshop pro (ancient, not later than Paintshop6, say pre 2005, later format extension is .pspimage Gimp Issue #493)
     # svg scalable vector graphics
 
-    # Savers that require image of specific mode:
-    # gif, indexed color
-    # flic, indexed or gray
-
     # loader named non-canonically
     # handled in code below, not metadata
     # rgbe is file-load-rgbe
     # xcf is gimp-xcf-load
 
-    # TODO unknown i.e. using magic is gimp-file-load
+    # TODO unknown format i.e. using magic is gimp-file-load
 
     # TODO also test thumbs???
 
+    # All formats that can be tested.
     # Note that no_saver_formats are not included, since they are in the loader_formats
     all_format_monikers = two_arg_file_formats + one_arg_file_formats + no_loader_formats
 
-    # formats whose saver requires downmode image
+    """
+    formats whose saver requires downmode image
+    Here "downmode" encompasses any of: lower the mode, remove alpha, scale down
+    """
     # to mode indexed or less
-    downmode_to_BW_formats = ("gif", "flic", "xbm")
+    downmode_to_BW_formats = ("gif", "fli", "xbm")
+    downmode_to_gray_formats = ("")
     # remove alpha i.e. flatten
     downmode_to_sans_alpha_formats = ("dicom", "fits")
-    # TODO restrict image size xmc
+    # xmc handles at most 256 pixels
+    downmode_to_small_size_formats = ("xmc", )
 
 
 
     def excludeFromTests(format_moniker):
         return format_moniker in ImageFormat.excluded_from_test
 
-    def canned_filename(format_moniker):
-        # TODO aberrant cases
-        # TODO extension from format_moniker
+    def get_extension(format_moniker):
+        """ Return extension for format_moniker"""
+
         if format_moniker in ImageFormat.map_moniker_to_extension.keys():
-            extension = ImageFormat.map_moniker_to_extension[format_moniker]
+            result = ImageFormat.map_moniker_to_extension[format_moniker]
         else:
             # extension same as moniker
-            extension = format_moniker
-        result = "/work/test/test." + extension
-        print(f"Test file: {result}")
+            result = format_moniker
         return result
 
 
@@ -181,9 +182,13 @@ class ImageFormat:
     TODO extract to ModeConverter class
     """
     def compatible_mode_image(format_moniker, image, drawable):
-        """ Return a down-moded image of mode that moniker accepts.  """
+        """ Return a down-moded image of mode that format requires.
+
+        Image is to-be-saved.
+        TODO xmc appears to save any image, but won't load its own dogfood.
+        """
         if format_moniker in ImageFormat.downmode_to_BW_formats :
-            print("Down moding to B&W")
+            print("Down moding to mode indexed B&W")
             # format requires indexed.  Convert to lowest common denominator: one-bit B&W mono
             # TODO convert only xbm to B&W, convert others to pallete
             new_image = pdb.gimp_image_duplicate(image)
@@ -191,21 +196,31 @@ class ImageFormat:
             pdb.gimp_image_convert_indexed(new_image, DITHER_NONE, PALETTE_MONO, 0, False, False, "foo")
             new_drawable = pdb.gimp_image_get_active_layer(new_image)
             result = new_image, new_drawable
-        # TODO flic requires indexed or gray but fails on B&W ?
+        elif format_moniker in ImageFormat.downmode_to_gray_formats:
+            print("Down moding to mode gray")
+            new_image = pdb.gimp_image_duplicate(image)
+            pdb.gimp_image_convert_grayscale(new_image)
+            new_drawable = pdb.gimp_image_get_active_layer(new_image)
+            result = new_image, new_drawable
         elif format_moniker in ImageFormat.downmode_to_sans_alpha_formats:
             # format requires without alpha
             if pdb.gimp_drawable_has_alpha(drawable):
                 print("Down moding to sans alpha")
-                # TODO copy  image, get alpha channel, remove it
                 new_image = pdb.gimp_image_duplicate(image )
-                # new_drawable = pdb.gimp_get_active_layer(image)
+                # flatten removes alpha channel
                 pdb.gimp_image_flatten(new_image)
                 new_drawable = pdb.gimp_image_get_active_layer(new_image)
                 result = new_image, new_drawable
             else:
                 result = image, drawable
-        #TODO xmc save restricted to 256 pixel wide
+        elif format_moniker in ImageFormat.downmode_to_small_size_formats:
+            print("Down moding to 256 pixels")
+            new_image = pdb.gimp_image_duplicate(image )
+            pdb.gimp_image_scale(new_image, 256, 256)
+            new_drawable = pdb.gimp_image_get_active_layer(new_image)
+            result = new_image, new_drawable
         else:
+            # format can be any mode, can have alpha, can be any size
             result = image, drawable
         return result
 

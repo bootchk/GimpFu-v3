@@ -76,13 +76,13 @@ Probably the procedure returned an error code, but it could also have crashed ha
 
 
 '''
-import os
-from shutil import copyfile
+import os   # file existence
 
 from gimpfu import *
 
 from image_format import ImageFormat
 from all_test_result import AllTestResult, KnownGoodAllTestResult
+from test_dir import TestDir
 
 
 def call_save_procedure(saver_name, image, drawable, format_moniker, filename):
@@ -165,7 +165,8 @@ def ensure_test_file(image, drawable, format_moniker):
 
     Return whether save_procedure ran, and whether it succeeded.
     """
-    filename = ImageFormat.canned_filename(format_moniker)
+    extension = ImageFormat.get_extension(format_moniker)
+    filename = TestDir.test_filename_with_extension(extension)
 
     if os.path.isfile(filename):
         # file already exists
@@ -278,29 +279,14 @@ def test_file_format(image, drawable, format_moniker):
     return result
 
 
-def populate_sample_files():
-    """ Copy test/in/sample.<foo> to test/test.<foo> for all formats that have no save procedure.
 
-    Files in test/in named sample.<foo> should have no save procedure.
-    Alternatively, we could iterate over the format extensions having no save procedure.
-    """
-    directory_name = "/work/test/in"
-    directory = os.fsencode(directory_name)
 
-    for file in os.listdir(directory):
-         filename = os.fsdecode(file)
-         # filepath = os.fspath(file)
-         if filename.startswith("sample."):
-             root_and_extension = os.path.splitext(filename)
-             # print(directory_name, filename, root_and_extension[1])
-             filepath = directory_name + "/" + filename
-             copyfile(filepath, "/work/test/test" + root_and_extension[1])
 
 
 def test_all_file_formats(image, drawable):
     log = []
 
-    populate_sample_files()
+    TestDir.populate_sample_files()
 
     all_result = AllTestResult()
 
