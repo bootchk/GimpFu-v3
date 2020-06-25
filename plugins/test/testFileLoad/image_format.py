@@ -1,8 +1,10 @@
 
+import logging
 
 from gimpfu import *   # pdb and enums for mode conversions
 
 
+logger = logging.getLogger("TestExportImport.ImageFormat")
 
 """
 Understands Gimp capabilities re image file formats.
@@ -27,12 +29,9 @@ class ImageFormat:
     It could be automated by querying the PDB ?
     """
 
+
     # TODO heif plugin? was in 2.10.2
 
-    # Exclude formats from test all
-    # Where we know they crash the test plugin and want the plugin to test everything else
-    # You can still test individually, just not using "test all"
-    excluded_from_test = ( )
 
     """
     Process for determining which extensions are supported.
@@ -63,15 +62,23 @@ class ImageFormat:
     }
 
     """
+    Exclude formats from test all
+    Where we know they fail and want to test everything else.
+    You can still test individually, just not using "test all"
+    Especially when they crash the *test plugin*, not just return error from PDB call.
+    Some may enter the debugger and wait on user interaction.
+
     Reasons are subject to change.
-    They are snapshots in time.
+    They are snapshots in time for a given state of Gimp development.
     Reasons given may be wrong.
     When bugs in Gimp are fixed, remove these reasons.
+    Any tester can alter this temporarily.
+    Should permanently remove a line when issue is closed.
     """
     map_omission_to_reason = {
         "cel"        : "Known crash",
         "openraster" : "Known to crash in Python load/save procedure",
-        "gih"        : "Known crash",
+        "gih"        : "Known crash, waiting on GimpParamStringArray implementation.",
         "colorxhtml" : "Known to crash in Python load/save procedure",
         "csource"    : "Docs say won't run non-interactively",
         "psp"        : "Can't locate a sample of this ancient format"
@@ -79,9 +86,11 @@ class ImageFormat:
 
 
     # moniker classes by loader signature
+    # fli requires two extra args
+    three_arg_file_formats = ("fli", )
     # pdf signature is (filename, filename as a password?)
     two_arg_file_formats = ("pdf", )
-    one_arg_file_formats = ( "bmp", "bz2", "cel", "dds", "dicom", "faxg3", "fits", "fli",
+    one_arg_file_formats = ( "bmp", "bz2", "cel", "dds", "dicom", "faxg3", "fits",
                         "gbr", "gif", "gih", "gz",
                         "hgt", "ico", "jpeg", "openraster",
                         "pat", "pcx", "pix", "png", "pnm", "psd", "psp",
@@ -115,7 +124,7 @@ class ImageFormat:
 
     # All formats that can be tested.
     # Note that no_saver_formats are not included, since they are in the loader_formats
-    all_format_monikers = two_arg_file_formats + one_arg_file_formats + no_loader_formats
+    all_format_monikers = two_arg_file_formats + one_arg_file_formats + no_loader_formats + three_arg_file_formats
 
     """
     formats whose saver requires downmode image
@@ -186,6 +195,8 @@ class ImageFormat:
         return format_moniker in ImageFormat.two_arg_file_formats
     def has_one_arg_loader(format_moniker):
         return format_moniker in ImageFormat.one_arg_file_formats
+    def has_three_arg_loader(format_moniker):
+        return format_moniker in ImageFormat.three_arg_file_formats
 
     def saver_takes_single_drawable(format_moniker):
         return format_moniker in ImageFormat.single_drawable_save_formats
@@ -206,7 +217,7 @@ class ImageFormat:
         TODO xmc appears to save any image, but won't load its own dogfood.
         """
         if format_moniker in ImageFormat.downmode_to_BW_formats :
-            print("Down moding to mode indexed B&W")
+            logger.info("Down moding to mode indexed B&W")
             # format requires indexed.  Convert to lowest common denominator: one-bit B&W mono
             # TODO convert only xbm to B&W, convert others to pallete
             new_image = pdb.gimp_image_duplicate(image)
@@ -215,7 +226,7 @@ class ImageFormat:
             new_drawable = pdb.gimp_image_get_active_layer(new_image)
             result = new_image, new_drawable
         elif format_moniker in ImageFormat.downmode_to_gray_formats:
-            print("Down moding to mode gray")
+            logger.info("Down moding to mode gray")
             new_image = pdb.gimp_image_duplicate(image)
             pdb.gimp_image_convert_grayscale(new_image)
             new_drawable = pdb.gimp_image_get_active_layer(new_image)
@@ -223,7 +234,7 @@ class ImageFormat:
         elif format_moniker in ImageFormat.downmode_to_sans_alpha_formats:
             # format requires without alpha
             if pdb.gimp_drawable_has_alpha(drawable):
-                print("Down moding to sans alpha")
+                logger.info("Down moding to sans alpha")
                 new_image = pdb.gimp_image_duplicate(image )
                 # flatten removes alpha channel
                 pdb.gimp_image_flatten(new_image)
@@ -232,9 +243,10 @@ class ImageFormat:
             else:
                 result = image, drawable
         elif format_moniker in ImageFormat.downmode_to_small_size_formats:
-            print("Down moding to 256 pixels")
+            logger.info("Down moding to 256 pixels")
+            # !!! 256 is the total, i.e. 16x16
             new_image = pdb.gimp_image_duplicate(image )
-            pdb.gimp_image_scale(new_image, 256, 256)
+            pdb.gimp_image_scale(new_image, 16, 16)
             new_drawable = pdb.gimp_image_get_active_layer(new_image)
             result = new_image, new_drawable
         else:

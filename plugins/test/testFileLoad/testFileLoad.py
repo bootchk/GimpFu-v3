@@ -179,6 +179,9 @@ def load_file(image, drawable, filename, format_moniker):
     elif  ImageFormat.has_one_arg_loader(format_moniker) :
         # load procedure has args (GFile)
         arg_string = "(filename)"
+    elif  ImageFormat.has_three_arg_loader(format_moniker) :
+        # from and to frame index.  The saved image has one frame, index 0 ?
+        arg_string = "(filename, 0, 0)"
     else:
       raise Exception(f"Not implemented loader args case: {format_moniker}")
 

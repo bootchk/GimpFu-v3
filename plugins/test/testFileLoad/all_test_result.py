@@ -41,7 +41,7 @@ class KnownGoodAllTestResult:
         result = AllTestResult()
 
         for format_moniker in ImageFormat.all_format_monikers:
-            if format_moniker in ImageFormat.excluded_from_test:
+            if ImageFormat.excludeFromTests(format_moniker):
                 result[format_moniker] = ("Omit", "Omit")
             else:
                 if format_moniker in ImageFormat.no_saver_formats:
