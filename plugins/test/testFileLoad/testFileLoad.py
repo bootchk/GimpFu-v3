@@ -157,15 +157,14 @@ def load_file(image, drawable, filename, format_moniker):
 
 def ensure_test_file(image, drawable, format_moniker):
     """ Ensure exists a file having canonical filename for given format: format_moniker.
-
-    Return canonical filename (like /work/test/test.jpeg)
-
     If file already exists, return filename.
-    Else try create, from given image, drawable.
+    Else call save procedure, from given image, drawable.
 
+    Return filename (like /tmp/tmp123/test.jpeg)
     Return whether save_procedure ran, and whether it succeeded.
     """
     extension = ImageFormat.get_extension(format_moniker)
+    TestDir.ensure_test_dir()
     filename = TestDir.test_filename_with_extension(extension)
 
     if os.path.isfile(filename):

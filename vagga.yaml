@@ -445,8 +445,13 @@ containers:
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimpui-doc /usr/local/share/gir-1.0/GimpUi-3.0.gir
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
-
     ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
+
+    # Larger /tmp for testing
+    # 100Mi is default, not enough to create many image files
+    volumes:
+      /tmp: !Tmpfs { size: 500Mi, mode: 0o1777 }
+
 
   # with gdb.  TODO move higher
   gimpMesonGdb:
@@ -664,7 +669,7 @@ commands:
       rm -rf /work/.home/.config/GIMP/2.99/plug-ins/*
 
       echo "Copying all wild test plugins"
-      cp -r /work/plugins/wild/* /work/.home/.config/GIMP/2.99/plug-ins
+      #cp -r /work/plugins/wild/* /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Copying all my test plugins"
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins

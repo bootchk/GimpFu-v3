@@ -23,8 +23,8 @@ class FuLogger:
         logger = logging.getLogger('GimpFu')
 
         # TODO make the level come from the command line or the environment
-        logger.setLevel(logging.DEBUG)
-        #logger.setLevel(logging.WARNING)
+        #logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.WARNING)
 
         # create file handler which logs even debug messages
         #fh = logging.FileHandler('spam.log')

@@ -19,19 +19,36 @@ class TestDir:
     _test_dir = None
 
     @classmethod
-    def create_scratch_temp_dir(cls):
-        if cls._test_dir is not None:
-            # cleanup previous
-            cls._test_dir.cleanup()
-        # Test dir will change name on every run
+    def create_new_test_dir(cls):
+        # Test dir will change name
         cls._test_dir = tempfile.TemporaryDirectory()
         print(f"Test directory is {cls.name()}")
 
     @classmethod
+    def ensure_test_dir(cls):
+        """ Ensure test dir exists, without cleaning. """
+        if cls._test_dir is None:
+            cls.create_new_test_dir()
+
+    @classmethod
+    def create_scratch_temp_dir(cls):
+        """ Ensure test dir exists and is scratched (clean) """
+        if cls._test_dir is not None:
+            # cleanup previous
+            cls._test_dir.cleanup()
+        # Test dir will change name on every run
+        cls.create_new_test_dir()
+
+
+    @classmethod
     def sample_dir_name(cls):
         """ Name of directory without trailing / """
-        # TODO from Python pwd ???
-        return "/work/test/in"
+        # sample files are in dir "in" of the python module
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        result = os.path.join(dir_path, "in")
+        print(f"Sample dir: {result}")
+        return result
+
 
     @classmethod
     def sample_dir(cls):
@@ -54,16 +71,18 @@ class TestDir:
 
     @classmethod
     def test_filename_with_extension(cls, suffix):
-        """ Return a path into test directory, str ending in /test
+        """ Return a path into test directory, str ending in /test.<suffix>
 
         All test files will be named like /tmp/234342/test.<foo>
 
-        File should not exist yet.
+        File need not exist yet.
         """
+        assert not suffix.startswith('.')
         result = os.path.join(cls.name(), "test" + "." + suffix)
         # result = "/work/test/test"
         print(f"Test path: {result}")
         return result
+
 
 
     @classmethod
@@ -81,9 +100,14 @@ class TestDir:
              filename = os.fsdecode(file)
              # filepath = os.fspath(file)
              if filename.startswith("sample."):
-                 # TODO platform independent path construction
-                 # get the extension, so we can add it to the copied file
+                 # platform independent path construction
+                 # get extension, so we can add it to the copied file
                  extension = os.path.splitext(filename)[1]
-                 # print(directory_name, filename, root_and_extension[1])
-                 sample_filepath = cls.sample_dir_name() + "/" + filename
-                 copyfile(sample_filepath, cls.test_filename_with_extension(extension))
+                 # assert extension begins with a period
+                 suffix = extension.lstrip('.')
+                 sample_filepath = os.path.join(cls.sample_dir_name(), filename)
+                 copyfile(sample_filepath, cls.test_filename_with_extension(suffix))
+
+        # Ensure a sample file
+        filename = cls.test_filename_with_extension("svg")
+        assert os.path.isfile(filename)
