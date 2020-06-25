@@ -32,7 +32,7 @@ class ImageFormat:
     # Exclude formats from test all
     # Where we know they crash the test plugin and want the plugin to test everything else
     # You can still test individually, just not using "test all"
-    excluded_from_test = ("cel", "openraster", "gih", "colorxhtml" )
+    excluded_from_test = ( )
 
     """
     Process for determining which extensions are supported.
@@ -60,6 +60,21 @@ class ImageFormat:
     "header"     : "h",     # C header source
     "html-table" : "html",
     "faxg3"      : "g3",
+    }
+
+    """
+    Reasons are subject to change.
+    They are snapshots in time.
+    Reasons given may be wrong.
+    When bugs in Gimp are fixed, remove these reasons.
+    """
+    map_omission_to_reason = {
+        "cel"        : "Known crash",
+        "openraster" : "Known to crash in Python load/save procedure",
+        "gih"        : "Known crash",
+        "colorxhtml" : "Known to crash in Python load/save procedure",
+        "csource"    : "Docs say won't run non-interactively",
+        "psp"        : "Can't locate a sample of this ancient format"
     }
 
 
@@ -117,7 +132,10 @@ class ImageFormat:
 
 
     def excludeFromTests(format_moniker):
-        return format_moniker in ImageFormat.excluded_from_test
+        return format_moniker in ImageFormat.map_omission_to_reason.keys()
+
+    def get_reason_for_omission(format_moniker):
+        return ImageFormat.map_omission_to_reason[format_moniker]
 
     def get_extension(format_moniker):
         """ Return extension for format_moniker"""

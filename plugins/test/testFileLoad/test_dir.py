@@ -11,18 +11,21 @@ Hides those fact from rest of app.
 import os
 import tempfile
 from shutil import copyfile
+import logging
 
 
 class TestDir:
 
     # must first call create_scratch_temp_dir
     _test_dir = None
+    logger = logging.getLogger("TestExportImport.TestDir")
+
 
     @classmethod
     def create_new_test_dir(cls):
         # Test dir will change name
         cls._test_dir = tempfile.TemporaryDirectory()
-        print(f"Test directory is {cls.name()}")
+        cls.logger.info(f"Test directory is {cls.name()}")
 
     @classmethod
     def ensure_test_dir(cls):
@@ -46,7 +49,7 @@ class TestDir:
         # sample files are in dir "in" of the python module
         dir_path = os.path.dirname(os.path.realpath(__file__))
         result = os.path.join(dir_path, "in")
-        print(f"Sample dir: {result}")
+        # print(f"Sample dir: {result}")
         return result
 
 
@@ -79,8 +82,7 @@ class TestDir:
         """
         assert not suffix.startswith('.')
         result = os.path.join(cls.name(), "test" + "." + suffix)
-        # result = "/work/test/test"
-        print(f"Test path: {result}")
+        # print(f"Test path: {result}")
         return result
 
 
@@ -106,6 +108,7 @@ class TestDir:
                  # assert extension begins with a period
                  suffix = extension.lstrip('.')
                  sample_filepath = os.path.join(cls.sample_dir_name(), filename)
+                 cls.logger.info(f"Sample file: {sample_filepath}")
                  copyfile(sample_filepath, cls.test_filename_with_extension(suffix))
 
         # Ensure a sample file

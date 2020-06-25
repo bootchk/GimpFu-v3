@@ -128,7 +128,7 @@ def call_save_procedure(saver_name, image, drawable, format_moniker, filename):
         arg_string = "(image, 1, drawable, filename)"
 
     eval_string = "pdb." + saver_name + arg_string
-    #print(f"Invoking: {eval_string}")
+    #logger.info(f"Invoking: {eval_string}")
     eval(eval_string)
 
 
@@ -200,6 +200,7 @@ def ensure_test_file(image, drawable, format_moniker):
     extension = ImageFormat.get_extension(format_moniker)
     TestDir.ensure_test_dir()
     filename = TestDir.test_filename_with_extension(extension)
+    logger.info(f"Test file: {filename}")
 
     if os.path.isfile(filename):
         # file already exists
@@ -270,7 +271,11 @@ def test_result_to_str(format_moniker, test_result):
     expected_result = KnownGoodAllTestResult.expected_result(format_moniker)
 
     result = format_moniker.ljust(10) + ": " + test_result[0].ljust(10) + "," + test_result[1].ljust(10)
-    #print(test_result, expected_result, test_result==expected_result)
+    #logger.info(test_result, expected_result, test_result==expected_result)
+
+    # append notes for omitted and unexpected results
+    if  test_result == ("Omit", "Omit"):
+        result += " Reason: " + ImageFormat.get_reason_for_omission(format_moniker)
     if test_result != expected_result :
         # test of the format failed in one or more aspects, from the ideal
         result += " Ideal: " + str(expected_result)
@@ -333,13 +338,14 @@ def test_all_file_formats(image, drawable):
         all_result[format_moniker] = single_result
 
     logger.info("testFileLoad summary of 'Test All' ")
+    logger.info("Format      Save       Load      Notes")
     for line in log: logger.info(line)
     # This is a GimpFu plugin so other GimpFu messages may precede or follow, and might be pertinent
 
     # return boolean: did all individual tests match known good result?
     go_nogo_result = (all_result == KnownGoodAllTestResult.known_good_all_test_result)
-    print(f"If test result is unexpectedly False, insure test directory is empty before starting.")
-    print(f"testFileLoad go/nogo: {go_nogo_result}")
+    logger.info(f"If test result is unexpectedly False, insure test directory is empty before starting.")
+    logger.info(f"testFileLoad go/nogo: {go_nogo_result}")
     return go_nogo_result
 
 
