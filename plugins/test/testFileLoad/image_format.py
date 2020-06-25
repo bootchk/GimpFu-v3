@@ -84,6 +84,17 @@ class ImageFormat:
         "psp"        : "Can't locate a sample of this ancient format"
     }
 
+    # procedures not named canonically file-<foo>-[load,save]
+    # Python names, with underbar
+    map_moniker_to_loader_name = {
+    "rgbe" : "file_load_rgbe",
+    "xcf"  :  "gimp_xcf_load",
+    }
+    map_moniker_to_saver_name = {
+    "rgbe" : "file_save_rgbe",
+    "xcf"  :  "gimp_xcf_save",
+    }
+
 
     # moniker classes by loader signature
     # fli requires two extra args
@@ -112,11 +123,6 @@ class ImageFormat:
     # hgt "height" or elevation maps NASA SRTM  Gimp only supports SRTM-1 and SRTM-3 variants
     # psp Paintshop pro (ancient, not later than Paintshop6, say pre 2005, later format extension is .pspimage Gimp Issue #493)
     # svg scalable vector graphics
-
-    # loader named non-canonically
-    # handled in code below, not metadata
-    # rgbe is file-load-rgbe
-    # xcf is gimp-xcf-load
 
     # TODO unknown format i.e. using magic is gimp-file-load
 
@@ -167,25 +173,21 @@ class ImageFormat:
         return not format_moniker in ImageFormat.no_saver_formats
 
 
+
     def saver_name(format_moniker):
-        # abberations
-        if format_moniker == "rgbe":
-            return "file_save_rgbe"
-        elif format_moniker == "xcf":
-            return "gimp_xcf_save"
+        if format_moniker in ImageFormat.map_moniker_to_saver_name.keys():
+            result = ImageFormat.map_moniker_to_saver_name[format_moniker]
         else:
-            # canonical
-            return "file_" + format_moniker + "_save"
+            result = "file_" + format_moniker + "_save"
+        return result
 
     def loader_name(format_moniker):
-        # aberrations
-        if format_moniker == "rgbe":
-            return "file_load_rgbe"
-        elif format_moniker == "xcf":
-            return "gimp_xcf_save"
+        if format_moniker in ImageFormat.map_moniker_to_loader_name.keys():
+            result = ImageFormat.map_moniker_to_loader_name[format_moniker]
         else:
-            # canonical
-            return "file_" + format_moniker + "_load"
+            result = "file_" + format_moniker + "_load"
+        return result
+
 
 
     """
