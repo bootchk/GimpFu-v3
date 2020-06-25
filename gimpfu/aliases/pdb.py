@@ -208,6 +208,17 @@ class GimpfuPDB():
 
     # specialized, convenience
 
+
+
+    def get_last_error(self):
+        """ Return last error from PDB.
+
+        For some reason, this is not in the gir nor the PDB Browser,
+        but it is a method on the PDB.
+        """
+        return Gimp.get_pdb().get_last_error()
+
+
     '''
     These are pdb procedures from v2 that Gimp deprecated.
     Since some plugins may still use them, FBC define adaptors.

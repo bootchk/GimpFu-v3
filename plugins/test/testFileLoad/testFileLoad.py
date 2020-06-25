@@ -73,16 +73,43 @@ Probably the procedure returned an error code, but it could also have crashed ha
 
 FAIL for a load procedure means: failed to create an image.
 Probably the procedure returned an error code, but it could also have crashed hard.
+If the saver PASS, that means it created a file, but the file could be invalid
+cause the loader to FAIL.
 
 
 '''
 import os   # file existence
+import logging
 
 from gimpfu import *
 
 from image_format import ImageFormat
 from all_test_result import AllTestResult, KnownGoodAllTestResult
 from test_dir import TestDir
+
+def get_logger():
+    logger = logging.getLogger('TestExportImport')
+
+    # TODO make the level come from the command line or the environment
+    logger.setLevel(logging.DEBUG)
+    #logger.setLevel(logging.WARNING)
+
+    # create file handler which logs even debug messages
+    #fh = logging.FileHandler('spam.log')
+    #fh.setLevel(logging.DEBUG)
+    # create console handler with same log level
+    ch = logging.StreamHandler()
+    # possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
+    ch.setLevel(logging.DEBUG)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    #fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    # add the handlers to the logger
+    #logger.addHandler(fh)
+    logger.addHandler(ch)
+    return logger
+
 
 
 def call_save_procedure(saver_name, image, drawable, format_moniker, filename):
@@ -118,7 +145,14 @@ def save_file(image, drawable, format_moniker, filename):
         saver_name = ImageFormat.saver_name(format_moniker)
         call_save_procedure(saver_name, image, drawable, format_moniker, filename)
         did_saver_run = True  # at least we tried to run it
-        did_saver_pass = os.path.isfile(filename)  # At least it created a file
+        # A dying plug-in might create a file before it dies, so existence of file is not sufficient to pass test
+        # TODO this should be a method of GimpFu: did_pdb_procedure_succeed
+        error_str = pdb.get_last_error()
+        if error_str != "success":
+            did_saver_pass = False
+        else:
+            # Test saver succeeds only if file exists
+            did_saver_pass = os.path.isfile(filename)  # At least it created a file
     else:
         did_saver_run = False
         did_saver_pass = False
@@ -298,8 +332,8 @@ def test_all_file_formats(image, drawable):
         log.append(test_result_to_str(format_moniker, single_result))
         all_result[format_moniker] = single_result
 
-    print("testFileLoad summary of 'Test All' ")
-    for line in log: print(line)
+    logger.info("testFileLoad summary of 'Test All' ")
+    for line in log: logger.info(line)
     # This is a GimpFu plugin so other GimpFu messages may precede or follow, and might be pertinent
 
     # return boolean: did all individual tests match known good result?
@@ -315,13 +349,16 @@ def plugin_func(image, drawable, run_all, file_format_index):
 
     Can be run non-interactive.
     """
+    global logger
+    logger = get_logger()
+
     if run_all:
         result = test_all_file_formats(image, drawable)
     else:
         # get moniker from same list we showed in GUI
         format_moniker = ImageFormat.all_format_monikers[file_format_index]
         result = test_file_format(image, drawable, format_moniker)
-        print(f"Test>File save/load: {test_result_to_str(format_moniker, result)}")
+        logger.info(f"Test>File save/load: {test_result_to_str(format_moniker, result)}")
 
     # when interactive, show the test images we saved/loaded
     gimp.displays_flush()
