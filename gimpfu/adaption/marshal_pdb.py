@@ -97,12 +97,14 @@ class MarshalPDB():
         '''
         Marshal args to a PDB procedure.
 
-        1. Gather many args into Gimp.ValueArray and return it.
+        1. Gather many args  into a FuValueArray and return it.
         2. Optionally prefix args with run mode
         GimpFu feature: hide run_mode from calling author
         3. Unwrap wrapped arguments so all args are GObjects
         4. Upcasts and conversions
         5. Check error FunctionInfo
+
+        !!! Returns FuValueArray, not Gimp.ValueArray
         '''
 
         # FuValueArray is global adaptor of Gimp.ValueArray.  Empty it.
@@ -136,8 +138,7 @@ class MarshalPDB():
 
             gen_value = FuGenericValue(go_arg, go_arg_type)
 
-            """
-            """
+            # One of the main capabilities of GimpFu: accept loose, Pythonic code and do convenient upcasts/conversions
             try:
                 MarshalPDB._try_type_conversions(procedure, gen_value, formal_args_index)
             except Exception as err:
@@ -163,9 +164,9 @@ class MarshalPDB():
                 # The PDB procedure call is usually going to fail anyway.
             """
 
-        result = FuValueArray.get_gvalue_array()
-
         MarshalPDB.logger.debug(f"marshal_args returns: {FuValueArray.dump()}" )
+        result = FuValueArray   # return the singleton class, not an instance !!!
+        # Class's produce GValueArray could be empty, or have errors (see proceed above)
         return result
 
 

@@ -112,7 +112,8 @@ class GimpfuPDB():
 
         # !!! Must unpack args before passing to _marshall_args
         try:
-            marshaled_args = MarshalPDB.marshal_args(proc_name, *args)
+            fuValueArray = MarshalPDB.marshal_args(proc_name, *args)
+            marshaled_args = fuValueArray.get_gvalue_array()
         except Exception as err: # TODO catch only MarshalError ???
             proceed(f"marshalling args to pdb.{proc_name} {err}")
             marshaled_args = None
@@ -129,10 +130,15 @@ class GimpfuPDB():
             # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
             error_str = Gimp.get_pdb().get_last_error()
             if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
-                # TODO  log something better than {marshaled_args}, which is a Gimp.ValueArray without a good __repr__
-                # TODO i.e. { {*args} } ?, but that leaves braces in the output
-                # TODO  { {*args} } throws "unhashable type GimpfuImage"
-                proceed(f"PDB procedure call fail: {proc_name} Gimp says: {error_str}")
+                """
+                Log the args because it is a common failure: wrong args.
+                FuValueArray has a good __repr__
+                We might also log what Author gave (args) before we marshalled them.
+                TODO i.e. { {*args} } ?, but that leaves braces in the output
+                TODO  { {*args} } throws "unhashable type GimpfuImage"
+                """
+                self.logger.warning(f"Args: {fuValueArray.dump()}")
+                proceed(f"PDB call fail: {proc_name} Gimp says: {error_str}")
                 result = None
             else:
                 result = MarshalPDB.unmarshal_results(inner_result)
