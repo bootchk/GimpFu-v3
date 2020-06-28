@@ -447,6 +447,9 @@ containers:
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
     ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
 
+    # some commands want wget
+    - !Install [wget]
+
     # Larger /tmp for testing
     # 100Mi is default, not enough to create many image files
     volumes:
@@ -462,11 +465,10 @@ containers:
 
 
 
-  # Faster if a command does this.  See gimpTestGUI which runs on gimpAMDev
+  # Faster if a command does this.
   gimpLocal:
     setup:
     # Choice:
-    #- !Container gimpAMDev
     - !Container gimpMesonDev
 
     # rebuild container if test plugin source (in /work i.e. project directory ) changes
@@ -510,6 +512,8 @@ containers:
 
 
 commands:
+
+  # baseOS does not contain many tools
   testOS: !Command
     description: Test sanity of OS in container baseOS
     container: baseOS
@@ -517,6 +521,8 @@ commands:
       which which
       which pkg-config
       python -V
+      wget --version
+      curl --version
 
   testMeson: !Command
     description: Test sanity of meson in container withTools
@@ -527,6 +533,7 @@ commands:
       which python3
       which intltool
       python3 -V
+      wget --version
 
   testSource: !Command
     description: List contents of cloned source
@@ -674,6 +681,18 @@ commands:
       echo "Copying all my test plugins"
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
 
+      echo "Copying testGimpExportImport plugins"
+      # -O -   means: pipe to stdout
+      wget https://github.com/bootchk/testGimpExportImport/tarball/master
+      tar xz -f master
+      rm master
+      # copy contents of top directory to a new directory
+      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+      cp -r bootchk-testGimp*/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+      rm -rf bootchk-testGimp*
+      rm -rf wget-log*
+      #curl -L  https://github.com/bootchk/testGimpExportImport/tarball/master | tar xz -C /work/.home/.config/GIMP/2.99/plug-ins
+
       # Scraps for copying selected plugins, if not all are copied
       # megaTestGimp
       #cp -r /work/plug-ins/mega*      /work/.home/.config/GIMP/2.99/plug-ins
@@ -733,7 +752,7 @@ commands:
 
   runUbuntuBug: !Command
     description: Run ubuntu-bug in the container
-    container: gimpAMDev
+    container: gimpMesonDev
     run: |
       ubuntu-bug gkt3
 
