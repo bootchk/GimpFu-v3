@@ -82,7 +82,7 @@ register(
       "author",
       "copyright",
       "year",
-      "Dump PDB to /tmp/pdb.txt",
+      "Dump PDB to /work/pdb.txt",
       "*",
       [
           (PF_IMAGE, "image", "Input image", None),
