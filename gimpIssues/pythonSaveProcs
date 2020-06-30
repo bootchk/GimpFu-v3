@@ -1,0 +1,89 @@
+
+2.99 PDB save procedures in Python language crash in PyGObject
+
+Exporting openraster or colorxhtml fails with a segfault.
+
+Note that this seems to be true for all the PDB *save procedures written in Python*
+(of which there are two, openraster and colorxhtml.)
+It does not seem that the PDB *load* procedures written in Python fail
+(although the openraster load also seems to fail, but for a different reason: call to Gimp.Image.get_filename should be "img.get_file" ???
+that is, execution is different code, and does not throw this segfault.)
+It does not seem that *all* PDB procedures written in Python fail.
+
+Replicate:
+
+Start Gimp in the console.
+Open an image.
+Choose File>Export.
+In the dialog select "openraster"
+Choose OK button.
+
+Expect: image to save to a .ras file.
+Actual:
+
+Console shows:
+/work/.home/.config/GIMP/2.99/plug-ins/file-openraster/file-openraster.py:401: Warning: g_object_is_floating: assertion 'G_IS_OBJECT (object)' failed
+  Gimp.main(FileOpenRaster.__gtype__, sys.argv)
+/work/.home/.config/GIMP/2.99/plug-ins/file-openraster/file-openraster.py:401: Warning: g_object_get_qdata: assertion 'G_IS_OBJECT (object)' failed
+  Gimp.main(FileOpenRaster.__gtype__, sys.argv)
+/work/.home/.config/GIMP/2.99/plug-ins/file-openraster/file-openraster.py: fatal error: Segmentation fault
+/work/.home/.config/GIMP/2.99/plug-ins/file-openraster/file-openraster.py (pid:70): [E]xit, show [S]tack trace or [P]roceed:
+
+(Note that in the above, I have copied the plugin to my local install directory so that I could harness the Python code.
+It fails even if you use the original installation.)
+
+Stack trace:
+
+The relevant part is:
+
+#4  0x00007f2c54963470 in <signal handler called> () at /lib/x86_64-linux-gnu/libc.so.6
+#5  0x00007f2c53ff19c7 in g_type_get_qdata () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#6  0x00007f2c54175536 in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-37m-x86_64-linux-gnu.so
+#7  0x00007f2c54175cac in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-37m-x86_64-linux-gnu.so
+#8  0x00007f2c5415fba9 in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-37m-x86_64-linux-gnu.so
+#9  0x00007f2c5424660b in ffi_closure_unix64_inner () at /lib/x86_64-linux-gnu/libffi.so.6
+#10 0x00007f2c54246986 in ffi_closure_unix64 () at /lib/x86_64-linux-gnu/libffi.so.6
+#11 0x00007f2c51b19159 in gimp_save_procedure_run (procedure=0xca9160, args=0xcb6120) at ../libgimp/gimpsaveprocedure.c:176
+        save_proc = 0xca9160
+        remaining = 0xcb6360
+        return_values = 0x0
+        run_mode = GIMP_RUN_INTERACTIVE
+        image = 0xc55410
+        drawables = 0xcc7be0
+        file = 0xcb62e0
+        n_drawables = 1
+        i = 5
+
+
+My analysis:
+
+It seems to crash at an assertion in the PyGObject library.
+
+After this call at line 176 of gimp/libgimp/gimpsaveprocedure.c:
+
+return_values = save_proc->priv->run_func (procedure,
+                                           run_mode,
+                                           image,
+                                           n_drawables,
+                                           drawables,
+                                           file,
+                                           remaining,
+                                           save_proc->priv->run_data);
+
+At which point I think that PyGObject is marshalling arguments to a Python procedure, the run_func.
+
+It is not evident from the stack trace that this is what is happening, but I harnessed gimpsaveprocedure.c with g_print,
+which shows that execution gets to, but not past, this line.
+
+I am not suggesting that PyGObject is faulty, I would first suspect something in Gimp, say some signature declaration.
+
+I thought about building a debug version of PyGObject, to possibly tell which argument was being marshalled.
+
+
+Context:
+
+Self-built Gimp 2.99 b5659e8aa45e9ecc8888cc7ca212c661c5dbf9eb
+Meson build, on Ubuntu19.10, in a container.
+I discovered this running a Python plugin that exercises all the PDB save/load procedures, where possible.
+See https://github.com/bootchk/testGimpExportImport.
+I will soon report a few other discovered issues with save/load in 2.99, but I think they are not relevant to this one.

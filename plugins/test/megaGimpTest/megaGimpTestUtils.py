@@ -15,7 +15,16 @@ def isPlugin(procName):
         )
 
 def isDeleting(procName):
+    """ We don't test procedures that might delete our test data. """
     return procName.find("-delete")>0
+
+def isLoadSave(procName):
+    """ save/load tested in another plugin testGimpExportImport
+
+    Typically name file-<foo>-save and -load"""
+    if (procName.startswith('file')):
+        return True
+    return False
 
 
 def shouldTestProcedure(procName):
@@ -30,6 +39,9 @@ def shouldTestProcedure(procName):
     """
 
     if isDeleting(procName):
+        return False
+
+    if isLoadSave(procName):
         return False
 
     # !!! Not test self, infinite recursion

@@ -119,7 +119,7 @@ Notations used in the comments:
 # Expose to Authors: math.  v2 did? v3, Authors must import it themselves
 # v2 import math
 
-print("gimpfu_top begin imports")
+#print("gimpfu_top begin imports")
 import sys
 
 

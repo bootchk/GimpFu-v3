@@ -246,7 +246,6 @@ def plugin_main(image, drawable):
     # get dictionary of PDB signatures
     with open("testPDB/pdb.json", "r") as read_file:
         data = json.load(read_file)
-
         # assert data is-a dictionary
 
         # run tests
@@ -281,7 +280,7 @@ register(
     ],
     [], # No return value
     plugin_main,
-    menu=N_("<Image>/Filters"), # menupath
+    menu=N_("<Image>/Test"), # menupath
     domain=("gimp30-python", gimp.locale_directory))
 
 TestLog.say(f"Starting")

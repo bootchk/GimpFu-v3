@@ -1,0 +1,61 @@
+
+2.99 Export then Import a "Autodesk FLIC animation" i.e. fli format fails for image with only one layer i.e. frame
+
+Exporting an image with only one layer creates a file that in turn cannot be Imported.
+This is of little consequence, since no one would want to create an "animation" with only one frame.
+The issue hinders automated testing, since calling the PDB save procedure with a minimal image and default parameters
+runs into the issue.
+
+
+Replicate:
+
+```
+Start Gimp.
+Create a new image (having only one layer)
+Choose File>Export.
+In the dialog, option menu "File type",  select "Autodesk FLIC animations"
+Choose OK button.
+Expect dialog to close and another dialog to open.
+Leave the parameters (first and last frame) having the values 1, and choose Export button.
+Expect dialog to close and file "Untitled.fli" to be created.
+
+Choose File>Open on "Untitled.fli", etc.
+```
+
+Expect: image opens
+Actual:
+
+Gimp message shows:
+```
+Opening '/work/Untitled.fli' failed:
+
+AutoDesk FLIC animation plug-in could not open image
+```
+
+
+
+
+My analysis:
+
+in gimp/plug-ins/file-fli/flik-gimp.c line 553:
+
+```
+if (from_frame >= fli_header.frames)
+  {
+    /* nothing to do ... */
+    fclose (fp);
+    return NULL;
+  }
+```
+
+The ">=" should be ">"
+In the test case, from_frame is 1 and fli_header.frames is 1.
+I lightly tested.
+
+
+
+Context:
+
+Self-built Gimp 2.99 b5659e8aa45e9ecc8888cc7ca212c661c5dbf9eb
+Meson build, on Ubuntu19.10, in a container.
+I discovered this running a Python plugin that exercises all the PDB save/load procedures, where possible.
