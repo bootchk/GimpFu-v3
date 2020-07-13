@@ -1,0 +1,51 @@
+
+A pattern does not currently allow many layers:
+plug-ins/common/file-pat.c
+
+      if (n_drawables != 1)
+        {
+          g_set_error (&error, G_FILE_ERROR, 0,
+                       _("PAT format does not support multiple layers."));
+
+I assume that there are no plans to change that.
+I.E.  the only reason that there is an API mismatch is because
+the changes made for multi-layer have made the API more general (allowing many layers instead of one)
+for the machinery in common with all export formats.
+I think some formats like "animated brush" the gih format, do allow many layers.
+So the machinery must have existed to pass many layers,
+but I don't completely understand the recent "multi-layer" changes to the API.
+
+I think that the pat code should follow the gbr code,
+which also restricts layer count to one.
+
+In plug-ins/common/file-gbr.c (for brush data) :
+
+    if (n_drawables != 1)
+      {
+        g_set_error (&error, G_FILE_ERROR, 0,
+                     _("GBR format does not support multiple layers."));
+
+but also:
+
+    gimp_pdb_run_procedure (gimp_get_pdb (),
+                            "file-gbr-save-internal",
+                            GIMP_TYPE_RUN_MODE, GIMP_RUN_NONINTERACTIVE,
+                            GIMP_TYPE_IMAGE,    image,
+                            GIMP_TYPE_DRAWABLE, drawables[0],
+
+which is different from what file-pat.c does:
+
+    gimp_pdb_run_procedure (gimp_get_pdb (),
+                            "file-pat-save-internal",
+                            GIMP_TYPE_RUN_MODE,     GIMP_RUN_NONINTERACTIVE,
+                            GIMP_TYPE_IMAGE,        image,
+                            G_TYPE_INT,             n_drawables,
+                            GIMP_TYPE_OBJECT_ARRAY, drawables,
+
+So in my opinion, the fix is to mimic the code from gbr for pat.
+I.E. call the _internal function passing only the first drawable from the array of drawables.
+The lower level function ( file_save_pat_internal) does not need to change.
+
+I don't know the code or the recent changes well, so I could be wrong.
+If someone who *does* know the plans and the code well would say this is the right fix,
+then anyone could fix and test it.

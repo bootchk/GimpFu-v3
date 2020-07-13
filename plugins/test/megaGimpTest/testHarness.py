@@ -84,3 +84,34 @@ def generateFooGimpData(drawable):
     # for pattern, GUI allows duplicate and delete, but not rename, name is e.g. "Amethyst copy"
     # no API for duplicate, rename, or delete
     # script-fu-paste-as-pattern will allow create a named pattern
+
+
+def generateGlobalFooParameters(image, drawable):
+    """
+    Generate instances (passed as args to PDB procedures, not by a name known to Gimp).
+    Used like 'image', 'drawable', instances passed into the tests,
+    but here it is global.
+    """
+    global fooVectors   # declare global so can assign to global
+    # GimpFu notation, not gi
+    fooVectors = gimp.Vectors(image, "foo")
+
+    global fooFile
+     # create a GObject file descriptor
+
+    # create a named file
+    # fooFile = Gio.file_new_for_path("/work/foo")
+
+    fooFile, stream = Gio.file_new_tmp(None)
+    assert fooFile is not None
+
+    # fooFile is-a GLocalFile, i.e. file doesn't exist yet if path is malformed
+    # create the file?
+    print(fooFile.__gtype__, stream.__gtype__)
+    #raise Exception
+
+    """
+    Many procedures take an array of drawables.
+    We don't create a global fooDrawableArray since GimpFu will automatically convert Drawable to GimpDrawableArray
+    where required.
+    """

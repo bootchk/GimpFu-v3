@@ -27,7 +27,7 @@ def get_gfile(filename):
     # create a GObject file descriptor
     gfile =  Gio.file_new_for_path(filename)
     if gfile is None:
-        print(">>>>Failed to create /tmp/pdb.txt")
+        print(f">>>>Failed to create {filename}")
         return None
     else:
         return gfile
@@ -44,6 +44,15 @@ def get_gfile2(filename):
     return f
 
 
+def print_filetype(file):
+    # Fails: FILE_QUERY_INFO_NONE
+    # info = f.query_info('standard::type,standard::size', flags=Gio.FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, cancellable=None)
+    # info = f.query_info('standard::type,standard::size', flags=None, cancellable=None)
+    info = file.query_info('standard::type, standard::size', flags=Gio.FileQueryInfoFlags.NONE, cancellable=None)
+
+    print(f"File type is: {info.get_file_type()}")
+
+
 def plugin_func(image, drawable):
 
     # filename = '/tmp/pdb.txt'
@@ -53,16 +62,13 @@ def plugin_func(image, drawable):
 
     f = get_gfile(filename)
 
+    # ??? can't get_info if not exist???  Easy enough to "touch pdb.txt" before starting
+    # print_filetype(f)
+
     '''
     !!! See the API at "PyGObject API Reference, which is the most up-to-date"
     There exist many dated examples on the net.
     '''
-    # Fails: FILE_QUERY_INFO_NONE
-    # info = f.query_info('standard::type,standard::size', flags=Gio.FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, cancellable=None)
-    # info = f.query_info('standard::type,standard::size', flags=None, cancellable=None)
-    info = f.query_info('standard::type, standard::size', flags=Gio.FileQueryInfoFlags.NONE, cancellable=None)
-
-    print(f"File type is: {info.get_file_type()}")
 
     result = gimp.get_pdb().dump_to_file(f)
     if result:

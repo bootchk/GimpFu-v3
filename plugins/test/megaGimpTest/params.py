@@ -79,6 +79,14 @@ def generateParamString(procName, inParamList,  image, drawable):
             # Usually a GFile
             # refer to test harness object
             result = appendParameter(result, 'fooFile')
+        elif aType == "GimpParamObjectArray" :
+            """
+            Usually an array of Gimp.Drawable.
+            The signature of many procedures changed in 3.0 to take: n_drawables, drawables
+            Refer to "drawable", since GimpFu will convert to GimpParamDrawableArray automatically.
+            However, this depends on the int for n_drawables being 1.
+            """
+            result = appendParameter(result, 'drawable')
 
         # TODO more types
         # GimpParamParasite

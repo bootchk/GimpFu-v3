@@ -2,6 +2,10 @@
 Utilities for plugin megaTestGimp
 """
 
+
+def isScriptFu(procName):
+    return procName.find("script-fu-")==0
+
 def isPlugin(procName):
     # Relies on procedure canonical names
     # TODO test procedure type?

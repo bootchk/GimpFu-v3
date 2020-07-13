@@ -30,6 +30,7 @@ from gi.repository import Gio   # Gio.File
 from gimpfu import *
 
 from megaGimpTestUtils import *
+from userFilter import UserFilter
 from testHarness import *
 from params import *
 from testLog import TestLog
@@ -186,54 +187,35 @@ def testProcs(data,  image, drawable):
         # print(key)
         TestStats.sample("procedures")
 
-        """
-        So testing is always from a known base, test on a copy of original image
-        Note there is no undo() operation in the PDB, to undo the previous test.
-        Alternatively, use the same image over and over, but errors will be different?
-        """
-        testImage = pdb.gimp_image_duplicate(image)
-        testDrawable = pdb.gimp_image_get_active_drawable(testImage)
+        if UserFilter.userWantsTest(key):
+            """
+            So testing is always from a known base, test on a copy of original image
+            Note there is no undo() operation in the PDB, to undo the previous test.
+            Alternatively, use the same image over and over, but errors will be different?
+            """
+            testImage = pdb.gimp_image_duplicate(image)
+            testDrawable = pdb.gimp_image_get_active_drawable(testImage)
 
-        # Not testing undo. Disable it for speed.
-        pdb.gimp_image_undo_disable(testImage)
+            # Not testing undo. Disable it for speed.
+            pdb.gimp_image_undo_disable(testImage)
 
-        # pass procName, its paramDict
-        testAProc(key, data[key],  testImage, testDrawable)
+            # pass procName, its paramDict
+            testAProc(key, data[key],  testImage, testDrawable)
 
-        # delete test image or undo changes made by procedure
-        pdb.gimp_image_delete(testImage)
+            # delete test image or undo changes made by procedure
+            pdb.gimp_image_delete(testImage)
 
 
 
-def plugin_main(image, drawable):
+def plugin_main(image, drawable, shouldTestScriptFu, shouldTestExportImport, shouldTestOther):
     """
     """
 
     # Generate named data in Gimp
     generateFooGimpData(drawable)
 
-    """
-    Generate instances (passed as args to PDB procedures, not by a name known to Gimp).
-    Used like 'image', 'drawable', instances passed into the tests,
-    but here it is global.
-    """
-    global fooVectors   # declare global so can assign to global
-    # GimpFu notation, not gi
-    fooVectors = gimp.Vectors(image, "foo")
-
-    global fooFile
-     # create a GObject file descriptor
-
-    # create a named file
-    # fooFile = Gio.file_new_for_path("/work/foo")
-
-    fooFile, stream = Gio.file_new_tmp(None)
-    assert fooFile is not None
-
-    # fooFile is-a GLocalFile, i.e. file doesn't exist yet if path is malformed
-    # create the file?
-    print(fooFile.__gtype__, stream.__gtype__)
-    #raise Exception
+    # generate named globals for various parameters
+    generateGlobalFooParameters(image, drawable)
 
     # Not testing undo.  Disable it for speed.
     pdb.gimp_image_undo_disable(image)
@@ -247,6 +229,8 @@ def plugin_main(image, drawable):
     with open("testPDB/pdb.json", "r") as read_file:
         data = json.load(read_file)
         # assert data is-a dictionary
+
+        UserFilter.setChoices(shouldTestScriptFu, shouldTestExportImport, shouldTestOther)
 
         # run tests
         testProcs(data, image, drawable)
@@ -277,6 +261,9 @@ register(
     "*", # image types: blank means don't care but no image param
     [(PF_IMAGE,  "i", _("_Image"), None),
      (PF_DRAWABLE, "d", _("_Drawable"), None),
+     (PF_TOGGLE, "shouldTestScriptFu", "ScriptFu procedures?", 1),
+     (PF_TOGGLE, "shouldTestExportImport", "Export/Import procedures?", 1),
+     (PF_TOGGLE, "shouldTestOther", "Other procedures?", 1),
     ],
     [], # No return value
     plugin_main,

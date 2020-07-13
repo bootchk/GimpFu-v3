@@ -17,12 +17,14 @@
       "GParamEnum"
       ]
    },
-"gimp-floating-sel-remove":
+"file-raw-placeholder-mef-load":
    {
    "in": [
-      "GimpParamLayer"
+      "GParamEnum"
+      , "GParamObject"
       ],
    "out": [
+      "GimpParamImage"
       ]
    },
 "gimp-image-scale":
@@ -64,14 +66,12 @@
    "out": [
       ]
    },
-"file-raw-placeholder-mef-load":
+"gimp-floating-sel-remove":
    {
    "in": [
-      "GParamEnum"
-      , "GParamObject"
+      "GimpParamLayer"
       ],
    "out": [
-      "GimpParamImage"
       ]
    },
 "plug-in-gfig":
@@ -166,6 +166,15 @@
    "out": [
       ]
    },
+"gimp-context-list-paint-methods":
+   {
+   "in": [
+      ],
+   "out": [
+      "GParamInt"
+      , "GimpParamStringArray"
+      ]
+   },
 "python-fu-slice":
    {
    "in": [
@@ -183,15 +192,6 @@
       , "GParamBoolean"
       ],
    "out": [
-      ]
-   },
-"gimp-context-list-paint-methods":
-   {
-   "in": [
-      ],
-   "out": [
-      "GParamInt"
-      , "GimpParamStringArray"
       ]
    },
 "gimp-image-get-item-position":
@@ -520,7 +520,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       , "GParamBoolean"
@@ -538,7 +539,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -587,7 +589,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -606,7 +609,8 @@
    {
    "in": [
       "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamDouble"
       , "GParamDouble"
       , "GParamBoolean"
@@ -626,14 +630,13 @@
       "GParamEnum"
       ]
    },
-"file-raw-placeholder-erf-load":
+"gimp-vectors-stroke-reverse":
    {
    "in": [
-      "GParamEnum"
-      , "GParamObject"
+      "GimpParamVectors"
+      , "GParamInt"
       ],
    "out": [
-      "GimpParamImage"
       ]
    },
 "gimp-drawable-width":
@@ -651,6 +654,16 @@
       "GParamDouble"
       ],
    "out": [
+      ]
+   },
+"file-raw-placeholder-erf-load":
+   {
+   "in": [
+      "GParamEnum"
+      , "GParamObject"
+      ],
+   "out": [
+      "GimpParamImage"
       ]
    },
 "plug-in-pixelize":
@@ -700,23 +713,24 @@
    "out": [
       ]
    },
-"file-pfm-save":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamObject"
-      ],
-   "out": [
-      ]
-   },
 "gimp-clone-default":
    {
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
       , "GimpParamFloatArray"
+      ],
+   "out": [
+      ]
+   },
+"file-pfm-save":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GParamInt"
+      , "GimpParamObjectArray"
+      , "GParamObject"
       ],
    "out": [
       ]
@@ -755,7 +769,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -793,7 +808,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -843,7 +859,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -904,7 +921,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamInt"
       , "GParamInt"
@@ -974,7 +992,8 @@
 "gimp-edit-named-cut":
    {
    "in": [
-      "GimpParamDrawable"
+      "GParamInt"
+      , "GimpParamObjectArray"
       , "GimpParamString"
       ],
    "out": [
@@ -997,21 +1016,6 @@
       ],
    "out": [
       "GParamBoolean"
-      ]
-   },
-"python-fu-clothify":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      ],
-   "out": [
       ]
    },
 "gimp-context-get-foreground":
@@ -1057,15 +1061,12 @@
       "GimpParamItem"
       ]
    },
-"python-fu-whirl-pinch":
+"plug-in-goat-exercise-vala":
    {
    "in": [
       "GParamEnum"
       , "GimpParamImage"
       , "GimpParamDrawable"
-      , "GParamDouble"
-      , "GParamDouble"
-      , "GParamDouble"
       ],
    "out": [
       ]
@@ -1077,6 +1078,16 @@
       ],
    "out": [
       "GimpParamString"
+      ]
+   },
+"gimp-image-get-selected-layers":
+   {
+   "in": [
+      "GimpParamImage"
+      ],
+   "out": [
+      "GParamInt"
+      , "GimpParamObjectArray"
       ]
    },
 "gimp-context-set-ink-tilt-sensitivity":
@@ -1100,21 +1111,6 @@
       "GParamEnum"
       , "GimpParamImage"
       , "GimpParamDrawable"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-add-watermark-text":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamString"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamString"
       ],
    "out": [
       ]
@@ -1610,6 +1606,16 @@
       , "GParamDouble"
       ]
    },
+"python-fu-test-vector-param":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
+      ],
+   "out": [
+      ]
+   },
 "file-pat-load":
    {
    "in": [
@@ -1926,10 +1932,14 @@
       "GimpParamImage"
       ]
    },
-"gimp-context-set-sample-transparent":
+"python-fu-accessPDB":
    {
    "in": [
-      "GParamBoolean"
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
+      , "GParamString"
+      , "GParamInt"
       ],
    "out": [
       ]
@@ -1964,6 +1974,14 @@
    "out": [
       ]
    },
+"gimp-context-set-sample-transparent":
+   {
+   "in": [
+      "GParamBoolean"
+      ],
+   "out": [
+      ]
+   },
 "gimp-item-transform-scale":
    {
    "in": [
@@ -1991,7 +2009,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       ],
@@ -2035,7 +2054,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       ],
@@ -2162,7 +2182,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       , "GParamString"
@@ -2205,17 +2226,6 @@
    {
    "in": [
       "GParamDouble"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-message":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamString"
       ],
    "out": [
       ]
@@ -2309,23 +2319,6 @@
       "GimpParamImage"
       ]
    },
-"gimp-context-set-gradient-reverse":
-   {
-   "in": [
-      "GParamBoolean"
-      ],
-   "out": [
-      ]
-   },
-"gimp-edit-cut":
-   {
-   "in": [
-      "GimpParamDrawable"
-      ],
-   "out": [
-      "GParamBoolean"
-      ]
-   },
 "file-gbr-load":
    {
    "in": [
@@ -2336,10 +2329,20 @@
       "GimpParamImage"
       ]
    },
-"gimp-layer-resize-to-image-size":
+"gimp-edit-cut":
    {
    "in": [
-      "GimpParamLayer"
+      "GParamInt"
+      , "GimpParamObjectArray"
+      ],
+   "out": [
+      "GParamBoolean"
+      ]
+   },
+"gimp-context-set-gradient-reverse":
+   {
+   "in": [
+      "GParamBoolean"
       ],
    "out": [
       ]
@@ -2351,6 +2354,14 @@
       , "GimpParamImage"
       , "GimpParamDrawable"
       , "GParamString"
+      ],
+   "out": [
+      ]
+   },
+"gimp-layer-resize-to-image-size":
+   {
+   "in": [
+      "GimpParamLayer"
       ],
    "out": [
       ]
@@ -2722,12 +2733,18 @@
       "GParamEnum"
       ]
    },
-"plug-in-dbbrowser":
+"file-gif-load-thumb":
    {
    "in": [
-      "GParamEnum"
+      "GParamObject"
+      , "GParamInt"
       ],
    "out": [
+      "GimpParamImage"
+      , "GParamInt"
+      , "GParamInt"
+      , "GParamEnum"
+      , "GParamInt"
       ]
    },
 "gimp-drawable-posterize":
@@ -2781,18 +2798,12 @@
       "GParamUInt"
       ]
    },
-"file-gif-load-thumb":
+"plug-in-dbbrowser":
    {
    "in": [
-      "GParamObject"
-      , "GParamInt"
+      "GParamEnum"
       ],
    "out": [
-      "GimpParamImage"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamEnum"
-      , "GParamInt"
       ]
    },
 "gimp-image-merge-down":
@@ -2895,11 +2906,14 @@
    "out": [
       ]
    },
-"gimp-image-set-active-layer":
+"python-fu-testProperties":
    {
    "in": [
-      "GimpParamImage"
-      , "GimpParamLayer"
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
+      , "GParamString"
+      , "GParamInt"
       ],
    "out": [
       ]
@@ -2912,6 +2926,15 @@
       , "GimpParamDrawable"
       , "GParamDouble"
       , "GParamDouble"
+      ],
+   "out": [
+      ]
+   },
+"gimp-image-set-active-layer":
+   {
+   "in": [
+      "GimpParamImage"
+      , "GimpParamLayer"
       ],
    "out": [
       ]
@@ -3011,6 +3034,16 @@
    "out": [
       ]
    },
+"python-fu-test-missing-drawable-attribute":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
+      ],
+   "out": [
+      ]
+   },
 "gimp-brush-is-editable":
    {
    "in": [
@@ -3018,14 +3051,6 @@
       ],
    "out": [
       "GParamBoolean"
-      ]
-   },
-"gimp-context-set-brush-force":
-   {
-   "in": [
-      "GParamDouble"
-      ],
-   "out": [
       ]
    },
 "gimp-edit-named-copy-visible":
@@ -3072,12 +3097,21 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       , "GParamString"
       , "GParamInt"
       , "GParamBoolean"
+      ],
+   "out": [
+      ]
+   },
+"gimp-context-set-brush-force":
+   {
+   "in": [
+      "GParamDouble"
       ],
    "out": [
       ]
@@ -3095,13 +3129,15 @@
    "out": [
       ]
    },
-"gimp-drawable-edit-fill":
+"plug-in-animationoptimize":
    {
    "in": [
-      "GimpParamDrawable"
-      , "GParamEnum"
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
       ],
    "out": [
+      "GimpParamImage"
       ]
    },
 "gimp-image-convert-precision":
@@ -3131,21 +3167,6 @@
       , "GParamInt"
       , "GParamBoolean"
       , "GParamBoolean"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-trim-to-size":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
       ],
    "out": [
       ]
@@ -3190,17 +3211,19 @@
 "gimp-edit-named-copy":
    {
    "in": [
-      "GimpParamDrawable"
+      "GParamInt"
+      , "GimpParamObjectArray"
       , "GimpParamString"
       ],
    "out": [
       "GimpParamString"
       ]
    },
-"gimp-context-set-background":
+"gimp-drawable-edit-fill":
    {
    "in": [
-      "GimpParamRGB"
+      "GimpParamDrawable"
+      , "GParamEnum"
       ],
    "out": [
       ]
@@ -3216,14 +3239,15 @@
    "out": [
       ]
    },
-"gimp-buffer-rename":
+"gimp-image-insert-vectors":
    {
    "in": [
-      "GimpParamString"
-      , "GimpParamString"
+      "GimpParamImage"
+      , "GimpParamVectors"
+      , "GimpParamVectors"
+      , "GParamInt"
       ],
    "out": [
-      "GimpParamString"
       ]
    },
 "gimp-vectors-stroke-new-from-points":
@@ -3250,15 +3274,14 @@
    "out": [
       ]
    },
-"gimp-image-insert-vectors":
+"gimp-drawable-offsets":
    {
    "in": [
-      "GimpParamImage"
-      , "GimpParamVectors"
-      , "GimpParamVectors"
-      , "GParamInt"
+      "GimpParamDrawable"
       ],
    "out": [
+      "GParamInt"
+      , "GParamInt"
       ]
    },
 "gimp-context-set-distance-metric":
@@ -3292,22 +3315,22 @@
    "out": [
       ]
    },
-"gimp-drawable-offsets":
-   {
-   "in": [
-      "GimpParamDrawable"
-      ],
-   "out": [
-      "GParamInt"
-      , "GParamInt"
-      ]
-   },
 "gimp-context-get-stroke-method":
    {
    "in": [
       ],
    "out": [
       "GParamEnum"
+      ]
+   },
+"file-raw-placeholder-rwl-load":
+   {
+   "in": [
+      "GParamEnum"
+      , "GParamObject"
+      ],
+   "out": [
+      "GimpParamImage"
       ]
    },
 "gimp-clone":
@@ -3324,14 +3347,16 @@
    "out": [
       ]
    },
-"file-raw-placeholder-rwl-load":
+"gimp-file-save":
    {
    "in": [
       "GParamEnum"
+      , "GimpParamImage"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
-      "GimpParamImage"
       ]
    },
 "script-fu-round-corners":
@@ -3393,15 +3418,12 @@
    "out": [
       ]
    },
-"plug-in-animationoptimize":
+"gimp-context-set-background":
    {
    "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
+      "GimpParamRGB"
       ],
    "out": [
-      "GimpParamImage"
       ]
    },
 "plug-in-mosaic":
@@ -3434,15 +3456,14 @@
    "out": [
       ]
    },
-"gimp-file-save":
+"gimp-buffer-rename":
    {
    "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamObject"
+      "GimpParamString"
+      , "GimpParamString"
       ],
    "out": [
+      "GimpParamString"
       ]
    },
 "gimp-drawable-color-balance":
@@ -3456,20 +3477,6 @@
       , "GParamDouble"
       ],
    "out": [
-      ]
-   },
-"plug-in-screenshot":
-   {
-   "in": [
-      "GParamEnum"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      ],
-   "out": [
-      "GimpParamImage"
       ]
    },
 "gimp-item-get-lock-position":
@@ -3486,7 +3493,8 @@
    "in": [
       "GimpParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -3665,21 +3673,6 @@
    "out": [
       ]
    },
-"python-fu-shadow-bevel":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamDouble"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      ],
-   "out": [
-      ]
-   },
 "gimp-context-set-line-dash-offset":
    {
    "in": [
@@ -3718,7 +3711,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -3744,14 +3738,6 @@
       , "GParamDouble"
       , "GParamBoolean"
       , "GParamBoolean"
-      ],
-   "out": [
-      ]
-   },
-"gimp-context-set-ink-blob-angle":
-   {
-   "in": [
-      "GParamDouble"
       ],
    "out": [
       ]
@@ -3792,6 +3778,14 @@
       ],
    "out": [
       "GParamInt"
+      ]
+   },
+"gimp-context-set-ink-blob-angle":
+   {
+   "in": [
+      "GParamDouble"
+      ],
+   "out": [
       ]
    },
 "script-fu-old-photo":
@@ -3985,7 +3979,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       ],
@@ -4124,7 +4119,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamString"
       ],
@@ -4174,28 +4170,6 @@
    "out": [
       ]
    },
-"python-fu-add-guides":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamInt"
-      , "GParamDouble"
-      , "GParamInt"
-      ],
-   "out": [
-      ]
-   },
-"gimp-drawable-is-gray":
-   {
-   "in": [
-      "GimpParamDrawable"
-      ],
-   "out": [
-      "GParamBoolean"
-      ]
-   },
 "script-fu-waves-anim":
    {
    "in": [
@@ -4208,6 +4182,15 @@
       , "GParamBoolean"
       ],
    "out": [
+      ]
+   },
+"gimp-drawable-is-gray":
+   {
+   "in": [
+      "GimpParamDrawable"
+      ],
+   "out": [
+      "GParamBoolean"
       ]
    },
 "gimp-text-get-extents-fontname":
@@ -4300,7 +4283,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -4445,7 +4429,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamInt"
       , "GParamString"
@@ -4474,7 +4459,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       ],
@@ -4937,7 +4923,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -4962,7 +4949,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -5283,6 +5271,16 @@
    "out": [
       ]
    },
+"python-fu-test-array-testArrayResult":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
+      ],
+   "out": [
+      ]
+   },
 "script-fu-selection-round":
    {
    "in": [
@@ -5315,15 +5313,6 @@
       "GParamBoolean"
       ]
    },
-"gimp-drawable-height":
-   {
-   "in": [
-      "GimpParamDrawable"
-      ],
-   "out": [
-      "GParamInt"
-      ]
-   },
 "file-raw-placeholder-pef-load":
    {
    "in": [
@@ -5332,6 +5321,15 @@
       ],
    "out": [
       "GimpParamImage"
+      ]
+   },
+"gimp-drawable-height":
+   {
+   "in": [
+      "GimpParamDrawable"
+      ],
+   "out": [
+      "GParamInt"
       ]
    },
 "gimp-message-get-handler":
@@ -5606,16 +5604,6 @@
       "GimpParamImage"
       ]
    },
-"python-fu-blendbgfg-func":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      ],
-   "out": [
-      ]
-   },
 "plug-in-sinus":
    {
    "in": [
@@ -5802,7 +5790,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamDouble"
       , "GParamDouble"
@@ -5848,7 +5837,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -5865,23 +5855,13 @@
       "GimpParamImage"
       ]
    },
-"python-fu-create-scaled-layer-from-visible":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamInt"
-      ],
-   "out": [
-      ]
-   },
 "file-pix-save":
    {
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -6009,6 +5989,20 @@
    "out": [
       ]
    },
+"file-raw-save":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GParamInt"
+      , "GimpParamObjectArray"
+      , "GParamObject"
+      , "GParamInt"
+      , "GParamInt"
+      ],
+   "out": [
+      ]
+   },
 "gimp-brushes-set-popup":
    {
    "in": [
@@ -6017,15 +6011,6 @@
       , "GParamDouble"
       , "GParamInt"
       , "GParamEnum"
-      ],
-   "out": [
-      ]
-   },
-"gimp-item-detach-parasite":
-   {
-   "in": [
-      "GimpParamItem"
-      , "GimpParamString"
       ],
    "out": [
       ]
@@ -6039,15 +6024,11 @@
       "GimpParamString"
       ]
    },
-"file-raw-save":
+"gimp-item-detach-parasite":
    {
    "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamObject"
-      , "GParamInt"
-      , "GParamInt"
+      "GimpParamItem"
+      , "GimpParamString"
       ],
    "out": [
       ]
@@ -6112,22 +6093,24 @@
    "out": [
       ]
    },
+"python-fu-accessGimp":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
+      , "GParamString"
+      , "GParamInt"
+      ],
+   "out": [
+      ]
+   },
 "gimp-context-get-line-cap-style":
    {
    "in": [
       ],
    "out": [
       "GParamEnum"
-      ]
-   },
-"python-fu-blendbgfg-slightly-func":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      ],
-   "out": [
       ]
    },
 "gimp-edit-named-paste-as-new-image":
@@ -6167,7 +6150,7 @@
       "GParamBoolean"
       ]
    },
-"python-fu-crop-flatten-save":
+"plug-in-palettemap":
    {
    "in": [
       "GParamEnum"
@@ -6177,7 +6160,7 @@
    "out": [
       ]
    },
-"plug-in-palettemap":
+"plug-in-laplace":
    {
    "in": [
       "GParamEnum"
@@ -6190,16 +6173,6 @@
 "gimp-context-set-brush-default-hardness":
    {
    "in": [
-      ],
-   "out": [
-      ]
-   },
-"plug-in-laplace":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
       ],
    "out": [
       ]
@@ -6243,18 +6216,9 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
-      ],
-   "out": [
-      ]
-   },
-"goat-exercise-lua":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
       ],
    "out": [
       ]
@@ -6265,19 +6229,6 @@
       "GParamEnum"
       , "GimpParamImage"
       , "GimpParamDrawable"
-      , "GParamInt"
-      , "GParamInt"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-Restore3":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamDouble"
       , "GParamInt"
       , "GParamInt"
       ],
@@ -6325,18 +6276,9 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-rpg-character-sketch":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
       ],
    "out": [
       ]
@@ -6381,22 +6323,6 @@
       , "GParamDouble"
       , "GParamDouble"
       , "GParamDouble"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-drawcols":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamString"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
       ],
    "out": [
       ]
@@ -6500,7 +6426,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamInt"
       , "GParamBoolean"
@@ -6666,18 +6593,9 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
-      ],
-   "out": [
-      ]
-   },
-"plug-in-goat-exercise-gjs":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
       ],
    "out": [
       ]
@@ -6813,6 +6731,16 @@
    "in": [
       "GimpParamChannel"
       , "GParamBoolean"
+      ],
+   "out": [
+      ]
+   },
+"python-fu-test-no-shebang":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
       ],
    "out": [
       ]
@@ -7173,7 +7101,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamInt"
       , "GParamInt"
@@ -7189,15 +7118,6 @@
    "out": [
       ]
    },
-"gimp-edit-copy":
-   {
-   "in": [
-      "GimpParamDrawable"
-      ],
-   "out": [
-      "GParamBoolean"
-      ]
-   },
 "gimp-brush-set-angle":
    {
    "in": [
@@ -7206,6 +7126,16 @@
       ],
    "out": [
       "GParamDouble"
+      ]
+   },
+"gimp-pdb-get-proc-return-value":
+   {
+   "in": [
+      "GimpParamString"
+      , "GParamInt"
+      ],
+   "out": [
+      "GParamParam"
       ]
    },
 "gimp-layer-set-offsets":
@@ -7218,14 +7148,14 @@
    "out": [
       ]
    },
-"gimp-pdb-get-proc-return-value":
+"gimp-edit-copy":
    {
    "in": [
-      "GimpParamString"
-      , "GParamInt"
+      "GParamInt"
+      , "GimpParamObjectArray"
       ],
    "out": [
-      "GParamParam"
+      "GParamBoolean"
       ]
    },
 "gimp-palette-rename":
@@ -7243,7 +7173,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamInt"
       , "GParamInt"
@@ -7303,12 +7234,23 @@
    "out": [
       ]
    },
-"file-sgi-save":
+"python-fu-test-color":
    {
    "in": [
       "GParamEnum"
       , "GimpParamImage"
       , "GimpParamDrawable"
+      ],
+   "out": [
+      ]
+   },
+"file-sgi-save":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamInt"
       ],
@@ -7764,16 +7706,6 @@
       "GParamDouble"
       ]
    },
-"gimp-file-load":
-   {
-   "in": [
-      "GimpParamEnum"
-      , "GParamObject"
-      ],
-   "out": [
-      "GimpParamImage"
-      ]
-   },
 "extension-gimp-help":
    {
    "in": [
@@ -7791,6 +7723,16 @@
       ],
    "out": [
       "GimpParamString"
+      ]
+   },
+"gimp-file-load":
+   {
+   "in": [
+      "GimpParamEnum"
+      , "GParamObject"
+      ],
+   "out": [
+      "GimpParamImage"
       ]
    },
 "goat-exercise-python":
@@ -7889,14 +7831,21 @@
       , "GimpParamUInt8Array"
       ]
    },
-"file-faxg3-load":
+"plug-in-displace-polar":
    {
    "in": [
       "GParamEnum"
-      , "GParamObject"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
+      , "GParamDouble"
+      , "GParamDouble"
+      , "GParamBoolean"
+      , "GParamBoolean"
+      , "GimpParamDrawable"
+      , "GimpParamDrawable"
+      , "GParamInt"
       ],
    "out": [
-      "GimpParamImage"
       ]
    },
 "plug-in-cartoon":
@@ -7911,19 +7860,22 @@
    "out": [
       ]
    },
-"plug-in-displace-polar":
+"file-faxg3-load":
+   {
+   "in": [
+      "GParamEnum"
+      , "GParamObject"
+      ],
+   "out": [
+      "GimpParamImage"
+      ]
+   },
+"python-fu-foo":
    {
    "in": [
       "GParamEnum"
       , "GimpParamImage"
       , "GimpParamDrawable"
-      , "GParamDouble"
-      , "GParamDouble"
-      , "GParamBoolean"
-      , "GParamBoolean"
-      , "GimpParamDrawable"
-      , "GimpParamDrawable"
-      , "GParamInt"
       ],
    "out": [
       ]
@@ -8086,18 +8038,6 @@
       "GimpParamParasite"
       ]
    },
-"python-fu-fisheye":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamDouble"
-      , "GParamInt"
-      ],
-   "out": [
-      ]
-   },
 "gimp-image-get-component-active":
    {
    "in": [
@@ -8106,16 +8046,6 @@
       ],
    "out": [
       "GParamBoolean"
-      ]
-   },
-"python-fu-blendbgfg-undo-func":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      ],
-   "out": [
       ]
    },
 "plug-in-web-browser":
@@ -8300,7 +8230,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -8389,7 +8320,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamString"
       ],
@@ -8413,12 +8345,22 @@
    "out": [
       ]
    },
+"gimp-image-raise-item-to-top":
+   {
+   "in": [
+      "GimpParamImage"
+      , "GimpParamItem"
+      ],
+   "out": [
+      ]
+   },
 "file-png-save":
    {
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       , "GParamInt"
@@ -8438,7 +8380,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       , "GParamBoolean"
@@ -8446,28 +8389,6 @@
       , "GParamBoolean"
       , "GParamBoolean"
       , "GParamBoolean"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-benchmark-foreground-extract":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamString"
-      , "GParamInt"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-feather-paste":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
       ],
    "out": [
       ]
@@ -8519,6 +8440,16 @@
    "out": [
       ]
    },
+"python-fu-test-upcast":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
+      ],
+   "out": [
+      ]
+   },
 "gimp-vectors-remove-stroke":
    {
    "in": [
@@ -8526,20 +8457,6 @@
       , "GParamInt"
       ],
    "out": [
-      ]
-   },
-"file-openraster-load-thumb":
-   {
-   "in": [
-      "GParamObject"
-      , "GParamInt"
-      ],
-   "out": [
-      "GimpParamImage"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamEnum"
-      , "GParamInt"
       ]
    },
 "gimp-image-undo-freeze":
@@ -8625,11 +8542,9 @@
    "out": [
       ]
    },
-"gimp-image-raise-item-to-top":
+"gimp-context-push":
    {
    "in": [
-      "GimpParamImage"
-      , "GimpParamItem"
       ],
    "out": [
       ]
@@ -8639,13 +8554,6 @@
    "in": [
       "GimpParamLayer"
       , "GParamBoolean"
-      ],
-   "out": [
-      ]
-   },
-"gimp-context-push":
-   {
-   "in": [
       ],
    "out": [
       ]
@@ -8732,6 +8640,20 @@
       , "GParamBoolean"
       ],
    "out": [
+      ]
+   },
+"file-openraster-load-thumb":
+   {
+   "in": [
+      "GParamObject"
+      , "GParamInt"
+      ],
+   "out": [
+      "GimpParamImage"
+      , "GParamInt"
+      , "GParamInt"
+      , "GParamEnum"
+      , "GParamInt"
       ]
    },
 "gimp-context-set-gradient":
@@ -8863,7 +8785,8 @@
 "gimp-selection-float":
    {
    "in": [
-      "GimpParamDrawable"
+      "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamInt"
       , "GParamInt"
       ],
@@ -8876,7 +8799,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       ],
@@ -9091,17 +9015,10 @@
       "GimpParamImage"
       ]
    },
-"python-fu-guide-creator":
+"gimp-help-using-docks":
    {
    "in": [
       "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamInt"
-      , "GParamString"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
       ],
    "out": [
       ]
@@ -9123,14 +9040,6 @@
       ],
    "out": [
       "GimpParamVectors"
-      ]
-   },
-"gimp-help-using-docks":
-   {
-   "in": [
-      "GParamEnum"
-      ],
-   "out": [
       ]
    },
 "script-fu-helloworld":
@@ -9168,14 +9077,6 @@
    "out": [
       ]
    },
-"gimp-context-set-palette":
-   {
-   "in": [
-      "GimpParamString"
-      ],
-   "out": [
-      ]
-   },
 "plug-in-nlfilt":
    {
    "in": [
@@ -9185,6 +9086,14 @@
       , "GParamDouble"
       , "GParamDouble"
       , "GParamInt"
+      ],
+   "out": [
+      ]
+   },
+"gimp-context-set-palette":
+   {
+   "in": [
+      "GimpParamString"
       ],
    "out": [
       ]
@@ -9231,36 +9140,26 @@
       "GParamDouble"
       ]
    },
-"file-gbr-save":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamObject"
-      , "GParamInt"
-      , "GParamString"
-      ],
-   "out": [
-      ]
-   },
-"file-dicom-save":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamObject"
-      ],
-   "out": [
-      ]
-   },
 "gimp-context-get-ink-speed-sensitivity":
    {
    "in": [
       ],
    "out": [
       "GParamDouble"
+      ]
+   },
+"file-gbr-save":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GParamInt"
+      , "GimpParamObjectArray"
+      , "GParamObject"
+      , "GParamInt"
+      , "GParamString"
+      ],
+   "out": [
       ]
    },
 "gimp-context-set-ink-blob-aspect-ratio":
@@ -9276,6 +9175,18 @@
    "in": [
       "GimpParamImage"
       , "GParamUInt"
+      ],
+   "out": [
+      ]
+   },
+"file-dicom-save":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GParamInt"
+      , "GimpParamObjectArray"
+      , "GParamObject"
       ],
    "out": [
       ]
@@ -9341,16 +9252,6 @@
       ],
    "out": [
       "GParamEnum"
-      ]
-   },
-"python-fu-ResizeRescaleCenterLayers":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      ],
-   "out": [
       ]
    },
 "file-raw-placeholder-x3f-load":
@@ -9544,6 +9445,19 @@
    "out": [
       ]
    },
+"python-fu-test-export-import":
+   {
+   "in": [
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GParamInt"
+      ],
+   "out": [
+      "GParamInt"
+      ]
+   },
 "gimp-drawable-edit-bucket-fill":
    {
    "in": [
@@ -9675,39 +9589,11 @@
    "out": [
       ]
    },
-"python-fu-NewIcon":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamInt"
-      , "GParamInt"
-      ],
-   "out": [
-      ]
-   },
 "gimp-layer-set-blend-space":
    {
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-random-shapes":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamString"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
       ],
    "out": [
       ]
@@ -9788,14 +9674,6 @@
       "GParamEnum"
       ]
    },
-"gimp-getpid":
-   {
-   "in": [
-      ],
-   "out": [
-      "GParamInt"
-      ]
-   },
 "plug-in-sample-colorize":
    {
    "in": [
@@ -9816,15 +9694,6 @@
    "out": [
       ]
    },
-"gimp-display-new":
-   {
-   "in": [
-      "GimpParamImage"
-      ],
-   "out": [
-      "GimpParamDisplay"
-      ]
-   },
 "gimp-item-set-lock-content":
    {
    "in": [
@@ -9832,6 +9701,24 @@
       , "GParamBoolean"
       ],
    "out": [
+      ]
+   },
+"file-jpeg-load":
+   {
+   "in": [
+      "GParamEnum"
+      , "GParamObject"
+      ],
+   "out": [
+      "GimpParamImage"
+      ]
+   },
+"gimp-getpid":
+   {
+   "in": [
+      ],
+   "out": [
+      "GParamInt"
       ]
    },
 "gimp-gradient-segment-get-left-pos":
@@ -9844,14 +9731,13 @@
       "GParamDouble"
       ]
    },
-"file-jpeg-load":
+"gimp-display-new":
    {
    "in": [
-      "GParamEnum"
-      , "GParamObject"
+      "GimpParamImage"
       ],
    "out": [
-      "GimpParamImage"
+      "GimpParamDisplay"
       ]
    },
 "script-fu-predator":
@@ -9869,15 +9755,6 @@
    "out": [
       ]
    },
-"gimp-image-undo-disable":
-   {
-   "in": [
-      "GimpParamImage"
-      ],
-   "out": [
-      "GParamBoolean"
-      ]
-   },
 "file-gz-load":
    {
    "in": [
@@ -9886,6 +9763,15 @@
       ],
    "out": [
       "GimpParamImage"
+      ]
+   },
+"gimp-image-undo-disable":
+   {
+   "in": [
+      "GimpParamImage"
+      ],
+   "out": [
+      "GParamBoolean"
       ]
    },
 "gimp-item-get-parasite-list":
@@ -10278,14 +10164,15 @@
       "GParamInt"
       ]
    },
-"plug-in-vinvert":
+"file-fli-info":
    {
    "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
+      "GParamObject"
       ],
    "out": [
+      "GParamInt"
+      , "GParamInt"
+      , "GParamInt"
       ]
    },
 "gimp-layer-get-mode":
@@ -10297,15 +10184,14 @@
       "GParamEnum"
       ]
    },
-"file-fli-info":
+"plug-in-vinvert":
    {
    "in": [
-      "GParamObject"
+      "GParamEnum"
+      , "GimpParamImage"
+      , "GimpParamDrawable"
       ],
    "out": [
-      "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
       ]
    },
 "script-fu-selection-rounded-rectangle":
@@ -10320,6 +10206,17 @@
    "out": [
       ]
    },
+"plug-in-script-fu-server":
+   {
+   "in": [
+      "GParamEnum"
+      , "GParamString"
+      , "GParamInt"
+      , "GParamString"
+      ],
+   "out": [
+      ]
+   },
 "plug-in-guillotine":
    {
    "in": [
@@ -10330,17 +10227,6 @@
    "out": [
       "GParamInt"
       , "GimpParamObjectArray"
-      ]
-   },
-"plug-in-script-fu-server":
-   {
-   "in": [
-      "GParamEnum"
-      , "GParamString"
-      , "GParamInt"
-      , "GParamString"
-      ],
-   "out": [
       ]
    },
 "gimp-brush-get-aspect-ratio":
@@ -10618,7 +10504,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       ],
    "out": [
@@ -10903,7 +10790,8 @@
    "in": [
       "GParamEnum"
       , "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamObject"
       , "GParamBoolean"
       , "GParamInt"
@@ -10961,19 +10849,14 @@
       , "GimpParamUInt8Array"
       ]
    },
-"python-fu-tile-indexer":
+"file-gex-load":
    {
    "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamInt"
-      , "GParamString"
-      , "GParamInt"
+      "GimpParamEnum"
+      , "GParamObject"
       ],
    "out": [
+      "GimpParamString"
       ]
    },
 "file-raw-placeholder-canon-load":
@@ -10984,16 +10867,6 @@
       ],
    "out": [
       "GimpParamImage"
-      ]
-   },
-"file-gex-load":
-   {
-   "in": [
-      "GimpParamEnum"
-      , "GParamObject"
-      ],
-   "out": [
-      "GimpParamString"
       ]
    },
 "file-jpeg-load-thumb":
@@ -11034,26 +10907,27 @@
    "out": [
       ]
    },
+"file-gih-save-internal":
+   {
+   "in": [
+      "GimpParamEnum"
+      , "GimpParamImage"
+      , "GParamInt"
+      , "GimpParamObjectArray"
+      , "GParamObject"
+      , "GParamInt"
+      , "GimpParamString"
+      , "GimpParamString"
+      ],
+   "out": [
+      ]
+   },
 "gimp-palette-entry-set-color":
    {
    "in": [
       "GimpParamString"
       , "GParamInt"
       , "GimpParamRGB"
-      ],
-   "out": [
-      ]
-   },
-"file-gih-save-internal":
-   {
-   "in": [
-      "GimpParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamObject"
-      , "GParamInt"
-      , "GimpParamString"
-      , "GimpParamString"
       ],
    "out": [
       ]
@@ -11137,18 +11011,6 @@
       "GimpParamImage"
       , "GParamInt"
       , "GimpParamUInt8Array"
-      ],
-   "out": [
-      ]
-   },
-"python-fu-psd2html":
-   {
-   "in": [
-      "GParamEnum"
-      , "GimpParamImage"
-      , "GimpParamDrawable"
-      , "GParamInt"
-      , "GParamInt"
       ],
    "out": [
       ]
@@ -11589,7 +11451,8 @@
    {
    "in": [
       "GimpParamImage"
-      , "GimpParamDrawable"
+      , "GParamInt"
+      , "GimpParamObjectArray"
       , "GParamDouble"
       , "GParamDouble"
       , "GParamBoolean"
