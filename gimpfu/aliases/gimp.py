@@ -222,7 +222,7 @@ class GimpfuGimp():
         # remember state for soon-to-come call
         self.adapted_gimp_object_name = name
 
-        if name is "pdb":
+        if name == "pdb":
             proceed("Use 'pdb', not 'gimp.pdb'.")
             # do more so that GimpFu really can proceed without more exceptions
 

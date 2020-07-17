@@ -201,7 +201,7 @@ class MarshalPDB():
             # unpack list of one element
             # TODO is this always the correct thing to do?
             # Some procedure signatures may return a list of one?
-            if len(result_list) is 1:
+            if len(result_list) == 1:
                 MarshalPDB.logger.debug("Unpacking single element list.")
                 result = result_list[0]
             else:
