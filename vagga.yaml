@@ -385,12 +385,6 @@ containers:
         make -j4
         make install
 
-    # rm the old pygimp that the gimp build still installs
-    # Gimp will put it in the PYTHONPATH, we don't want to find its contents
-    # EmptyDir is not correct, it keeps the directory empty is all child containers
-    # - !EmptyDir /usr/local/lib/gimp/2.99/python
-    - !Sh "rm -rf /usr/local/lib/gimp/2.99/python/*"
-
     # remove DNS file that vagga will recreate after build
     - !Sh "rm /etc/resolv.conf"
 
@@ -400,7 +394,8 @@ containers:
       XDG_DATA_DIRS: "/usr/local/share:/usr/share"
       PATH: "/usr/local/bin:/usr/bin:/bin"
 
-
+    # Try not to alter this container, it is stock container after GIMP build
+    # Note that /usr/local/lib/gimp/2.99/plug-ins/python does not exist
 
 
 
@@ -508,7 +503,12 @@ containers:
       HOME: /work/.home
 
 
+# Cruft
 
+# Gimp will put it in the PYTHONPATH, we don't want to find its contents
+# EmptyDir is not correct, it keeps the directory empty is all child containers
+# - !EmptyDir /usr/local/lib/gimp/2.99/python
+#- !Sh "rm -rf /usr/local/lib/gimp/2.99/python/*"
 
 
 commands:
@@ -616,11 +616,15 @@ commands:
       # local plugins in /work/.home/.config/GIMP/2.99/plug-ins
       # !!! outside the container
 
+      # Refresh installation of gimpfu from development gimp_directory
+      echo "Copying gimpfu to local"
+      cp -r /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
+
       echo "Copying all test plugins"
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
 
-      echo "Chmoding test plugins"
-      find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
+      #echo "Chmoding test plugins"
+      #find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
 
       echo "Altering PYTHONPATH to point to local plug-ins"
       export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}

@@ -1,23 +1,137 @@
 
-Work in progress.
 
-Port of GimpFu (the simplified Gimp plugin API for Python) to Gimp 3 and Python3
+GimpFu (the simplified Gimp plugin API for Python)  for Gimp 3 and Python3.
 
-Repository also includes a Vagga script to create a development container for Gimp 3.
+Note: *The planned Gimp 3 still supports Python plugins, but using GObject Introspection.  Gimp 3 does not plan to support GimpFu plugins without this unofficial repository.  If you need the certainty that a new plugin will work in Gimp 3, you should use the official machinery.*
 
-The current status: proved the concept, now working on breadth.
-It works for many existing plugins in the wild (requiring only a few minor edits to said plugins.)
-As I test new, wild plugins, the rate at which I find holes in the GimpFu implementation is decreasing.
+# Status
+
+## Completeness
+
+Work in progress.  It proves the idea is possible.
+
+GimpFu v3 is not complete: some features of GimpFu v2 are not yet supported.
+GimpFu v3  works for many existing plugins in the wild (requiring only a few minor edits to said plugins.)
+
+As users and developers test wild plugins and GimpFu v3 is improved,
+fewer holes are found in GimpFu v3.
+
+## Support
+
+For now, GimpFu v3 is *not* supported by Gimp.org.
+It is a third-party plugin.
+
+GimpFu v3 might be supported by Gimp.org if:
+* there is enough demand
+* someone steps forward to maintain and fix issues in GimpFu v3
+
+## Stability
+
+Gimp 2.99 is constantly changing, and GimpFu v3 frequently changes,
+both to accomodate changes to Gimp 2.99
+and to improve GimpFu v3.
+Pull and rebuild often.
+
+# Installation
+
+In the command line in a terminal:
+```
+>cd *wherever you cloned this repository*
+>cp -r gimpfu ~/.config/GIMP/2.99/plug-ins
+```
+
+Run:
+```
+>export PYTHONPATH=~/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
+>/usr/local/bin/gimp-2.99 --verbose
+```
+If you also have or installed some GimpFu v3 plugins,
+expect to see them in the Gimp menus.
+(A typical Gimp 2.99 build will have no GimpFu plugins.)  GimpFu itself does not appear in the Gimp menus.
+
+## Notes on Installation
+
+GimpFu v3 does not require building or compiling; it is all Python scripts.
+
+GimpFu v3 does depend on Gimp 2.99 and Python 3.  You probably need to build Gimp 2.99 yourself.
+
+Thus you can test GimpFu v3 after you build Gimp 2.99
+simply by copying the gimpfu directory this repository to either:
+
+* /usr/local/lib/gimp/2.99/python/gimpfu.py (Gimp's official installation place, varies by distribution)
+* ~/.config/GIMP/2.99/plug-ins (the local, custom installation place)
+
+Then, because Gimp does not alter PYTHONPATH when it starts a Python interpreter,
+you must set PYTHONPATH so Python will find the 'gimpfu' module when a Gimp Python plugin does "from gimpfu import *."
+
+Then you can start your own Gimp 2.99 (typically installed to /usr/local/bin)
+
+The current Gimp development branch (mainline, 2.99) repository
+has abandoned maintenance of GimpFu v2.
+The files in the Gimp repository (in the /gimp/plug-ins/python/pygimp directory) are relics.
+A 2.99 build does not build or install those files.
+
+# Hacking
+
+To change GimpFu v3, you can just edit the files in the directory where you installed them, then restart Gimp. (There is no C source to be compiled for GimpFu v3.)
+
+## Test Plugins
+
+The repository includes a set of test plugins (GimpFu v3 compatible), in /plugins.  See /plugins/readme.txt
+
+You can copy a test plugin (that uses GimpFu) from the repository
+to your user local location for plugins (say ~/.config/GIMP/2.99/plug-ins).
+
+In Gimp 3:
+* each plugin must be inside its own directory
+* each plugin (the top .py file) must have execute permission
+
+Thus copy an entire test plugin's directory, for example:
+
+```
+>cd *wherever you cloned this repository*
+>cp -r plugins/wild/foggify   ~/.config/GIMP/2.99/plug-ins
+>chmod +x ~/.config/GIMP/2.99/plug-ins/foggify/foggify.py
+```
+*A typical plugin found on the net is for Gimp 2 and might require minor edits to work with GimpFu v3.*
+
+# Differences between v2 and v3 of GimpFu
+
+GimpFu v3 maintains the outward capabilities and API or "language" of GimpFu v2.
+
+## Design/Programming documents
+
+The documents that tell you how to write a plugin:
+
+v2 [Gimp Python Documentation](https://www.gimp.org/docs/python/index.html)  
+This document will not be supported by Gimp.org starting with Gimp 3.
+
+v3 The above document guides what the GimpFu v3 must do, for backward compatibility.
+
+Some of the document will change:
+* description of the implementation methods (C language) and installation
+* import modules: the 'gimpfu' module is all that most authors will use
+* anything for which the model has changed in Gimp itself (example?)
+* Tile and Pixel Region objects are obsoleted
+
+The document will also say more about how GimpFu reports errors.
+Because of the dynamic binding, the nature of error messages is changed.
+GimpFu v3 may attempt to keep going (so that more errors are found) where GimpFu v2 might have stopped.
 
 
-# Differences between v2 and v3 of Gimpfu
+## Implementation
 
-## Implementation (this is the crux of GimpFu)
+GimpFu v3 is not a port:  GimpFu v3 is almost a total rewrite.
 
 * v2 uses static binding: C language files to bind Python to Gimp
 * v3 uses dynamic binding: uses Python language files and GI (GObject Introspection.)
 
-More about GI.  Gimp is being enhanced with GObject annotations that allow GI of its API.
+GimpFu v3, since it is all Python, might have fewer lines of code.
+It is more readable.  GimpFu v2 static binding was an art understood by few people.
+
+### More about GI.  
+
+Gimp 3 is being enhanced with GObject annotations that allow GI of its API.
 The PyGObject module (import gi) lets Python code do GI.
 The PyGObject module is partially implemented in the C language,
 but GimpFu no longer uses any C language.
@@ -25,14 +139,16 @@ but GimpFu no longer uses any C language.
 PyGObject automatically marshals many Python objects (e.g. lists)
 into GObjects that Gimp can use.
 
-Now, to port a Gimp Python plugin:
+Now, to port a Gimp Python plugin using only GI:
 
 * the author must understand many details of GI.
   For example, how to create a GValueArray.
 * each ported Gimp Python plugin uses much boilerplate.
   The boilerplate is different (authors must re learn) from v2 GimpFu boilerplate
 
-With GimpFu:
+With GimpFu, most existing GimpFu plugins will work with minor changes.
+
+The advantages of using GimpFu over Python with GI:
 
 * many details of GI are hidden
 * boilerplate is reduced
@@ -46,12 +162,13 @@ With GimpFu:
 ## Plugin source code
 
 * v2 The gimp repository has a parallel directory named gimp/plug-ins/python.
-  Some of those plugins use v2 GimpFu.
+  Some of those plugins use v2 GimpFu while others are use the full PyGimp API.
 * v3 (branch mainline, i.e. 2.99) gimp/plug-ins/python: Python language plugins
-  but **none** of the plugins use GimpFu; they all have been ported to use only
+  but *none* of the plugins use GimpFu; they all have been ported to use only
   Gimp and GI.
 * this repository:  /plug-ins : test plugins, that mostly use GimpFu.
-  Most are copied from wild plugins found on the net, often at GitHub.
+  Some (/wild) are copied from the net, often at GitHub.
+  Some (/test) are written specificially to test features of GimpFu v3
 
 ## Plugin source directory structure
 
@@ -68,43 +185,33 @@ With GimpFu:
   (You could do that: "from gimpfu.gimpenums import *")
 
 
-## Installation
-
-The current Gimp development branch (mainline, 2.99) build does not even install the pygimp directory.
-
-You can test this repository in your own Gimp 2.99 build
-simply by installing (copying) the gimpfu directory to either:
-
-* /usr/local/lib/gimp/2.99/python/gimpfu.py (the official installation place)
-* ~/.config/GIMP/2.99/plug-ins (the local, custom installation place)
-
 ## Disambiguation
 
 * v2: PyGimp was larger than GimpFu.  PyGimp included the 'gimpfu' module
-  as well as some modules that were useful without Gimpfu.
+  as well as some modules that were useful without GimpFu.
 * v3: PyGimp is no longer a useful moniker.  The pygimp directory no longer exists.
   Much existing documentation refers to 'PyGimp.'
   Usually you can just substitute 'GimpFu' for 'PyGimp'.
 
 GimpFu **is** the package that provides a mostly backward compatible API for writing Gimp Python plugins.
-An author can still write a Gimp Python plugin, using only GI, without any modules from the GimpFu package.
+An author can still write a Gimp 3 Python plugin, using only GI, without any modules from the GimpFu package.
 
 ## Porting Gimp Python plugins from v2 to v3
 
-See the document: pluginPortingGuide
+See the document in this repository: gimpfu/docs/pluginPortingGuide.txt
 
 # Python GI API documents
 
 It is better to read documents for the Python API than to read documents for the C API.
 Although with some mental energy you can read the C API and figure out the Python API.
 
-## GObject, Gio, GLib, but *not* Gimp 2.99
+## GObject, Gio, GLib, but *not* Gimp 2.99 GI API docs
 
 The best documentation about the GObject introspected Python API's of various projects
-is found at [PyGObject API Reference] https://lazka.github.io/pgi-docs/
+is found at [PyGObject API Reference](https://lazka.github.io/pgi-docs/)
 Many other docs on the web (such as at the Gnome project?) are outdated, or for the C API.
 
-## Gimp
+## Gimp 2.99 GI API docs
 
 You should generate docs yourself for the GObject introspected Python API for GIMP.
 Since Gimp2.99 is a development branch, you should pull it often, and the API might change.
@@ -112,15 +219,17 @@ When you build Gimp, the gir goes to say, /usr/local/share/gir-1.0/Gimp-3.0.gir
 
 To create a document:
 
+```
 > g-ir-doc-tool --language=Python -o ~/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
-
+```
 To browse the document:
 
+```
 > yelp ~/gimp-doc
+```
 
-The vagga.yaml script does that inside the container.
-You can read the script to see how to install dependencies for building the doc
-(g-ir-doc-tool and yelp.)
+You might need to install package 'yelp'.
+The command g-ir-doc-tool might be in package 'libgirepository1.0-dev'.
 
 
 
@@ -130,20 +239,22 @@ This is a high-level list of features that GimpFu provides,
 that need to be ported/rewritten
 along with the status in parenthesis
 
-1. Automatic plugin GUI generation (needs breadth)
-2. pdb convenience object  (needs breadth)
-3. Gimp enums to Python names (needs breadth)
-4. PF_ enums, the ones that GimpFu/PythonFu defines ( needs breadth)
-5. Use new plugin "defaults" machinery in Gimp 3, really "plugin settings", called "gimp_procedure_config" (strategy devised, no progress)
-6. Other convenience Python objects e.g. "image" (needs breadth)
+1. Automatic plugin GUI generation (needs breadth, and may go away when Gimp itself will do it, as planned.)
+2. pdb and gimp convenience objects  (needs breadth)
+3. Other convenience Python objects e.g. "image" (needs breadth)
+4. Gimp enums to Python names (needs breadth)
+5. PF_ enums, the ones that GimpFu/PythonFu defines ( needs breadth)
+6. Use new plugin "defaults" machinery in Gimp 3, really "plugin settings", called "gimp_procedure_config" (done)
 7. Write a "GimpFu plugin Porting Guide" (drafted)
 8. Adapt to new plugin installation requirements (proved)
-9. Marshaling of Gimp types GimpFloatArray, GimpStringArray, etc.
+9. Marshalling of old Gimp types GimpFloatArray, GimpStringArray, etc.
+10. Marshalling of new gimp types GimpObjectArray, GFile
+11. pixel regions or a substitute
 
 
-# Dev strategy
+# Development strategy
 
-True hacking.  Start coding, see what is broken, fix, and repeat.
+Start coding, see what is broken, fix, and repeat.
 
 Lacking a "Developers Guide to Architecture of PyGimp" you must reverse engineer.
 From the PyGimp/GimpFu code and the GimpFu (Author's Guide) document.
@@ -160,119 +271,10 @@ And what GimpFu does is automate (or provide simplified API) for authors.
 So you take pieces from already ported/authored non-GimpFu Python3/Gimp3 plugins,
 and put those pieces into the GimpFu framework.
 
+# vagga
 
-# To use the source
-
-The current Gimp 2.99 repository doesn't even attempt to build GimpFu.
-You don't need to hack it so it does (but eventually it should.)
-
-You can just copy the files in the source directory
-into the Python plugin install directory of your dev system.
-(There is no C source to be compiled for GimpFu)
-You can copy a test plugin (that uses GimpFu) from the test directory
-to your user local location for plugins (say ~/.config/gimp/....)
-or to the install location for Gimp packaged Python plugins.
-
-
-
-# My dev environment
-
-I use Vagga tool for development containers.
-You don't need this if you already can build Gimp.
-
-The vagga.yaml script builds a userspace container,
-and has commands to execute in the container.
-
-In other words, the vagga.yaml script completely builds a dev system,
-installing the base OS, all dependencies, and building babl, gegl, and Gimp.
-
-Vagga:
-    - knows when it needs to rebuild.
-    - doesn't require root privileges.
-    - Easily deletable (rm -Rf .vagga).
-    - your machine (its original dev environment) is completely isolated.
-    - if you hack at the Gimp clone, the command will rebuild Gimp automatically.
-    - you can pull nightly changes to Gimp and the command will rebuild Gimp automatically.
-
-
-# Getting started developing GimpFu
-
-    install Vagga from its website
-    >sudo apt-get install uidmap
-    clone this repository
-    cd to the clone
-    clone gimp repository into this repository (see below)
-    >vagga --use-env DISPLAY gimpTestGUI
-
-The last command will take a long time (the first time you run it.)
-Ultimately, it will run Gimp from within the container.
-And test GimpFu plugins and the Gimpfu source are installed in the container's home
-(project/.home/.config/GIMP/2.99/plug-ins)
-and PYTHONPATH is set to find them.
-(That way, the container starts easily, but Gimp finds the local plugins and gimpfu
-before finding what is installed by the Gimp build.)
-
-Then you can hack at the .py files in your clone and rerun the last commmand.
-It will take seconds to restart.
-
-(Alternatively, if you run gimpRunGUI,
-it uses the plugins and gimpfu source
-that the vagga.yaml script puts into the container itself,
-in the locations that a Gimp build would install plugins and gimpfu.)
-
-If you change the text of a test plugin,
-you need to rm project/.home/.config/GIMP/2.99/plug-ins.rc
-which is where GIMP caches plugin specifications.
-When you do that, GIMP will reread from the standard paths for plugins,
-and RE-register all the plugins it finds.
-If you don't, you will see the plugin in the GIMP GUI
-with the old specifications, i.e.
-at the old menu, or with old parameters, or with the old run_func, etc.
-
-
-
-## More about developing in a vagga container
-
-
-Vagga leaves versioned containers which will fill your disk drive.
-Occasionally you will need to:
-
->vagga _clean --unused
-
-To start from scratch (rebuilding your container from nothing):
-
->rm -Rf .vagga
-
-Dragging it to the trash doesn't help free up space.
-
-
-Before you begin creating a dev environment,
-clone the Gimp repository into /gimp in the project directory.
-Since the build scripts copy from there into the container.
-So that the container builds Gimp from a local possibly hacked copy.
-I have one minor hack in my Gimp clone to support Gimpfu.
-
-Typically:
-
-    vaggaGimp (clone of this repository)
-       gimp (you add this clone of gimp 2.99 repository)
-       .vagga (ephemera, ignored, created by vagga, the containers)
-       source (from this repository )
-       vagga.yaml (from this repository)
-       test, readme, etc. (from this repository)
-
-
-The vagga.yaml script copies hacked .py files
-from this repository
-into the container at the correct install place e.g. /usr/local/lib/gimp/2.99/python/gimpfu.py
-at the last possible moment (after compile Gimp, before running Gimp.)
-
-
-# Hacks to Gimp itself
-
-gimp/libgimp/gimp_procedure.c is hacked to allow
-several procedure.add_arg_from_property() calls with the same named property.
-Comment out the preemptive return after the error "duplicate argument name"
-See discussion Gimp issue TODO
-
-gimp/libgimpbase/gimparamspecs.c and .h are hacked re GimpFloatArray
+Repository also includes a Vagga script (vagga.yaml) to create a development container for Gimp 3.
+That lets you build and test Gimp on many different Linux distributions without disturbing your machine.
+Its not necessary for GimpFu v3, since GimpFu v3 is all scripts.
+You might be interested in vagga as yet another way to build Gimp.
+More info in the file vagga.md
