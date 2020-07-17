@@ -1,0 +1,15 @@
+
+Test cases for changes to script-fu/scheme-wrapper.c :
+
+1a.  unknown type GimpObjectArray
+1b.  unknown type GFile
+
+Both can be tested with Edit>Paste as..>Brush  i.e. plug-ins/script-fu/scripts/paste-as-brush.scm
+(However, also requires another fix to paste-as-brush.scm
+to an old signature for PDB procedure file-gbr_save.
+Said fix not in this patch.)
+
+2.  unknown return type GimpObjectArray
+
+Test by creating two layers then Layer>Stack>Reverse layer order
+i.e. plug-ins/script-fu/scripts/reverse-layers.scm

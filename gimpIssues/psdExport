@@ -1,0 +1,35 @@
+2.10.20 Export photoshop .psd fails second time w calling errors to PDB procedures, image no longer exist.
+
+To replicate:
+
+Summary: create and export an untitled image twice.
+
+  File>New
+  Choose OK
+  File>Export as
+  (expect a file chooser dialog)
+  Choose Photoshop image (.psd)
+  Leave name as "Untitled.psd".
+  Choose Export button.
+  (Expect it to succeed.)
+
+  Close image.
+
+  Repeat the above  through Choose Export button
+  Expect "do you want to replace" dialog.
+  Choose Replace button.
+
+  Expected result:  file saved.
+  Actual result: Gimp message dialog box showing:
+  Calling error for procedure 'gimp-item-get-image' value '3' for item #1.  ... out of range... repeated 2 times.
+  Calling error for procedure 'gimp-item-get-precision' invalid ID for argument 'image'.  Most likely... image doesn't exist any longer... repeated 2 times.
+
+I tested both:
+
+  Ubuntu 16.04, a flatpak Gimp 2.10.20, updated today.
+  In a container, Ubuntu 19.10, a self-built version of Gimp 2.10.20.
+
+Only seems to happen for .psd, works OK with .png.
+
+
+
