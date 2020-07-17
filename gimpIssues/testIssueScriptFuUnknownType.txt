@@ -1,0 +1,34 @@
+
+Test cases for changes to script-fu/scheme-wrapper.c :
+
+1a.  unknown type GimpObjectArray
+1b.  unknown type GFile
+
+Both can be tested with Edit>Paste as..>Brush
+i.e. plug-ins/script-fu/scripts/paste-as-brush.scm
+(However, also requires another fix to paste-as-brush.scm
+to an old signature for PDB procedure file-gbr_save.
+Said fix not in this patch.)
+
+File>New
+Make a selection
+Edit>Copy
+Edit>Paste as>New brush...
+expect dialog
+change filename
+change brush name
+Choose OK
+Expect:
+   Gimp reloads brushes
+   Gimp shows new filename loaded in console
+   New brush with new name in Gimp brushes pane
+
+2.  unknown return type GimpObjectArray
+
+Test with Layer>Stack>Reverse layer order
+i.e. plug-ins/script-fu/scripts/reverse-layers.scm
+
+ File>New
+ Layer>Duplicate (expect Background copy layer on top)
+ Layer>Stack>Reverse layer order
+ Expect: "Background copy" layer on bottom
