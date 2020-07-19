@@ -1,14 +1,15 @@
-2.99 ScriptFu plugins give error 'unbound variable' for calls to obsolete PDB procedures
+2.99 Some of Gimp's ScriptFu plugins give error 'unbound variable' for calls to renamed PDB procedures
 
-This is an omnibus issue, for a set of similar symptoms caused when a plugin
-calls a renamed PDB procedure
+This is an omnibus issue, for a set of similar symptoms when
+some of Gimp's /plug-ins/script-fu/scripts
+call a renamed PDB procedure
 e.g. "unbound variable image-is-valid" where the PDB procedure is now "image-id-is-valid".
 
 The attached .txt files describe the issues in detail and how to replicate/test.
 
 The attached .diff files are patches.
 
-Please let me know if you prefer a different process for submitting patches to 2.99.
+Please let me know if you prefer me to use a different process for submitting patches to 2.99.
 
 I have detected about a dozen other issues with scriptfu scripts.
 Using a plugin that tests all the scriptfu scripts.
