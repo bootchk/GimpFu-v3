@@ -1,0 +1,34 @@
+
+/Filters/Render/Noise/DifferenceClouds  fails w/ gimp message "unbound variable gimp-item-is-layer"
+
+Test case
+=========
+
+File>New
+/Filters/Render/Noise/Difference Clouds...
+
+Expect:
+   https://docs.gimp.org/2.10/en/script-fu-difference-clouds.html
+
+   A cloud-like effect on the image.  No new layers.
+
+Actual:
+ Gimp Message dialog: "unbound variable gimp-item-is-layer
+
+
+Fix
+===
+
+In plug-ins/script-fu/scripts/difference-clouds.scm:
+gimp-item-is-layer =>
+gimp-item-id-is-layer
+
+gimp-item-is-layer is not in the PDB for 2.99.  I couldn't easily find the commit where that changed.
+
+script-fu values seems to usually be ID's.  I don't have a deep understanding of script-fu.
+
+
+Other
+=====
+
+See similar issue/fix for distress-selection.scm

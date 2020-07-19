@@ -1,0 +1,41 @@
+diff --git a/plug-ins/script-fu/scripts/paste-as-brush.scm b/plug-ins/script-fu/scripts/paste-as-brush.scm
+index 062e97d140..713ee4506b 100644
+--- a/plug-ins/script-fu/scripts/paste-as-brush.scm
++++ b/plug-ins/script-fu/scripts/paste-as-brush.scm
+@@ -25,7 +25,7 @@
+          (type 0)
+          (path 0))
+ 
+-    (if (= TRUE (car (gimp-image-is-valid brush-image)))
++    (if (= TRUE (car (gimp-image-id-is-valid brush-image)))
+       (begin
+         (set! brush-draw (car (gimp-image-get-active-drawable brush-image)))
+         (set! type (car (gimp-drawable-type brush-draw)))
+@@ -34,7 +34,7 @@
+                                   filename
+                                   (number->string brush-image)
+                                   ".gbr"))
+-       
++
+         (if (= type GRAYA-IMAGE)
+             (begin
+                 (gimp-context-push)
+@@ -43,13 +43,14 @@
+                 (gimp-context-pop)
+             )
+         )
+-       
++
++        ; scriptfu will marshall single drawable into GimpObjectArray of len 1
+         (file-gbr-save RUN-NONINTERACTIVE
+-                       brush-image brush-draw path path
++                       brush-image 1 brush-draw path
+                        spacing name)
+-       
++
+         (gimp-image-delete brush-image)
+-       
++
+         (gimp-brushes-refresh)
+         (gimp-context-set-brush name)
+       )

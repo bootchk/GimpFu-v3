@@ -26,7 +26,9 @@ Actual:
 Fix
 ===
 
-In plug-ins/script-fu/scripts/distress-selection.scm:  gimp-item-is-channel => gimp-item-id-is-channel
+In plug-ins/script-fu/scripts/distress-selection.scm:
+gimp-item-is-channel => 
+gimp-item-id-is-channel
 
 gimp-item-is-channel is not in the PDB for 2.99.  I couldn't easily find the commit where that changed.
 
