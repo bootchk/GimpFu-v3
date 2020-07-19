@@ -1,0 +1,53 @@
+
+Select>Distort fails w/ gimp message "unbound variable gimp-item-is-channel"
+
+Test case
+=========
+
+File>New
+Make a rectangular selection
+Select>Distort...
+expect a dialog
+Choose OK button.
+
+Expect:
+   See https://docs.gimp.org/2.10/en/script-fu-distress-selection.html
+
+   The selection assumes a jagged edge?
+
+   (Note the plugin's own docstring says "distress",
+   the plugin is named                   "distort"
+   and Gimp help says the effect is      "deform")
+
+Actual:
+ Gimp Message dialog: "unbound variable gimp-item-is-channel
+
+
+Fix
+===
+
+In plug-ins/script-fu/scripts/distress-selection.scm:  gimp-item-is-channel => gimp-item-id-is-channel
+
+gimp-item-is-channel is not in the PDB for 2.99.  I couldn't easily find the commit where that changed.
+
+script-fu values seems to usually be ID's.  I don't have a deep understanding of script-fu.
+
+
+Other
+=====
+
+This also fixes unreported issue with Filters>Decor>Coffee stain,
+which calls distress-selection.scm
+
+Test case:
+
+File>New
+Filters>Decor>Coffee Stain...
+expect a dialog
+Choose OK
+
+Expect:
+     See https://docs.gimp.org/2.10/en/script-fu-coffee-stain.html
+     Three new layers showing coffee stains.
+Actual:
+    Same error message as above

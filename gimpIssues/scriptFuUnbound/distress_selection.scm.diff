@@ -1,0 +1,13 @@
+diff --git a/plug-ins/script-fu/scripts/distress-selection.scm b/plug-ins/script-fu/scripts/distress-selection.scm
+index ef87b7926d..dcd69da941 100644
+--- a/plug-ins/script-fu/scripts/distress-selection.scm
++++ b/plug-ins/script-fu/scripts/distress-selection.scm
+@@ -87,7 +87,7 @@
+     (plug-in-gauss-iir RUN-NONINTERACTIVE theImage theLayer 1 TRUE TRUE)
+     (gimp-image-select-item inImage CHANNEL-OP-REPLACE theLayer)
+     (gimp-image-remove-layer theImage theLayer)
+-    (if (and (= (car (gimp-item-is-channel inDrawable)) TRUE)
++    (if (and (= (car (gimp-item-id-is-channel inDrawable)) TRUE)
+              (= (car (gimp-item-is-layer-mask inDrawable)) FALSE))
+       (gimp-image-set-active-channel theImage inDrawable)
+       )
