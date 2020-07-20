@@ -1,6 +1,7 @@
 {
 "gimp-image-set-colormap":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -11,6 +12,7 @@
    },
 "gimp-context-get-transform-direction":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -19,6 +21,7 @@
    },
 "file-raw-placeholder-mef-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -29,6 +32,7 @@
    },
 "gimp-image-scale":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -39,6 +43,7 @@
    },
 "gimp-vectors-bezier-stroke-cubicto":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -54,6 +59,7 @@
    },
 "plug-in-blinds":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -68,6 +74,7 @@
    },
 "gimp-floating-sel-remove":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -76,6 +83,7 @@
    },
 "plug-in-gfig":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -86,6 +94,7 @@
    },
 "gimp-image-pick-correlate-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -97,6 +106,7 @@
    },
 "gimp-palettes-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -107,6 +117,7 @@
    },
 "gimp-pdb-set-proc-attribution":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -118,6 +129,7 @@
    },
 "gimp-unit-get-factor":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       ],
@@ -127,6 +139,7 @@
    },
 "gimp-gradient-segment-set-right-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -138,6 +151,7 @@
    },
 "script-fu-make-brush-elliptical":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -150,6 +164,7 @@
    },
 "file-raw-placeholder-raf-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -160,6 +175,7 @@
    },
 "python-fu-console":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       ],
@@ -168,6 +184,7 @@
    },
 "gimp-context-list-paint-methods":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -177,6 +194,7 @@
    },
 "python-fu-slice":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -196,6 +214,7 @@
    },
 "gimp-image-get-item-position":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -206,6 +225,7 @@
    },
 "gimp-gradient-segment-range-move":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -219,6 +239,7 @@
    },
 "script-fu-selection-to-image":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -229,6 +250,7 @@
    },
 "plug-in-borderaverage":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -242,6 +264,7 @@
    },
 "script-fu-test-sphere":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamDouble"
@@ -273,6 +296,7 @@
    },
 "gimp-context-set-interpolation":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -281,6 +305,7 @@
    },
 "gimp-image-undo-group-end":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -289,6 +314,7 @@
    },
 "gimp-pdb-set-proc-documentation":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -300,6 +326,7 @@
    },
 "file-xmc-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -310,6 +337,7 @@
    },
 "gimp-item-get-lock-content":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -319,6 +347,7 @@
    },
 "gimp-item-get-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -328,6 +357,7 @@
    },
 "gimp-gradient-get-uniform-samples":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -340,6 +370,7 @@
    },
 "gimp-item-id-is-valid":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -349,6 +380,7 @@
    },
 "gimp-plug-in-menu-branch-register":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -358,6 +390,7 @@
    },
 "gimp-selection-translate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -368,6 +401,7 @@
    },
 "plug-in-qbist":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -378,6 +412,7 @@
    },
 "gimp-brush-get-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -387,6 +422,7 @@
    },
 "gimp-gradient-segment-range-flip":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -397,6 +433,7 @@
    },
 "gimp-vectors-bezier-stroke-new-ellipse":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamDouble"
@@ -411,6 +448,7 @@
    },
 "gimp-image-flatten":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -420,6 +458,7 @@
    },
 "gimp-pdb-set-file-proc-thumbnail-loader":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -429,6 +468,7 @@
    },
 "plug-in-cml-explorer":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -440,6 +480,7 @@
    },
 "gimp-text-layer-set-antialias":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamBoolean"
@@ -449,6 +490,7 @@
    },
 "file-dds-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -461,6 +503,7 @@
    },
 "gimp-help-using-photography":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -469,6 +512,7 @@
    },
 "gimp-image-convert-set-dither-matrix":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       , "GParamInt"
@@ -480,6 +524,7 @@
    },
 "gimp-context-get-gradient-blend-color-space":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -488,6 +533,7 @@
    },
 "gimp-edit-copy-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -497,6 +543,7 @@
    },
 "file-sgi-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -507,6 +554,7 @@
    },
 "gimp-brush-set-spikes":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -517,6 +565,7 @@
    },
 "file-gif-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -536,6 +585,7 @@
    },
 "file-pcx-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -548,6 +598,7 @@
    },
 "script-fu-fuzzy-border":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -566,6 +617,7 @@
    },
 "gimp-display-id-is-valid":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -575,6 +627,7 @@
    },
 "gimp-image-reorder-item":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -586,6 +639,7 @@
    },
 "file-csource-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -598,6 +652,7 @@
    },
 "gimp-brush-set-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -607,6 +662,7 @@
    },
 "gimp-image-pick-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -623,6 +679,7 @@
    },
 "gimp-layer-get-composite-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -632,6 +689,7 @@
    },
 "gimp-vectors-stroke-reverse":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -641,6 +699,7 @@
    },
 "gimp-drawable-width":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -650,6 +709,7 @@
    },
 "gimp-context-set-ink-angle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -658,6 +718,7 @@
    },
 "file-raw-placeholder-erf-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -668,6 +729,7 @@
    },
 "plug-in-pixelize":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -679,6 +741,7 @@
    },
 "gimp-context-get-line-width-unit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -687,6 +750,7 @@
    },
 "gimp-item-id-is-layer-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -696,6 +760,7 @@
    },
 "gimp-channel-new-from-component":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -707,6 +772,7 @@
    },
 "gimp-patterns-close-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -715,6 +781,7 @@
    },
 "gimp-clone-default":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -725,6 +792,7 @@
    },
 "file-pfm-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -737,6 +805,7 @@
    },
 "gimp-text-layer-resize":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamDouble"
@@ -747,6 +816,7 @@
    },
 "gimp-gradient-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -756,6 +826,7 @@
    },
 "gimp-gradient-segment-get-blending-function":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -766,6 +837,7 @@
    },
 "file-save-rgbe":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -778,6 +850,7 @@
    },
 "gimp-image-get-channels":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -788,6 +861,7 @@
    },
 "gimp-brush-duplicate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -797,6 +871,7 @@
    },
 "gimp-image-resize-to-layers":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -805,6 +880,7 @@
    },
 "file-bmp-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -817,6 +893,7 @@
    },
 "gimp-image-select-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -828,6 +905,7 @@
    },
 "gimp-drawable-type":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -837,6 +915,7 @@
    },
 "gimp-get-parasite-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -846,6 +925,7 @@
    },
 "gimp-pdb-get-proc-argument":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -856,6 +936,7 @@
    },
 "file-header-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -868,6 +949,7 @@
    },
 "gimp-image-lower-item":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -877,6 +959,7 @@
    },
 "gimp-debug-timer-end":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -885,6 +968,7 @@
    },
 "script-fu-contactsheet":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -899,6 +983,7 @@
    },
 "gimp-image-set-metadata":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -908,6 +993,7 @@
    },
 "file-raw-placeholder-bay-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -918,6 +1004,7 @@
    },
 "file-fli-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -932,6 +1019,7 @@
    },
 "gimp-pdb-set-file-proc-handles-remote":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -940,6 +1028,7 @@
    },
 "plug-in-smooth-palette":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -956,6 +1045,7 @@
    },
 "gimp-context-get-line-join-style":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -964,6 +1054,7 @@
    },
 "gimp-image-get-vectors-by-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -974,6 +1065,7 @@
    },
 "gimp-text-layer-get-justification":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -983,6 +1075,7 @@
    },
 "gimp-gradients-close-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -991,6 +1084,7 @@
    },
 "gimp-edit-named-cut":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       , "GimpParamObjectArray"
@@ -1002,6 +1096,7 @@
    },
 "gimp-image-get-selection":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -1011,6 +1106,7 @@
    },
 "gimp-item-get-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -1020,6 +1116,7 @@
    },
 "gimp-context-get-foreground":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -1028,6 +1125,7 @@
    },
 "script-fu-copy-visible":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1038,6 +1136,7 @@
    },
 "gimp-vectors-stroke-rotate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -1050,6 +1149,7 @@
    },
 "gimp-item-transform-rotate-simple":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamEnum"
@@ -1063,6 +1163,7 @@
    },
 "plug-in-goat-exercise-vala":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1073,6 +1174,7 @@
    },
 "gimp-image-get-metadata":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -1082,6 +1184,7 @@
    },
 "gimp-image-get-selected-layers":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -1092,6 +1195,7 @@
    },
 "gimp-context-set-ink-tilt-sensitivity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -1100,6 +1204,7 @@
    },
 "gimp-fonts-refresh":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -1107,6 +1212,7 @@
    },
 "plug-in-zealouscrop":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1117,6 +1223,7 @@
    },
 "gimp-item-set-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -1126,6 +1233,7 @@
    },
 "gimp-file-save-thumbnail":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamObject"
@@ -1135,6 +1243,7 @@
    },
 "gimp-pdb-get-data-size":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -1144,6 +1253,7 @@
    },
 "gimp-image-get-exported-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -1153,6 +1263,7 @@
    },
 "gimp-context-set-stroke-method":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -1161,6 +1272,7 @@
    },
 "plug-in-cubism":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1174,6 +1286,7 @@
    },
 "gimp-item-get-children":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -1184,6 +1297,7 @@
    },
 "plug-in-lighting":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1215,6 +1329,7 @@
    },
 "plug-in-gauss-iir2":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1227,6 +1342,7 @@
    },
 "gimp-context-set-sample-threshold-int":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -1235,6 +1351,7 @@
    },
 "gimp-layer-set-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
@@ -1244,6 +1361,7 @@
    },
 "gimp-text-layer-get-antialias":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -1253,6 +1371,7 @@
    },
 "gimp-image-select-contiguous-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -1265,6 +1384,7 @@
    },
 "gimp-image-set-component-active":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -1275,6 +1395,7 @@
    },
 "gimp-item-is-group":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -1284,6 +1405,7 @@
    },
 "plug-in-colormap-remap":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1296,6 +1418,7 @@
    },
 "gimp-item-set-color-tag":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamEnum"
@@ -1305,6 +1428,7 @@
    },
 "gimp-palette-add-entry":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -1316,6 +1440,7 @@
    },
 "file-raw-placeholder-minolta-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -1326,6 +1451,7 @@
    },
 "gradient-save-as-css":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -1336,6 +1462,7 @@
    },
 "gimp-message":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -1344,6 +1471,7 @@
    },
 "plug-in-ifscompose":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1354,6 +1482,7 @@
    },
 "gimp-image-select-item":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -1364,6 +1493,7 @@
    },
 "gimp-image-get-default-new-layer-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -1373,6 +1503,7 @@
    },
 "gimp-file-load-layers":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GimpParamImage"
@@ -1385,6 +1516,7 @@
    },
 "script-fu-difference-clouds":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1395,6 +1527,7 @@
    },
 "gimp-context-set-brush":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -1403,6 +1536,7 @@
    },
 "plug-in-randomize-hurl":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1417,6 +1551,7 @@
    },
 "gimp-image-merge-layer-group":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamLayer"
@@ -1427,6 +1562,7 @@
    },
 "gimp-context-get-ink-angle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -1435,6 +1571,7 @@
    },
 "gimp-context-set-line-miter-limit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -1443,6 +1580,7 @@
    },
 "gimp-image-get-parasite":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -1453,6 +1591,7 @@
    },
 "gimp-context-get-mypaint-brush":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -1461,6 +1600,7 @@
    },
 "gimp-vectors-stroke-interpolate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -1474,6 +1614,7 @@
    },
 "plug-in-fractal-trace":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1490,6 +1631,7 @@
    },
 "gimp-pdb-temp-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -1498,6 +1640,7 @@
    },
 "file-raw-placeholder-dng-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -1508,6 +1651,7 @@
    },
 "gimp-palette-set-columns":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -1517,6 +1661,7 @@
    },
 "plug-in-edge":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1530,6 +1675,7 @@
    },
 "file-psd-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -1540,6 +1686,7 @@
    },
 "gimp-image-get-floating-sel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -1549,6 +1696,7 @@
    },
 "plug-in-script-fu-text-console":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       ],
@@ -1557,6 +1705,7 @@
    },
 "gimp-context-set-sample-criterion":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -1565,6 +1714,7 @@
    },
 "gimp-image-new-with-precision":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       , "GParamInt"
@@ -1577,6 +1727,7 @@
    },
 "gimp-drawable-brightness-contrast":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamDouble"
@@ -1587,6 +1738,7 @@
    },
 "gimp-pdb-set-data":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -1597,6 +1749,7 @@
    },
 "gimp-gradient-segment-get-left-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -1608,6 +1761,7 @@
    },
 "python-fu-test-vector-param":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1618,6 +1772,7 @@
    },
 "file-pat-load":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GParamObject"
@@ -1628,6 +1783,7 @@
    },
 "gimp-patterns-set-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -1637,6 +1793,7 @@
    },
 "gimp-selection-invert":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -1645,6 +1802,7 @@
    },
 "file-png-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -1655,6 +1813,7 @@
    },
 "file-pdf-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -1668,6 +1827,7 @@
    },
 "plug-in-normalize":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1678,6 +1838,7 @@
    },
 "gimp-progress-cancel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -1686,6 +1847,7 @@
    },
 "gimp-layer-copy":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamBoolean"
@@ -1696,6 +1858,7 @@
    },
 "gimp-drawable-edit-gradient-fill":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -1714,6 +1877,7 @@
    },
 "gimp-layer-set-composite-space":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
@@ -1723,6 +1887,7 @@
    },
 "gimp-selection-feather":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamDouble"
@@ -1732,6 +1897,7 @@
    },
 "gimp-item-transform-shear":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamEnum"
@@ -1743,6 +1909,7 @@
    },
 "gimp-drawable-fill":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -1752,6 +1919,7 @@
    },
 "plug-in-gflare":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1773,6 +1941,7 @@
    },
 "gimp-drawable-edit-stroke-item":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GimpParamItem"
@@ -1782,6 +1951,7 @@
    },
 "gimp-drawable-colorize-hsl":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamDouble"
@@ -1793,6 +1963,7 @@
    },
 "gimp-item-set-expanded":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -1802,6 +1973,7 @@
    },
 "gimp-palette-export-text":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -1812,6 +1984,7 @@
    },
 "file-pdf-load-thumb":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamObject"
       , "GParamInt"
@@ -1826,6 +1999,7 @@
    },
 "file-raw-placeholder-qtk-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -1836,6 +2010,7 @@
    },
 "gimp-pdb-get-proc-menu-paths":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -1846,6 +2021,7 @@
    },
 "gimp-floating-sel-anchor":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -1854,6 +2030,7 @@
    },
 "plug-in-unit-editor":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       ],
@@ -1862,6 +2039,7 @@
    },
 "gimp-channel-get-opacity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamChannel"
       ],
@@ -1871,6 +2049,7 @@
    },
 "gimp-image-id-is-valid":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -1880,6 +2059,7 @@
    },
 "gimp-channel-get-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamChannel"
       ],
@@ -1889,6 +2069,7 @@
    },
 "gimp-image-set-active-channel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamChannel"
@@ -1898,6 +2079,7 @@
    },
 "gimp-layer-get-opacity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -1907,6 +2089,7 @@
    },
 "gimp-airbrush-default":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -1917,6 +2100,7 @@
    },
 "gimp-context-set-defaults":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -1924,6 +2108,7 @@
    },
 "file-pnm-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -1934,6 +2119,7 @@
    },
 "python-fu-accessPDB":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1946,6 +2132,7 @@
    },
 "gimp-context-set-ink-speed-sensitivity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -1954,6 +2141,7 @@
    },
 "plug-in-pagecurl":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -1969,6 +2157,7 @@
    },
 "gimp-displays-flush":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -1976,6 +2165,7 @@
    },
 "gimp-context-set-sample-transparent":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamBoolean"
       ],
@@ -1984,6 +2174,7 @@
    },
 "gimp-item-transform-scale":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamDouble"
@@ -1997,6 +2188,7 @@
    },
 "gimp-item-get-color-tag":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -2006,6 +2198,7 @@
    },
 "file-pbm-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2019,6 +2212,7 @@
    },
 "gimp-online-wiki":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -2027,6 +2221,7 @@
    },
 "gimp-context-set-gradient-fg-bg-rgb":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -2034,6 +2229,7 @@
    },
 "gimp-get-default-unit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -2042,6 +2238,7 @@
    },
 "gimp-item-get-image":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -2051,6 +2248,7 @@
    },
 "file-pgm-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2064,6 +2262,7 @@
    },
 "gimp-selection-flood":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -2072,6 +2271,7 @@
    },
 "gimp-layer-set-opacity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamDouble"
@@ -2081,6 +2281,7 @@
    },
 "gimp-channel-set-opacity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamChannel"
       , "GParamDouble"
@@ -2090,6 +2291,7 @@
    },
 "file-raw-placeholder-hasselblad-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -2100,6 +2302,7 @@
    },
 "gimp-image-convert-color-profile":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -2112,6 +2315,7 @@
    },
 "gimp-context-get-font":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -2120,6 +2324,7 @@
    },
 "script-fu-guide-new-percent":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2132,6 +2337,7 @@
    },
 "gimp-drawable-merge-shadow":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamBoolean"
@@ -2141,6 +2347,7 @@
    },
 "gimp-image-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       , "GParamInt"
@@ -2152,6 +2359,7 @@
    },
 "gimp-image-get-channel-by-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -2162,6 +2370,7 @@
    },
 "gimp-edit-paste-as-new-image":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -2170,6 +2379,7 @@
    },
 "gimp-item-set-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -2179,6 +2389,7 @@
    },
 "file-xbm-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2200,6 +2411,7 @@
    },
 "script-fu-circuit":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2215,6 +2427,7 @@
    },
 "gimp-text-layer-set-justification":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
@@ -2224,6 +2437,7 @@
    },
 "gimp-context-set-ink-size":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -2232,6 +2446,7 @@
    },
 "gimp-layer-get-composite-space":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -2241,6 +2456,7 @@
    },
 "file-raw-placeholder-ari-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -2251,6 +2467,7 @@
    },
 "gimp-image-grid-get-offset":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -2261,6 +2478,7 @@
    },
 "gimp-gradient-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -2269,6 +2487,7 @@
    },
 "file-dicom-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -2279,6 +2498,7 @@
    },
 "gimp-pdb-set-file-proc-mime-types":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -2288,6 +2508,7 @@
    },
 "gimp-image-undo-thaw":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -2297,6 +2518,7 @@
    },
 "gimp-unit-get-singular":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       ],
@@ -2306,6 +2528,7 @@
    },
 "plug-in-drawable-compose":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2321,6 +2544,7 @@
    },
 "file-gbr-load":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GParamObject"
@@ -2331,6 +2555,7 @@
    },
 "gimp-edit-cut":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       , "GimpParamObjectArray"
@@ -2341,6 +2566,7 @@
    },
 "gimp-context-set-gradient-reverse":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamBoolean"
       ],
@@ -2349,6 +2575,7 @@
    },
 "plug-in-gimpressionist":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2360,6 +2587,7 @@
    },
 "gimp-layer-resize-to-image-size":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -2368,6 +2596,7 @@
    },
 "gimp-help":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -2377,6 +2606,7 @@
    },
 "plug-in-curve-bend":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2405,6 +2635,7 @@
    },
 "gimp-image-lower-item-to-bottom":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -2414,6 +2645,7 @@
    },
 "gimp-item-transform-flip-simple":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamEnum"
@@ -2426,6 +2658,7 @@
    },
 "gimp-palette-get-info":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -2435,6 +2668,7 @@
    },
 "python-fu-dump-pdb":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2445,6 +2679,7 @@
    },
 "python-fu-palette-to-gradient":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -2455,6 +2690,7 @@
    },
 "gimp-context-get-ink-size":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -2463,6 +2699,7 @@
    },
 "gimp-image-flip":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamEnum"
@@ -2472,6 +2709,7 @@
    },
 "script-fu-reverse-layers":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2482,6 +2720,7 @@
    },
 "gimp-drawable-equalize":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamBoolean"
@@ -2491,6 +2730,7 @@
    },
 "gimp-image-get-xcf-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -2500,6 +2740,7 @@
    },
 "gimp-image-floating-sel-attached-to":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -2509,6 +2750,7 @@
    },
 "gimp-palettes-close-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -2517,6 +2759,7 @@
    },
 "gimp-context-set-gradient-fg-bg-hsv-ccw":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -2524,6 +2767,7 @@
    },
 "plug-in-lic":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2534,6 +2778,7 @@
    },
 "script-fu-add-bevel":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2547,6 +2792,7 @@
    },
 "gimp-context-set-transform-direction":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -2555,6 +2801,7 @@
    },
 "script-fu-weave":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2572,6 +2819,7 @@
    },
 "gimp-heal":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GimpParamDrawable"
@@ -2585,6 +2833,7 @@
    },
 "gimp-context-get-sample-threshold":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -2593,6 +2842,7 @@
    },
 "gimp-vectors-get-strokes":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       ],
@@ -2603,6 +2853,7 @@
    },
 "gimp-pdb-set-file-proc-priority":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -2612,6 +2863,7 @@
    },
 "plug-in-gauss":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2625,6 +2877,7 @@
    },
 "gimp-image-is-dirty":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -2634,6 +2887,7 @@
    },
 "gimp-selection-border":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -2643,6 +2897,7 @@
    },
 "plug-in-lens-distortion":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2659,6 +2914,7 @@
    },
 "plug-in-warp":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2683,6 +2939,7 @@
    },
 "gimp-image-undo-enable":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -2692,6 +2949,7 @@
    },
 "gimp-context-get-sample-merged":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -2700,6 +2958,7 @@
    },
 "gimp-buffer-get-image-type":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -2709,6 +2968,7 @@
    },
 "gimp-item-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -2717,6 +2977,7 @@
    },
 "script-fu-paste-as-pattern":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -2727,6 +2988,7 @@
    },
 "gimp-context-get-ink-blob-type":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -2735,6 +2997,7 @@
    },
 "file-gif-load-thumb":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamObject"
       , "GParamInt"
@@ -2749,6 +3012,7 @@
    },
 "gimp-drawable-posterize":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -2758,6 +3022,7 @@
    },
 "gimp-gradient-segment-range-split-midpoint":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -2768,6 +3033,7 @@
    },
 "gimp-channel-set-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamChannel"
       , "GimpParamRGB"
@@ -2777,6 +3043,7 @@
    },
 "plug-in-emboss":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2791,6 +3058,7 @@
    },
 "gimp-image-get-tattoo-state":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -2800,6 +3068,7 @@
    },
 "plug-in-dbbrowser":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       ],
@@ -2808,6 +3077,7 @@
    },
 "gimp-image-merge-down":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamLayer"
@@ -2819,6 +3089,7 @@
    },
 "gimp-gradient-rename":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -2829,6 +3100,7 @@
    },
 "plug-in-oilify":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2841,6 +3113,7 @@
    },
 "plug-in-c-astretch":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2851,6 +3124,7 @@
    },
 "gimp-dynamics-get-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -2861,6 +3135,7 @@
    },
 "gimp-pdb-get-proc-documentation":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -2872,6 +3147,7 @@
    },
 "gimp-pattern-get-pixels":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -2885,6 +3161,7 @@
    },
 "script-fu-make-brush-rectangular-feathered":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -2898,6 +3175,7 @@
    },
 "gimp-smudge-default":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -2908,6 +3186,7 @@
    },
 "python-fu-testProperties":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2920,6 +3199,7 @@
    },
 "plug-in-gauss-rle2":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2932,6 +3212,7 @@
    },
 "gimp-image-set-active-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamLayer"
@@ -2941,6 +3222,7 @@
    },
 "plug-in-nova":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -2957,6 +3239,7 @@
    },
 "gimp-brush-get-pixels":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -2973,6 +3256,7 @@
    },
 "gimp-eraser-default":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -2983,6 +3267,7 @@
    },
 "gimp-plug-in-help-register":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamObject"
@@ -2992,6 +3277,7 @@
    },
 "gimp-help-concepts-usage":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -3000,6 +3286,7 @@
    },
 "gimp-layer-create-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
@@ -3010,6 +3297,7 @@
    },
 "gimp-pattern-get-info":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -3021,6 +3309,7 @@
    },
 "gimp-context-set-default-colors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -3028,6 +3317,7 @@
    },
 "gimp-pdb-dump":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamObject"
       ],
@@ -3036,6 +3326,7 @@
    },
 "python-fu-test-missing-drawable-attribute":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3046,6 +3337,7 @@
    },
 "gimp-brush-is-editable":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -3055,6 +3347,7 @@
    },
 "gimp-edit-named-copy-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -3065,6 +3358,7 @@
    },
 "gimp-context-set-ink-size-sensitivity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -3073,6 +3367,7 @@
    },
 "gimp-layer-scale":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamInt"
@@ -3084,6 +3379,7 @@
    },
 "gimp-gradient-segment-range-blend-opacity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -3094,6 +3390,7 @@
    },
 "file-colorxhtml-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3110,6 +3407,7 @@
    },
 "gimp-context-set-brush-force":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -3118,6 +3416,7 @@
    },
 "plug-in-unsharp-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3131,6 +3430,7 @@
    },
 "plug-in-animationoptimize":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3142,6 +3442,7 @@
    },
 "gimp-image-convert-precision":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -3151,6 +3452,7 @@
    },
 "gimp-layer-get-blend-space":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -3160,6 +3462,7 @@
    },
 "plug-in-video":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3173,6 +3476,7 @@
    },
 "file-raw-placeholder-kodak-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -3183,6 +3487,7 @@
    },
 "gimp-brushes-refresh":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -3190,6 +3495,7 @@
    },
 "gimp-context-set-feather":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamBoolean"
       ],
@@ -3198,6 +3504,7 @@
    },
 "script-fu-grid-system":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3210,6 +3517,7 @@
    },
 "gimp-edit-named-copy":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       , "GimpParamObjectArray"
@@ -3221,6 +3529,7 @@
    },
 "gimp-drawable-edit-fill":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -3230,6 +3539,7 @@
    },
 "gimp-gradient-segment-range-set-coloring-type":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -3241,6 +3551,7 @@
    },
 "gimp-image-insert-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamVectors"
@@ -3252,6 +3563,7 @@
    },
 "gimp-vectors-stroke-new-from-points":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamEnum"
@@ -3265,6 +3577,7 @@
    },
 "gimp-pdb-set-proc-icon":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamEnum"
@@ -3276,6 +3589,7 @@
    },
 "gimp-drawable-offsets":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -3286,6 +3600,7 @@
    },
 "gimp-context-set-distance-metric":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -3294,6 +3609,7 @@
    },
 "plug-in-spyrogimp":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3317,6 +3633,7 @@
    },
 "gimp-context-get-stroke-method":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -3325,6 +3642,7 @@
    },
 "file-raw-placeholder-rwl-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -3335,6 +3653,7 @@
    },
 "gimp-clone":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GimpParamDrawable"
@@ -3349,6 +3668,7 @@
    },
 "gimp-file-save":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3361,6 +3681,7 @@
    },
 "script-fu-round-corners":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3378,6 +3699,7 @@
    },
 "plug-in-alienmap2":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3398,6 +3720,7 @@
    },
 "gimp-gradient-segment-range-split-uniform":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -3409,6 +3732,7 @@
    },
 "gimp-drawable-curves-explicit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -3420,6 +3744,7 @@
    },
 "gimp-context-set-background":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamRGB"
       ],
@@ -3428,6 +3753,7 @@
    },
 "plug-in-mosaic":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3450,6 +3776,7 @@
    },
 "gimp-online-roadmap":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -3458,6 +3785,7 @@
    },
 "gimp-buffer-rename":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -3468,6 +3796,7 @@
    },
 "gimp-drawable-color-balance":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -3481,6 +3810,7 @@
    },
 "gimp-item-get-lock-position":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -3490,6 +3820,7 @@
    },
 "gimp-xcf-save":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GimpParamImage"
@@ -3502,6 +3833,7 @@
    },
 "gimp-gradient-segment-get-coloring-type":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -3512,6 +3844,7 @@
    },
 "plug-in-busy-dialog":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamInt"
@@ -3524,6 +3857,7 @@
    },
 "gimp-gradients-get-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -3534,6 +3868,7 @@
    },
 "gimp-drawable-free-shadow":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -3542,6 +3877,7 @@
    },
 "gimp-drawable-offset":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamBoolean"
@@ -3554,6 +3890,7 @@
    },
 "plug-in-metadata-editor":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3563,6 +3900,7 @@
    },
 "gimp-gradients-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -3574,6 +3912,7 @@
    },
 "gimp-floating-sel-to-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -3582,6 +3921,7 @@
    },
 "plug-in-sparkle":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3605,6 +3945,7 @@
    },
 "gimp-image-set-component-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -3615,6 +3956,7 @@
    },
 "gimp-image-rotate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -3624,6 +3966,7 @@
    },
 "gimp-help-using-selections":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -3632,6 +3975,7 @@
    },
 "gimp-drawable-curves-spline":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -3643,6 +3987,7 @@
    },
 "plug-in-film":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3663,6 +4008,7 @@
    },
 "script-fu-guide-new":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3675,6 +4021,7 @@
    },
 "gimp-context-set-line-dash-offset":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -3683,6 +4030,7 @@
    },
 "gimp-context-set-line-width-unit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       ],
@@ -3691,6 +4039,7 @@
    },
 "gimp-brush-get-shape":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -3700,6 +4049,7 @@
    },
 "gimp-layer-add-alpha":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -3708,6 +4058,7 @@
    },
 "file-exr-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3720,6 +4071,7 @@
    },
 "gimp-gradient-segment-range-redistribute-handles":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -3730,6 +4082,7 @@
    },
 "plug-in-dog":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3744,6 +4097,7 @@
    },
 "gimp-palettes-refresh":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -3751,6 +4105,7 @@
    },
 "gimp-context-set-brush-default-size":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -3758,6 +4113,7 @@
    },
 "plug-in-sobel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3771,6 +4127,7 @@
    },
 "gimp-vectors-bezier-stroke-new-moveto":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamDouble"
@@ -3782,6 +4139,7 @@
    },
 "gimp-context-set-ink-blob-angle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -3790,6 +4148,7 @@
    },
 "script-fu-old-photo":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3805,6 +4164,7 @@
    },
 "gimp-text-layer-get-line-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -3814,6 +4174,7 @@
    },
 "gimp-fonts-get-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -3824,6 +4185,7 @@
    },
 "plug-in-bump-map":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3845,6 +4207,7 @@
    },
 "gimp-context-get-distance-metric":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -3853,6 +4216,7 @@
    },
 "gimp-get-monitor-resolution":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -3862,6 +4226,7 @@
    },
 "gimp-pdb-proc-exists":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -3871,6 +4236,7 @@
    },
 "gimp-image-grid-get-style":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -3880,6 +4246,7 @@
    },
 "gimp-unit-set-deletion-flag":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       , "GParamBoolean"
@@ -3889,6 +4256,7 @@
    },
 "plug-in-engrave":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3901,6 +4269,7 @@
    },
 "gimp-context-set-brush-angle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -3909,6 +4278,7 @@
    },
 "file-xwd-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -3919,6 +4289,7 @@
    },
 "file-svg-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -3933,6 +4304,7 @@
    },
 "gimp-gradient-segment-get-middle-pos":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -3943,6 +4315,7 @@
    },
 "script-fu-paste-as-brush":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -3954,6 +4327,7 @@
    },
 "plug-in-neon":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3966,6 +4340,7 @@
    },
 "gimp-palette-export-css":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -3976,6 +4351,7 @@
    },
 "file-sunras-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -3989,6 +4365,7 @@
    },
 "gimp-pdb-query":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -4005,6 +4382,7 @@
    },
 "file-raw-placeholder-pxn-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -4015,6 +4393,7 @@
    },
 "gimp-image-remove-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamLayer"
@@ -4024,6 +4403,7 @@
    },
 "gimp-vectors-stroke-flip-free":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -4037,6 +4417,7 @@
    },
 "gimp-context-set-line-join-style":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -4045,6 +4426,7 @@
    },
 "script-fu-set-cmap":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4056,6 +4438,7 @@
    },
 "gimp-context-set-brush-size":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -4064,6 +4447,7 @@
    },
 "gimp-palette-entry-get-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -4074,6 +4458,7 @@
    },
 "gimp-gradients-set-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -4083,6 +4468,7 @@
    },
 "gimp-drawable-type-with-alpha":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -4092,6 +4478,7 @@
    },
 "plug-in-sel-gauss":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4104,6 +4491,7 @@
    },
 "plug-in-flarefx":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4116,6 +4504,7 @@
    },
 "file-cel-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4129,6 +4518,7 @@
    },
 "file-ico-load-thumb":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamObject"
       , "GParamInt"
@@ -4143,6 +4533,7 @@
    },
 "gimp-get-images":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -4152,6 +4543,7 @@
    },
 "gimp-gradient-segment-get-right-pos":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -4162,6 +4554,7 @@
    },
 "gimp-paintbrush-default":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -4172,6 +4565,7 @@
    },
 "script-fu-waves-anim":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4186,6 +4580,7 @@
    },
 "gimp-drawable-is-gray":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -4195,6 +4590,7 @@
    },
 "gimp-text-get-extents-fontname":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamDouble"
@@ -4210,6 +4606,7 @@
    },
 "plug-in-photocopy":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4224,6 +4621,7 @@
    },
 "gimp-drawable-get-thumbnail-format":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -4233,6 +4631,7 @@
    },
 "gimp-vectors-import-from-string":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -4247,6 +4646,7 @@
    },
 "gimp-unit-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamDouble"
@@ -4262,6 +4662,7 @@
    },
 "gimp-context-set-gradient-repeat-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -4270,6 +4671,7 @@
    },
 "gimp-palettes-get-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -4280,6 +4682,7 @@
    },
 "file-ico-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4292,6 +4695,7 @@
    },
 "plug-in-gradmap":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4302,6 +4706,7 @@
    },
 "file-tga-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -4312,6 +4717,7 @@
    },
 "gimp-gimprc-set":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -4321,6 +4727,7 @@
    },
 "script-fu-selection-to-brush":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4334,6 +4741,7 @@
    },
 "gimp-layer-get-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -4343,6 +4751,7 @@
    },
 "gimp-brush-set-hardness":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamDouble"
@@ -4353,6 +4762,7 @@
    },
 "gimp-patterns-refresh":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -4360,6 +4770,7 @@
    },
 "gimp-unit-get-plural":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       ],
@@ -4369,6 +4780,7 @@
    },
 "gimp-context-set-ink-blob-type":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -4377,6 +4789,7 @@
    },
 "gimp-image-set-resolution":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamDouble"
@@ -4387,6 +4800,7 @@
    },
 "gimp-context-set-font":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -4395,6 +4809,7 @@
    },
 "gimp-image-remove-channel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamChannel"
@@ -4404,6 +4819,7 @@
    },
 "plug-in-newsprint":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4426,6 +4842,7 @@
    },
 "file-gih-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4448,6 +4865,7 @@
    },
 "gimp-context-set-sample-merged":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamBoolean"
       ],
@@ -4456,6 +4874,7 @@
    },
 "file-ppm-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4469,6 +4888,7 @@
    },
 "gimp-item-transform-rotate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamDouble"
@@ -4482,6 +4902,7 @@
    },
 "gimp-selection-save":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -4491,6 +4912,7 @@
    },
 "gimp-image-attach-parasite":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamParasite"
@@ -4500,6 +4922,7 @@
    },
 "plug-in-wavelet-decompose":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4513,6 +4936,7 @@
    },
 "script-fu-burn-in-anim":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4531,6 +4955,7 @@
    },
 "gimp-gimprc-query":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -4540,6 +4965,7 @@
    },
 "plug-in-jigsaw":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4555,6 +4981,7 @@
    },
 "extension-script-fu":
    {
+   "type":  "GIMP Extension",
    "in": [
       ],
    "out": [
@@ -4562,6 +4989,7 @@
    },
 "gimp-brush-get-info":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -4574,6 +5002,7 @@
    },
 "gimp-item-get-linked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -4583,6 +5012,7 @@
    },
 "plug-in-whirl-pinch":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4596,6 +5026,7 @@
    },
 "gimp-context-set-line-width":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -4604,6 +5035,7 @@
    },
 "plug-in-semiflatten":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4614,6 +5046,7 @@
    },
 "gimp-pdb-get-proc-info":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -4625,6 +5058,7 @@
    },
 "gimp-layer-set-composite-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
@@ -4634,6 +5068,7 @@
    },
 "gimp-context-get-paint-method":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -4642,6 +5077,7 @@
    },
 "gimp-brush-get-hardness":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -4651,6 +5087,7 @@
    },
 "plug-in-flame":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4661,6 +5098,7 @@
    },
 "gimp-image-grid-set-offset":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamDouble"
@@ -4671,6 +5109,7 @@
    },
 "gimp-help-concepts-paths":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -4679,6 +5118,7 @@
    },
 "gimp-layer-is-floating-sel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -4688,6 +5128,7 @@
    },
 "python-fu-foggify":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4701,6 +5142,7 @@
    },
 "gimp-image-get-effective-color-profile":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -4711,6 +5153,7 @@
    },
 "gimp-brush-set-shape":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamEnum"
@@ -4721,6 +5164,7 @@
    },
 "file-raw-placeholder-rdc-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -4731,6 +5175,7 @@
    },
 "gimp-image-undo-group-start":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -4739,6 +5184,7 @@
    },
 "script-fu-guides-from-selection":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4749,6 +5195,7 @@
    },
 "gimp-pdb-add-proc-menu-path":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -4758,6 +5205,7 @@
    },
 "gimp-progress-install":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -4766,6 +5214,7 @@
    },
 "gimp-drawable-has-alpha":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -4775,6 +5224,7 @@
    },
 "gimp-image-merge-visible-layers":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamEnum"
@@ -4785,6 +5235,7 @@
    },
 "gimp-item-set-lock-position":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -4794,6 +5245,7 @@
    },
 "gimp-unit-get-symbol":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       ],
@@ -4803,6 +5255,7 @@
    },
 "gimp-drawable-is-rgb":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -4812,6 +5265,7 @@
    },
 "script-fu-erase-rows":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4825,6 +5279,7 @@
    },
 "plug-in-vpropagate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4841,6 +5296,7 @@
    },
 "gimp-image-grid-set-style":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -4850,6 +5306,7 @@
    },
 "gimp-layer-remove-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
@@ -4859,6 +5316,7 @@
    },
 "gimp-gradient-segment-get-right-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -4870,6 +5328,7 @@
    },
 "gimp-temp-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -4879,6 +5338,7 @@
    },
 "gimp-image-get-active-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -4888,6 +5348,7 @@
    },
 "gimp-image-get-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -4898,6 +5359,7 @@
    },
 "gimp-context-get-line-miter-limit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -4906,6 +5368,7 @@
    },
 "script-fu-erase-nth-rows":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4920,6 +5383,7 @@
    },
 "file-openraster-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4932,6 +5396,7 @@
    },
 "plug-in-randomize-slur":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4946,6 +5411,7 @@
    },
 "file-xz-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4958,6 +5424,7 @@
    },
 "python-fu-palette-to-gradient-repeating":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -4968,6 +5435,7 @@
    },
 "script-fu-xach-effect":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -4988,6 +5456,7 @@
    },
 "gimp-image-get-parasite-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -4998,6 +5467,7 @@
    },
 "script-fu-clothify":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5013,6 +5483,7 @@
    },
 "plug-in-animationplay":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5023,6 +5494,7 @@
    },
 "gimp-context-get-sample-transparent":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -5031,6 +5503,7 @@
    },
 "plug-in-red-eye-removal":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5042,6 +5515,7 @@
    },
 "gimp-image-resize":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -5054,6 +5528,7 @@
    },
 "file-gif-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -5064,6 +5539,7 @@
    },
 "plug-in-softglow":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5077,6 +5553,7 @@
    },
 "gimp-vectors-export-to-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamObject"
@@ -5087,6 +5564,7 @@
    },
 "gimp-text-fontname":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamDrawable"
@@ -5105,6 +5583,7 @@
    },
 "file-pcx-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -5115,6 +5594,7 @@
    },
 "gimp-image-raise-item":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -5124,6 +5604,7 @@
    },
 "gimp-context-get-sample-criterion":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -5132,6 +5613,7 @@
    },
 "gimp-airbrush":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamDouble"
@@ -5143,6 +5625,7 @@
    },
 "file-pdf-save-multi":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamInt"
@@ -5157,6 +5640,7 @@
    },
 "gimp-vectors-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -5167,6 +5651,7 @@
    },
 "gimp-plug-in-set-pdb-error-handler":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -5175,6 +5660,7 @@
    },
 "gimp-selection-bounds":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -5188,6 +5674,7 @@
    },
 "plug-in-make-seamless":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5198,6 +5685,7 @@
    },
 "plug-in-deinterlace":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5209,6 +5697,7 @@
    },
 "gimp-palette-get-columns":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -5218,6 +5707,7 @@
    },
 "gimp-brushes-close-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -5226,6 +5716,7 @@
    },
 "gimp-pdb-set-file-proc-handles-raw":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -5234,6 +5725,7 @@
    },
 "gimp-image-grid-get-background-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -5243,6 +5735,7 @@
    },
 "plug-in-retinex":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5257,6 +5750,7 @@
    },
 "gimp-drawable-levels":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -5273,6 +5767,7 @@
    },
 "python-fu-test-array-testArrayResult":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5283,6 +5778,7 @@
    },
 "script-fu-selection-round":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5294,6 +5790,7 @@
    },
 "gimp-eraser":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -5306,6 +5803,7 @@
    },
 "gimp-text-layer-get-kerning":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -5315,6 +5813,7 @@
    },
 "file-raw-placeholder-pef-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -5325,6 +5824,7 @@
    },
 "gimp-drawable-height":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -5334,6 +5834,7 @@
    },
 "gimp-message-get-handler":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -5342,6 +5843,7 @@
    },
 "file-bmp-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -5352,6 +5854,7 @@
    },
 "gimp-context-get-feather-radius":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -5361,6 +5864,7 @@
    },
 "gimp-paintbrush":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamDouble"
@@ -5374,6 +5878,7 @@
    },
 "gimp-displays-reconnect":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamImage"
@@ -5383,6 +5888,7 @@
    },
 "gimp-image-select-rectangle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -5396,6 +5902,7 @@
    },
 "script-fu-unsharp-mask":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5408,6 +5915,7 @@
    },
 "file-raw-placeholder-nikon-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -5418,6 +5926,7 @@
    },
 "file-fli-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -5430,6 +5939,7 @@
    },
 "gimp-gradient-segment-range-blend-colors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -5440,6 +5950,7 @@
    },
 "gimp-image-select-polygon":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -5451,6 +5962,7 @@
    },
 "gimp-unit-get-number-of-units":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -5459,6 +5971,7 @@
    },
 "gimp-brush-set-aspect-ratio":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamDouble"
@@ -5469,6 +5982,7 @@
    },
 "plug-in-wind":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5484,6 +5998,7 @@
    },
 "gimp-selection-sharpen":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -5492,6 +6007,7 @@
    },
 "gimp-message-set-handler":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -5500,6 +6016,7 @@
    },
 "plug-in-erode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5516,6 +6033,7 @@
    },
 "script-fu-guides-remove":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5526,6 +6044,7 @@
    },
 "gimp-text-layer-set-kerning":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamBoolean"
@@ -5535,6 +6054,7 @@
    },
 "gimp-context-get-brush-hardness":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -5543,6 +6063,7 @@
    },
 "gimp-progress-end":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -5550,6 +6071,7 @@
    },
 "gimp-text-layer-get-font":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -5559,6 +6081,7 @@
    },
 "gimp-image-add-vguide":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -5569,6 +6092,7 @@
    },
 "gimp-vectors-new-from-text-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamLayer"
@@ -5579,6 +6103,7 @@
    },
 "gimp-text-layer-set-language":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GimpParamString"
@@ -5588,6 +6113,7 @@
    },
 "gimp-image-thaw-layers":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -5596,6 +6122,7 @@
    },
 "file-desktop-link-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -5606,6 +6133,7 @@
    },
 "plug-in-sinus":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5629,6 +6157,7 @@
    },
 "gimp-dynamics-refresh":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -5636,6 +6165,7 @@
    },
 "script-fu-make-brush-elliptical-feathered":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -5649,6 +6179,7 @@
    },
 "gimp-image-convert-indexed":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -5663,6 +6194,7 @@
    },
 "gimp-context-set-brush-default-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -5670,6 +6202,7 @@
    },
 "gimp-palette-export-java":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -5680,6 +6213,7 @@
    },
 "plug-in-grid":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5702,6 +6236,7 @@
    },
 "gimp-image-freeze-layers":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -5710,6 +6245,7 @@
    },
 "gimp-drawable-bpp":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -5719,6 +6255,7 @@
    },
 "gimp-text-layer-set-hint-style":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
@@ -5728,6 +6265,7 @@
    },
 "script-fu-lava":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5745,6 +6283,7 @@
    },
 "plug-in-antialias":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5755,6 +6294,7 @@
    },
 "gimp-heal-default":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -5765,6 +6305,7 @@
    },
 "file-pat-save-internal":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GimpParamImage"
@@ -5777,6 +6318,7 @@
    },
 "gimp-image-get-guide-position":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -5787,6 +6329,7 @@
    },
 "file-jpeg-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5808,6 +6351,7 @@
    },
 "gimp-text-layer-get-language":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -5817,6 +6361,7 @@
    },
 "gimp-detach-parasite":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -5825,6 +6370,7 @@
    },
 "gimp-gradient-duplicate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -5834,6 +6380,7 @@
    },
 "file-gz-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5846,6 +6393,7 @@
    },
 "plug-in-animationoptimize-diff":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5857,6 +6405,7 @@
    },
 "file-pix-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5869,6 +6418,7 @@
    },
 "plug-in-tile":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5884,6 +6434,7 @@
    },
 "gimp-selection-all":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -5892,6 +6443,7 @@
    },
 "gimp-fonts-close-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -5900,6 +6452,7 @@
    },
 "gimp-layer-set-lock-alpha":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamBoolean"
@@ -5909,6 +6462,7 @@
    },
 "gimp-layer-from-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayerMask"
       ],
@@ -5918,6 +6472,7 @@
    },
 "gimp-image-find-next-guide":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -5928,6 +6483,7 @@
    },
 "plug-in-oilify-enhanced":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5943,6 +6499,7 @@
    },
 "plug-in-goat-exercise-c":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -5953,6 +6510,7 @@
    },
 "gimp-plug-ins-query":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -5969,6 +6527,7 @@
    },
 "gimp-vectors-stroke-get-points":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -5982,6 +6541,7 @@
    },
 "gimp-plug-in-domain-register":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamObject"
@@ -5991,6 +6551,7 @@
    },
 "file-raw-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6005,6 +6566,7 @@
    },
 "gimp-brushes-set-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -6017,6 +6579,7 @@
    },
 "gimp-unit-get-identifier":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       ],
@@ -6026,6 +6589,7 @@
    },
 "gimp-item-detach-parasite":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -6035,6 +6599,7 @@
    },
 "file-raw-placeholder-panasonic-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -6045,6 +6610,7 @@
    },
 "gimp-layer-group-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -6054,6 +6620,7 @@
    },
 "gimp-brushes-get-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -6064,6 +6631,7 @@
    },
 "gimp-context-set-brush-aspect-ratio":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -6072,6 +6640,7 @@
    },
 "file-psp-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -6082,6 +6651,7 @@
    },
 "script-fu-ripply-anim":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6095,6 +6665,7 @@
    },
 "python-fu-accessGimp":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6107,6 +6678,7 @@
    },
 "gimp-context-get-line-cap-style":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -6115,6 +6687,7 @@
    },
 "gimp-edit-named-paste-as-new-image":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -6124,6 +6697,7 @@
    },
 "file-psd-load-merged":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -6134,6 +6708,7 @@
    },
 "gimp-image-grid-get-foreground-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -6143,6 +6718,7 @@
    },
 "gimp-unit-get-deletion-flag":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       ],
@@ -6152,6 +6728,7 @@
    },
 "plug-in-palettemap":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6162,6 +6739,7 @@
    },
 "plug-in-laplace":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6172,6 +6750,7 @@
    },
 "gimp-context-set-brush-default-hardness":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -6179,6 +6758,7 @@
    },
 "gimp-palette-entry-set-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -6189,6 +6769,7 @@
    },
 "gimp-image-width":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -6198,6 +6779,7 @@
    },
 "plug-in-polar-coords":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6213,6 +6795,7 @@
    },
 "file-bz2-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6225,6 +6808,7 @@
    },
 "plug-in-glasstile":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6237,6 +6821,7 @@
    },
 "gimp-channel-copy":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamChannel"
       ],
@@ -6246,6 +6831,7 @@
    },
 "file-raw-placeholder-sinar-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -6256,6 +6842,7 @@
    },
 "gimp-item-get-parent":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -6265,6 +6852,7 @@
    },
 "gimp-image-thaw-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -6273,6 +6861,7 @@
    },
 "file-fits-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6285,6 +6874,7 @@
    },
 "gimp-context-set-paint-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -6293,6 +6883,7 @@
    },
 "gimp-vectors-stroke-scale":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -6304,6 +6895,7 @@
    },
 "file-print-gtk":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6314,6 +6906,7 @@
    },
 "plug-in-mblur-inward":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6329,6 +6922,7 @@
    },
 "gimp-floating-sel-attach":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GimpParamDrawable"
@@ -6338,6 +6932,7 @@
    },
 "gimp-brush-get-angle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -6347,6 +6942,7 @@
    },
 "gimp-image-insert-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamLayer"
@@ -6358,6 +6954,7 @@
    },
 "gimp-text-layer-get-markup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -6367,6 +6964,7 @@
    },
 "plug-in-compose":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6382,6 +6980,7 @@
    },
 "gimp-context-set-line-cap-style":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -6390,6 +6989,7 @@
    },
 "gimp-palette-duplicate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -6399,6 +6999,7 @@
    },
 "gimp-edit-named-paste":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GimpParamString"
@@ -6410,6 +7011,7 @@
    },
 "gimp-image-select-ellipse":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -6423,6 +7025,7 @@
    },
 "file-tiff-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6437,6 +7040,7 @@
    },
 "gimp-drawable-sub-thumbnail":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -6456,6 +7060,7 @@
    },
 "gimp-buffer-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -6464,6 +7069,7 @@
    },
 "gimp-image-get-component-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -6474,6 +7080,7 @@
    },
 "gimp-context-get-ink-tilt-sensitivity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -6482,6 +7089,7 @@
    },
 "gimp-item-id-is-selection":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -6491,6 +7099,7 @@
    },
 "gimp-context-set-foreground":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamRGB"
       ],
@@ -6499,6 +7108,7 @@
    },
 "script-fu-sota-chrome-it":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6516,6 +7126,7 @@
    },
 "gimp-quit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamBoolean"
       ],
@@ -6524,6 +7135,7 @@
    },
 "gimp-image-convert-grayscale":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -6532,6 +7144,7 @@
    },
 "gimp-dodgeburn":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamDouble"
@@ -6545,6 +7158,7 @@
    },
 "gimp-context-set-diagonal-neighbors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamBoolean"
       ],
@@ -6553,6 +7167,7 @@
    },
 "plug-in-shift":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6565,6 +7180,7 @@
    },
 "gimp-online-docs-web-site":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -6573,6 +7189,7 @@
    },
 "gimp-context-get-sample-threshold-int":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -6581,6 +7198,7 @@
    },
 "gimp-buffer-get-width":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -6590,6 +7208,7 @@
    },
 "file-html-table-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6602,6 +7221,7 @@
    },
 "gimp-channel-combine-masks":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamChannel"
       , "GimpParamChannel"
@@ -6614,6 +7234,7 @@
    },
 "gimp-layer-set-show-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamBoolean"
@@ -6623,6 +7244,7 @@
    },
 "file-load-rgbe":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -6633,6 +7255,7 @@
    },
 "gimp-item-get-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -6642,6 +7265,7 @@
    },
 "gimp-file-load-thumbnail":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamObject"
       ],
@@ -6654,6 +7278,7 @@
    },
 "gimp-item-set-linked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -6663,6 +7288,7 @@
    },
 "gimp-gradient-is-editable":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -6672,6 +7298,7 @@
    },
 "gimp-progress-init":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamDisplay"
@@ -6681,6 +7308,7 @@
    },
 "gimp-pdb-set-proc-menu-label":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -6690,6 +7318,7 @@
    },
 "gimp-layer-add-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GimpParamLayerMask"
@@ -6699,6 +7328,7 @@
    },
 "gimp-image-get-resolution":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -6709,6 +7339,7 @@
    },
 "gimp-image-get-sample-point-position":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -6720,6 +7351,7 @@
    },
 "gimp-image-freeze-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -6728,6 +7360,7 @@
    },
 "gimp-channel-set-show-masked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamChannel"
       , "GParamBoolean"
@@ -6737,6 +7370,7 @@
    },
 "python-fu-test-no-shebang":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6747,6 +7381,7 @@
    },
 "gimp-pdb-get-proc-image-types":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -6756,6 +7391,7 @@
    },
 "plug-in-animationunoptimize":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6767,6 +7403,7 @@
    },
 "gimp-context-get-feather":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -6775,6 +7412,7 @@
    },
 "gimp-context-get-line-width":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -6783,6 +7421,7 @@
    },
 "plug-in-spheredesigner":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6793,6 +7432,7 @@
    },
 "gimp-help-using-web":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -6801,6 +7441,7 @@
    },
 "gimp-selection-shrink":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -6810,6 +7451,7 @@
    },
 "gimp-text-layer-get-letter-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -6819,6 +7461,7 @@
    },
 "gimp-context-set-transform-resize":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -6827,6 +7470,7 @@
    },
 "plug-in-applylens":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6841,6 +7485,7 @@
    },
 "script-fu-blend-anim":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6854,6 +7499,7 @@
    },
 "gimp-palette-delete-entry":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -6863,6 +7509,7 @@
    },
 "file-hgt-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -6874,6 +7521,7 @@
    },
 "file-xbm-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -6884,6 +7532,7 @@
    },
 "gimp-image-get-imported-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -6893,6 +7542,7 @@
    },
 "plug-in-gauss-iir":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6906,6 +7556,7 @@
    },
 "gimp-vectors-stroke-get-length":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -6917,6 +7568,7 @@
    },
 "gimp-image-undo-is-enabled":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -6926,6 +7578,7 @@
    },
 "plug-in-hsv-noise":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6940,6 +7593,7 @@
    },
 "gimp-progress-pulse":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -6947,6 +7601,7 @@
    },
 "plug-in-despeckle":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -6961,6 +7616,7 @@
    },
 "gimp-context-get-line-dash-offset":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -6969,6 +7625,7 @@
    },
 "gimp-palettes-set-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -6978,6 +7635,7 @@
    },
 "gimp-pdb-get-proc-attribution":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -6989,6 +7647,7 @@
    },
 "script-fu-coffee-stain":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7001,6 +7660,7 @@
    },
 "gimp-vectors-import-from-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamObject"
@@ -7014,6 +7674,7 @@
    },
 "plug-in-depth-merge":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7032,6 +7693,7 @@
    },
 "gimp-text-layer-get-base-direction":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -7041,6 +7703,7 @@
    },
 "plug-in-plasma":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7053,6 +7716,7 @@
    },
 "gimp-pdb-get-proc-menu-label":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -7062,6 +7726,7 @@
    },
 "gimp-image-grid-get-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -7072,6 +7737,7 @@
    },
 "gimp-drawable-mask-intersect":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -7085,6 +7751,7 @@
    },
 "gimp-gradient-get-custom-samples":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -7098,6 +7765,7 @@
    },
 "file-xmc-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7120,6 +7788,7 @@
    },
 "gimp-brush-set-angle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamDouble"
@@ -7130,6 +7799,7 @@
    },
 "gimp-pdb-get-proc-return-value":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -7140,6 +7810,7 @@
    },
 "gimp-layer-set-offsets":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamInt"
@@ -7150,6 +7821,7 @@
    },
 "gimp-edit-copy":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       , "GimpParamObjectArray"
@@ -7160,6 +7832,7 @@
    },
 "gimp-palette-rename":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -7170,6 +7843,7 @@
    },
 "file-dds-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7196,6 +7870,7 @@
    },
 "gimp-selection-grow":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -7205,6 +7880,7 @@
    },
 "gimp-selection-is-empty":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -7214,6 +7890,7 @@
    },
 "file-psd-load-thumb":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamObject"
       , "GParamInt"
@@ -7228,6 +7905,7 @@
    },
 "gimp-context-set-brush-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -7236,6 +7914,7 @@
    },
 "python-fu-test-color":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7246,6 +7925,7 @@
    },
 "file-sgi-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7259,6 +7939,7 @@
    },
 "gimp-gradients-refresh":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -7266,6 +7947,7 @@
    },
 "plug-in-pixelize2":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7278,6 +7960,7 @@
    },
 "gimp-image-grid-set-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamDouble"
@@ -7288,6 +7971,7 @@
    },
 "gimp-image-remove-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamVectors"
@@ -7297,6 +7981,7 @@
    },
 "gimp-image-thaw-channels":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -7305,6 +7990,7 @@
    },
 "plug-in-plug-in-details":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       ],
@@ -7313,6 +7999,7 @@
    },
 "gimp-layer-get-show-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -7322,6 +8009,7 @@
    },
 "gimp-help-using-simpleobjects":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -7330,6 +8018,7 @@
    },
 "gimp-drawable-get-pixel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -7342,6 +8031,7 @@
    },
 "gimp-text-layer-set-font":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GimpParamString"
@@ -7351,6 +8041,7 @@
    },
 "plug-in-fractalexplorer":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7380,6 +8071,7 @@
    },
 "gimp-buffers-get-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -7390,6 +8082,7 @@
    },
 "gimp-layer-resize":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamInt"
@@ -7402,6 +8095,7 @@
    },
 "gimp-fonts-set-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -7411,6 +8105,7 @@
    },
 "gimp-fonts-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -7421,6 +8116,7 @@
    },
 "gimp-palette-is-editable":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -7430,6 +8126,7 @@
    },
 "gimp-brush-is-generated":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -7439,6 +8136,7 @@
    },
 "gimp-item-transform-flip":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamDouble"
@@ -7452,6 +8150,7 @@
    },
 "gimp-drawable-foreground-extract":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -7462,6 +8161,7 @@
    },
 "plug-in-spread":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7474,6 +8174,7 @@
    },
 "plug-in-rgb-noise":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7490,6 +8191,7 @@
    },
 "gimp-vectors-bezier-stroke-conicto":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -7503,6 +8205,7 @@
    },
 "gimp-item-id-is-channel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -7512,6 +8215,7 @@
    },
 "script-fu-make-brush-rectangular":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -7524,6 +8228,7 @@
    },
 "gimp-context-set-line-dash-pattern":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       , "GimpParamFloatArray"
@@ -7533,6 +8238,7 @@
    },
 "gimp-progress-set-text":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -7541,6 +8247,7 @@
    },
 "gimp-layer-set-edit-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamBoolean"
@@ -7550,6 +8257,7 @@
    },
 "gimp-channel-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -7564,6 +8272,7 @@
    },
 "plug-in-solid-noise":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7580,6 +8289,7 @@
    },
 "gimp-help-using-fileformats":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -7588,6 +8298,7 @@
    },
 "gimp-image-get-layers":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -7598,6 +8309,7 @@
    },
 "gimp-image-base-type":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -7607,6 +8319,7 @@
    },
 "plug-in-colors-channel-mixer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7627,6 +8340,7 @@
    },
 "gimp-item-id-is-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -7636,6 +8350,7 @@
    },
 "gimp-text-layer-get-indent":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -7645,6 +8360,7 @@
    },
 "plug-in-bump-map-tiled":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7666,6 +8382,7 @@
    },
 "gimp-text-layer-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -7679,6 +8396,7 @@
    },
 "gimp-drawable-mask-bounds":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -7692,6 +8410,7 @@
    },
 "gimp-plug-in-get-pdb-error-handler":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -7700,6 +8419,7 @@
    },
 "gimp-context-get-brush-force":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -7708,6 +8428,7 @@
    },
 "extension-gimp-help":
    {
+   "type":  "GIMP Extension",
    "in": [
       "GParamInt"
       , "GimpParamStringArray"
@@ -7719,6 +8440,7 @@
    },
 "gimp-get-module-load-inhibit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -7727,6 +8449,7 @@
    },
 "gimp-file-load":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GParamObject"
@@ -7737,6 +8460,7 @@
    },
 "goat-exercise-python":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7747,6 +8471,7 @@
    },
 "gimp-image-set-color-profile-from-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamObject"
@@ -7756,6 +8481,7 @@
    },
 "gimp-pencil":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -7766,6 +8492,7 @@
    },
 "gimp-text-layer-get-hint-style":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -7775,6 +8502,7 @@
    },
 "script-fu-selection-to-pattern":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7787,6 +8515,7 @@
    },
 "gimp-online-bugs-features":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -7795,6 +8524,7 @@
    },
 "gimp-drawable-edit-stroke-selection":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -7803,6 +8533,7 @@
    },
 "file-raw-placeholder-cine-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -7813,6 +8544,7 @@
    },
 "gimp-xcf-load":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GParamObject"
@@ -7823,6 +8555,7 @@
    },
 "gimp-image-get-colormap":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -7833,6 +8566,7 @@
    },
 "plug-in-displace-polar":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7850,6 +8584,7 @@
    },
 "plug-in-cartoon":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7862,6 +8597,7 @@
    },
 "file-faxg3-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -7872,6 +8608,7 @@
    },
 "python-fu-foo":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7882,6 +8619,7 @@
    },
 "gimp-image-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -7890,6 +8628,7 @@
    },
 "file-raw-placeholder-mos-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -7900,6 +8639,7 @@
    },
 "gimp-image-detach-parasite":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -7909,6 +8649,7 @@
    },
 "gimp-layer-get-lock-alpha":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -7918,6 +8659,7 @@
    },
 "gimp-image-insert-channel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamChannel"
@@ -7929,6 +8671,7 @@
    },
 "gimp-unit-get-number-of-built-in-units":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -7937,6 +8680,7 @@
    },
 "gimp-image-get-layer-by-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -7947,6 +8691,7 @@
    },
 "gimp-pdb-set-file-proc-save-handler":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -7957,6 +8702,7 @@
    },
 "gimp-brushes-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -7970,6 +8716,7 @@
    },
 "plug-in-decompose":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -7987,6 +8734,7 @@
    },
 "file-raw-placeholder-srw-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -7997,6 +8745,7 @@
    },
 "gimp-progress-get-window-handle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8005,6 +8754,7 @@
    },
 "gimp-image-duplicate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8014,6 +8764,7 @@
    },
 "script-fu-drop-shadow":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8030,6 +8781,7 @@
    },
 "gimp-item-get-parasite":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -8040,6 +8792,7 @@
    },
 "gimp-image-get-component-active":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -8050,6 +8803,7 @@
    },
 "plug-in-web-browser":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamString"
       ],
@@ -8058,6 +8812,7 @@
    },
 "gimp-item-transform-2d":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamDouble"
@@ -8074,6 +8829,7 @@
    },
 "gimp-image-get-active-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8083,6 +8839,7 @@
    },
 "gimp-context-set-gradient-blend-color-space":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -8091,6 +8848,7 @@
    },
 "gimp-text-layer-get-text":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -8100,6 +8858,7 @@
    },
 "gimp-context-get-brush":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8108,6 +8867,7 @@
    },
 "gimp-drawable-levels-stretch":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -8116,6 +8876,7 @@
    },
 "gimp-item-transform-matrix":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamDouble"
@@ -8134,6 +8895,7 @@
    },
 "gimp-drawable-set-pixel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -8146,6 +8908,7 @@
    },
 "gimp-vectors-stroke-translate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -8157,6 +8920,7 @@
    },
 "gimp-brush-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -8165,6 +8929,7 @@
    },
 "gimp-image-get-precision":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8174,6 +8939,7 @@
    },
 "gimp-progress-uninstall":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -8182,6 +8948,7 @@
    },
 "file-sunras-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -8192,6 +8959,7 @@
    },
 "gimp-item-id-is-text-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -8201,6 +8969,7 @@
    },
 "gimp-palette-export-php":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -8211,6 +8980,7 @@
    },
 "gimp-context-get-ink-size-sensitivity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8219,6 +8989,7 @@
    },
 "gimp-context-get-brush-angle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8227,6 +8998,7 @@
    },
 "file-psd-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8239,6 +9011,7 @@
    },
 "gimp-image-add-hguide":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -8249,6 +9022,7 @@
    },
 "gimp-image-convert-rgb":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8257,6 +9031,7 @@
    },
 "gimp-context-get-paint-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8265,6 +9040,7 @@
    },
 "file-cel-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -8276,6 +9052,7 @@
    },
 "gimp-layer-get-edit-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -8285,6 +9062,7 @@
    },
 "gimp-image-get-guide-orientation":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -8295,6 +9073,7 @@
    },
 "gimp-get-parasite":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -8304,6 +9083,7 @@
    },
 "file-gbr-save-internal":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GimpParamImage"
@@ -8317,6 +9097,7 @@
    },
 "file-pat-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8330,6 +9111,7 @@
    },
 "gimp-item-set-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamUInt"
@@ -8339,6 +9121,7 @@
    },
 "gimp-image-unset-active-channel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8347,6 +9130,7 @@
    },
 "gimp-image-raise-item-to-top":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -8356,6 +9140,7 @@
    },
 "file-png-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8377,6 +9162,7 @@
    },
 "file-pdf-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8395,6 +9181,7 @@
    },
 "gimp-smudge":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamDouble"
@@ -8406,6 +9193,7 @@
    },
 "script-fu-gradient-example":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamDouble"
@@ -8417,6 +9205,7 @@
    },
 "file-ico-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -8427,6 +9216,7 @@
    },
 "plug-in-mblur":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8442,6 +9232,7 @@
    },
 "python-fu-test-upcast":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8452,6 +9243,7 @@
    },
 "gimp-vectors-remove-stroke":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -8461,6 +9253,7 @@
    },
 "gimp-image-undo-freeze":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8470,6 +9263,7 @@
    },
 "script-fu-perspective-shadow":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8488,6 +9282,7 @@
    },
 "gimp-image-set-active-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamVectors"
@@ -8497,6 +9292,7 @@
    },
 "gimp-palette-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -8506,6 +9302,7 @@
    },
 "plug-in-script-fu-console":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       ],
@@ -8514,6 +9311,7 @@
    },
 "gimp-context-get-brush-aspect-ratio":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8522,6 +9320,7 @@
    },
 "plug-in-diffraction":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8544,6 +9343,7 @@
    },
 "gimp-context-push":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8551,6 +9351,7 @@
    },
 "gimp-layer-set-apply-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamBoolean"
@@ -8560,6 +9361,7 @@
    },
 "gimp-online-developer-web-site":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -8568,6 +9370,7 @@
    },
 "plug-in-metadata-viewer":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8577,6 +9380,7 @@
    },
 "gimp-convolve-default":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -8587,6 +9391,7 @@
    },
 "plug-in-small-tiles":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8598,6 +9403,7 @@
    },
 "gimp-unit-get-abbreviation":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       ],
@@ -8607,6 +9413,7 @@
    },
 "file-gih-load":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GParamObject"
@@ -8617,6 +9424,7 @@
    },
 "gimp-pdb-set-file-proc-load-handler":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -8628,6 +9436,7 @@
    },
 "script-fu-distress-selection":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8644,6 +9453,7 @@
    },
 "file-openraster-load-thumb":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamObject"
       , "GParamInt"
@@ -8658,6 +9468,7 @@
    },
 "gimp-context-set-gradient":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -8666,6 +9477,7 @@
    },
 "gimp-drawable-invert":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamBoolean"
@@ -8675,6 +9487,7 @@
    },
 "gimp-image-get-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8684,6 +9497,7 @@
    },
 "gimp-display-get-window-handle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDisplay"
       ],
@@ -8693,6 +9507,7 @@
    },
 "gimp-brush-rename":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -8703,6 +9518,7 @@
    },
 "gimp-image-freeze-channels":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8711,6 +9527,7 @@
    },
 "plug-in-align-layers":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8721,6 +9538,7 @@
    },
 "gimp-image-get-channel-by-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -8731,6 +9549,7 @@
    },
 "gimp-context-get-ink-blob-aspect-ratio":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8739,6 +9558,7 @@
    },
 "gimp-image-add-sample-point":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -8750,6 +9570,7 @@
    },
 "gimp-gradient-segment-range-set-blending-function":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -8761,6 +9582,7 @@
    },
 "script-fu-tile-blur":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8775,6 +9597,7 @@
    },
 "gimp-image-height":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8784,6 +9607,7 @@
    },
 "gimp-selection-float":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       , "GimpParamObjectArray"
@@ -8796,6 +9620,7 @@
    },
 "file-pnm-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8809,6 +9634,7 @@
    },
 "gimp-brush-get-radius":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -8818,6 +9644,7 @@
    },
 "gimp-drawable-threshold":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -8829,6 +9656,7 @@
    },
 "gimp-item-transform-translate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamDouble"
@@ -8840,6 +9668,7 @@
    },
 "gimp-image-get-unit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8849,6 +9678,7 @@
    },
 "gimp-image-get-active-drawable":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -8858,6 +9688,7 @@
    },
 "gimp-context-get-gradient":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8866,6 +9697,7 @@
    },
 "gimp-image-get-layer-by-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -8876,6 +9708,7 @@
    },
 "file-raw-placeholder-sony-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -8886,6 +9719,7 @@
    },
 "file-raw-placeholder-orf-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -8896,6 +9730,7 @@
    },
 "gimp-get-color-configuration":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8904,6 +9739,7 @@
    },
 "gimp-context-get-background":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8912,6 +9748,7 @@
    },
 "gimp-image-set-tattoo-state":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -8921,6 +9758,7 @@
    },
 "plug-in-autocrop-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8931,6 +9769,7 @@
    },
 "file-svg-load-thumb":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamObject"
       , "GParamInt"
@@ -8945,6 +9784,7 @@
    },
 "gimp-context-get-palette":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8953,6 +9793,7 @@
    },
 "gimp-context-get-diagonal-neighbors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -8961,6 +9802,7 @@
    },
 "gimp-context-set-feather-radius":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       , "GParamDouble"
@@ -8970,6 +9812,7 @@
    },
 "gimp-vectors-copy":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       ],
@@ -8979,6 +9822,7 @@
    },
 "plug-in-imagemap":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -8989,6 +9833,7 @@
    },
 "gimp-display-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDisplay"
       ],
@@ -8997,6 +9842,7 @@
    },
 "file-openraster-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -9007,6 +9853,7 @@
    },
 "file-xz-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -9017,6 +9864,7 @@
    },
 "gimp-help-using-docks":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -9025,6 +9873,7 @@
    },
 "gimp-gradient-get-number-of-segments":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -9034,6 +9883,7 @@
    },
 "gimp-image-get-vectors-by-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -9044,6 +9894,7 @@
    },
 "script-fu-helloworld":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -9056,6 +9907,7 @@
    },
 "plug-in-rotate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9068,6 +9920,7 @@
    },
 "gimp-vectors-stroke-flip":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -9079,6 +9932,7 @@
    },
 "plug-in-nlfilt":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9092,6 +9946,7 @@
    },
 "gimp-context-set-palette":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -9100,6 +9955,7 @@
    },
 "plug-in-colortoalpha":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9111,6 +9967,7 @@
    },
 "gimp-context-set-brush-hardness":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -9119,6 +9976,7 @@
    },
 "gimp-convolve":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamDouble"
@@ -9131,6 +9989,7 @@
    },
 "gimp-gradient-segment-set-middle-pos":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -9142,6 +10001,7 @@
    },
 "gimp-context-get-ink-speed-sensitivity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -9150,6 +10010,7 @@
    },
 "file-gbr-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9164,6 +10025,7 @@
    },
 "gimp-context-set-ink-blob-aspect-ratio":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -9172,6 +10034,7 @@
    },
 "gimp-image-delete-guide":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -9181,6 +10044,7 @@
    },
 "file-dicom-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9193,6 +10057,7 @@
    },
 "gimp-context-get-gradient-reverse":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -9201,6 +10066,7 @@
    },
 "gimp-context-get-brush-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -9209,6 +10075,7 @@
    },
 "gimp-image-get-active-channel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -9218,6 +10085,7 @@
    },
 "plug-in-sel2path":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9248,6 +10116,7 @@
    },
 "gimp-context-get-gradient-repeat-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -9256,6 +10125,7 @@
    },
 "file-raw-placeholder-x3f-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -9266,6 +10136,7 @@
    },
 "gimp-image-grid-set-background-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamRGB"
@@ -9275,6 +10146,7 @@
    },
 "plug-in-checkerboard":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9287,6 +10159,7 @@
    },
 "gimp-drawable-get-format":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -9296,6 +10169,7 @@
    },
 "gimp-gradient-segment-range-replicate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -9307,6 +10181,7 @@
    },
 "gimp-drawable-update":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -9319,6 +10194,7 @@
    },
 "plug-in-autostretch-hsv":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9329,6 +10205,7 @@
    },
 "gimp-file-load-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GimpParamImage"
@@ -9340,6 +10217,7 @@
    },
 "gimp-selection-none":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -9348,6 +10226,7 @@
    },
 "plug-in-autocrop":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9358,6 +10237,7 @@
    },
 "gimp-image-delete-sample-point":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -9367,6 +10247,7 @@
    },
 "script-fu-line-nova":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9381,6 +10262,7 @@
    },
 "gimp-vectors-stroke-get-point-at-dist":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -9396,6 +10278,7 @@
    },
 "gimp-drawable-desaturate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -9405,6 +10288,7 @@
    },
 "gimp-progress-update":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -9413,6 +10297,7 @@
    },
 "gimp-brush-get-spikes":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -9422,6 +10307,7 @@
    },
 "gimp-attach-parasite":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamParasite"
       ],
@@ -9430,6 +10316,7 @@
    },
 "plug-in-ripple":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9447,6 +10334,7 @@
    },
 "python-fu-test-export-import":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9460,6 +10348,7 @@
    },
 "gimp-drawable-edit-bucket-fill":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -9471,6 +10360,7 @@
    },
 "gimp-layer-new-from-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamImage"
@@ -9482,6 +10372,7 @@
    },
 "gimp-text-layer-set-indent":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamDouble"
@@ -9491,6 +10382,7 @@
    },
 "gimp-palette-get-colors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -9501,6 +10393,7 @@
    },
 "plug-in-convmatrix":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9519,6 +10412,7 @@
    },
 "gimp-image-get-color-profile":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -9529,6 +10423,7 @@
    },
 "gimp-item-transform-perspective":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamDouble"
@@ -9546,6 +10441,7 @@
    },
 "gimp-gradient-segment-set-left-pos":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -9557,6 +10453,7 @@
    },
 "gimp-get-default-comment":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -9565,6 +10462,7 @@
    },
 "gimp-item-get-expanded":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -9574,6 +10472,7 @@
    },
 "gimp-context-get-brush-size":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -9582,6 +10481,7 @@
    },
 "gimp-text-layer-set-line-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamDouble"
@@ -9591,6 +10491,7 @@
    },
 "gimp-layer-set-blend-space":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
@@ -9600,6 +10501,7 @@
    },
 "plug-in-waves":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9615,6 +10517,7 @@
    },
 "gimp-item-attach-parasite":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamParasite"
@@ -9624,6 +10527,7 @@
    },
 "plug-in-maze":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9641,6 +10545,7 @@
    },
 "gimp-context-get-transform-resize":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -9649,6 +10554,7 @@
    },
 "gimp-context-set-antialias":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamBoolean"
       ],
@@ -9657,6 +10563,7 @@
    },
 "plug-in-threshold-alpha":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9668,6 +10575,7 @@
    },
 "gimp-context-get-interpolation":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -9676,6 +10584,7 @@
    },
 "plug-in-sample-colorize":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9696,6 +10605,7 @@
    },
 "gimp-item-set-lock-content":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -9705,6 +10615,7 @@
    },
 "file-jpeg-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -9715,6 +10626,7 @@
    },
 "gimp-getpid":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -9723,6 +10635,7 @@
    },
 "gimp-gradient-segment-get-left-pos":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -9733,6 +10646,7 @@
    },
 "gimp-display-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -9742,6 +10656,7 @@
    },
 "script-fu-predator":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9757,6 +10672,7 @@
    },
 "file-gz-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -9767,6 +10683,7 @@
    },
 "gimp-image-undo-disable":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -9776,6 +10693,7 @@
    },
 "gimp-item-get-parasite-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -9786,6 +10704,7 @@
    },
 "file-pix-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -9796,6 +10715,7 @@
    },
 "gimp-unit-get-digits":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamUnit"
       ],
@@ -9805,6 +10725,7 @@
    },
 "gimp-drawable-histogram":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -9822,6 +10743,7 @@
    },
 "gimp-drawable-hue-saturation":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamEnum"
@@ -9835,6 +10757,7 @@
    },
 "script-fu-spinning-globe":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9850,6 +10773,7 @@
    },
 "plug-in-hot":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9863,6 +10787,7 @@
    },
 "gimp-text-layer-set-font-size":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamDouble"
@@ -9873,6 +10798,7 @@
    },
 "gimp-layer-new-from-drawable":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GimpParamImage"
@@ -9883,6 +10809,7 @@
    },
 "gimp-text-layer-get-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -9892,6 +10819,7 @@
    },
 "gimp-edit-paste":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamBoolean"
@@ -9902,6 +10830,7 @@
    },
 "plug-in-destripe":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9913,6 +10842,7 @@
    },
 "gimp-palette-entry-get-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -9923,6 +10853,7 @@
    },
 "gimp-context-set-dynamics":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -9931,6 +10862,7 @@
    },
 "python-fu-palette-offset":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -9942,6 +10874,7 @@
    },
 "gimp-palette-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -9950,6 +10883,7 @@
    },
 "plug-in-illusion":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -9962,6 +10896,7 @@
    },
 "gimp-image-find-next-sample-point":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamUInt"
@@ -9972,6 +10907,7 @@
    },
 "gimp-text-layer-set-text":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GimpParamString"
@@ -9981,6 +10917,7 @@
    },
 "gimp-gradient-segment-range-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -9991,6 +10928,7 @@
    },
 "gimp-vectors-bezier-stroke-lineto":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -10002,6 +10940,7 @@
    },
 "file-raw-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -10012,6 +10951,7 @@
    },
 "gimp-context-get-line-dash-pattern":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10021,6 +10961,7 @@
    },
 "script-fu-slide":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10036,6 +10977,7 @@
    },
 "plug-in-map-object":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10092,6 +11034,7 @@
    },
 "gimp-context-get-opacity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10100,6 +11043,7 @@
    },
 "gimp-image-clean-all":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -10108,6 +11052,7 @@
    },
 "script-fu-addborder":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10122,6 +11067,7 @@
    },
 "gimp-brush-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -10131,6 +11077,7 @@
    },
 "gimp-item-id-is-drawable":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -10140,6 +11087,7 @@
    },
 "gimp-image-grid-set-foreground-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamRGB"
@@ -10149,6 +11097,7 @@
    },
 "gimp-context-get-dynamics":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10157,6 +11106,7 @@
    },
 "gimp-buffer-get-height":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -10166,6 +11116,7 @@
    },
 "file-fli-info":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamObject"
       ],
@@ -10177,6 +11128,7 @@
    },
 "gimp-layer-get-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -10186,6 +11138,7 @@
    },
 "plug-in-vinvert":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10196,6 +11149,7 @@
    },
 "script-fu-selection-rounded-rectangle":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10208,6 +11162,7 @@
    },
 "plug-in-script-fu-server":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -10219,6 +11174,7 @@
    },
 "plug-in-guillotine":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10231,6 +11187,7 @@
    },
 "gimp-brush-get-aspect-ratio":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -10240,6 +11197,7 @@
    },
 "gimp-image-crop":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -10252,6 +11210,7 @@
    },
 "gimp-drawable-edit-clear":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -10260,6 +11219,7 @@
    },
 "gimp-item-id-is-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamInt"
       ],
@@ -10269,6 +11229,7 @@
    },
 "gimp-context-set-opacity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -10277,6 +11238,7 @@
    },
 "file-bz2-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -10287,6 +11249,7 @@
    },
 "gimp-dodgeburn-default":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -10297,6 +11260,7 @@
    },
 "gimp-context-get-pattern":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10305,6 +11269,7 @@
    },
 "gimp-patterns-get-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -10315,6 +11280,7 @@
    },
 "gimp-patterns-popup":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -10325,6 +11291,7 @@
    },
 "plug-in-randomize-pick":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10339,6 +11306,7 @@
    },
 "file-xmc-load-thumb":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamObject"
       , "GParamInt"
@@ -10353,6 +11321,7 @@
    },
 "plug-in-dilate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10369,6 +11338,7 @@
    },
 "gimp-context-set-mypaint-brush":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -10377,6 +11347,7 @@
    },
 "gimp-context-set-paint-method":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -10385,6 +11356,7 @@
    },
 "plug-in-gauss-rle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10398,6 +11370,7 @@
    },
 "file-fits-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -10408,6 +11381,7 @@
    },
 "gimp-image-convert-color-profile-from-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamObject"
@@ -10419,6 +11393,7 @@
    },
 "gimp-vectors-export-to-string":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamVectors"
@@ -10429,6 +11404,7 @@
    },
 "gimp-debug-timer-start":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10436,6 +11412,7 @@
    },
 "gimp-text-layer-set-letter-spacing":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamDouble"
@@ -10445,6 +11422,7 @@
    },
 "gimp-image-get-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -10454,6 +11432,7 @@
    },
 "gimp-context-swap-colors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10461,6 +11440,7 @@
    },
 "file-tiff-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -10471,6 +11451,7 @@
    },
 "gimp-image-select-round-rectangle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"
@@ -10486,6 +11467,7 @@
    },
 "plug-in-noisify":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10501,6 +11483,7 @@
    },
 "file-xwd-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10513,6 +11496,7 @@
    },
 "gimp-context-set-pattern":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -10521,6 +11505,7 @@
    },
 "gimp-drawable-is-indexed":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -10530,6 +11515,7 @@
    },
 "gimp-gradient-segment-set-left-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -10541,6 +11527,7 @@
    },
 "gimp-buffer-get-bytes":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -10550,6 +11537,7 @@
    },
 "file-raw-placeholder-phaseone-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -10560,6 +11548,7 @@
    },
 "gimp-context-set-sample-threshold":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -10568,6 +11557,7 @@
    },
 "gimp-image-thumbnail":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -10583,6 +11573,7 @@
    },
 "gimp-palette-export-python":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -10593,6 +11584,7 @@
    },
 "gimp-context-get-antialias":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10601,6 +11593,7 @@
    },
 "script-fu-refresh":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -10609,6 +11602,7 @@
    },
 "gimp-gradient-segment-set-right-pos":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -10620,6 +11614,7 @@
    },
 "gimp-image-set-file":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamObject"
@@ -10629,6 +11624,7 @@
    },
 "plug-in-recompose":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10639,6 +11635,7 @@
    },
 "gimp-online-main-web-site":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       ],
@@ -10647,6 +11644,7 @@
    },
 "gimp-pdb-get-data":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -10657,6 +11655,7 @@
    },
 "gimp-layer-get-apply-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -10666,6 +11665,7 @@
    },
 "gimp-vectors-stroke-close":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamVectors"
       , "GParamInt"
@@ -10675,6 +11675,7 @@
    },
 "gimp-text-layer-set-base-direction":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamEnum"
@@ -10684,6 +11685,7 @@
    },
 "plug-in-apply-canvas":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10696,6 +11698,7 @@
    },
 "gimp-layer-flatten":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -10704,6 +11707,7 @@
    },
 "gimp-selection-value":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -10715,6 +11719,7 @@
    },
 "plug-in-exchange":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10734,6 +11739,7 @@
    },
 "gimp-version":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10742,6 +11748,7 @@
    },
 "gimp-layer-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -10757,6 +11764,7 @@
    },
 "gimp-brush-set-radius":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamDouble"
@@ -10767,6 +11775,7 @@
    },
 "python-fu-mega-test-gimp":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10777,6 +11786,7 @@
    },
 "gimp-text-layer-get-font-size":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -10787,6 +11797,7 @@
    },
 "file-tga-save":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10801,6 +11812,7 @@
    },
 "gimp-text-layer-set-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GimpParamRGB"
@@ -10810,6 +11822,7 @@
    },
 "gimp-pdb-set-proc-image-types":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GimpParamString"
@@ -10819,6 +11832,7 @@
    },
 "gimp-image-set-unit":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamUnit"
@@ -10828,6 +11842,7 @@
    },
 "gimp-context-get-ink-blob-angle":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10836,6 +11851,7 @@
    },
 "gimp-drawable-thumbnail":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamInt"
@@ -10851,6 +11867,7 @@
    },
 "file-gex-load":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GParamObject"
@@ -10861,6 +11878,7 @@
    },
 "file-raw-placeholder-canon-load":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamObject"
@@ -10871,6 +11889,7 @@
    },
 "file-jpeg-load-thumb":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamObject"
       , "GParamInt"
@@ -10885,6 +11904,7 @@
    },
 "gimp-context-pop":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10892,6 +11912,7 @@
    },
 "plug-in-displace":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10909,6 +11930,7 @@
    },
 "file-gih-save-internal":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamEnum"
       , "GimpParamImage"
@@ -10924,6 +11946,7 @@
    },
 "gimp-palette-entry-set-color":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       , "GParamInt"
@@ -10934,6 +11957,7 @@
    },
 "script-fu-carve-it":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -10946,6 +11970,7 @@
    },
 "plug-in-script-fu-eval":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -10955,6 +11980,7 @@
    },
 "gimp-channel-get-show-masked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamChannel"
       ],
@@ -10964,6 +11990,7 @@
    },
 "gimp-context-set-gradient-fg-bg-hsv-cw":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10971,6 +11998,7 @@
    },
 "gimp-context-set-gradient-fg-transparent":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -10978,6 +12006,7 @@
    },
 "file-glob":
    {
+   "type":  "GIMP Plug-In",
    "in": [
       "GParamString"
       , "GParamBoolean"
@@ -10989,6 +12018,7 @@
    },
 "plug-in-papertile":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       , "GimpParamImage"
@@ -11007,6 +12037,7 @@
    },
 "gimp-image-set-color-profile":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -11017,6 +12048,7 @@
    },
 "script-fu-font-map":
    {
+   "type":  "Temporary Procedure",
    "in": [
       "GParamEnum"
       , "GParamString"
@@ -11032,6 +12064,7 @@
    },
 "gimp-vectors-set-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -11041,6 +12074,7 @@
    },
 "gimp-palette-swap-colors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11048,6 +12082,7 @@
    },
 "gimp-layer-set-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -11057,6 +12092,7 @@
    },
 "gimp-brushes-set-opacity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamDouble"
       ],
@@ -11065,6 +12101,7 @@
    },
 "gimp-channel-get-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11074,6 +12111,7 @@
    },
 "gimp-undo-push-group-end":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11082,6 +12120,7 @@
    },
 "gimp-channel-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11090,6 +12129,7 @@
    },
 "gimp-drawable-parasite-find":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -11100,6 +12140,7 @@
    },
 "gimp-drawable-get-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11109,6 +12150,7 @@
    },
 "gimp-drawable-get-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11118,6 +12160,7 @@
    },
 "gimp-parasite-attach":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamParasite"
       ],
@@ -11126,6 +12169,7 @@
    },
 "gimp-layer-set-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamUInt"
@@ -11135,6 +12179,7 @@
    },
 "gimp-drawable-set-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -11144,6 +12189,7 @@
    },
 "gimp-drawable-bytes":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       ],
@@ -11153,6 +12199,7 @@
    },
 "gimp-drawable-parasite-attach":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamParasite"
@@ -11162,6 +12209,7 @@
    },
 "gimp-gradients-get-gradient":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11170,6 +12218,7 @@
    },
 "gimp-layer-get-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11179,6 +12228,7 @@
    },
 "gimp-palette-set-foreground":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamRGB"
       ],
@@ -11187,6 +12237,7 @@
    },
 "gimp-vectors-set-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -11196,6 +12247,7 @@
    },
 "gimp-image-raise-channel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11205,6 +12257,7 @@
    },
 "gimp-vectors-parasite-find":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -11215,6 +12268,7 @@
    },
 "gimp-palette-set-default-colors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11222,6 +12276,7 @@
    },
 "gimp-drawable-set-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamUInt"
@@ -11231,6 +12286,7 @@
    },
 "gimp-vectors-set-linked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -11240,6 +12296,7 @@
    },
 "gimp-image-parasite-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11250,6 +12307,7 @@
    },
 "gimp-layer-get-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11259,6 +12317,7 @@
    },
 "gimp-drawable-get-image":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11268,6 +12327,7 @@
    },
 "gimp-image-get-channel-position":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11278,6 +12338,7 @@
    },
 "gimp-palette-set-background":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamRGB"
       ],
@@ -11286,6 +12347,7 @@
    },
 "gimp-parasite-find":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11295,6 +12357,7 @@
    },
 "gimp-channel-get-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11304,6 +12367,7 @@
    },
 "gimp-vectors-get-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11313,6 +12377,7 @@
    },
 "gimp-drawable-get-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11322,6 +12387,7 @@
    },
 "gimp-image-parasite-detach":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -11331,6 +12397,7 @@
    },
 "gimp-vectors-get-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11340,6 +12407,7 @@
    },
 "gimp-brushes-set-brush":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11348,6 +12416,7 @@
    },
 "gimp-brushes-set-paint-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GParamEnum"
       ],
@@ -11356,6 +12425,7 @@
    },
 "gimp-image-active-drawable":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11365,6 +12435,7 @@
    },
 "gimp-vectors-get-image":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11374,6 +12445,7 @@
    },
 "gimp-channel-ops-duplicate":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11383,6 +12455,7 @@
    },
 "gimp-layer-get-linked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11392,6 +12465,7 @@
    },
 "gimp-edit-named-paste-as-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11401,6 +12475,7 @@
    },
 "gimp-palette-refresh":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11408,6 +12483,7 @@
    },
 "gimp-palette-get-foreground":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11416,6 +12492,7 @@
    },
 "gimp-layer-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11424,6 +12501,7 @@
    },
 "gimp-channel-set-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -11433,6 +12511,7 @@
    },
 "gimp-gradients-get-active":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11441,6 +12520,7 @@
    },
 "gimp-palettes-set-palette":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11449,6 +12529,7 @@
    },
 "gimp-color-picker":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -11465,6 +12546,7 @@
    },
 "gimp-vectors-get-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11474,6 +12556,7 @@
    },
 "gimp-image-lower-channel":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11483,6 +12566,7 @@
    },
 "gimp-gradients-set-gradient":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11491,6 +12575,7 @@
    },
 "gimp-brushes-get-opacity":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11499,6 +12584,7 @@
    },
 "gimp-drawable-set-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -11508,6 +12594,7 @@
    },
 "gimp-image-raise-layer-to-top":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11517,6 +12604,7 @@
    },
 "gimp-drawable-get-linked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11526,6 +12614,7 @@
    },
 "gimp-image-lower-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11535,6 +12624,7 @@
    },
 "gimp-selection-clear":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11543,6 +12633,7 @@
    },
 "gimp-image-set-cmap":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -11553,6 +12644,7 @@
    },
 "gimp-palette-get-background":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11561,6 +12653,7 @@
    },
 "gimp-patterns-set-pattern":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11569,6 +12662,7 @@
    },
 "gimp-image-raise-layer":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11578,6 +12672,7 @@
    },
 "gimp-layer-set-preserve-trans":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       , "GParamBoolean"
@@ -11587,6 +12682,7 @@
    },
 "gimp-channel-set-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamUInt"
@@ -11596,6 +12692,7 @@
    },
 "gimp-channel-ops-offset":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamDrawable"
       , "GParamBoolean"
@@ -11608,6 +12705,7 @@
    },
 "gimp-layer-set-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -11617,6 +12715,7 @@
    },
 "gimp-convert-rgb":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11625,6 +12724,7 @@
    },
 "gimp-patterns-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11635,6 +12735,7 @@
    },
 "gimp-brushes-get-paint-mode":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11643,6 +12744,7 @@
    },
 "gimp-layer-get-preserve-trans":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -11652,6 +12754,7 @@
    },
 "gimp-image-get-layer-position":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11662,6 +12765,7 @@
    },
 "gimp-channel-set-visible":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -11671,6 +12775,7 @@
    },
 "gimp-image-lower-layer-to-bottom":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11680,6 +12785,7 @@
    },
 "gimp-image-raise-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11689,6 +12795,7 @@
    },
 "gimp-layer-set-linked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -11698,6 +12805,7 @@
    },
 "gimp-channel-get-name":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11707,6 +12815,7 @@
    },
 "gimp-image-parasite-attach":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamParasite"
@@ -11716,6 +12825,7 @@
    },
 "gimp-image-raise-vectors-to-top":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11725,6 +12835,7 @@
    },
 "gimp-drawable-parasite-detach":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -11734,6 +12845,7 @@
    },
 "gimp-image-parasite-find":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamString"
@@ -11744,6 +12856,7 @@
    },
 "gimp-drawable-parasite-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11754,6 +12867,7 @@
    },
 "gimp-gradients-set-active":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11762,6 +12876,7 @@
    },
 "gimp-vectors-parasite-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11772,6 +12887,7 @@
    },
 "gimp-layer-get-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11781,6 +12897,7 @@
    },
 "gimp-undo-push-group-start":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11789,6 +12906,7 @@
    },
 "gimp-vectors-set-tattoo":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamUInt"
@@ -11798,6 +12916,7 @@
    },
 "gimp-brushes-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11808,6 +12927,7 @@
    },
 "gimp-image-get-cmap":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11818,6 +12938,7 @@
    },
 "gimp-vectors-get-linked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11827,6 +12948,7 @@
    },
 "gimp-convert-grayscale":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11835,6 +12957,7 @@
    },
 "gimp-drawable-delete":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       ],
@@ -11843,6 +12966,7 @@
    },
 "gimp-drawable-set-linked":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GParamBoolean"
@@ -11852,6 +12976,7 @@
    },
 "gimp-image-floating-selection":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       ],
@@ -11861,6 +12986,7 @@
    },
 "gimp-layer-mask":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamLayer"
       ],
@@ -11870,6 +12996,7 @@
    },
 "gimp-image-get-vectors-position":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11880,6 +13007,7 @@
    },
 "gimp-image-lower-vectors":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11889,6 +13017,7 @@
    },
 "gimp-parasite-list":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11898,6 +13027,7 @@
    },
 "gimp-vectors-parasite-attach":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamParasite"
@@ -11907,6 +13037,7 @@
    },
 "gimp-edit-paste-as-new":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       ],
    "out": [
@@ -11915,6 +13046,7 @@
    },
 "gimp-vectors-parasite-detach":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamItem"
       , "GimpParamString"
@@ -11924,6 +13056,7 @@
    },
 "gimp-crop":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamInt"
@@ -11936,6 +13069,7 @@
    },
 "gimp-image-lower-vectors-to-bottom":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GimpParamItem"
@@ -11945,6 +13079,7 @@
    },
 "gimp-parasite-detach":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamString"
       ],
@@ -11953,6 +13088,7 @@
    },
 "gimp-convert-indexed":
    {
+   "type":  "Internal GIMP procedure",
    "in": [
       "GimpParamImage"
       , "GParamEnum"

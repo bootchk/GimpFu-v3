@@ -2,9 +2,15 @@
 
 # Input is a text file dump of the pdb, created by calling pdb.dump_to_file(f)
 
-# Output is a JSON file and another format that looks like type signatures
+# Output is two files:
+# 1) a JSON file (many lines per PDB procedure)  to stdout
+# 2) a file  (each line a type signature for a PDB procedure)
+# TODO to a separate file e.g. signature.txt
+
+# invoke   nawk -f parsePDBTxt.nawk pdb.txt >pdb.json
 
 # TODO !!! The JSON has an extra comma after the last procedure
+# You must manually delete it
 
 # lloyd konneker May 2020
 
@@ -49,9 +55,17 @@ function captureProcNameSig(name) {
 # JSON is dict[name] of dict[inParams list[types], outParams list[types]]
 
 function captureProcNameJSON(name) {
+  # start new json record
   print name ":"
-  # always a dictionary of params, keyed by "in" and "out"
+
+  # json record is a dictionary of attributes
+  # keyed by type: and then dicts of params, keyed by "in" and "out"
   print indent "{"
+}
+
+function captureProcTypeJSON(type) {
+  # type is quoted string
+  print indent "\"type\":" type ","
 }
 
 function closeProcJSON() {
@@ -63,6 +77,7 @@ function closeProcJSON() {
 
 # JSON does not allow trailing commas, JSON5 does
 function captureTypeJSON(type, shouldPrefixComma) {
+  # TODO these are formal param types
   # types are in a comma delimited list
   if (shouldPrefixComma == "true") {
     print indent indent ", " type
@@ -70,7 +85,6 @@ function captureTypeJSON(type, shouldPrefixComma) {
   else {
     print indent indent type
   }
-
 }
 
 
@@ -88,6 +102,14 @@ function captureProcName(name) {
   captureProcNameSig(name)
   captureProcNameJSON(name)
 }
+
+function captureProcType(type) {
+  # signature not have proc type
+  # print "type is" type
+  captureProcTypeJSON(type)
+}
+
+
 
 function closeProc() {
   closeProcJSON()
@@ -116,7 +138,7 @@ function closeParamSet(shouldAddComma) {
 }
 
 function captureType(shouldPrefixComma) {
-  # capture type on second following line
+  # capture arg type on second following line
   # it is already quoted
   getline; getline
   type = $1
@@ -148,16 +170,40 @@ END {
 /\(register-procedure / {
    captureProcName($2)
 
+   # Capture attributes of procedure
    currentProc = stripQuotes($2)
+
+   # procedure type is on the sixth quoted string
+
+   # skip forward five quotes strings
+   for (counter = 5; counter >= 0; counter--) {
+     # Not checking for read errors.
+     getline
+     # while first word not starts with quote char
+     # print $1
+     while ( ! match($1, /\"/) ) {
+       getline
+     }
+   }
+
+   # assert on sixth quoted string
+
+
+   # capture the whole record, a string with spaces e.g. "Gimp Plug-In"
+   captureProcType($0)
+
    state = "proc"
    next
    }
 
-# match opening left paren
-# since parens anywhere, match beginning of line and whitespace
+# match opening left paren (except for the left paren in "(register-procedure" )
+# since parens can be anywhere, match beginning of line and whitespace
 
 /^\s*\(/ {
    switch ( state )  {
+
+     # !!! State:null is handled above, matching "(register-procedure"
+
      case "proc":
         state = "inParamSet"
         openParamSet("in")

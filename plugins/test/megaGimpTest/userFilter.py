@@ -7,11 +7,13 @@ class UserFilter:
     """ Understands user choice of tests """
 
     _shouldTestScriptFu = False
+    _shouldTestPythonFu = False
     _shouldTestExportImport = False
     _shouldTestOther = False
 
-    def setChoices(shouldTestScriptFu, shouldTestExportImport, shouldTestOther):
+    def setChoices(shouldTestScriptFu, shouldTestPythonFu, shouldTestExportImport, shouldTestOther):
         UserFilter._shouldTestScriptFu = shouldTestScriptFu
+        UserFilter._shouldTestPythonFu = shouldTestPythonFu
         UserFilter._shouldTestExportImport = shouldTestExportImport
         UserFilter._shouldTestOther = shouldTestOther
 
@@ -23,6 +25,9 @@ class UserFilter:
         result = True
         if   isScriptFu(procedure_name):
             if not UserFilter._shouldTestScriptFu :
+                result = False
+        if   isPythonFu(procedure_name):
+            if not UserFilter._shouldTestPythonFu :
                 result = False
         elif isLoadSave(procedure_name):
             if not UserFilter._shouldTestExportImport :
