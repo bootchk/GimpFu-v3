@@ -37,8 +37,9 @@ Pull and rebuild often.
 In the command line in a terminal:
 ```
 >cd *wherever you cloned this repository*
->cp -r gimpfu ~/.config/GIMP/2.99/plug-ins
+>cp -r gimpfu ~/.config/GIMP/2.99/plug-ins/gimpfu
 ```
+Note that we copy the 'gimpfu' directory to another directory named 'gimpfu' in the plugins directory.
 
 Run:
 ```

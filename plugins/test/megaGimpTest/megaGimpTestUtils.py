@@ -1,37 +1,9 @@
 """
 Utilities for plugin megaTestGimp
+
 """
+from procedureCategory import ProcedureCategory
 
-
-def isScriptFu(procName):
-    return procName.find("script-fu-")==0
-
-def isPythonFu(procName):
-    return procName.find("python-fu-")==0
-
-def isPlugin(procName):
-    # Relies on procedure canonical names
-    # TODO test procedure type?
-    # file-foo-save is a plug-in also
-    # file-foo-load TODO
-    return (procName.find("plug-in-")==0
-        or isScriptFu(procName)
-        or isPythonFu(procName)
-        or (procName.find("file-")==0
-           and procName.find("-save")>0)
-        )
-
-def isDeleting(procName):
-    """ We don't test procedures that might delete our test data. """
-    return procName.find("-delete")>0
-
-def isLoadSave(procName):
-    """ save/load tested in another plugin testGimpExportImport
-
-    Typically name file-<foo>-save and -load"""
-    if (procName.startswith('file')):
-        return True
-    return False
 
 
 def shouldTestProcedure(procName):
@@ -45,11 +17,13 @@ def shouldTestProcedure(procName):
     - delete test objects (they should be run last)
     """
 
-    if isDeleting(procName):
+    if ProcedureCategory.isDeleting(procName):
         return False
 
-    if isLoadSave(procName):
-        return False
+    # We will test load/save if user requests it.
+    # But better to use plugin testGimpExportImport
+    # OLD if isLoadSave(procName):
+    #    return False
 
     # !!! Not test self, infinite recursion
     if procName in ("python-fu-mega-test-gimp"):

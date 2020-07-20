@@ -615,16 +615,18 @@ commands:
 
       # local plugins in /work/.home/.config/GIMP/2.99/plug-ins
       # !!! outside the container
+      mkdir /work/.home/.config/GIMP/2.99/plug-ins
 
       # Refresh installation of gimpfu from development gimp_directory
+      # Make sure to copy entire directory to a specific directory
       echo "Copying gimpfu to local"
-      cp -r /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
+      cp -r /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins/gimpfu
 
       echo "Copying all test plugins"
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
 
       #echo "Chmoding test plugins"
-      #find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
+      find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
 
       echo "Altering PYTHONPATH to point to local plug-ins"
       export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
