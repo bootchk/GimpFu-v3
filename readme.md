@@ -39,7 +39,7 @@ In the command line in a terminal:
 >cd *wherever you cloned this repository*
 >cp -r gimpfu ~/.config/GIMP/2.99/plug-ins/gimpfu
 ```
-Note that we copy the 'gimpfu' directory to another directory named 'gimpfu' in the plugins directory.
+Note that we copy the entire 'gimpfu' directory to another directory named 'gimpfu' in the plugins directory.
 
 Run:
 ```
@@ -72,42 +72,23 @@ has abandoned maintenance of GimpFu v2.
 The files in the Gimp repository (in the /gimp/plug-ins/python/pygimp directory) are relics.
 A 2.99 build does not build or install those files.
 
-# Hacking
 
-To change GimpFu v3, you can just edit the files in the directory where you installed them, then restart Gimp. (There is no C source to be compiled for GimpFu v3.)
+# Language Guide for Plugin Authors
 
-## Test Plugins
+## GimpFu Reference Manual
 
-The repository includes a set of test plugins (GimpFu v3 compatible), in /plugins.  See /plugins/readme.txt
+See the [Gimp Python Documentation](https://www.gimp.org/docs/python/index.html)
 
-You can copy a test plugin (that uses GimpFu) from the repository
-to your user local location for plugins (say ~/.config/GIMP/2.99/plug-ins).
+This tells you how to write a plugin:
 
-In Gimp 3:
-* each plugin must be inside its own directory
-* each plugin (the top .py file) must have execute permission
+The document is for Gimp 2, but GimpFu v3 for Gimp 3 is mostly backward compatible.
 
-Thus copy an entire test plugin's directory, for example:
 
-```
->cd *wherever you cloned this repository*
->cp -r plugins/wild/foggify   ~/.config/GIMP/2.99/plug-ins
->chmod +x ~/.config/GIMP/2.99/plug-ins/foggify/foggify.py
-```
-*A typical plugin found on the net is for Gimp 2 and might require minor edits to work with GimpFu v3.*
+### Future changes to the GimpFu Reference Manual
 
-# Differences between v2 and v3 of GimpFu
+The document will not be supported by Gimp.org starting with Gimp 3.
 
-GimpFu v3 maintains the outward capabilities and API or "language" of GimpFu v2.
-
-## Design/Programming documents
-
-The documents that tell you how to write a plugin:
-
-v2 [Gimp Python Documentation](https://www.gimp.org/docs/python/index.html)  
-This document will not be supported by Gimp.org starting with Gimp 3.
-
-v3 The above document guides what the GimpFu v3 must do, for backward compatibility.
+The document guides what the GimpFu v3 must do, for backward compatibility.
 
 Some of the document will change:
 * description of the implementation methods (C language) and installation
@@ -119,8 +100,75 @@ The document will also say more about how GimpFu reports errors.
 Because of the dynamic binding, the nature of error messages is changed.
 GimpFu v3 may attempt to keep going (so that more errors are found) where GimpFu v2 might have stopped.
 
+## Porting Gimp Python plugins from v2 to v3
 
-## Implementation
+See the document in this repository: gimpfu/docs/pluginPortingGuide.txt
+
+Again, GimpFu v3 is intended to be backward compatible.
+Typically you might need to change a few lines of your plugin, for:
+
+  - Python 3 syntax changes
+  - GimpFu changes
+  - Gimp changes (to the model, and to names of methods)
+
+
+# Developing and Maintaining GimpFu
+
+## Editing GimpFu
+
+To change GimpFu v3, you can just edit the files in the directory where you installed them, then restart Gimp.
+(There is no C source to be compiled for GimpFu v3.)
+
+## The Nature of GimpFu
+
+GimpFu is *not* a plugin that you can call.  It helps a plugin author implement a plugin.
+
+GimpFu instantiates the Gimp.Plugin class, on behalf of plugin authors.
+GimpFu does not register itself as a Gimp plugin,
+but registers the plugin author's plugin.
+
+GimpFu uses the Adaptor or Wrapper pattern.
+
+GimpFu makes heavy use of eval() of generated code that accesses Gimp via GI.
+
+
+## The GimpFu Language
+
+GimpFu can be said to implements its own mini language.
+
+The essential element of the language are:
+
+  - the register() and main() functions
+  - the 'gimp' and 'pdb' aliases
+  - the abbreviated Gimp constants/enums, e.g. BACKGROUND_FILL
+
+## Test Plugins
+
+The repository includes a set of test plugins (GimpFu v3 compatible), in /plugins.  See /plugins/readme.txt
+
+You can copy a test plugin (that uses GimpFu) from the repository
+to your user local location for plugins (say ~/.config/GIMP/2.99/plug-ins).
+
+In Gimp 3:
+* each plugin must be inside its own directory
+* the the top .py file must be named the same as its parent directory
+* each plugin (the top .py file) must have execute permission
+
+Thus copy an entire test plugin's directory, for example:
+
+```
+  >cd  to wherever you cloned this repository
+  >cp -r plugins/wild/foggify   ~/.config/GIMP/2.99/plug-ins
+  >chmod +x ~/.config/GIMP/2.99/plug-ins/foggify/foggify.py
+```
+*A typical plugin found on the net is for Gimp 2 and might require minor edits to work with GimpFu v3.*
+
+
+## Differences between v2 and v3 of GimpFu
+
+GimpFu v3 maintains the outward capabilities and API or "language" of GimpFu v2.
+
+### Binding to Gimp
 
 GimpFu v3 is not a port:  GimpFu v3 is almost a total rewrite.
 
@@ -133,6 +181,7 @@ It is more readable.  GimpFu v2 static binding was an art understood by few peop
 ### More about GI.  
 
 Gimp 3 is being enhanced with GObject annotations that allow GI of its API.
+GimpFu uses GObject Introspection, but hides it from plugin authors.
 The PyGObject module (import gi) lets Python code do GI.
 The PyGObject module is partially implemented in the C language,
 but GimpFu no longer uses any C language.
@@ -194,25 +243,34 @@ The advantages of using GimpFu over Python with GI:
   Much existing documentation refers to 'PyGimp.'
   Usually you can just substitute 'GimpFu' for 'PyGimp'.
 
-GimpFu **is** the package that provides a mostly backward compatible API for writing Gimp Python plugins.
+GimpFu *is* the package that provides a simplfied API, mostly backward compatible, for writing Gimp Python plugins.
+
 An author can still write a Gimp 3 Python plugin, using only GI, without any modules from the GimpFu package.
 
-## Porting Gimp Python plugins from v2 to v3
 
-See the document in this repository: gimpfu/docs/pluginPortingGuide.txt
 
-# Python GI API documents
+## Python GI API documents
+
+At high levels, GimpFu is just Python.
+
+At low levels, GimpFu uses the Python GI API to access Gimp.
+So to develop GimpFu, you must understand the Python GI API to Gimp.
+Just as if you were writing a Python Gimp plugin without API.
+That is, you must understand how to use the Python GI API,
+because that is what GimpFu hides (i.e. automates.)
 
 It is better to read documents for the Python API than to read documents for the C API.
 Although with some mental energy you can read the C API and figure out the Python API.
 
-## GObject, Gio, GLib, but *not* Gimp 2.99 GI API docs
+### GObject, Gio, GLib, but *not* Gimp 2.99 GI API docs
 
 The best documentation about the GObject introspected Python API's of various projects
 is found at [PyGObject API Reference](https://lazka.github.io/pgi-docs/)
 Many other docs on the web (such as at the Gnome project?) are outdated, or for the C API.
 
-## Gimp 2.99 GI API docs
+GimpFu, and most Python Gimp plugins, use these API's just a little.
+
+### Gimp 2.99 GI API docs
 
 You should generate docs yourself for the GObject introspected Python API for GIMP.
 Since Gimp2.99 is a development branch, you should pull it often, and the API might change.
@@ -221,16 +279,18 @@ When you build Gimp, the gir goes to say, /usr/local/share/gir-1.0/Gimp-3.0.gir
 To create a document:
 
 ```
-> g-ir-doc-tool --language=Python -o ~/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+> g-ir-doc-tool --language=Python -o ~/gimp-python-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
 ```
+(Similarly, you can generate the C, Lua, JS, etc. API documents.)
+
 To browse the document:
 
 ```
-> yelp ~/gimp-doc
+> yelp ~/gimp-python-doc
 ```
 
 You might need to install package 'yelp'.
-The command g-ir-doc-tool might be in package 'libgirepository1.0-dev'.
+To get the command g-ir-doc-tool, you might need to install package 'libgirepository1.0-dev'.
 
 
 
@@ -255,7 +315,9 @@ along with the status in parenthesis
 
 # Development strategy
 
-Start coding, see what is broken, fix, and repeat.
+This is just a log of the initial development of the project.
+
+Start coding, fix, and repeat.
 
 Lacking a "Developers Guide to Architecture of PyGimp" you must reverse engineer.
 From the PyGimp/GimpFu code and the GimpFu (Author's Guide) document.
@@ -265,7 +327,7 @@ Test with a null GimpFu plugin (that does nothing really.)
 Proceed to test with other existing GimpFu plugins, say clothify.py
 
 The most basic statement of what the port involves is:
-convert a static binding of Python to Gimp and to a dynamic GI binding.
+convert 'a static binding of Python to Gimp' to a 'dynamic GI binding'.
 That has already been done for many Python plugins that don't use GimpFu.
 The problem is to convert GimpFu to a dynamic binding.
 And what GimpFu does is automate (or provide simplified API) for authors.
