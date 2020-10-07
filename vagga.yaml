@@ -183,6 +183,9 @@ containers:
     # Since 2.99.2, Gimp requires vala compiler
     - !Install [ valac ]
 
+    # some commands want wget
+    - !Install [wget]
+
     environ:
       HOME: /work/.home
 
@@ -442,9 +445,6 @@ containers:
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
     ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
 
-    # some commands want wget
-    - !Install [wget]
-
     # Larger /tmp for testing
     # 100Mi is default, not enough to create many image files
     volumes:
@@ -624,6 +624,18 @@ commands:
 
       echo "Copying all test plugins"
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
+
+      echo "Copying testGimpPDB"
+
+      # -O -   means: pipe to stdout
+      wget https://github.com/bootchk/testGimpPDB/tarball/master
+      tar xz -f master
+      rm master
+      # copy contents of top directory to a new directory
+      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
+      cp -r bootchk-testGimp*/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
+      rm -rf bootchk-testGimp*
+      rm -rf wget-log*
 
       #echo "Chmoding test plugins"
       find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
