@@ -460,6 +460,7 @@ containers:
 
 
 
+  # Final container with a few more customizations
   # Faster if a command does this.
   gimpLocal:
     setup:
@@ -501,6 +502,36 @@ containers:
 
     environ:
       HOME: /work/.home
+
+
+
+
+  # Final container with a few more customizations
+  # Faster if a command does this.  Some commands copy plugins into the container.
+  gimpAMLocal:
+    setup:
+    # Choice:
+    - !Container gimpAMDev
+
+    # rebuild container if test plugin source (in /work i.e. project directory ) changes
+    - !Depends plugins
+
+    # create container user's .config for GIMP, to hold locally installed plug-ins
+    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins
+
+    # ensure a directory to mount to
+    #- !EnsureDir /work/testGimpPDB
+
+    # mount directories from outside the container
+    # /root:   means to mount it in .vagga/container/work ???
+    # /root/testGimpPDB:   means to mount it ???
+    volumes:
+      /work/testGimpPDB: !BindRO /volumes/testGimpPDB
+
+    environ:
+      HOME: /work/.home
+
+
 
 
 # Cruft
@@ -601,8 +632,8 @@ commands:
   # gegl, babl typelib in /usr/local/lib/x86_64-linux-gnu/gi...
 
   gimpAMGUI: !Command
-    description: Run gimp GUI in gimpAMDev container, with locally installed plugins
-    container: gimpAMDev
+    description: Run gimp GUI in gimpAMLocal container, with locally installed plugins
+    container: gimpAMLocal
     run: |
       export HOME=/work/.home
       export GIMP_PREFIX="/usr/local"
@@ -626,16 +657,18 @@ commands:
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Copying testGimpPDB"
+      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
+      cp -r /work/testGimpPDB/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
 
       # -O -   means: pipe to stdout
-      wget https://github.com/bootchk/testGimpPDB/tarball/master
-      tar xz -f master
-      rm master
+      #wget https://github.com/bootchk/testGimpPDB/tarball/master
+      #tar xz -f master
+      #rm master
       # copy contents of top directory to a new directory
-      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
-      cp -r bootchk-testGimp*/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
-      rm -rf bootchk-testGimp*
-      rm -rf wget-log*
+      #mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
+      #cp -r bootchk-testGimp*/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
+      #rm -rf bootchk-testGimp*
+      #rm -rf wget-log*
 
       #echo "Chmoding test plugins"
       find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
@@ -717,7 +750,7 @@ commands:
       #curl -L  https://github.com/bootchk/testGimpExportImport/tarball/master | tar xz -C /work/.home/.config/GIMP/2.99/plug-ins
 
       # Scraps for copying selected plugins, if not all are copied
-      # megaTestGimp
+      # testGimpPDB
       #cp -r /work/plug-ins/mega*      /work/.home/.config/GIMP/2.99/plug-ins
       # testColor
       #cp -r /work/testPlugins/testRGB /work/.home/.config/GIMP/2.99/plug-ins
