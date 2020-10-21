@@ -219,19 +219,28 @@ containers:
 
 
 
-    # Gimp depends on latest gegl which is not released
+    # Gimp depends on latest gegl which might not be released by gegl.org
+    # i.e. get from gimp.org OR get from gegl.org
+    # !!! If you change this, also change below the cd to the gegl dir, named differently
+
+    # Get from gimp.org
     #- !Tar
     #  url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.18.tar.xz
+    #  url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.24.tar.xz
     #  path: /home
 
-    # latest, bleeding, from shared, bare repository
-    #- !Git
-    #  url: https://gitlab.gnome.org/GNOME/gegl.git
-    #  path: /home/gegl
+    # Get latest, bleeding, from shared, bare repository at gegl.org
 
-    - !Tar
-      url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.24.tar.xz
-      path: /home
+    # !!! Must specify a revision, else vagga will, the first time get the latest
+    # !!! and subsequently cache it indefinitely.  See vagga docs.
+    # !!! But you can't get the latest revision until it is released.
+    # So just refresh the whole container sequence when gegl changes
+    #  revision: 4.27
+
+    - !Git
+      url: https://gitlab.gnome.org/GNOME/gegl
+      path: /home/gegl
+
 
 
 
@@ -301,10 +310,10 @@ containers:
     - !Sh echo ">>>>>>"
 
     # !!! Not using     --prefix=${GIMP_PREFIX} \
-    # WAS  cd /home/gegl-0.4.18 for a tar pull
+    # WAS  cd /home/gegl-0.4.xx for a tar pull
     # WAS cd /home/gegl for a git pull
     - !Sh |
-        cd /home/gegl-0.4.24
+        cd /home/gegl
         meson _build \
          --buildtype=release \
           -Db_lto=true
@@ -317,6 +326,17 @@ containers:
 
     # Show that it installed .so
     - !Sh ls /usr/local/lib/x86_64-linux-gnu
+
+    # Show installed version
+    - !Sh |
+       echo "trying: pkg-config gegl"
+       pkg-config gegl-0.4 --modversion
+
+    # Using !Git, but that does not create a git repository so this doesn't work
+    # cd /home/gegl
+    # git status
+
+
 
 
 
@@ -424,14 +444,15 @@ containers:
 
     # Note that meson builds out of tree, i.e. does not touch gimp directory
 
+
     # build
     - !Sh |
         cd /home/gimp
         meson _build \
          --buildtype=debug \
-         -Djavascript=never \
-         -Dlua=never \
-         -Dpython=always \
+         -Djavascript=false \
+         -Dlua=false \
+         -Dpython=true \
          -Dgtk-doc=false
         cd _build
         ninja
@@ -578,7 +599,7 @@ commands:
 
 
   testBablGegl: !Command
-    description: Test build babl and gegl
+    description: Get version of and test built babl and gegl
     container: bablGeglDev
     run: |
       ls /home/babl
@@ -588,17 +609,22 @@ commands:
       echo "$PKG_CONFIG_PATH is:" $PKG_CONFIG_PATH
       echo "trying: pkg-config gegl"
       pkg-config gegl-0.4 --modversion
-      cd /home/gegl
-      git status
+
+  # It doesn't seems to matter that /usr/local/lib/x86_64-linux-gnu/pkgconfig is not in PKG_CONFIG_PATH
+
+
+
 
   #   cd /home/gegl-0.4.18/_build
   #    ninja test
 
 
-  gimpMeson: !Command
+  gimpBuildMeson: !Command
     description: Build gimp using meson
     container: gimpMesonDev
     run: |
+      echo "Gegl version"
+      dpkg -l | grep gegl
       export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
       echo $LD_LIBRARY_PATH
       /usr/local/bin/gimp-2.99 --version
@@ -684,8 +710,8 @@ commands:
 
   # export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
 
-  gimpMesonRunGUI: !Command
-    description: Run the meson built gimp GUI in gimpMesonDev container
+  gimpMesonGUI: !Command
+    description: Run the meson built gimp GUI in gimpMesonDev container (need --use-env DISPLAY)
     container: gimpMesonDev
     run: |
       export HOME=/work/.home
