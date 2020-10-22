@@ -8,7 +8,6 @@ from adaption.wrappable import *
 from adaption.marshal import Marshal
 from adaption.types import Types
 from adaption.upcast import Upcast
-from adaption.value_array import FuValueArray
 from adaption.generic_value import FuGenericValue
 
 from gimppdb.gimppdb import GimpPDB
@@ -129,7 +128,7 @@ class MarshalPDB():
         for x in args:
             MarshalPDB.logger.debug(f"marshalling arg: {x} index: {formal_args_index}" )
             # to dump more uncomment this
-            # MarshalPDB.logger.debug(f"cumulative marshalled args: {FuValueArray.dump()}" )
+            # MarshalPDB.logger.debug(f"cumulative marshalled args: {result}" )
 
             go_arg, go_arg_type = MarshalPDB._unwrap_to_param(x)
             # assert are GObject types, i.e. fundamental or Boxed

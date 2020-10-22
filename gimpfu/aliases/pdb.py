@@ -131,12 +131,11 @@ class GimpfuPDB():
             if error_str != 'success':   # ??? GIMP_PDB_SUCCESS
                 """
                 Log the args because it is a common failure: wrong args.
-                FuValueArray has a good __repr__
                 We might also log what Author gave (args) before we marshalled them.
                 TODO i.e. { {*args} } ?, but that leaves braces in the output
                 TODO  { {*args} } throws "unhashable type GimpfuImage"
                 """
-                self.logger.warning(f"Args: {fuValueArray.dump()}")
+                self.logger.warning(f"Args: {marshaled_args}")
                 proceed(f"PDB call fail: {proc_name} Gimp says: {error_str}")
                 result = None
             else:
