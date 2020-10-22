@@ -97,18 +97,17 @@ class MarshalPDB():
         '''
         Marshal args to a PDB procedure.
 
-        1. Gather many args  into a FuValueArray and return it.
+        1. Gather many args  into a sequence and return it.
         2. Optionally prefix args with run mode
         GimpFu feature: hide run_mode from calling author
         3. Unwrap wrapped arguments so all args are GObjects
         4. Upcasts and conversions
         5. Check error FunctionInfo
 
-        !!! Returns FuValueArray, not Gimp.ValueArray
+        !!! Returns sequence of GValue
         '''
 
-        # FuValueArray is global adaptor of Gimp.ValueArray.  Empty it.
-        FuValueArray.reset()
+        result = []
 
         formal_args_index = 0
 
@@ -117,7 +116,7 @@ class MarshalPDB():
             # no GUI, this is a call from a plugin
 
             a_gvalue = FuGenericValue.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)
-            FuValueArray.push_gvalue( a_gvalue )
+            result.append( a_gvalue )
             # Run mode is in the formal args, not in passed actual args
             formal_args_index = 1
 
@@ -149,7 +148,7 @@ class MarshalPDB():
                 proceed("Passing function as argument to PDB.")
 
             a_gvalue = gen_value.get_gvalue()
-            FuValueArray.push_gvalue(a_gvalue)
+            result.append(a_gvalue)
 
             formal_args_index += 1
 
@@ -164,9 +163,9 @@ class MarshalPDB():
                 # The PDB procedure call is usually going to fail anyway.
             """
 
-        MarshalPDB.logger.debug(f"marshal_args returns: {FuValueArray.dump()}" )
-        result = FuValueArray   # return the singleton class, not an instance !!!
-        # Class's produce GValueArray could be empty, or have errors (see proceed above)
+        MarshalPDB.logger.debug(f"marshal_args returns: {result}" )
+
+        # result sequence could be empty, or have errors (see proceed above)
         return result
 
 

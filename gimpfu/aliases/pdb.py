@@ -112,8 +112,7 @@ class GimpfuPDB():
 
         # !!! Must unpack args before passing to _marshall_args
         try:
-            fuValueArray = MarshalPDB.marshal_args(proc_name, *args)
-            marshaled_args = fuValueArray.get_gvalue_array()
+            marshaled_args = MarshalPDB.marshal_args(proc_name, *args)
         except Exception as err: # TODO catch only MarshalError ???
             proceed(f"marshalling args to pdb.{proc_name} {err}")
             marshaled_args = None

@@ -675,9 +675,9 @@ commands:
       mkdir /work/.home/.config/GIMP/2.99/plug-ins
 
       # Refresh installation of gimpfu from development gimp_directory
-      # Make sure to copy entire directory to a specific directory
+      # Copy entire directory into the plug-ins directory
       echo "Copying gimpfu to local"
-      cp -r /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins/gimpfu
+      cp -rv /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Copying all test plugins"
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
@@ -711,7 +711,7 @@ commands:
   # export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
 
   gimpMesonGUI: !Command
-    description: Run the meson built gimp GUI in gimpMesonDev container (need --use-env DISPLAY)
+    description: Run meson gimp GUI in gimpMesonDev container (need --use-env DISPLAY), w/o plugins
     container: gimpMesonDev
     run: |
       export HOME=/work/.home
