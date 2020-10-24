@@ -1,0 +1,13 @@
+diff --git a/libgimpwidgets/meson.build b/libgimpwidgets/meson.build
+index 63f086dc33..7e6c65afb4 100644
+--- a/libgimpwidgets/meson.build
++++ b/libgimpwidgets/meson.build
+@@ -216,7 +216,7 @@ test_eevl = executable('test-eevl',
+   'test-eevl.c',
+   include_directories: rootInclude,
+   dependencies: [
+-    glib, gtk3,
++    glib, gtk3, math,
+   ],
+   c_args: '-DG_LOG_DOMAIN="LibGimpWidgets"',
+   link_with: [ libgimpwidgets, ],
