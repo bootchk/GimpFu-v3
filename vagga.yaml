@@ -468,21 +468,26 @@ containers:
 
     # each version of gcc has its own libasanx
     # TODO this may not be necessary
-    - !Install [ libx32asan5 ]
+    # - !Install [ libx32asan5 ]
 
     # -Db_-shared-libasan
+    # env CC=clang CXX=clang++ CC_LD=/usr/bin/ld.lld CXX_LD=/usr/bin/ld.lld LDFLAGS=-shared-libasan meson _build
+    # -Db_sanitize=address
+
+    # TODO move this higher
+    - !Install [ dbus-x11 ]
+    - !Install [ gnome-terminal ]
 
     # build
     - !Sh |
-        which ld.lld
         cd /home/gimp
-        env CC=clang CXX=clang++ CC_LD=/usr/bin/ld.lld CXX_LD=/usr/bin/ld.lld LDFLAGS=-shared-libasan meson _build \
+        meson _build \
          --buildtype=debug \
          -Djavascript=false \
          -Dlua=false \
          -Dpython=true \
-         -Dgtk-doc=false \
-         -Db_sanitize=address
+         -Dgtk-doc=false
+
 
         cd _build
         ninja
@@ -501,13 +506,6 @@ containers:
     volumes:
       /tmp: !Tmpfs { size: 500Mi, mode: 0o1777 }
 
-
-  # with gdb.  TODO move higher
-  gimpMesonGdb:
-    setup:
-    - !Container gimpMesonDev
-
-    - !Install [meson]
 
 
 
@@ -571,13 +569,19 @@ containers:
     - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins
 
     # ensure a directory to mount to
-    #- !EnsureDir /work/testGimpPDB
+    - !EnsureDir /work/testGimpPDB
+    - !EnsureDir /work/testGimpExportImport
 
     # mount directories from outside the container
+    # /volumes/ is defined in .config/vagga/settings.html
+
+    # This is mounting plugin directories kept in ~/git/testGimpPDB
+
     # /root:   means to mount it in .vagga/container/work ???
     # /root/testGimpPDB:   means to mount it ???
     volumes:
       /work/testGimpPDB: !BindRO /volumes/testGimpPDB
+      /work/testGimpExportImport: !BindRO /volumes/testGimpExportImport
 
     environ:
       HOME: /work/.home
@@ -716,6 +720,10 @@ commands:
       mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
       cp -r /work/testGimpPDB/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
 
+      echo "Copying testGimpExportImport"
+      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+      cp -r /work/testGimpExportImport/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+
       # -O -   means: pipe to stdout
       #wget https://github.com/bootchk/testGimpPDB/tarball/master
       #tar xz -f master
@@ -733,7 +741,7 @@ commands:
       export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
       echo $PYTHONPATH
 
-      # For asan 
+      # For asan
       export LD_PRELOAD=$(gcc -print-file-name=libasan.so)
 
       /usr/local/bin/gimp-2.99 --verbose
@@ -779,6 +787,11 @@ commands:
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
       export NO_AT_BRIDGE=1
 
+      # stop glib at warnings
+      export G_DEBUG=fatal-warnings
+      # tell Gimp to start certain plugins for debugging
+      export GIMP_PLUGIN_DEBUG=file-openraster-save
+
       echo "HOME"            $HOME
       echo "GIMP_PREFIX"     $GIMP_PREFIX
       echo "LD_LIBRARY_PATH" $LD_LIBRARY_PATH
@@ -786,6 +799,8 @@ commands:
       echo "PATH"            $PATH
       echo "GEGL_PATH"       $GEGL_PATH
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
+
+
 
       echo "Removing old plugins and gimpfu source"
       rm -rf /work/.home/.config/GIMP/2.99/plug-ins/*
@@ -830,7 +845,14 @@ commands:
       # export G_MESSAGES_DEBUG=all
       # /usr/local/bin/gimp-2.99 --verbose --no-data
 
-      /usr/local/bin/gimp-2.99 --verbose
+      #which gnome-terminal
+      #/usr/bin/gnome-terminal &
+
+      # --verbose
+      # gdb
+      /usr/local/bin/gimp-2.99
+
+
 
   # quicker startup
   generateGIDocs: !Command
