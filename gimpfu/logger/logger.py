@@ -22,23 +22,32 @@ class FuLogger:
 
         logger = logging.getLogger('GimpFu')
 
+        # possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
         # TODO make the level come from the command line or the environment
-        #logger.setLevel(logging.DEBUG)
-        logger.setLevel(logging.WARNING)
+        # TODO for now, uncomment one of the following two lines
+        logger.setLevel(logging.DEBUG)
+        #logger.setLevel(logging.WARNING)
 
+        """
+        A logger contains one or more handlers,
+        components which serialize e.g. print the logged stream of messages.
+        I.E. the stream can be forked to console AND a file.
+        The handlers can have a level more restrictive than the logger.
+        """
         # create file handler which logs even debug messages
         #fh = logging.FileHandler('spam.log')
         #fh.setLevel(logging.DEBUG)
-        # create console handler with same log level
+        # create console handler
         ch = logging.StreamHandler()
-        # possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
         ch.setLevel(logging.DEBUG)
+
         # create formatter and add it to the handlers
         formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-        #fh.setFormatter(formatter)
         ch.setFormatter(formatter)
+        #fh.setFormatter(formatter)
+
         # add the handlers to the logger
-        #logger.addHandler(fh)
         logger.addHandler(ch)
+        #logger.addHandler(fh)
 
         return logger

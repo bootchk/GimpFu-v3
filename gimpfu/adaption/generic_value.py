@@ -163,10 +163,14 @@ class FuGenericValue():
         return isinstance(obj, collections.Sequence)
 
     def list_for_actual_arg(self):
-        """ Return list for self.actual_arg. """
+        """ Return list for self.actual_arg.
+        As necessary, wrap self.actual_arg in a list.
+        """
         if self.is_tuple_or_list(self._actual_arg):
+            # already a list
             result = self._actual_arg
         else:
+            # an element, contain it
             result = [self._actual_arg,]
         return result
 
@@ -181,25 +185,43 @@ class FuGenericValue():
 
         gvalue_setter is a method of Gimp e.g. Gimp.value_set_object_array
 
-        Allow Author to pass single instance, convert it to a list and then an array.
+        GimpFu allows Author to pass single instance.
+        Will convert it to a list and then to to_gtype.
 
-        TODO type convert elements of sequence.
+        to_gtype is the type of the container.
+        We don't check that that contained elements are proper gtype.
+        to_gtype only sometimes conveys the contained gtype.
+        TODO type convert contained elements.
         """
         self.logger.info(f"to_gimp_array {to_gtype}")
 
         list = self.list_for_actual_arg()
 
+        # require elements have gtype
+        """
+        TODO
+        contained_gtype = list[0].__gtype__
+        This doesn't seem to work, returns a method of an adapter???
+
+        And yet the following is not sufficient when a list is passed.
+        """
+        contained_gtype = self._actual_arg.__gtype__
+        self.logger.info(f"Contained gtype is: {contained_gtype}")
+
         try:
+            # create empty (i.e. no value) GValue of desired type,
             self._gvalue = GObject.Value (to_gtype)
 
+            """
+            set value into GValue
+            setter function needs gtype of elements in list.
+            """
             """
             PyGObject will convert list using len(list)
             The length is still also passed to the PDB procedure
             Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
-            We do need to pass type of elements in list.
-            TODO do we need to convert list elements by passing a type other than actual_arg.__gtype__ ?
             """
-            gvalue_setter(self._gvalue, self._actual_arg.__gtype__, list)
+            gvalue_setter(self._gvalue, contained_gtype, list)
             self._did_create_gvalue = True
             self._did_convert = True
 
