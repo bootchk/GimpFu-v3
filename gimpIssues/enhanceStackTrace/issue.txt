@@ -1,0 +1,9 @@
+
+Enhance: show stack trace for crashing plugins
+
+By design, Gimp does not open a debugging window (showing a stack trace) for faulted plugins, which are separate processes.
+I recall reading this design prevents flooding gimp.org with bug reports for third party plugins.
+
+Example:
+
+TODO not sure this is correct

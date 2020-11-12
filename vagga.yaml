@@ -197,8 +197,21 @@ containers:
     # Since 2.99.2, Gimp requires vala compiler
     - !Install [ valac ]
 
-    # some commands want wget
+    # avoid dbus error messages from gimp
+    - !Install [ dbus-x11 ]
+
+    # Below not required by gimp, just required by my dev
+
+    # to run gimp in dbg in a gnome-terminal
+    - !Install [ gnome-terminal ]
+
+    # some my vagga commands want wget
     - !Install [wget]
+
+    # Larger /tmp for testing
+    # 100Mi is default, not enough to create many image files
+    volumes:
+      /tmp: !Tmpfs { size: 500Mi, mode: 0o1777 }
 
     environ:
       HOME: /work/.home
@@ -474,9 +487,7 @@ containers:
     # env CC=clang CXX=clang++ CC_LD=/usr/bin/ld.lld CXX_LD=/usr/bin/ld.lld LDFLAGS=-shared-libasan meson _build
     # -Db_sanitize=address
 
-    # TODO move this higher
-    - !Install [ dbus-x11 ]
-    - !Install [ gnome-terminal ]
+
 
     # build
     - !Sh |
@@ -501,17 +512,14 @@ containers:
     - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
     ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
 
-    # Larger /tmp for testing
-    # 100Mi is default, not enough to create many image files
-    volumes:
-      /tmp: !Tmpfs { size: 500Mi, mode: 0o1777 }
+
 
 
 
 
   # Final container with a few more customizations
   # Faster if a command does this.
-  gimpLocal:
+  gimpMesonLocal:
     setup:
     # Choice:
     - !Container gimpMesonDev
@@ -544,10 +552,18 @@ containers:
     # Must be a Python package, directory having a ????
     # First remove the bad gimpfu.py at the top?  Build should not have installed it
     ##- !Remove /usr/local/lib/gimp/2.99/python/gimpfu.py
-    - !Copy
-      source: /work/gimpfu
-      path:  /usr/local/lib/gimp/2.99/python
+    #- !Copy
+    #  source: /work/gimpfu
+    #  path:  /usr/local/lib/gimp/2.99/python
     # TODO use include-regex expression in Copy
+
+    volumes:
+      /work/testGimpPDB: !BindRO /volumes/testGimpPDB
+      /work/testGimpExportImport: !BindRO /volumes/testGimpExportImport
+
+      # Larger /tmp for testing
+      # 100Mi is default, not enough to create many image files
+      /tmp: !Tmpfs { size: 500Mi, mode: 0o1777 }
 
     environ:
       HOME: /work/.home
@@ -582,6 +598,10 @@ containers:
     volumes:
       /work/testGimpPDB: !BindRO /volumes/testGimpPDB
       /work/testGimpExportImport: !BindRO /volumes/testGimpExportImport
+
+      # Larger /tmp for testing
+      # 100Mi is default, not enough to create many image files
+      /tmp: !Tmpfs { size: 500Mi, mode: 0o1777 }
 
     environ:
       HOME: /work/.home
@@ -744,7 +764,23 @@ commands:
       # For asan
       export LD_PRELOAD=$(gcc -print-file-name=libasan.so)
 
+      # stop glib at warnings
+      export G_DEBUG=fatal-warnings
+
+      # Per devel-docs/debugging
+      # Mostly GUI messages
+      # export GIMP_DEBUG=all
+
+      # This fails to open a terminal ?
+      # /usr/bin/gnome-terminal &
+
+      # Also fails:
+      # gimp --stack-trace-mode=always
+
       /usr/local/bin/gimp-2.99 --verbose
+
+
+
 
 
 
@@ -776,7 +812,7 @@ commands:
 
   gimpMesonTestGUI: !Command
     description: Run gimp GUI in gimpMesonDev container, creating user's plugins in home
-    container:  gimpMesonDev
+    container:  gimpMesonLocal
     run: |
       export HOME=/work/.home
       export GIMP_PREFIX="/usr/local"
@@ -786,11 +822,6 @@ commands:
       export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
       export NO_AT_BRIDGE=1
-
-      # stop glib at warnings
-      export G_DEBUG=fatal-warnings
-      # tell Gimp to start certain plugins for debugging
-      export GIMP_PLUGIN_DEBUG=file-openraster-save
 
       echo "HOME"            $HOME
       echo "GIMP_PREFIX"     $GIMP_PREFIX
@@ -841,6 +872,12 @@ commands:
       echo "Altering PYTHONPATH to point to local plug-ins"
       export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
       echo $PYTHONPATH
+
+      # stop glib at warnings
+      #export G_DEBUG=fatal-warnings
+
+      # tell Gimp to start certain plugins for debugging
+      export GIMP_PLUGIN_DEBUG=file-openraster-save
 
       # export G_MESSAGES_DEBUG=all
       # /usr/local/bin/gimp-2.99 --verbose --no-data

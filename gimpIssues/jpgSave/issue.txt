@@ -1,0 +1,24 @@
+
+2.99 PDB procedure file-jpeg-save throws GLib CRITICAL when called non-interactively
+
+
+To reproduce:
+in a plugin call the pdb procedure file-jpeg-save with args (runmode, image, num_drawables, drawables, file).
+The rest of the parameters should default.
+(I don't have a small test case, see below for context.)
+
+Expect: no error messages.
+Actual: (file-jpeg:89): GLib-GObject-CRITICAL **: 19:37:03.157: g_value_get_double: assertion 'G_VALUE_HOLDS_DOUBLE (value)' failed
+(Its not clear in my testing whether it actually created a file and if it did, what jpg options it used.)
+
+Note that export as jpg seems to succeed when you use the GUI.
+
+I suspect the cause is at plug-ins/file-jpeg/jpeg.c near line 485.
+There the code gets gvalues of type double for args 5-8,
+but near line 232 the procedure registers those args as types (int, bool, int, int).
+
+Context:
+I found this using my test plugin https://github.com/bootchk/testGimpExportImport.git.
+When I also set export G_DEBUG=fatal-warnings, the plugin actually aborts.
+Self-built latest gimp using meson build.
+Ubuntu 20.04
