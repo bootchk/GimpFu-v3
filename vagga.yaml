@@ -432,7 +432,7 @@ containers:
     # build
     - !Sh |
         cd /home/gimp
-        CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs  --enable-debug
+        CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs  --enable-debug --with-pdbgen
         make -j4
         make install
 
@@ -487,7 +487,7 @@ containers:
     # env CC=clang CXX=clang++ CC_LD=/usr/bin/ld.lld CXX_LD=/usr/bin/ld.lld LDFLAGS=-shared-libasan meson _build
     # -Db_sanitize=address
 
-
+    # -v      verbose
 
     # build
     - !Sh |

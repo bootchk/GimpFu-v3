@@ -1,0 +1,277 @@
+diff --git a/pdb/app.pl b/pdb/app.pl
+index 6d48b3c29c..52a746e460 100644
+--- a/pdb/app.pl
++++ b/pdb/app.pl
+@@ -67,7 +67,8 @@ sub declare_args {
+     my $out = shift;
+     my $outargs = shift;
+ 
+-    local $result = "";
++    # lkk
++    local $result = "// <da\n";
+ 
+     foreach (@_) {
+ 	my @args = @{$proc->{$_}} if (defined $proc->{$_});
+@@ -108,36 +109,69 @@ sub declare_args {
+ 	}
+     }
+ 
++    # lkk
++    $result .= "// da>\n";
+     $result;
+ }
+ 
++#lkk
++# generate preamble to body.
++# Assign to local var from in_args in value_array named "args"
+ sub marshal_inargs {
+     my ($proc, $argc) = @_;
+ 
+-    my $result = "";
++    my $result = "//<mi\n";
+     my %decls;
+ 
+     my @inargs = @{$proc->{inargs}} if (defined $proc->{inargs});
+ 
++    #lkk
++    # When exists a var whose assigned should be deferred until after next arg.
++    my $deferred_array_length_arg_name = "";
++    my $did_defer_array_length_arg = 0;
++
+     foreach (@inargs) {
+ 	my($pdbtype, @typeinfo) = &arg_parse($_->{type});
+ 	my $arg = $arg_types{$pdbtype};
+ 	my $var = $_->{name};
+ 	my $value;
+ 
+-	$value = "gimp_value_array_index (args, $argc)";
+-	if (!exists $_->{dead}) {
+-	    $result .= eval qq/"  $arg->{get_value_func};\n"/;
+-	}
++        # If arg is an array length and the array knows its own length,
++        # defer initializion of local vars for this arg
++        # until after the array arg whose length it is.
++        # Order of args: length then array is traditional in C-API.
++        # pdbgen.pl ensures (length, array) inargs are in pairs, in that order.
++        if ( $_->{does_array_know_length} ) {
++                $deferred_array_length_arg_name = $var;
++                $did_defer_array_length_arg = 1;
++                # Not increment argc, an index into GimpValueArray, the source of values
++                # which is the PDB API and does not have this arg.
++        }
++        else {
++
++        	$value = "gimp_value_array_index (args, $argc)";
++        	if (!exists $_->{dead}) {
++        	    $result .= eval qq/"  $arg->{get_value_func};\n"/;
++        	}
+ 
+-	$argc++;
++                if ($did_defer_array_length_arg) {
++                        # Generate local var for array length
++                        # from the length attribute of the current arg, an array.
++                        # The body of the invoker function being generated references this local var.
++                        $result .= "  $deferred_array_length_arg_name = ((GimpObjectArray*)g_value_get_boxed(gimp_value_array_index(args, "
++                                . ($argc) . ")))->length;\n";
++                        $did_defer_array_length_arg = 0;
++                }
++
++                $argc++;
++        }  
+ 
+ 	if (!exists $_->{no_validate}) {
+ 	    $success = 1;
+ 	}
+     }
+ 
+-    $result = "\n" . $result . "\n" if $result;
++    $result = "\n" . $result . "//mi>\n" if $result;
+     $result;
+ }
+ 
+@@ -724,22 +758,31 @@ CODE
+ 	$argc = 0;
+ 
+         foreach $arg (@inargs) {
+-	    my ($pspec, $postproc) = &generate_pspec($arg);
++            #lkk
++            # If arg is array length and array knows its own length:
++            # omit arg from PDB signature
++            if ( $arg->{does_array_know_length} ) {
++                    $out->{register} .= "  // omit ". $arg->{name} . "\n";
++                    # !!! argc still counts the C-API args
++            }
++            else {
+ 
+-	    $pspec =~ s/^/' ' x length("  gimp_procedure_add_argument (")/meg;
++        	    my ($pspec, $postproc) = &generate_pspec($arg);
+ 
+-	    $out->{register} .= <<CODE;
++        	    $pspec =~ s/^/' ' x length("  gimp_procedure_add_argument (")/meg;
++
++        	    $out->{register} .= <<CODE;
+   gimp_procedure_add_argument (procedure,
+ ${pspec});
+ CODE
+ 
+-            if ($postproc ne '') {
+-		$pspec = "procedure->args[$argc]";
+-		$postproc =~ s/^/'  '/meg;
+-		$out->{register} .= eval qq/"$postproc"/;
+-	    }
+-
+-	    $argc++;
++                    if ($postproc ne '') {
++        		$pspec = "procedure->args[$argc]";
++        		$postproc =~ s/^/'  '/meg;
++        		$out->{register} .= eval qq/"$postproc"/;
++        	    }
++            }
++            $argc++;
+ 	}
+ 
+ 	$argc = 0;
+@@ -790,7 +833,7 @@ CODE
+ 	}
+ 	else {
+ 	    my $invoker = "";
+-	
++
+ 	    $invoker .= ' ' x 2 . "GimpValueArray *return_vals;\n" if scalar @outargs;
+ 	    $invoker .= &declare_args($proc, $out, 0, qw(inargs));
+ 	    $invoker .= &declare_args($proc, $out, 1, qw(outargs));
+diff --git a/pdb/lib.pl b/pdb/lib.pl
+index fc8c91d9d7..65e026bbe7 100644
+--- a/pdb/lib.pl
++++ b/pdb/lib.pl
+@@ -182,6 +182,8 @@ sub generate_fun {
+     my $value_array = "";
+     my $arg_array = "";
+     my $argc = 0;
++    # lkk
++    my $skip = 0;
+     foreach (@inargs) {
+         my ($type, @typeinfo) = &arg_parse($_->{type});
+         my $arg = $arg_types{$type};
+@@ -190,34 +192,45 @@ sub generate_fun {
+         my $var_len;
+         my $value;
+ 
+-        # This gets passed to gimp_value_array_new_with_types()
+-        if ($type eq 'enum') {
+-            $enum_type = $typeinfo[0];
+-            $enum_type =~ s/([a-z])([A-Z])/$1_$2/g;
+-            $enum_type =~ s/([A-Z]+)([A-Z])/$1_$2/g;
+-            $enum_type =~ tr/[a-z]/[A-Z]/;
+-            $enum_type =~ s/^GIMP/GIMP_TYPE/;
+-            $enum_type =~ s/^GEGL/GEGL_TYPE/;
+-
+-            $value_array .= "$enum_type, ";
+-        }
+-        else {
+-            $value_array .= "$arg->{gtype}, ";
+-        }
+-
+-        if (exists $_->{array}) {
+-            $value_array .= "NULL";
+-        }
++        # $value_array gets passed to gimp_value_array_new_with_types()
++
++        # lkk
++        # If arg is array length and array knows its own length,
++        # omit wrapper's formal args for array length from PDB signature
++        # OLD if (not index($var, "num_") == 0 ) {
++        if ( not $_->{does_array_know_length} ) {
++          if ($type eq 'enum') {
++              $enum_type = $typeinfo[0];
++              $enum_type =~ s/([a-z])([A-Z])/$1_$2/g;
++              $enum_type =~ s/([A-Z]+)([A-Z])/$1_$2/g;
++              $enum_type =~ tr/[a-z]/[A-Z]/;
++              $enum_type =~ s/^GIMP/GIMP_TYPE/;
++              $enum_type =~ s/^GEGL/GEGL_TYPE/;
++
++              $value_array .= "$enum_type, ";
++          }
++          else {
++              $value_array .= "$arg->{gtype}, ";
++          }
++
++          if (exists $_->{array}) {
++              $value_array .= "NULL";
++          }
++          else {
++              $value_array .= "$var";
++          }
++
++          $value_array .= ",  // va $argc\n" . " " x 42;
++        }
++        # lkk
+         else {
+-            $value_array .= "$var";
++          $skip++;
+         }
+ 
+-        $value_array .= ",\n" . " " x 42;
+-
+         if (exists $_->{array}) {
+             my $arrayarg = $_->{array};
+ 
+-            $value = "gimp_value_array_index (args, $argc)";
++            $value = "gimp_value_array_index (args, ($argc - $skip))";
+ 
+             if (exists $arrayarg->{name}) {
+                 $var_len = $arrayarg->{name};
+@@ -690,10 +703,10 @@ LGPL
+     # We generate two files, a _pdb.h file with prototypes for all
+     # the functions we make, and a _pdb.c file for the actual implementation
+     while (my($group, $out) = each %out) {
+-        my $hname = "${group}pdb.h"; 
++        my $hname = "${group}pdb.h";
+         my $cname = "${group}pdb.c";
+         if ($group ne 'gimp') {
+-	    $hname = "gimp${hname}"; 
++	    $hname = "gimp${hname}";
+ 	    $cname = "gimp${cname}";
+         }
+         $hname =~ s/_//g; $hname =~ s/pdb\./_pdb./;
+diff --git a/pdb/pdbgen.pl b/pdb/pdbgen.pl
+index 8a18970437..641d6dfb7c 100755
+--- a/pdb/pdbgen.pl
++++ b/pdb/pdbgen.pl
+@@ -115,7 +115,7 @@ $evalcode = <<'CODE';
+ 	$pdb{$proc} = $entry;
+     }
+ 
+-    # Find out what to do with these entries 
++    # Find out what to do with these entries
+     while (my ($dest, $procs) = each %exports) { push @{$gen{$dest}}, @$procs }
+ }
+ CODE
+@@ -159,7 +159,6 @@ sub nicelist {
+ }
+ 
+ # Add args for array lengths
+-
+ sub arrayexpand {
+     my $args = shift;
+     my $newargs;
+@@ -180,8 +179,19 @@ sub arrayexpand {
+ 
+ 	    $arg->{void_ret} = 1 if exists $_->{void_ret};
+ 
++            # Flag is an array length
+ 	    $arg->{num} = 1;
+ 
++            # Flag whether array is object knowing its own length
++            # Compare to type names defined in pdb.pl
++            if ( ($_->{type} eq 'imagearray')
++               or($_->{type} eq 'itemarray')
++               or($_->{type} eq 'layerarray')
++               or($_->{type} eq 'channelarray')
++               or($_->{type} eq 'vectorarray') ) {
++                 $arg->{does_array_know_length} = 1;
++            }
++
+ 	    push @$newargs, $arg;
+  	}
+ 
