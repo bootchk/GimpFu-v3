@@ -1,0 +1,42 @@
+2.99 Select>Distort... throws Gtk-WARNING
+
+To replicate:
+
+```
+start Gimp in a console
+File>New, choose OK
+Select>Distort..
+```
+
+Expect:
+
+Dialog to open without error messages in console
+
+Actual:
+
+Dialog opens, apparently with all text correct, yet...
+
+In console: (script-fu:160): Gtk-WARNING **: 14:01:29.658: Failed to set text '_Threshold (bigger 1<-->254 smaller):'
+from markup due to error parsing markup: Error on line 1 char 33: ?--? is not a valid name
+
+(If instead, you first export G_DEBUG=fatal-warnings, then the plugin crashes,
+and subsequently, item "Select>Distort" is no longer in the menus.)
+
+Analysis:
+
+In plug-ins/script-fu/scripts/distress-selection.scm appears the text "<-->".
+Apparently the "<>" confuses some parser used by GTK, trying to parse something like XML or HTML?
+But without apparent effect on the result.
+
+This is the only place in Gimp that the notation "1<-->254" appears to be used in the GUI.
+I think the notation "1-254" conveys the same meaning.
+It would be nice to not have warnings and to have uniform or conventional notation in the GUI.
+So this is only a user interace issue.
+But to change the notation would require many translations to be updated?
+
+
+
+
+Context:
+Ubuntu 20.04
+Self-built latest gimp using automake

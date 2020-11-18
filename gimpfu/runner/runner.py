@@ -373,12 +373,18 @@ class FuRunner:
 
         if summarize_proceed_errors():  # side effect is writing to console
             """ Gimpfu proceeded past earlier exceptions.
-            Display a dialog.
-            Then raise a final exception.
+            Display GIMP dialog.
             """
             msg = "GimpFu detected errors.  See console for a summary."
             Gimp.message(msg)
-            raise Exception(msg)
+            final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
+
+            # TODO can't get this to work
+            #glib_error = GLib.Error( GLib.quark_from_string("GimpFu"), 0, msg )
+            #GLib.quark_from_string("GimpFu"), 0,
+            # final_result = procedure.new_return_values( Gimp.PDBStatusType.EXECUTION_ERROR, glib_error)
+
+            # Alternatively: raise Exception(msg) but that is confusing to Author
 
 
         # ensure final_result is type GimpValueArray
