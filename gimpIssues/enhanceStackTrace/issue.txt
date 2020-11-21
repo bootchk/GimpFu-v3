@@ -1,14 +1,14 @@
 
-2.99 Enhance: GIMP_PLUGIN_DEBUG debugging aids for plugins
+2.99 Enhance: GIMP_PLUGIN_DEBUG backtrace for plugins
 
-This has several items.  A patch is attached.
+This has several items.  A patch is attached (having a few small merge conflicts.)
 
 This is about the "machinery" behind the GIMP_PLUGIN_DEBUG env var.
 See both the old and the enhanced devel-docs/debug-plug-ins.txt.
 
 The enhancements benefit a developer/tester of plugins.
 
-Since v3, more plugins will rely on GLib and benefit from enhanced debugging aids.
+Since v3, more plugins will rely on GLib and benefit from enhanced debugging.
 
 
 
@@ -66,7 +66,7 @@ which was shorthand for option "run:fatal-warning", is eliminated.
 
 
 
-5) The code that implements the machinery is mixed with other irrelevant code.
+6) The code that implements the machinery is mixed with other irrelevant code.
 Making the code hard to read or change.
 
 The enhancement refactors by extracting functions relevant to debugging
@@ -80,7 +80,7 @@ The patch goes slightly beyond that with other small code improvements.
 
 
 
-6) The documentation is stale.
+7) The documentation is stale.
 
 The enhancement updates devel-docs/debug-plug-ins.txt, to make it clearer,
 and to document the enhancements.
