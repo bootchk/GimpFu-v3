@@ -2,7 +2,10 @@
 
 GimpFu (the simplified Gimp plugin API for Python)  for Gimp 3 and Python3.
 
-Note: *The planned Gimp 3 still supports Python plugins, but using GObject Introspection.  Gimp 3 does not plan to support GimpFu plugins without this unofficial repository.  If you need the certainty that a new plugin will work in Gimp 3, you should use the official machinery.*
+Note: *The planned Gimp 3 still supports Python plugins, but using GObject Introspection.  Gimp 3 does not plan to support GimpFu style plugins without this unofficial repository.  
+If you need the certainty that a new plugin will work in Gimp 3, you should use the official machinery.*
+
+*GimpFu is NOT a plugin, only a Python module that other Python scripts use to make them behave as plugins.*
 
 # Status
 
@@ -19,7 +22,7 @@ fewer holes are found in GimpFu v3.
 ## Support
 
 For now, GimpFu v3 is *not* supported by Gimp.org.
-It is a third-party plugin.
+It is third-party.
 
 GimpFu v3 might be supported by Gimp.org if:
 * there is enough demand
@@ -48,29 +51,34 @@ Run:
 ```
 If you also have or installed some GimpFu v3 plugins,
 expect to see them in the Gimp menus.
-(A typical Gimp 2.99 build will have no GimpFu plugins.)  GimpFu itself does not appear in the Gimp menus.
+(A typical Gimp 2.99 build will have no GimpFu plugins.)  
+GimpFu itself does not appear in the Gimp menus.
+
 
 ## Notes on Installation
 
 GimpFu v3 does not require building or compiling; it is all Python scripts.
 
-GimpFu v3 does depend on Gimp 2.99 and Python 3.  You probably need to build Gimp 2.99 yourself.
+GimpFu v3 does depend on Gimp 2.99 and Python 3.
 
-Thus you can test GimpFu v3 after you build Gimp 2.99
+Thus you can test GimpFu v3 after you install a Gimp 2.99
 simply by copying the gimpfu directory this repository to either:
 
-* /usr/local/lib/gimp/2.99/python/gimpfu.py (Gimp's official installation place, varies by distribution)
 * ~/.config/GIMP/2.99/plug-ins (the local, custom installation place)
+* any other place you install Python modules
 
 Then, because Gimp does not alter PYTHONPATH when it starts a Python interpreter,
 you must set PYTHONPATH so Python will find the 'gimpfu' module when a Gimp Python plugin does "from gimpfu import *."
 
-Then you can start your own Gimp 2.99 (typically installed to /usr/local/bin)
+Then install a gimpfu style plugin (that does "from gimpfu import *"),
+possibly an old plugin that you have modified for GimpFu v3.
 
-The current Gimp development branch (mainline, 2.99) repository
+Then you can start Gimp 2.99 (typically installed to /usr/local/bin)
+
+( The current Gimp development branch (mainline, 2.99) repository
 has abandoned maintenance of GimpFu v2.
 The files in the Gimp repository (in the /gimp/plug-ins/python/pygimp directory) are relics.
-A 2.99 build does not build or install those files.
+A 2.99 build does not build or install those files.)
 
 
 # Language Guide for Plugin Authors

@@ -878,7 +878,8 @@ commands:
       # export G_DEBUG=fatal-critical
 
       # tell Gimp to debug certain plugins
-      export GIMP_PLUGIN_DEBUG=all,fatal-criticals
+      # all,fatal-warnings
+      export GIMP_PLUGIN_DEBUG=gimpfu,run
 
       # print all G_MESSAGES
       # export G_MESSAGES_DEBUG=all
@@ -890,7 +891,7 @@ commands:
 
       # --verbose
       # gdb
-      /usr/local/bin/gimp-2.99
+      /usr/local/bin/gimp-2.99 --stack-trace-mode query
 
 
 

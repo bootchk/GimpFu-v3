@@ -1,9 +1,86 @@
 
-Enhance: show stack trace for crashing plugins
+2.99 Enhance: GIMP_PLUGIN_DEBUG debugging aids for plugins
 
-By design, Gimp does not open a debugging window (showing a stack trace) for faulted plugins, which are separate processes.
-I recall reading this design prevents flooding gimp.org with bug reports for third party plugins.
+This has several items.  A patch is attached.
 
-Example:
+This is about the "machinery" behind the GIMP_PLUGIN_DEBUG env var.
+See both the old and the enhanced devel-docs/debug-plug-ins.txt.
 
-TODO not sure this is correct
+The enhancements benefit a developer/tester of plugins.
+
+Since v3, more plugins will rely on GLib and benefit from enhanced debugging aids.
+
+
+
+1) Currently, the machinery only works for the plug-in logging domain.
+That is it catches log events from plug-in code proper,
+and not from e.g. GLib code itself.
+A developer may want to catch log events regardless of logging domain.
+
+The enhanced code installs a fatal log handler for more domains .
+
+(As is currently done for the app process.
+The list of domains is not entirely in common with app.
+The patch does not catch GEGL events.
+The coded const array of domains is not shared with app, but it could be.
+)
+
+2) Currently, the machinery only works for one named plug-in.
+
+Since plugins can call plugins, a tester may not know in advance which plugin is faulty.
+
+The enhancement allows GIMP_PLUGIN_DEBUG=all, to catch fatal log events for any plugin.
+
+
+
+3) Currently, the machinery only allows GIMP_PLUGIN_DEBUG=foo,fatal-warnings that
+catches both WARNINGS and/or CRITICALS (not fine-grained.)
+
+Anecdotal evidence suggests that CRITICALS are more serious than WARNINGSs.
+A tester might want to filter more serious events.
+
+The enhancement allows GIMP_PLUGIN_DEBUG=foo,fatal-criticals
+to make fatal any CRITICAL log events, but not WARNINGs.
+
+
+
+4) Currently, the machinery does not print the process name that received log events,
+only the log domain that sent the event.
+Many processes (the app and many plugins) may be printing interleaved to stderr.
+So it is hard to read the console.
+
+The enhancement prints the name of the receiving plugin ahead of the sender
+e.g. "file-psd: GLib-GIO: ... "
+The prefix is new, but the message format remains similar
+to that printed currently, similar to what the GLib default log handler prints.
+
+
+
+5) In the absence of options ( e.g. GIMP_PLUGIN_DEBUG=all ) the default option
+is the same as "=all,run:fatal-warnings".  This means that a tester cannot
+define options that can print a backtrace only for ERROR.
+
+The enhancement eliminates the default, so that GIMP_PLUGIN_DEBUG=all means an
+ERROR will print a backtrace according to stack-trace-mode.  The option "on",
+which was shorthand for option "run:fatal-warning", is eliminated.
+
+
+
+5) The code that implements the machinery is mixed with other irrelevant code.
+Making the code hard to read or change.
+
+The enhancement refactors by extracting functions relevant to debugging
+from libgimp/gimp.c to libgimp/gimp-debug.c.
+Done without changing the build system or changing any #include statements.
+
+(Extracting means taking a chunk of code from gimp.c, replacing it with a function
+call, and defining the function in gimp-debug.c whose body is the chunk.
+The patch goes slightly beyond that with other small code improvements.
+)
+
+
+
+6) The documentation is stale.
+
+The enhancement updates devel-docs/debug-plug-ins.txt, to make it clearer,
+and to document the enhancements.
