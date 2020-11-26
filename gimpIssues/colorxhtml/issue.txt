@@ -1,0 +1,115 @@
+2.99 export as "color xhtml" i.e. html ascii art fails
+
+```
+Summary: Fix one reported and several unreported bugs, and enhance.
+
+See  #5312  dbc19800 workarounds for openraster plugin.
+The attached patch workarounds #5312, for colorxhtml plugin.
+
+In GITLAB, see history for more discussion.
+
+
+
+Other unreported bugs in code:
+
+Gimp.init() => GimpUi.init()
+
+Gimp.ValueArray.new() => new_from_values()
+
+
+
+
+Other enhancements:
+
+0) Scale the in image so out image is not stretched by non-square glyphs
+   (used like monitor pixels.)  I think this is the major enhancement.
+
+1a) display message when multiple layers are passed since not supported.
+1b) display message when alpha channel, since not supported
+   (but image type is RGB, so we should not get, but we do?)
+
+2) Improve  menu item, desc, blurb:
+
+  menu item "Colored HTML text "=> "ASCII art in HTML"
+  desc       => "Save as HTML containing ASCII art"
+  blurb      => "Saves the image as .html that a browser shows as color ASCII art."
+
+  As Ehad observed in #4361, no one knows what "Color XHTML" is
+  but some will know what "ASCII art" is (see wikipedia.)
+  "Color XHTML"  brings up nothing on web search.
+  "Color XHTML gimp" also brings up little,
+  i.e. it seems there exists no tutorial even for GIMP.
+
+  Not sure it is wise to attract more users for this plugin ;)
+
+  This change brings the format to the top of the pulldown list of formats
+
+3) Offers to cancel if image is large ( > ~640x480) and would export slowly.
+   Typically, a 640x480 image takes about ten seconds.
+
+4) Default characters (glyphs) "foo"  => "XOXO" which renders with more color,
+   less browser background color
+
+5) Add html tag "font-weight: bold;" which renders with more color,
+    less browser background color
+
+6) html "background-color" tag applied to the body (once)
+   instead of to each character (thousands of times).
+   Yields much smaller size of the output file.
+   Also lets user edit the .html, change background with one small change.
+
+7) Output have white background color when background in GIMP context is white,
+   else use black.
+   Most often user's use white GIMP background.
+   This is a change in behaviour (was hardcoded to black.)
+   But user can redo, or easily edit the .html with text editor.
+
+8) Other refactoring (extract GUI functions) to make the code clearer
+
+9) Add option "Respect whitespace"
+   Then whitespace is not removed from the input text
+   and new lines are respected so that the output image in the browser
+   has the same shape as any text file the user chose.
+   Thus they choose a text file that is traditional ASCII art
+   (where each character will occupy a pixel,
+   and the dimensions of the text file match dimensions of the image )
+   they get a better representation.
+   Also, if they choose any text file somewhat smaller than the image,
+   the output in the browser will look like the text file,
+   but with colors.
+
+10) Eliminate registering for the xhtml format.
+   The plugin always writes suffix ".html"
+   The plugin can load neither html or xhtml.
+   The output may indeed meet the xhtml standard, but no user cares.
+   Having the extra registered format only confuses the user:
+   it makes them think they have a choice to make (but they don't)
+   and it doesn't tell them what suffix will be written.
+
+11) Change source file name to match naming convention:
+   colorxhtml.py => file-asciiart.py
+   It is a file save type plugin, named similar to file-openraster.py
+
+
+
+More discussion:
+
+I did test, extensively, but not all edge cases.
+
+Changes will require redo translation.
+
+May require more GUI work.
+I am not sure the settings dialog and progress bar is correct.
+
+As Ehad noted, this is a wacky plugin, probably of low utility.
+But I don't think it should be eliminated.
+One reason is that it is one of the few example plugins in Python.
+And is an example of the FileSave type of plugin.
+
+As noted in the code, a TODO is to work for unicode.
+It is easy to find Python code for such a fix on the web.
+https://stackoverflow.com/questions/92438/stripping-non-printable-characters-from-a-string-in-python
+"ASCII art" is a misnomer if it would actually work for unicode,
+but "ASCII art" has entered the language to describe a style of artwork.
+
+```

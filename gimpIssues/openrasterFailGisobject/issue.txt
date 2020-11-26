@@ -1,0 +1,236 @@
+ 2.99 PDB procedure file-openraster-save throws CRITICAL at Gimp.ObjectArray.new(), patch attached
+
+Reproduce, simply but without a useful backtrace:
+
+"Export As" format ora
+
+1) File>New, choose OK
+2) File>Export As.., choose "SelectFileType>Open Raster", choose "Export"
+
+Expect: success
+
+Actual: Console shows
+
+```
+/usr/lib/python3/dist-packages/gi/overrides/GObject.py:266: Warning: g_object_ref: assertion 'G_IS_OBJECT (object)' failed
+  _gi._gvalue_set(self, py_value)
+/usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins/file-openraster/file-openraster.py:142: Warning: g_object_ref: assertion 'G_IS_OBJECT (object)' failed
+  Gimp.get_pdb().run_procedure('file-png-save', [
+
+(gimp-2.99:37): GLib-GObject-CRITICAL **: 10:42:04.955: g_object_ref: assertion 'G_IS_OBJECT (object)' failed
+
+(gimp-2.99:37): GLib-GObject-CRITICAL **: 10:42:04.955: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
+
+(file-png:82): GLib-GObject-CRITICAL **: 10:42:04.985: g_object_ref: assertion 'G_IS_OBJECT (object)' failed
+
+(file-png:82): GLib-GObject-CRITICAL **: 10:42:04.985: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
+
+(file-png:82): GLib-GObject-CRITICAL **: 10:42:04.985: g_object_ref: assertion 'G_IS_OBJECT (object)' failed
+
+(file-png:82): GLib-GObject-CRITICAL **: 10:42:04.985: g_object_ref: assertion 'G_IS_OBJECT (object)' failed
+
+(file-png:82): GLib-GObject-CRITICAL **: 10:42:04.986: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
+
+(file-png:82): GEGL-CRITICAL **: 10:42:05.122: gegl_buffer_get_extent: assertion 'GEGL_IS_BUFFER (buffer)' failed
+/usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins/file-png/file-png: fatal error: Segmentation fault
+/usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins/file-png/file-png (pid:82): [E]xit, show [S]tack trace or [P]roceed:
+```
+
+I omit the backtrace, its not useful since many errors intervene with the root cause.
+
+To reproduce so that it stops at the first fault:
+
+1) set env var GIMP_PLUGIN_DEBUG=file-png,fatal-warnings (note openraster.py calls file-png-save, where error is)
+2) as before, try export as ora
+
+
+```
+Aside: this is one case where my patch #5971 helps debug, since there is a tree of PDB procedure calls,
+you don't know which one is at fault ahead of time:
+
+1) install my patch from #5971 (has simple merge conflicts)
+2) set env var GIMP_PLUGIN_DEBUG=all,fatal-critical
+3) as before, try export as ora
+```
+
+Now the console shows:
+
+```
+Plugin file-openraster.py: GLib-GObject: CRITICAL: g_object_ref: assertion 'G_IS_OBJECT (object)' failed
+GLib-GObject (pid:80): [E]xit, show [S]tack trace or [P]roceed:
+```
+
+Enter "s".
+Snippet of backtrace is:
+
+```
+# Stack traces obtained from PID 80 - Thread 80 #
+
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007f5a3fd22142 in read () from /lib/x86_64-linux-gnu/libc.so.6
+  Id   Target Id                                Frame
+* 1    Thread 0x7f5a3fa45740 (LWP 80) "python3" 0x00007f5a3fd22142 in read () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 1 (Thread 0x7f5a3fa45740 (LWP 80)):
+#0  0x00007f5a3fd22142 in read () at /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f5a3ea822c1 in gimp_stack_trace_print (prog_name=0x7f5a3f195300 "GLib-GObject", stream=0x7f5a3fdfd6a0 <_IO_2_1_stdout_>, trace=0x0) at ../libgimpbase/gimputils.c:1345
+        status = 32602
+        stack_printed = 0
+        gtrace = 0x0
+        gimp_pid = "80\000G_IS_OBJECT ("
+        buffer = "ct_ref: assertioCRITICAL: g_objep\022n?Z\177\000\000pbK?Z\177\000\000", '\377' <repeats 16 times>, "\000\000\000\000\000\000\000\000\000\000  \000   \000\000\000\000\000\000\377\000\000\000\377\377\377\377\377\377\360\251\220\000\000\000\000\000\360\251\220\000\000\000\000\000\360\251\220", '\000' <repeats 13 times>, "\360\251\220\000\000\000\000\000\360\251\220\000\000\000\000\000\360\251\220", '\000' <repeats 13 times>, "\026\000\000\000\001", '\000' <repeats 12 times>, "S\031?Z\177\000\000\200\311\337?Z\177\000\000\b\000\000\000\000\000\000\000"...
+        read_n = 42136848
+        sync_fd = {8, 9}
+        out_fd = {10, 11}
+        fork_pid = 83
+        pid = 80
+        eintr_count = 0
+        tid = 80
+#2  0x00007f5a3ea82617 in gimp_stack_trace_query (prog_name=0x7f5a3f195300 "GLib-GObject") at ../libgimpbase/gimputils.c:1515
+        buf = "s\n", '\000' <repeats 13 times>
+#3  0x00007f5a3d03bdae in gimp_fatal_func (log_domain=0x7f5a3f195300 "GLib-GObject", flags=10, message=0x2819d20 "g_object_ref: assertion 'G_IS_OBJECT (object)' failed", data=0x0) at ../libgimp/gimp-debug.c:397
+        sigset = {__val = {0 <repeats 16 times>}}
+        level = 0x7f5a3d04ee24 "CRITICAL"
+#4  0x00007f5a3f20839c in g_logv () at /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#5  0x00007f5a3f208583 in g_log () at /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#6  0x00007f5a3f168960 in g_object_ref () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#7  0x00007f5a3ea7dc3e in gimp_object_array_new (object_type=Python Exception <class 'gdb.error'> No type named TypeNode.:
+, data=0x28da340, length=1, static_data=0) at ../libgimpbase/gimpparamspecs.c:1483
+        tmp = 0x28ded90
+        i = 0
+        array = 0x281dec0
+        __func__ = "gimp_object_array_new"
+#8  0x00007f5a3ea7dcc6 in gimp_object_array_copy (array=0x281dee0) at ../libgimpbase/gimpparamspecs.c:1510
+#9  0x00007f5a3f16175b in g_boxed_copy () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#10 0x00007f5a3f161a92 in g_value_set_boxed () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#11 0x00007f5a3f30abc7 in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-38-x86_64-linux-gnu.so
+#12 0x00007f5a3f30b1c2 in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-38-x86_64-linux-gnu.so
+#13 0x00000000005f42ea in PyCFunction_Call ()
+#14 0x00000000005f46d6 in _PyObject_MakeTpCall ()
+#15 0x0000000000570936 in _PyEval_EvalFrameDefault ()
+#16 0x00000000005f7146 in _PyFunction_Vectorcall ()
+#17 0x000000000056b399 in _PyEval_EvalFrameDefault ()
+#18 0x000000000056955a in _PyEval_EvalCodeWithName ()
+#19 0x00000000005f7323 in _PyFunction_Vectorcall ()
+#20 0x000000000059c654 in  ()
+#21 0x00000000005f463f in _PyObject_MakeTpCall ()
+#22 0x0000000000570936 in _PyEval_EvalFrameDefault ()
+#23 0x000000000056955a in _PyEval_EvalCodeWithName ()
+#24 0x00000000005f7323 in _PyFunction_Vectorcall ()
+#25 0x000000000056b26e in _PyEval_EvalFrameDefault ()
+#26 0x000000000056955a in _PyEval_EvalCodeWithName ()
+#27 0x00000000005f7323 in _PyFunction_Vectorcall ()
+#28 0x000000000056b26e in _PyEval_EvalFrameDefault ()
+#29 0x000000000056955a in _PyEval_EvalCodeWithName ()
+#30 0x00000000005f7323 in _PyFunction_Vectorcall ()
+#31 0x00000000005f6e27 in PyObject_CallObject ()
+#32 0x00007f5a3f2f8e4e in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-38-x86_64-linux-gnu.so
+#33 0x00007f5a3f578e06 in  () at /lib/x86_64-linux-gnu/libffi.so.7
+#34 0x00007f5a3f579188 in  () at /lib/x86_64-linux-gnu/libffi.so.7
+#35 0x00007f5a3d01be06 in gimp_save_procedure_run (procedure=0x28d3170, args=0x281d8c0) at ../libgimp/gimpsaveprocedure.c:176
+        save_proc = 0x28d3170
+        remaining = 0x281df00
+        return_values = 0x271b378
+        run_mode = GIMP_RUN_INTERACTIVE
+        image = 0x280fe10
+        drawables = 0x285e760
+        file = 0x281de80
+        n_drawables = 1
+        i = 5
+```
+
+Reading the stack trace:
+
+6 throws the CRITICAL
+
+7 ..... "object_type=Python Exception <class 'gdb.error'>" only means that gdb failed
+while trying to print the stacktrace, not that the openraster.py faulted
+
+I believe the issue starts at about line 149 of openraster.py,
+trying to create a GimpObjectArray for a list of drawables.
+(committed recently in dbc19800.)
+
+```
+[
+...
+GObject.Value(Gimp.ObjectArray, Gimp.ObjectArray.new(Gimp.Drawable, [drawable], 1)),
+...
+]
+```
+
+This code fixes it (see the attached patch.)
+
+```
+# Create an empty gvalue that is a GimpObjectArray
+a_gvalue = GObject.Value(Gimp.ObjectArray.__gtype__)
+# Set its value from a list holding one drawable
+Gimp.value_set_object_array(a_gvalue, drawable.__gtype__, [drawable])
+
+[
+...
+a_gvalue,
+...
+]
+```
+
+I can't explain why the original code fails.
+Maybe there is a problem in GI annotations.
+The attached patch might be considered an expedient work-around.
+Maybe there is another Python construct that works, but several I tried failed.
+```
+GObject.Value(Gimp.ObjectArray, Gimp.ObjectArray.new(Gimp.Drawable, [drawable])),
+GObject.Value(Gimp.ObjectArray, Gimp.ObjectArray.new(Gimp.Drawable, [drawable], 1)),
+GObject.Value(Gimp.ObjectArray, Gimp.ObjectArray.new(drawable.__gtype__, [drawable], 1)),
+```
+
+
+
+
+There could also be an education/documentation issue.
+It is hard to understand what the gir doc means, for Gimp, language Python.  It says:
+
+```
+Gimp.ObjectArray
+from gi.repository import Gimp
+
+object_array = Gimp.ObjectArray()
+
+Methods
+Gimp.ObjectArray.copy
+Gimp.ObjectArray.free
+Fields
+Gimp.ObjectArray->data
+Gimp.ObjectArray->length
+Gimp.ObjectArray->object_type
+Gimp.ObjectArray->static_data
+More Information
+Gimp
+```
+
+" object_array = Gimp.ObjectArray()" seems to suggest you could instantiate one,
+that the class/type name is the constructor?
+
+The new() method is not documented, but in my experience, works sometimes,
+e.g. for Gimp.Image.new()
+
+Gimp.ObjectArray is a type that you can use where you need to pass a type,
+and in Python you can instantiate one but it would always be empty?
+and there is no method to give or take its contents ?
+and the other methods should rarely be needed?
+The GI annotation for Gimp.ObjectArray might say
+"is an opaque type only used to create a GValue
+using the factory method Gimp.value_set_object_array()" ?
+Or maybe a Gimp.ObjectArrayFactory would be helpful?
+
+
+
+
+
+
+Related: #5312 #5838 (dbc19800) both trying to fix openraster
+
+
+Context:
+self-built recent master using meson build
+Ubuntu 20.04

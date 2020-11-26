@@ -879,7 +879,8 @@ commands:
 
       # tell Gimp to debug certain plugins
       # all,fatal-warnings
-      export GIMP_PLUGIN_DEBUG=gimpfu,run
+      # export GIMP_PLUGIN_DEBUG=file-png,fatal-warnings
+      export GIMP_PLUGIN_DEBUG=all,fatal-criticals
 
       # print all G_MESSAGES
       # export G_MESSAGES_DEBUG=all

@@ -5,3 +5,5 @@ gimpfu/__pycache__
 pygimpv2
 pdb.txt
 *.pyc
+*.html
+*.css
