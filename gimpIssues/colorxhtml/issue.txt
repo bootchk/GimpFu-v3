@@ -1,16 +1,14 @@
 2.99 export as "color xhtml" i.e. html ascii art fails
 
 ```
-Summary: Fix one reported and several unreported bugs, and enhance.
+Summary: Fix one reported and several unreported bugs, and many enhancements.
 
 See  #5312  dbc19800 workarounds for openraster plugin.
-The attached patch workarounds #5312, for colorxhtml plugin.
-
-In GITLAB, see history for more discussion.
+The attached patch works around #5312, for colorxhtml plugin.
 
 
 
-Other unreported bugs in code:
+Other fixes of unreported bugs:
 
 Gimp.init() => GimpUi.init()
 
@@ -21,11 +19,19 @@ Gimp.ValueArray.new() => new_from_values()
 
 Other enhancements:
 
+The enhancements make the plugin more useful (hah!) and user friendly
+but also make the plugin serve as a good example/template.
+
 0) Scale the in image so out image is not stretched by non-square glyphs
    (used like monitor pixels.)  I think this is the major enhancement.
 
 1a) display message when multiple layers are passed since not supported.
-1b) display message when alpha channel, since not supported
+1b) ... when alpha channel, not supported
+   (but registered image type is RGB, so GIMP "Export As" dialog should disable
+   choice of "ASCII art", but it doesn't?)
+1c) ... when floating point encoding, not supported
+   (we should register plugins whether they support floating point encoding)
+1d) ... when greyscale or indexed, not supported
    (but image type is RGB, so we should not get, but we do?)
 
 2) Improve  menu item, desc, blurb:
@@ -64,18 +70,18 @@ Other enhancements:
    This is a change in behaviour (was hardcoded to black.)
    But user can redo, or easily edit the .html with text editor.
 
-8) Other refactoring (extract GUI functions) to make the code clearer
+8) Other refactoring (extract functions) to make the code clearer
 
 9) Add option "Respect whitespace"
    Then whitespace is not removed from the input text
    and new lines are respected so that the output image in the browser
    has the same shape as any text file the user chose.
-   Thus they choose a text file that is traditional ASCII art
+   Thus wheny they choose a text file that is traditional ASCII art
    (where each character will occupy a pixel,
    and the dimensions of the text file match dimensions of the image )
    they get a better representation.
-   Also, if they choose any text file somewhat smaller than the image,
-   the output in the browser will look like the text file,
+   Also, if they choose any text file somewhat smaller area than the image,
+   the output in the browser will look more like the text file,
    but with colors.
 
 10) Eliminate registering for the xhtml format.
@@ -90,16 +96,27 @@ Other enhancements:
    colorxhtml.py => file-asciiart.py
    It is a file save type plugin, named similar to file-openraster.py
 
+   Also rename the PDB procedure colorxhtml-save => asciiart-save
+
+12) make progress bar label advance with line number
+   (a separate issue is that the Export As dialog's progress bar
+   does not seem to be working, doesn't change with calls to progress_update() )
+
+13) file chooser filter on mimetype 'text/*'
+
+
+
 
 
 More discussion:
 
 I did test, extensively, but not all edge cases.
+I tested both AM and meson build.
+Tested with ASAN on AM build.
 
 Changes will require redo translation.
 
-May require more GUI work.
-I am not sure the settings dialog and progress bar is correct.
+May require more GUI work, by someone who knows the standard GIMP style.
 
 As Ehad noted, this is a wacky plugin, probably of low utility.
 But I don't think it should be eliminated.

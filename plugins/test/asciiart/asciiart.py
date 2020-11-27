@@ -22,9 +22,11 @@
 """
 Only saves.
 
+Before 3.0, name was "Color XHTML".
 "Color XHTML" is not the name of a format.
-It is a text file in HTML format that renders like "ASCII art."
-Only usually read by a browser that renders HTML.
+Plugin creates a text file in HTML format that renders like "ASCII art."
+Only usually read by a browser that renders HTML
+(not by apps that display/edit images.)
 
 Character glyphs simulate screen dots, having color/intensity.
 So the current GIMP image is like a color map applied to a text file.
@@ -44,11 +46,10 @@ Although a user can upload a file that contains stroke-like characters e.g.
  (...(;)...)
  (...(;)...) etc.
 that would then be rendered in the colors of the image.
-
 That works best when the text file is the dimensions of the image.
 """
 
-# TODO allow greyscale image
+# FUTURE allow greyscale image
 
 
 import string
@@ -81,7 +82,9 @@ escape_table = {
 }
 
 
-# Some template strings, %s and %d are placeholder
+"""
+Template strings for html, %s and %d are placeholder
+"""
 
 # bold renders  with more color in browser
 style_def = """body {
@@ -96,7 +99,7 @@ style_def = """body {
 preamble = """<!DOCTYPE html>
 <html>
 <head>
-<title>ASCII art from GIMP</title>
+<title>ASCII art by GIMP</title>
 %s
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
@@ -106,10 +109,11 @@ preamble = """<!DOCTYPE html>
 
 glyph_style_string = 'color:#%s;'
 
-
-
 postamble = """\n</pre>\n</body>\n</html>\n"""
 
+
+
+# can handle image encoding where each color is 8, 16, or 32 bit integers.
 fmt_from_bpp = {
         3: 'BBB',
         6: 'HHH',
@@ -165,7 +169,7 @@ def get_background_color_name_from_gimp():
         result = 'white'
     else:
         # default to black
-        # TODO mangle GIMP background color into an html color
+        # FUTURE mangle GIMP background color into an html color
         # Better to create GIMP function Gimp.RGB.to_nearest_name()
         result = 'black'
     return result
@@ -180,7 +184,7 @@ def translate_and_escape_raw_data(stream, respect_whitespace=False):
 
     Control characters are unprintable (do not advance the printhead.)
 
-    TODO: Only handles ascii files?  FUTURE: handle unicode, any language.
+    FUTURE Only handles ascii files?  handle unicode, any language.
     """
     goodchars = string.digits + string.ascii_letters + string.punctuation
     if respect_whitespace:
@@ -193,15 +197,14 @@ def translate_and_escape_raw_data(stream, respect_whitespace=False):
     stream = stream.translate(allchars)
 
     result = [escape_table.get(c, c) for c in stream]
-    # !!! result is no longer a list of chars, but a list of strings
+    # !!! result is no longer a sequence of chars, but a list of strings
     return result
 
 
 
 class InfiniteGenerator(object):
     """
-    Generate infinite sequence,
-    from a finite sequence, wrapping around.
+    Generate infinite sequence from a finite sequence, wrapping around.
     """
     def __init__(self, finite):
         # assert finite is iterable e.g. a list
@@ -237,6 +240,7 @@ class RowGenerator(object):
     i.e. make it infinite.
 
     Returns (row_index, row)
+    where row is a sequence (a list) of strings.
 
     Respecting new lines and padding with spaces.
     """
@@ -328,10 +332,13 @@ def show_settings_dialog(characters, size, source_file, separate, respect_whites
     choose_file_dialog = Gtk.FileChooserDialog(use_header_bar=use_header_bar,
                                    title=_("Read characters from file..."),
                                    action=Gtk.FileChooserAction.OPEN)
+    # Make it show only text files, not images or binary
+    filter = Gtk.FileFilter()
+    filter.add_mime_type('text/*')
+    choose_file_dialog.add_filter(filter)
     choose_file_dialog.add_button("_Cancel", Gtk.ResponseType.CANCEL)
     choose_file_dialog.add_button("_OK", Gtk.ResponseType.OK)
 
-    # TODO make the chooser show only mime type txt files
     def choose_file(button, user_data=None):
         choose_file_dialog.show()
         if choose_file_dialog.run() == Gtk.ResponseType.OK:
@@ -408,10 +415,15 @@ def show_settings_dialog(characters, size, source_file, separate, respect_whites
     dialog.get_content_area().add(grid)
     grid.show()
 
+    '''
+    No progress bar in this dialog.
+    Plugin uses the progress bar in "Export As" parent dialog
+    '''
+
     dialog.show()
     if dialog.run() == Gtk.ResponseType.OK:
         was_canceled = False
-        # Only changes the local reference, still need to return them
+        # Only changes local references, still need to return them
         characters =                    characters_entry.get_text()
         size =                            font_size_spin.get_value_as_int()
         source_file =                characters_checkbox.get_active()
@@ -419,24 +431,29 @@ def show_settings_dialog(characters, size, source_file, separate, respect_whites
         respect_whitespace = respect_whitespace_checkbox.get_active()
     else:
         was_canceled = True
+    """
+    In general:
+    Don't destroy if you have embedded your own progress bar.
+    Do destroy if any progress bar is in another widget.
+
+    In this case, there is a progress bar in the "Export As" dialog,
+    which remains shown.
+    Destroy our settings dialog because
+    1) it does not offer a Cancel button
+    2) it obscures the progress bar in the parent window
+    """
     dialog.destroy()
     return was_canceled, characters, size, source_file, separate, respect_whitespace
 
 
 
-# We would expect n_drawables parameter is unnecessary with introspection but
-# now that isn't working. Until issue #5312 is resolved we keep n_drawables.
-def save_colorxhtml(procedure, run_mode, image, n_drawables, drawables, file, args, data):
-
-    assert(isinstance(drawables, list))
-    drawable = drawables[0]
-
+def preflight(procedure, image, drawables, drawable, file):
     """
-    Preflight limitations of plugin.
+    Detect conditions the plugin cannot process.
+    Returns None, or a plugin return value having an error.
 
-    The protocol for plugins should prevent some of these,
-    and might in the future,
-    but for now it doesn't.
+    The protocol for save plugins should prevent some of these,
+    and might in the future, but for now it doesn't.
     """
 
     # plugins do not register whether they accept multiple layers
@@ -449,13 +466,21 @@ def save_colorxhtml(procedure, run_mode, image, n_drawables, drawables, file, ar
         error = 'No file given'
         return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR,
                                            GLib.Error(error))
-    # Because we register image type RGB,
-    # expect not to be called with alpha, but we are???
-    if not (drawable.bpp() in (3, 6, 12)):  # keys in fmt_from_bpp
+    # Because we register image type RGB, expect protocol prevent???
+    if drawable.has_alpha():
         error =  N_('Cannot save image with alpha channel')
         return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR,
                                            GLib.Error(error))
-    # plugin does calculations only for integer precision
+    # Because we register image type RGB, expect protocol prevent???
+    # Exclude Indexed 1 bpp, Grayscale 1 bpp (and other modes, encodings?)
+    # FIXME If Indexed or Grayscale becomes 3 bpp, this test fails
+    # to prevent the current algorithm from producing garbage image.
+    if not (drawable.bpp() in (3, 6, 12)):  # keys in fmt_from_bpp
+        error =  N_('Cannot save image of this mode or encoding')
+        return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR,
+                                           GLib.Error(error))
+    # assert bpp is 3,6,12 (8, 16, 32 bit per channel)
+    # plugin algorithm only for integer precision
     precision = image.get_precision()
     if not (precision in (
                 Gimp.Precision.U8_LINEAR,
@@ -467,10 +492,23 @@ def save_colorxhtml(procedure, run_mode, image, n_drawables, drawables, file, ar
                 Gimp.Precision.U32_LINEAR,
                 Gimp.Precision.U32_NON_LINEAR,
                 Gimp.Precision.U32_PERCEPTUAL, )):
-        error =  N_('Cannot save image with floating precision')
+        error =  N_('Cannot save image with floating point encoding')
         return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR,
                                            GLib.Error(error))
 
+    return None
+
+
+
+# We would expect n_drawables parameter is unnecessary with introspection but
+# now that isn't working. Until issue #5312 is resolved we keep n_drawables.
+def save_asciiart(procedure, run_mode, image, n_drawables, drawables, file, args, data):
+
+    assert(isinstance(drawables, list))
+
+    error = preflight(procedure, image, drawables, drawables[0], file)
+    if error:
+        return error
 
     source_file = args.index(0)
     characters =  args.index(1)
@@ -487,9 +525,18 @@ def save_colorxhtml(procedure, run_mode, image, n_drawables, drawables, file, ar
 
     if run_mode == Gimp.RunMode.INTERACTIVE:
 
-        GimpUi.init ("colorxhtml.py")
+        GimpUi.init ("file-asciiart.py")
 
-        # Warn user progress can be glacial (since processing per pixel.)
+        """
+        For a save type plugin, a progress bar will appear
+        in the "Export As" dialog, at the bottom.
+
+        We init the progress bar early, so user knows
+        what choice they made in the "Export As" dialog
+        """
+        Gimp.progress_init(_("Exporting ASCII art in HTML"))
+
+        # Warn user export can be glacial (since processing per pixel.)
         if ((width * height) > 500000): # approximately 800x600 pixels
             was_canceled = show_warn_slow_dialog()
             if was_canceled:
@@ -502,10 +549,13 @@ def save_colorxhtml(procedure, run_mode, image, n_drawables, drawables, file, ar
            show_settings_dialog(characters, size, source_file, separate, respect_whitespace )
 
         # Assert settings dialog is destroyed
-        # "Export As" dialog remains visible, contains progress bar
         if was_canceled:
              return procedure.new_return_values(Gimp.PDBStatusType.CANCEL,
                                        GLib.Error())
+            # Assert "Export As" dialog remains visible, user can choose again
+
+        # Assert "Export As" dialog remains open
+        # It shows progress, and offers a Cancel button to stop this plugin
 
     html = open(file.peek_path(), 'w')
 
@@ -526,19 +576,18 @@ def save_colorxhtml(procedure, run_mode, image, n_drawables, drawables, file, ar
     glyph_strings = translate_and_escape_raw_data(raw_chars, respect_whitespace)
     """
     glyph_strings has some non-printable control chars removed,
-    and optionally whitespace removed (printable but not visible)
+    and optionally whitespace (especially newline) removed
+    (whitespace *is* printable but not visible)
     and html control chars escaped.
     glyph_strings is a list of strings.
     Each string is html for a glyph (renders in the box of a character).
     Often the string is a single character,
-    but e.g. the string for an html escape is '&gt;'
+    but e.g. the string for an html escape of > is '&gt;'
     """
 
     if not glyph_strings:
         # file was empty or user cleared out the text entry field. Default.
         glyph_strings = list('X' * 80)
-
-    Gimp.progress_init(_("Saving as HTML"))
 
     # substitute into the html style string for the html body
     style = style_def % ( size, get_background_color_name_from_gimp())
@@ -551,10 +600,9 @@ def save_colorxhtml(procedure, run_mode, image, n_drawables, drawables, file, ar
 
     html.write(preamble % ss)
 
-    colors = {}
+    html_color_index = {}
 
-    # Constants used for formatting the pixel color. We can handle image
-    # types where each color is 8 bits, 16 bits, or 32 bit integers.
+    # Constants for converting pixel color to html style string for color.
     fmt = fmt_from_bpp[bpp]
     pixel_shift = 8 * (bpp//3 - 1)
 
@@ -579,16 +627,27 @@ def save_colorxhtml(procedure, run_mode, image, n_drawables, drawables, file, ar
             glyph_string = row_of_glyph_strings[x]
 
             if separate:
-                if html_color not in colors:
+                if html_color not in html_color_index:
                     css.write('span.N%s { %s }\n' % (html_color, style))
-                    colors[html_color] = 1
+                    html_color_index[html_color] = 1
                 html.write('<span class="N%s">%s</span>' % (html_color, glyph_string))
             else:
                 html.write('<span style="%s">%s</span>' % (style, glyph_string))
 
         html.write('\n')
 
+        """
+        When mode is NON_INTERACTIVE, this is a no operation.
+
+        Per libgimp docs, this is redirected to the progress bar for the plugin.
+        In this case (a file save type plugin), to progress bar in "Export As"
+        """
+        # float() makes / be floating divide, so result is [0.0, 1.0]
+        # TODO apparently this is not working, no change to the length of bar.
         Gimp.progress_update(y / float(height))
+        # Since above not working, change label of progress bar to indicate
+        Gimp.progress_set_text(_(f"Line {y}"))
+
 
     html.write(postamble)
     html.close()
@@ -601,7 +660,7 @@ def save_colorxhtml(procedure, run_mode, image, n_drawables, drawables, file, ar
     ])
 
 
-class ColorXhtml(Gimp.PlugIn):
+class AsciiArt(Gimp.PlugIn):
     ## Parameters ##
     __gproperties__ = {
         "source-file":(bool,
@@ -629,21 +688,20 @@ class ColorXhtml(Gimp.PlugIn):
                       _("_Respect whitespace"),
                        False,
                       GObject.ParamFlags.READWRITE)
-
     }
 
     ## GimpPlugIn virtual methods ##
     def do_query_procedures(self):
         self.set_translation_domain("gimp30-python",
                                     Gio.file_new_for_path(Gimp.locale_directory()))
-        return [ 'file-colorxhtml-save' ]
+        return [ 'file-asciiart-save' ]
 
     def do_create_procedure(self, name):
         procedure = None
-        if name == 'file-colorxhtml-save':
+        if name == 'file-asciiart-save':
             procedure = Gimp.SaveProcedure.new(self, name,
                                            Gimp.PDBProcType.PLUGIN,
-                                           save_colorxhtml, None)
+                                           save_asciiart, None)
             procedure.set_image_types("RGB")  # ("RGB*, GRAY*")
             procedure.set_documentation (
                 N_("Save as HTML containing ASCII art"),
@@ -661,7 +719,7 @@ class ColorXhtml(Gimp.PlugIn):
             procedure.add_argument_from_property(self, "font-size")
             procedure.add_argument_from_property(self, "separate")
             procedure.add_argument_from_property(self, "respect_whitespace")
-
         return procedure
 
-Gimp.main(ColorXhtml.__gtype__, sys.argv)
+
+Gimp.main(AsciiArt.__gtype__, sys.argv)
