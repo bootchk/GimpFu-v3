@@ -855,11 +855,17 @@ commands:
       echo "Copying all my test plugins"
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
 
-      echo "Copying testGimpExportImport plugins"
+
+      # Copy some plugins from volumes of the container
+
       echo "Copying testGimpExportImport"
-      # Copy from a volume of the container
       mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
       cp -r /work/testGimpExportImport/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+
+      echo "Copying testGimpPDB"
+      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
+      cp -r /work/testGimpPDB/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
+
 
       # Scraps for copying selected plugins, if not all are copied
       # testGimpPDB

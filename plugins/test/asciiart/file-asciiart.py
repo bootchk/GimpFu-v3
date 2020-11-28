@@ -42,7 +42,7 @@ the aspect ratio of glyph height/width.
 Unlike some ASCII art, the shape of the character glyphs
 does not usually contribute as drawing strokes.
 Usually only a few glyphs are used.
-Although a user can upload a file that contains stroke-like characters e.g.
+Although a user can choose a file that contains stroke-like characters e.g.
  (...(;)...)
  (...(;)...) etc.
 that would then be rendered in the colors of the image.
@@ -72,7 +72,6 @@ from gi.repository import Gtk
 
 import gettext
 _ = gettext.gettext
-def N_(message): return message
 
 escape_table = {
     '&': '&amp;',
@@ -147,22 +146,20 @@ def get_background_color_name_from_gimp():
 
     Result string is valid html color name.
     Make html background crudely match the Gimp context.
-    Each glyph has its own color,
-    color of the glyphs is the html foreground.
+    Color of the character glyphs is the html foreground.
     """
-    # returns a tuple (bool, Gimp.RGB)
+    # returns a tuple (bool, Gimp.RGB), discard the bool
     gimp_background_color = Gimp.context_get_background()[1]
 
     """
     Better to compare to a named color.
     But there is no equality operator?
-    Not used.
-
+    Not used code:
     parsed_white = Gimp.RGB() # construct new color, unknown value
     parsed_white.parse_name('white') # set new value, discard boolean result
     print(parsed_white)
     """
-    # white is (1.0, 1.0, 1.0), were it really a tuple
+    # white is (1.0, 1.0, 1.0)
     if (    (gimp_background_color.r == 1.0)
         and (gimp_background_color.g == 1.0)
         and (gimp_background_color.b == 1.0) ):
@@ -170,7 +167,7 @@ def get_background_color_name_from_gimp():
     else:
         # default to black
         # FUTURE mangle GIMP background color into an html color
-        # Better to create GIMP function Gimp.RGB.to_nearest_name()
+        # Better to create libgimp function Gimp.RGB.to_nearest_name()
         result = 'black'
     return result
 
@@ -178,7 +175,7 @@ def get_background_color_name_from_gimp():
 
 def translate_and_escape_raw_data(stream, respect_whitespace=False):
     """
-    Translate control and whitespace characters in stream.
+    Translate control and whitespace (optionally) characters in stream.
     Escape characters that are html control characters.
     Return translated stream.
 
@@ -232,15 +229,13 @@ class InfiniteGenerator(object):
 class RowGenerator(object):
     """
     Generate rows of strings from a sequence of strings.
-    Row of len row_len.
+    Row of length row_len.
 
     Stops generating after row_count rows are generated.
 
-    When the sequence is not long enough, wrap around,
-    i.e. make it infinite.
+    When the sequence is not long enough, wrap around, i.e. make it infinite.
 
-    Returns (row_index, row)
-    where row is a sequence (a list) of strings.
+    Returns (row_index, row) where row is a sequence (a list) of strings.
 
     Respecting new lines and padding with spaces.
     """
@@ -295,7 +290,7 @@ GUI
 """
 
 def show_warn_slow_dialog():
-
+    """ Returns whether canceled. """
     # Gimp.message() not adequate: not in front, not offer Cancel
 
     message_dialog = Gtk.MessageDialog(parent= None, # parent_dialog,
@@ -304,8 +299,6 @@ def show_warn_slow_dialog():
                                     buttons=Gtk.ButtonsType.OK_CANCEL,
                                     text=_("The image is large and may export slowly")
                                     )
-
-
     response = message_dialog.run()
     message_dialog.destroy()
     if response == Gtk.ResponseType.OK:
@@ -320,7 +313,6 @@ def show_settings_dialog(characters, size, source_file, separate, respect_whites
     args are reference-by-value of current settings.
     Using the dialog, user may enter new values for settings.
     Return reference to new values.
-
     Also return whether canceled
     """
     use_header_bar = Gtk.Settings.get_default().get_property("gtk-dialogs-use-header")
@@ -458,7 +450,7 @@ def preflight(procedure, image, drawables, drawable, file):
 
     # plugins do not register whether they accept multiple layers
     if len(drawables) > 1:
-        error = N_("Format does not support multiple layers")
+        error = _("Format does not support multiple layers")
         return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR,
                                            GLib.Error(error))
     # expect the protocol to prevent this, so probably superfluous
@@ -468,7 +460,7 @@ def preflight(procedure, image, drawables, drawable, file):
                                            GLib.Error(error))
     # Because we register image type RGB, expect protocol prevent???
     if drawable.has_alpha():
-        error =  N_('Cannot save image with alpha channel')
+        error =  _('Cannot save image with alpha channel')
         return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR,
                                            GLib.Error(error))
     # Because we register image type RGB, expect protocol prevent???
@@ -476,11 +468,11 @@ def preflight(procedure, image, drawables, drawable, file):
     # FIXME If Indexed or Grayscale becomes 3 bpp, this test fails
     # to prevent the current algorithm from producing garbage image.
     if not (drawable.bpp() in (3, 6, 12)):  # keys in fmt_from_bpp
-        error =  N_('Cannot save image of this mode or encoding')
+        error =  _('Cannot save image of this mode or encoding')
         return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR,
                                            GLib.Error(error))
     # assert bpp is 3,6,12 (8, 16, 32 bit per channel)
-    # plugin algorithm only for integer precision
+    # plugin algorithm only for integer encoding
     precision = image.get_precision()
     if not (precision in (
                 Gimp.Precision.U8_LINEAR,
@@ -492,10 +484,9 @@ def preflight(procedure, image, drawables, drawable, file):
                 Gimp.Precision.U32_LINEAR,
                 Gimp.Precision.U32_NON_LINEAR,
                 Gimp.Precision.U32_PERCEPTUAL, )):
-        error =  N_('Cannot save image with floating point encoding')
+        error =  _('Cannot save image with floating point encoding')
         return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR,
                                            GLib.Error(error))
-
     return None
 
 
@@ -531,7 +522,7 @@ def save_asciiart(procedure, run_mode, image, n_drawables, drawables, file, args
         For a save type plugin, a progress bar will appear
         in the "Export As" dialog, at the bottom.
 
-        We init the progress bar early, so user knows
+        Init the progress bar early, so user knows
         what choice they made in the "Export As" dialog
         """
         Gimp.progress_init(_("Exporting ASCII art in HTML"))
@@ -579,6 +570,7 @@ def save_asciiart(procedure, run_mode, image, n_drawables, drawables, file, args
     and optionally whitespace (especially newline) removed
     (whitespace *is* printable but not visible)
     and html control chars escaped.
+
     glyph_strings is a list of strings.
     Each string is html for a glyph (renders in the box of a character).
     Often the string is a single character,
@@ -645,9 +637,9 @@ def save_asciiart(procedure, run_mode, image, n_drawables, drawables, file, args
         # float() makes / be floating divide, so result is [0.0, 1.0]
         # TODO apparently this is not working, no change to the length of bar.
         Gimp.progress_update(y / float(height))
-        # Since above not working, change label of progress bar to indicate
-        Gimp.progress_set_text(_(f"Line {y}"))
-
+        # Since above not working, change label of progress bar instead.
+        # not i18n
+        Gimp.progress_set_text(f"Line {y}")
 
     html.write(postamble)
     html.close()
@@ -702,12 +694,12 @@ class AsciiArt(Gimp.PlugIn):
             procedure = Gimp.SaveProcedure.new(self, name,
                                            Gimp.PDBProcType.PLUGIN,
                                            save_asciiart, None)
-            procedure.set_image_types("RGB")  # ("RGB*, GRAY*")
+            procedure.set_image_types("RGB")  # FUTURE ("RGB*, GRAY*")
             procedure.set_documentation (
-                N_("Save as HTML containing ASCII art"),
+                _("Save as HTML containing ASCII art"),
                 "Saves the image as .html that a browser shows as color ASCII art",
                 name)
-            procedure.set_menu_label(N_("ASCII art in HTML"))
+            procedure.set_menu_label(_("ASCII art in HTML"))
             procedure.set_attribution("Manish Singh and Carol Spears",
                                       "(c) GPL V3.0 or later",
                                       "2003")
