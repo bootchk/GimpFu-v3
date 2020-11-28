@@ -63,7 +63,7 @@ class Types():
         if isinstance(gen_value.actual_arg, str):
             formal_arg_type_name = formal_arg_type.name
             if FormalTypes.is_file_descriptor_type(formal_arg_type_name):
-                gen_value.file_descriptor()
+                gen_value.to_file_descriptor()
 
 
     @staticmethod

@@ -216,7 +216,6 @@ class FuGenericValue():
         Return gtype that items of list SHOULD be as specified by to_container_gtype.
         """
         # TODO this is not right
-        # TODO try is_container_of_adaptees()
         result = FormalTypes.contained_gtype_from_container_gtype(container_gtype)
 
         # FAIL: self.logger.info(f"Contained gtype.__gtype__ is: {contained_gtype.__gtype__}")
@@ -229,6 +228,7 @@ class FuGenericValue():
     # OLD
     # self.contained_gtype_from(to_container_gtype)
     # contained_gtype.name == "GBoxed":  # ??? "GimpObjectArray":
+
     def is_contained_gtype_a_boxed_type(self, container_gtype):
         return container_gtype.name == 'GimpObjectArray'
 
@@ -288,8 +288,7 @@ class FuGenericValue():
            primitive types
         """
 
-
-        # setter function needs gtype of contained items.
+        # setter i.e. factory method needs gtype of contained items.
         # hack
         # use any boxed type, setter doesn't actually use it???
         # TEMP This works but is not general
@@ -361,10 +360,10 @@ class FuGenericValue():
         # result_arg_type = Gimp.GimpParamFloatArray
 
 
-    def file_descriptor(self):
+    def to_file_descriptor(self):
+        """ try convert self.actual_arg from string to Gio.File """
         assert isinstance(self._actual_arg, str)
 
-        # create a GObject file descriptor
         try:
             gfile =  Gio.file_new_for_path(self._actual_arg)
         except Exception as err:
@@ -377,10 +376,8 @@ class FuGenericValue():
             self._did_convert = True
 
 
-
-
-    def color(self):
-        ''' Convert result_arg to instance of type Gimp.RGB '''
+    def to_color(self):
+        ''' Try convert self.actual_arg to type Gimp.RGB '''
         assert self._did_upcast
 
         RGB_result = GimpfuRGB.color_from_python_type(self._actual_arg)

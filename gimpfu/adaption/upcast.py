@@ -101,7 +101,7 @@ class Upcast():
         if gen_value.did_upcast:
             # also convert value
             try:
-                gen_value.color()
+                to_color()
             except Exception as err:
                 proceed(f"Converting to color: {err}")
             #Upcast.logger.info(type(result))
