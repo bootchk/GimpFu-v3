@@ -4,6 +4,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 from adaption.wrappable import *    # is_subclass_of_type
+from message.proceed_error import proceed
 
 import logging
 
@@ -101,7 +102,7 @@ class Upcast():
         if gen_value.did_upcast:
             # also convert value
             try:
-                to_color()
+                gen_value.to_color()
             except Exception as err:
                 proceed(f"Converting to color: {err}")
             #Upcast.logger.info(type(result))

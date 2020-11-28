@@ -1,7 +1,8 @@
-2.99 export as "color xhtml" i.e. html ascii art fails
+2.99 export as "color xhtml" fails.  Enhance.  Patch attached.
 
 ```
 Summary: Fix one reported and several unreported bugs, and many enhancements.
+That is, a major rewrite.
 
 See  #5312  dbc19800 workarounds for openraster plugin.
 The attached patch works around #5312, for colorxhtml plugin.
