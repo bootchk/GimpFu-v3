@@ -13,6 +13,8 @@ from adapters.rgb import GimpfuRGB
 from message.proceed_error import proceed
 from message.suggest import Suggest
 
+from adaption.formal_types import FormalTypes
+
 import collections.abc      # ABC for sequences
 import logging
 
@@ -154,71 +156,169 @@ class FuGenericValue():
         self.upcast(GObject.TYPE_UCHAR)
 
 
-
+    """
+    Utilities for conversion to gimp array
+    """
 
     def is_tuple_or_list(self, obj):
         if isinstance(obj, str):
-            # Python thinks a str is a sequence, but we treat it as a single element
+            # Python thinks a str is a sequence, but we treat it as a single item
             return False
         return isinstance(obj, collections.Sequence)
 
+    def unwrap_items(self, list):
+        """ Return new list where each item in list was unwrapped. """
+
+        self.logger.debug(f"unwrap_items")
+        result_list = []
+        for item in list:
+            self.logger.debug(f"item gtype: {item.adaptee_gtype}")
+            result_list.append(item.unwrap())
+        return result_list
+
+
+    """
+    The type of the container tells you what the type of the items should be,
+    more or less,  e.g. GimpStringArray should contain strings.
+
+    But GimpObjectArray only(?) means it should contain opaque i.e. boxed objects.
+    That is, GimpObjectArray is in C an array of pointers.
+    The pointed to objects can be of many types,
+    e.g. Gimp.Layer *or* Gimp.Channel.
+
+    libgimp's factory methods for Gimp<foo>Array *want* the contained type.
+    I am not sure they actually *need* the contained type in all cases.
+    Also not sure the factory methods are type checking items to ensure
+    items *are* the contained type.
+
+    In particular, for the case container_gtype is GimpObjectArray,
+    it doesn't make any difference what the specific contained_gtype is,
+    as long as it is some boxed type e.g. Gimp.Layer
+    to ensure that an array of pointers is created.
+
+    Also for all the cases where the container_gtype indicates
+    contained_gtype is a primitive type
+    (e.g. GimpStringArray indicates contained_gtype is string),
+    I am not sure we actually need to pass the correct contained_gtype
+    to libgimp's factory method,
+    since if the items are the corresponding Python type,
+    PyGObject will do the right thing,
+    and again, the factory method is not actually checking (or using at all?)
+    the passed contained_gtype.
+
+    container_gtype is the type of the container.
+    GimpFu does not check that that contained items are gtype specified by
+    container_gtype or contained_gtype_from.
+    TODO type check or convert contained items.
+    """
+    def contained_gtype_from(self, container_gtype):
+        """
+        Return gtype that items of list SHOULD be as specified by to_container_gtype.
+        """
+        # TODO this is not right
+        # TODO try is_container_of_adaptees()
+        result = FormalTypes.contained_gtype_from_container_gtype(container_gtype)
+
+        # FAIL: self.logger.info(f"Contained gtype.__gtype__ is: {contained_gtype.__gtype__}")
+        # A GType does not have a GType? Or if it does, it is <GType>
+
+        self.logger.debug(f"contained_gtype_from: {container_gtype.name} returns: {result.name}")
+        # ensure result is a gtype or None ???
+        return result
+
+    # OLD
+    # self.contained_gtype_from(to_container_gtype)
+    # contained_gtype.name == "GBoxed":  # ??? "GimpObjectArray":
+    def is_contained_gtype_a_boxed_type(self, container_gtype):
+        return container_gtype.name == 'GimpObjectArray'
+
+
     def list_for_actual_arg(self):
-        """ Return list for self.actual_arg.
-        As necessary, wrap self.actual_arg in a list.
+        """
+        Return list from self.actual_arg.
+
+        self.actual_arg might already be a list.
+        Require any such list is non-empty.
+        Else contain self.actual_arg in a list.
         """
         if self.is_tuple_or_list(self._actual_arg):
             # already a list
             result = self._actual_arg
         else:
-            # an element, contain it
+            # an item, contain it
             result = [self._actual_arg,]
+
+        # items in list might still be wrapped
+        assert(len(result)>0)
         return result
 
 
     """
-    For now, use e.g. Gimp.value_set_float_array,
-    which might be the only way to do it.
-    But possibly there is a simpler implementation.
+    For now, use Gimp.value_set_<foo>_array factory methods.
+    That might be the only way, or maybe is a simpler implementation.
     """
-    def to_gimp_array(self, to_gtype, gvalue_setter ):
-        """ Make self's GValue hold a Gimp<foo>Array specified by to_gtype, created from Python native sequences.
-
-        gvalue_setter is a method of Gimp e.g. Gimp.value_set_object_array
-
-        GimpFu allows Author to pass single instance.
-        Will convert it to a list and then to to_gtype.
-
-        to_gtype is the type of the container.
-        We don't check that that contained elements are proper gtype.
-        to_gtype only sometimes conveys the contained gtype.
-        TODO type convert contained elements.
+    def to_gimp_array(self, to_container_gtype, gvalue_setter ):
         """
-        self.logger.info(f"to_gimp_array {to_gtype}")
+        Make self's GValue hold a Gimp<foo>Array
+        where <foo> is determined by to_container_gtype,
+        and contents are from self.actual_arg.
 
-        list = self.list_for_actual_arg()
+        self.actual_arg can be a single item *or* Python native sequences.
+        GimpFu allows Author to pass an item where
+        the called PDB procedure expects an array.
+        Contain item in a list and then to to_container_gtype.
 
-        # require elements have gtype
+        gvalue_setter is a method of Gimp e.g. Gimp.value_set_object_array.
+        It needs contained_gtype.
         """
-        TODO
-        contained_gtype = list[0].__gtype__
-        This doesn't seem to work, returns a method of an adapter???
+        self.logger.info(f"to_gimp_array {to_container_gtype}")
 
-        And yet the following is not sufficient when a list is passed.
+        try:
+            list = self.list_for_actual_arg()
+        except Exception as err:
+            proceed(f"Exception in list_for_actual_arg: _actual_arg: {self._actual_arg}, {err}")
+
         """
-        contained_gtype = self._actual_arg.__gtype__
-        self.logger.info(f"Contained gtype is: {contained_gtype}")
+        assert list is-a list, but items are wrapped or primitive types
+        But we don't know much about the contained items.
+        (They were passed as arguments by Author.)
+        Could be:
+           wrapped GObjects
+           ??? unwrapped GObjects (responds to .__gtype__)
+           primitive types
+        """
+
+
+        # setter function needs gtype of contained items.
+        # hack
+        # use any boxed type, setter doesn't actually use it???
+        # TEMP This works but is not general
+        # it works only when testing GimpObjectArray
+
+        contained_gtype = Gimp.Layer.__gtype__
+
+        if self.is_contained_gtype_a_boxed_type(to_container_gtype):
+            # TODO For now assume everything is wrapped, how could it not be?
+            list = self.unwrap_items(list)
+        else:
+            list = list
+
+        # assert list now contains unwrapped or primitive instances
 
         try:
             # create empty (i.e. no value) GValue of desired type,
-            self._gvalue = GObject.Value (to_gtype)
+            self._gvalue = GObject.Value (to_container_gtype)
 
             """
             set value into GValue
-            setter function needs gtype of elements in list.
-            """
-            """
-            PyGObject will convert list using len(list)
-            The length is still also passed to the PDB procedure
+
+            We are calling e.g. Gimp.value_set_object_array()
+            whose C signature is like (...len, array...)
+            PyGObject will convert "list" to  "len(list), array"
+
+            Elsewhere, the length is also passed to a PDB procedure
+            since the PDB API is C-like, not Python-like.
+
             Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
             """
             gvalue_setter(self._gvalue, contained_gtype, list)
@@ -226,66 +326,18 @@ class FuGenericValue():
             self._did_convert = True
 
         except Exception as err:
-            proceed(f"Failed to create Gimp.<foo>Array: {err}.")
+            proceed(f"Fail to_gimp_array: {to_container_gtype.name}: {err}.")
+
+
 
 
     def to_object_array(self):
         """ Make self own a GValue holding a GimpObjectArray """
         self.to_gimp_array(Gimp.ObjectArray.__gtype__, Gimp.value_set_object_array )
 
-        """
-        OLD
-        self.logger.info(f"to_object_array")
-
-        list = self.list_for_actual_arg()
-
-        try:
-            self._gvalue = GObject.Value (Gimp.ObjectArray.__gtype__)
-
-            # PyGObject will convert using sequence and len(sequence)
-            # Note that the previous arg (length) is still also passed to the PDB procedure
-
-            # ??? we don't need to pass len(list)
-            # Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
-            # we do need to pass type of elements in list
-            # TODO Layer is a hack, need gtype of list elements
-            print(self._actual_arg.__gtype__)
-            #Gimp.value_set_object_array(self._gvalue, Gimp.Layer, list)
-            Gimp.value_set_object_array(self._gvalue, self._actual_arg.__gtype__, list)
-            self._did_create_gvalue = True
-            self._did_convert = True
-
-        except Exception as err:
-            proceed(f"Failed to create Gimp.ObjectArray: {err}.")
-        """
-
     def to_float_array(self):
         """ Make self's GValue hold a GimpFloatArray created from self.actual_arg"""
         self.to_gimp_array(Gimp.FloatArray.__gtype__, Gimp.value_set_float_array )
-
-        """
-        OLD
-        # require self._actual_arg is-a sequence type
-
-        # TODO use logger (">>>>>>>>>>Converting float list")
-
-        # TODO not sure we need to float(), maybe PyGObject will do it
-        #float_list = [float(item) for item in actual_arg]
-        float_list = self._actual_arg
-
-        try:
-            self._gvalue = GObject.Value (Gimp.FloatArray.__gtype__)
-
-            # PyGObject will convert using sequence and len(sequence)
-            # Note that the previous arg (length) is still also passed to the PDB procedure
-            Gimp.value_set_float_array(self._gvalue, float_list)
-            self._did_create_gvalue = True
-            self._did_convert = True
-
-            # OLD result_gvalue = FuFloatArray.new_gimp_float_array_gvalue(float_list)
-        except Exception as err:
-            proceed(f"Failed to create Gimp.FloatArray: {err}.")
-        """
 
     def to_string_array(self):
         """ Make self's GValue hold a GimpStringArray created from self.actual_arg"""

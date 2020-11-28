@@ -25,8 +25,8 @@ class FuLogger:
         # possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
         # TODO make the level come from the command line or the environment
         # TODO for now, uncomment one of the following two lines
-        #logger.setLevel(logging.DEBUG)
-        logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.DEBUG)
+        #logger.setLevel(logging.WARNING)
 
         """
         A logger contains one or more handlers,
@@ -42,7 +42,8 @@ class FuLogger:
         ch.setLevel(logging.DEBUG)
 
         # create formatter and add it to the handlers
-        formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+        # -20 means column padded to 20 chars
+        formatter = logging.Formatter('%(name)-23s - %(levelname)s - %(message)s')
         ch.setFormatter(formatter)
         #fh.setFormatter(formatter)
 

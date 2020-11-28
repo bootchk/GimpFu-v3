@@ -1,11 +1,40 @@
 
 
-GimpFu (the simplified Gimp plugin API for Python)  for Gimp 3 and Python3.
+GimpFu v3
 
-Note: *The planned Gimp 3 still supports Python plugins, but using GObject Introspection.  Gimp 3 does not plan to support GimpFu style plugins without this unofficial repository.  
-If you need the certainty that a new plugin will work in Gimp 3, you should use the official machinery.*
+The simplified Gimp plugin API, for Gimp 3 and Python3.
+
+Disclaimer: *Not supported by gimp.org.  The planned Gimp 3 still supports Python plugins, but using GObject Introspection.  Gimp 3 will not support GimpFu style plugins without this unofficial repository.
+When writing a new plugin, to be certain it will work in Gimp 3, you should use the official machinery and not GimpFu v3.*
 
 *GimpFu is NOT a plugin, only a Python module that other Python scripts use to make them behave as plugins.*
+
+
+# Why it is interesting to work on
+
+This is a sales pitch to get developers interested in contributing.
+
+As programming, developing GimpFu v3 is very stimulating.  
+It uses the metaobject protocol of Python
+(e.g. special method __getattr__ etc.).
+It is metaprogramming, generating Python code from the user's code
+and eval'ing it.
+
+From the user's point of view, GimpFu remains valuable as a simplified way to program plugins,
+There are thousands of plugins in the GimpFu language,
+and hundreds of casual and not-so casual programmers who know the language.
+
+From a historical point of view,
+you are standing on the shoulders of giants.
+Read GimpFu 2 documents and code to know who I am talking about.
+They designed the GIMP plugin architecture and the GimpFu language,
+which remain good.
+It is only the tremendous work they did to static bind Python 2 to GIMP
+that is being discarded by GIMP 3 (rightfully so.)
+And many features of PyGimp and GimpFu v2 are migrated to GIMP v3 itself.
+But GimpFu the language could remain relevant.
+It lowers the barrier for entry to programming GIMP plugins.
+
 
 # Status
 
@@ -51,8 +80,9 @@ Run:
 ```
 If you also have or installed some GimpFu v3 plugins,
 expect to see them in the Gimp menus.
-(A typical Gimp 2.99 build will have no GimpFu plugins.)  
-GimpFu itself does not appear in the Gimp menus.
+(A typical Gimp 2.99 build will have no GimpFu plugins.)
+
+GimpFu itself is not a plugin and does not appear in the Gimp menus.
 
 
 ## Notes on Installation
@@ -189,6 +219,7 @@ It is more readable.  GimpFu v2 static binding was an art understood by few peop
 ### More about GI.  
 
 Gimp 3 is being enhanced with GObject annotations that allow GI of its API.
+
 GimpFu uses GObject Introspection, but hides it from plugin authors.
 The PyGObject module (import gi) lets Python code do GI.
 The PyGObject module is partially implemented in the C language,

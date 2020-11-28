@@ -742,6 +742,7 @@ commands:
       cp -r /work/testGimpPDB/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
 
       echo "Copying testGimpExportImport"
+      # Copy from a volume of the container
       mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
       cp -r /work/testGimpExportImport/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
 
@@ -811,6 +812,17 @@ commands:
 
 
 
+  # -O -   means: pipe to stdout
+  #wget https://github.com/bootchk/testGimpExportImport/tarball/master
+  #tar xz -f master
+  #rm master
+  # copy contents of top directory to a new directory
+  #mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+  #cp -r bootchk-testGimp*/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+  #rm -rf bootchk-testGimp*
+  #rm -rf wget-log*
+  #curl -L  https://github.com/bootchk/testGimpExportImport/tarball/master | tar xz -C /work/.home/.config/GIMP/2.99/plug-ins
+
   gimpMesonTestGUI: !Command
     description: Run gimp GUI in gimpMesonDev container, creating user's plugins in home
     container:  gimpMesonLocal
@@ -844,16 +856,10 @@ commands:
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Copying testGimpExportImport plugins"
-      # -O -   means: pipe to stdout
-      wget https://github.com/bootchk/testGimpExportImport/tarball/master
-      tar xz -f master
-      rm master
-      # copy contents of top directory to a new directory
+      echo "Copying testGimpExportImport"
+      # Copy from a volume of the container
       mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
-      cp -r bootchk-testGimp*/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
-      rm -rf bootchk-testGimp*
-      rm -rf wget-log*
-      #curl -L  https://github.com/bootchk/testGimpExportImport/tarball/master | tar xz -C /work/.home/.config/GIMP/2.99/plug-ins
+      cp -r /work/testGimpExportImport/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
 
       # Scraps for copying selected plugins, if not all are copied
       # testGimpPDB
@@ -880,7 +886,7 @@ commands:
       # tell Gimp to debug certain plugins
       # all,fatal-warnings
       # export GIMP_PLUGIN_DEBUG=file-png,fatal-warnings
-      export GIMP_PLUGIN_DEBUG=all,fatal-warnings
+      export GIMP_PLUGIN_DEBUG=all,fatal-criticals
 
       # print all G_MESSAGES
       # export G_MESSAGES_DEBUG=all

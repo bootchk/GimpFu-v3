@@ -101,6 +101,11 @@ class Adapter():
         ''' Class name by which author knows adaptee class e.g. Gimp.Image '''
         return type(self._adaptee).__name__
 
+    @property
+    def adaptee_gtype(self):
+        ''' gtype of adaptee e.g. Gimp.Layer.__gtype__ '''
+        return self._adaptee.__gtype__
+
 
 
     '''

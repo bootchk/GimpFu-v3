@@ -1,5 +1,6 @@
 
-from gimppdb.gimppdb import GimpPDB
+import gi
+from gi.repository import GObject    # GObject type constants
 
 import logging
 
@@ -30,7 +31,7 @@ class FormalTypes():
     Is it spec.value_type.name or spec.name?
     '''
 
-    logger = logging.getLogger("GimpFu.Types")
+    logger = logging.getLogger("GimpFu.FormalTypes")
 
     """
     These classify groups/sets of typenames.
@@ -73,4 +74,26 @@ class FormalTypes():
         mangled_formal_type_name = formal_type_name.replace('GimpParam', '')
         result = mangled_formal_type_name == actual_type_name
         FormalTypes.logger.debug(f"{result}    formal {formal_type_name} == actual {actual_type_name}")
+        return result
+
+    @staticmethod
+    def contained_gtype_from_container_gtype(to_container_gtype):
+        """
+        Infer contained gtype from a container's gtype.
+        Don't check that each contained item actually is that type.
+        """
+        FormalTypes.logger.debug(f"gtype_from_container_gtype: to_container_gtype: {to_container_gtype} name: {to_container_gtype.name} ")
+
+        result = None
+        if to_container_gtype.name == 'GimpObjectArray':
+            # i.e. an opaque object
+            # TYPE_OBJECT is GObject itself
+            result = GObject.TYPE_BOXED  #Gimp.Drawable
+        elif FormalTypes.is_float_array_type(to_container_gtype):
+            result =  GObject.TYPE_FLOAT
+        else:
+            raise NotImplementedError
+        # Must pass C code: assertion 'g_type_is_a (object_type, G_TYPE_OBJECT)
+        assert isinstance(result, GObject.GType)
+        FormalTypes.logger.debug(f"gtype_from_container_gtype returns: {result} ")
         return result
