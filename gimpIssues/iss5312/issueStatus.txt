@@ -36,5 +36,6 @@ returns one argument, a list, e.g. in Scheme
 (gimp-context-list-paint-methods )   a function call with no args
 returns only a list.
 
+TODO keep working on this
 
 E.G. gimp-context-list-paint-methods returns num_strings, StringArray

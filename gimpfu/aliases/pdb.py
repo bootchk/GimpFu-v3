@@ -122,6 +122,7 @@ class GimpfuPDB():
 
             # Not a try: except????
             inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
+            assert inner_result is not None, "PDB procedure call failed to return value array."
 
             # The first element of result is the PDB status
             self.logger.debug(f"run_procedure result is: {inner_result.index(0)}")
