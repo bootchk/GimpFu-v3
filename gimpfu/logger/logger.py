@@ -1,6 +1,7 @@
 
 
 import logging
+import os
 
 
 """
@@ -23,10 +24,10 @@ class FuLogger:
         logger = logging.getLogger('GimpFu')
 
         # possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
-        # TODO make the level come from the command line or the environment
-        # TODO for now, uncomment one of the following two lines
-        #logger.setLevel(logging.DEBUG)
-        logger.setLevel(logging.WARNING)
+        if os.getenv("GIMPFU_DEBUG") is not None:
+            logger.setLevel(logging.DEBUG)  # Show every log message
+        else:
+            logger.setLevel(logging.WARNING)   # Omit DEBUG and INFO
 
         """
         A logger contains one or more handlers,
