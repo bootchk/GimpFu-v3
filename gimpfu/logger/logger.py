@@ -25,8 +25,8 @@ class FuLogger:
         # possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
         # TODO make the level come from the command line or the environment
         # TODO for now, uncomment one of the following two lines
-        logger.setLevel(logging.DEBUG)
-        #logger.setLevel(logging.WARNING)
+        #logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.WARNING)
 
         """
         A logger contains one or more handlers,

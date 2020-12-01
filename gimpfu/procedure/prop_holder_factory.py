@@ -109,7 +109,8 @@ class Foo(GObject.GObject):
             # fatal, useless to proceed if we can't convey args to Gimp
             raise RuntimeError(f"Unhandled property type: {type}")
 
-        self.logger.info(f"exec( {code_string} )")
+        # This logs a long string
+        #self.logger.info(f"exec( {code_string} )")
 
         # create class Foo in globals by exec template
         exec(code_string)

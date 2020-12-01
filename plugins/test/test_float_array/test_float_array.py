@@ -15,6 +15,12 @@ _ = gettext.gettext
 def N_(message): return message
 
 
+"""
+This tests passing an array to a libgimp routine.
+
+At one time, it was broken (since annotation ) to Gimp.pencil was wrong.
+"""
+
 def foo_with_pdb():
 
     # the foo you want to test
@@ -92,8 +98,14 @@ def foo_with_pdb():
 
 def foo(procedure, run_mode, image, drawable, args, data):
 
-    result = Gimp.pencil(drawable, 4, [100.0, 100.0, 400.0, 400.0])
+    # Note this is not a call to the PDB, but to a GI'd libgimp routine.
+
+    # result = Gimp.pencil(drawable, 4, [100.0, 100.0, 400.0, 400.0])
     #fails: TypeError: Gimp.pencil() takes exactly 2 arguments (3 given)
+
+    result = Gimp.pencil(drawable, [100.0, 100.0, 400.0, 400.0])
+
+    print("test array in call to Gimp.pencil succeeded.\n")
 
     return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
 
@@ -107,21 +119,21 @@ class Foo (Gimp.PlugIn):
         self.set_translation_domain("gimp30-python",
                                     Gio.file_new_for_path(Gimp.locale_directory()))
 
-        return [ 'python-fu-foo' ]  # Return procedure name, elsewhere this is "name"
+        return [ 'python-fu-test-array-to-libgimp' ]  # Return procedure name, elsewhere this is "name"
 
     def do_create_procedure(self, name):
         procedure = Gimp.ImageProcedure.new(self, name,
                                             Gimp.PDBProcType.PLUGIN,
                                             foo, None)
         procedure.set_image_types("*");
-        procedure.set_documentation (N_("Test foo"),
-                                     "Tests Gimp/PyGObject implementation of conversions.",
+        procedure.set_documentation (N_("Test array to libgimp"),
+                                     "Tests PyGObject marshalling.",
                                      name)
-        procedure.set_menu_label(N_("_Test gimp_pencil"))
+        procedure.set_menu_label(N_("_Test array to libgimp Gimp.pencil"))
         procedure.set_attribution("Konneker",
                                   "Konneker",
                                   "2020")
-        procedure.add_menu_path ("<Image>/Filters/Test")
+        procedure.add_menu_path ("<Image>/Test")
         return procedure
 
 Gimp.main(Foo.__gtype__, sys.argv)

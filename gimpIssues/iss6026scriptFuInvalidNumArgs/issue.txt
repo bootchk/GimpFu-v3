@@ -1,0 +1,47 @@
+
+2.99 ScriptFu scripts fail on changed API to PDB gimp-edit-Copying for multilayer
+
+About 10 scripts in plug-ins/script-fu/scripts fail with, e.g.:
+
+```
+Error: Invalid number of arguments for gimp-edit-copy (expected 2 but received 1)
+```
+
+Usually gimp-edit-copy but also gimp-edit-cut and others?
+Henceforth 'foo'.
+
+See 98603c69, which broke the PDB API.
+
+One solution is to:
+
+1) keep the old API for PDB gimp-edit-foo.
+And put code in the PDB procedure definition
+(that generates wrapper code e.g. ..._pdb.c)
+to *adapt* to libgimp API
+(that is, put the single drawable in a GimpObjectArray
+before passing to libgimp gimp-edit-foo)
+
+2) add new PDB procedures gimp-edit-foo-visible
+which call the v3 libgimp gimp-edit-foo (without adaption.)
+(Where 'visible' denotes 'all the possibly many rendered layers')
+
+In other words, keep the original semantics,
+and add a new procedure for the new multi-layer semantics.
+
+Another solution is to just fix all the GIMP .scm scripts.
+But that leaves many third party ScriptFu scripts needing fixes.
+I think that calls to gimp-edit-foo are common,
+so that many third-party plugins would be broken.
+
+In my opinion, the PDB API need not stay in one-to-one correspondence
+with the libgimp API.  The PDB API can be larger, and should be
+more object-oriented and less C-like.
+See #5919 , which suggests other changes to the PDB API related to
+the problem of passing arrays to/from PDB procedures.
+It also suggests doing adaption in the generated PDB wrappers,
+so the PDB API remains object oriented.
+
+I can submit a patch once I know which solution is desired.
+
+I discovered this while testing using my plugin that tests most PDB procedures:
+https://github.com/bootchk/testGimpPDB
