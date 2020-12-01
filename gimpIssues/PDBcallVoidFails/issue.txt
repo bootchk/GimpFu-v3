@@ -1,0 +1,111 @@
+2.99 Python call to PDB procedure taking (void) throws CRITICAL and fails
+
+```
+Replicate:
+
+result = Gimp.get_pdb().run_procedure('gimp-context-list-paint-methods', [] )
+
+gimp-context-list-paint-methods(void) is an INTERNAL procedure taking no arguments
+
+(see attached small plugin test case)
+
+Expect:
+
+result is a tuple (True, ['gimp-pencil', ...])
+
+Actual:
+
+(testEmptyArgs.py:192): LibGimp-CRITICAL **: 16:44:10.397: gimp_pdb_run_procedure_argv: assertion 'arguments != NULL' failed
+
+and result is None
+```
+
+A call to libgimp works:
+
+result = Gimp.gimp-context-list-paint-methods()
+
+so there is a workaround, but there are reasons some authors may want to use the PDB call.
+
+I also tried passing an empty GimpValueArray (see comments in test case.)
+
+
+43d0f0fb changed how the args are passed to run_procedure()
+I vaguely recall changing the annotations somewhere so you could pass a native list
+instead of a GimpValueArray for the args parameter?  I am not saying the commit is the
+cause.
+
+If you install my patch in #5971 and set env GIMP_DEBUG=all,fatal-criticals
+so that a CRITICAL is fatal and generates a stack trace,
+you get this stack trace:
+
+```
+#3  0x00007f0a27f8fcbb in gimp_fatal_func (log_domain=0x7f0a27f9bef2 "LibGimp", flags=10, message=0x13ae380 "gimp_pdb_run_procedure_argv: assertion 'arguments != NULL' failed", data=0x0) at ../libgimp/gimp-debug.c:397
+        sigset = {__val = {0 <repeats 16 times>}}
+        level = 0x7f0a27fa3534 "CRITICAL"
+#4  0x00007f0a29fdd39c in g_logv () at /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#5  0x00007f0a29fdd583 in g_log () at /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#6  0x00007f0a27f62170 in gimp_pdb_run_procedure_argv (pdb=0x13ae860, procedure_name=0x13c46a0 "gimp-context-list-paint-methods", arguments=0x0, n_arguments=0) at ../libgimp/gimppdb.c:306
+        args = 0x0
+        return_values = 0x1
+        __func__ = "gimp_pdb_run_procedure_argv"
+#7  0x00007f0a2a34dff5 in  () at /lib/x86_64-linux-gnu/libffi.so.7
+#8  0x00007f0a2a34d40a in  () at /lib/x86_64-linux-gnu/libffi.so.7
+#9  0x00007f0a2a0d60a5 in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-38-x86_64-linux-gnu.so
+#10 0x00007f0a2a0cd25c in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-38-x86_64-linux-gnu.so
+#11 0x00007f0a2a0d119d in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-38-x86_64-linux-gnu.so
+#12 0x00000000005f46d6 in _PyObject_MakeTpCall ()
+#13 0x0000000000570936 in _PyEval_EvalFrameDefault ()
+#14 0x00000000005f7146 in _PyFunction_Vectorcall ()
+#15 0x00000000005f6e27 in PyObject_CallObject ()
+#16 0x00007f0a2a0cde4e in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-38-x86_64-linux-gnu.so
+#17 0x00007f0a2a34de06 in  () at /lib/x86_64-linux-gnu/libffi.so.7
+#18 0x00007f0a2a34e188 in  () at /lib/x86_64-linux-gnu/libffi.so.7
+#19 0x00007f0a27f5dcdd in gimp_image_procedure_run (procedure=0x13be150, args=0x13afae0) at ../libgimp/gimpimageprocedure.c:138
+        image_proc = 0x13be150
+        remaining = 0x13b2b20
+        return_values = 0x1399748
+        run_mode = GIMP_RUN_INTERACTIVE
+        image = 0x137f010
+        drawable = 0x13a82d0
+        i = 3
+#20 0x00007f0a27f6a53a in gimp_procedure_run (procedure=0x13be150, args=0x13afae0) at ../libgimp/gimpprocedure.c:1819
+        return_vals = 0x90a9f0 <_Py_NoneStruct>
+        error = 0x0
+        i = 9480688
+        __func__ = "gimp_procedure_run"
+#21 0x00007f0a27f652be in gimp_plug_in_proc_run_internal (plug_in=0x13a7560, proc_run=0x12e92c0, procedure=0x13be150, proc_return=0x7ffe55315840) at ../libgimp/gimpplugin.c:1216
+        arguments = 0x13afae0
+        return_values = 0x0
+#22 0x00007f0a27f65129 in gimp_plug_in_proc_run (plug_in=0x13a7560, proc_run=0x12e92c0) at ../libgimp/gimpplugin.c:1163
+        proc_return = {name = 0x7ffe55315880 "\005", n_params = 20381232, params = 0x1399598}
+        procedure = 0x13be150
+#23 0x00007f0a27f64e42 in gimp_plug_in_loop (plug_in=0x13a7560) at ../libgimp/gimpplugin.c:1071
+        msg = {type = 5, data = 0x12e92c0}
+#24 0x00007f0a27f6446c in _gimp_plug_in_run (plug_in=0x13a7560) at ../libgimp/gimpplugin.c:820
+        __func__ = "_gimp_plug_in_run"
+#25 0x00007f0a27f57c9a in gimp_main (plug_in_type=Python Exception <class 'gdb.error'> No type named TypeNode.:
+, argc=7, argv=0x1399760) at ../libgimp/gimp.c:538
+        read_channel = 0x136fe30
+        write_channel = 0x1109e20
+        basename = 0x139b810 "\001"
+        protocol_version = 270
+        __func__ = "gimp_main"
+#26 0x00007f0a2a34dff5 in  () at /lib/x86_64-linux-gnu/libffi.so.7
+#27 0x00007f0a2a34d40a in  () at /lib/x86_64-linux-gnu/libffi.so.7
+#28 0x00007f0a2a0d60a5 in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-38-x86_64-linux-gnu.so
+#29 0x00007f0a2a0cd25c in  () at /usr/lib/python3/dist-packages/gi/_gi.cpython-38-x86_64-linux-gnu.so
+#30 0x00000000005f46d6 in _PyObject_MakeTpCall ()
+#31 0x0000000000570936 in _PyEval_EvalFrameDefault ()
+#32 0x000000000056955a in _PyEval_EvalCodeWithName ()
+#33 0x000000000068c4a7 in PyEval_EvalCode ()
+#34 0x000000000067bc91 in  ()
+#35 0x000000000067bd0f in  ()
+#36 0x000000000067bdcb in PyRun_FileExFlags ()
+#37 0x000000000067de4e in PyRun_SimpleFileExFlags ()
+#38 0x00000000006b6032 in Py_RunMain ()
+#39 0x00000000006b63bd in Py_BytesMain ()
+#40 0x00007f0a2aa0d0b3 in __libc_start_main () at /lib/x86_64-linux-gnu/libc.so.6
+#41 0x00000000005fa4de in _start ()
+[Inferior 1 (process 193) detached]
+LibGimp (pid:193): [E]xit, show [S]tack trace or [P]roceed:
+```

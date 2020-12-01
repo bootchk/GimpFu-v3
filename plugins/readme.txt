@@ -10,6 +10,7 @@ The plugins don't all work.
 Categories:
 - wild: gleaned from the web. Authors are third parties, rarely Gimp.org
 - test: unit tests of GimpFu features.  Author self
+- nonGimpFu: unit tests of GI's Python plugins.  Author self
 - bad: abandoned active testing, horrible.
 
 When I find a plugin that fails on some little used corner case,

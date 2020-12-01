@@ -27,5 +27,5 @@ register(
       ],
       [],
       plugin_func,
-      menu="<Image>/Filters/Test")
+      menu="<Image>/Test")
 main()

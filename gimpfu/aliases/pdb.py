@@ -118,7 +118,8 @@ class GimpfuPDB():
             marshaled_args = None
 
         if marshaled_args is not None:
-            # require marshaled_args is not None, but it could be an empty GimpValueArray
+            # marshaled_args is-a list of GValues, but it could be an empty list.
+            # PyGObject will marshall the list into a GimpValueArray
 
             # Not a try: except????
             inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)

@@ -142,7 +142,7 @@ class Foggify (Gimp.PlugIn):
         procedure.set_attribution("lkk",
                                   "lkk",
                                   "2020")
-        procedure.add_menu_path ("<Image>/Filters/Test")
+        procedure.add_menu_path ("<Image>/Test")
 
         #procedure.add_argument_from_property(self, "name")
         # TODO: add support for GBoxed values.

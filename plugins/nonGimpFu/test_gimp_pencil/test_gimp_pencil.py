@@ -13,23 +13,16 @@ import gettext
 _ = gettext.gettext
 def N_(message): return message
 
-'''
-A GI plugin
-Test that g_error() terminates plugin
-(and invokes GIMP debug machinery.)
-'''
+
 
 def foo(procedure, run_mode, image, drawable, args, data):
 
-    # Not exist?
-    # GLib.error("here")
+    result = Gimp.pencil(drawable, [100.0, 100.0, 400.0, 400.0])
+    #fails: TypeError: Gimp.pencil() takes exactly 2 arguments (3 given)
+    # but /usr/local/share/gir-1.0/Gimp-3.0.gir
+    # and the code in libgimpbase/gimppainttools_pdb.c says 3 args
 
-    # This causes seg fault, which is caught by GIMP sig handler
-    # Not the same thing as the GIMP fatal handler
-    # GLib.free(1)
-
-    # apparently there is no way to do the same thing as g_error() using GI
-    print("Doing nothing")
+    Gimp.displays_flush()
 
     return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
 
@@ -43,21 +36,21 @@ class Foo (Gimp.PlugIn):
         self.set_translation_domain("gimp30-python",
                                     Gio.file_new_for_path(Gimp.locale_directory()))
 
-        return [ 'python-fu-test-glib-error' ]  # Return procedure name, elsewhere this is "name"
+        return [ 'python-fu-foo' ]  # Return procedure name, elsewhere this is "name"
 
     def do_create_procedure(self, name):
         procedure = Gimp.ImageProcedure.new(self, name,
                                             Gimp.PDBProcType.PLUGIN,
                                             foo, None)
         procedure.set_image_types("*");
-        procedure.set_documentation (N_("Test GLib error"),
-                                     "Tests GLib error.",
+        procedure.set_documentation (N_("Test foo"),
+                                     "Tests Gimp/PyGObject implementation of conversions.",
                                      name)
-        procedure.set_menu_label(N_("_Test GLib Error"))
+        procedure.set_menu_label(N_("_Test gimp_pencil"))
         procedure.set_attribution("Konneker",
                                   "Konneker",
                                   "2020")
-        procedure.add_menu_path ("<Image>/Filters/Test")
+        procedure.add_menu_path ("<Image>/Test")
         return procedure
 
 Gimp.main(Foo.__gtype__, sys.argv)
