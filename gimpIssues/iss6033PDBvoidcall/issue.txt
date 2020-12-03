@@ -109,3 +109,18 @@ you get this stack trace:
 [Inferior 1 (process 193) detached]
 LibGimp (pid:193): [E]xit, show [S]tack trace or [P]roceed:
 ```
+
+
+
+Patch attached.
+
+Since the patch fixes 43d0f0fb which recently added the patched functions,
+there is little danger that the patch will affect older GIMP code.
+
+The solution is to allow n_values==0 for gimp_value_array_new_from_values(),
+returning an empty GimpValueArray.
+
+A faulty precondition is removed from gimp_pdb_run_procedure_argv()
+and a corrected precondition is put in gimp_value_array_new_from_values().
+No other code in gimp_pdb_run_procedure_argv() requires the precondition,
+so it is sufficient that only gimp_value_array_new_from_values() requires the precondition.

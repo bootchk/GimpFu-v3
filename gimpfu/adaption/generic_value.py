@@ -5,7 +5,7 @@ from gi.repository import GObject
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from gi.repository import GLib  # GLib.guint ???
+# from gi.repository import GLib  # GLib.guint ???
 from gi.repository import Gio   # Gio.File
 
 from adapters.rgb import GimpfuRGB
@@ -25,7 +25,7 @@ import logging
 class FuGenericValue():
     '''
     A (type, value) that holds any ('generic') value.
-    Similar to GValue.
+    A thin class around GValue.
 
     Adapts Python types to GTypes.
 
@@ -166,16 +166,6 @@ class FuGenericValue():
             return False
         return isinstance(obj, collections.Sequence)
 
-    def unwrap_items(self, list):
-        """ Return new list where each item in list was unwrapped. """
-
-        self.logger.debug(f"unwrap_items")
-        result_list = []
-        for item in list:
-            self.logger.debug(f"item gtype: {item.adaptee_gtype}")
-            result_list.append(item.unwrap())
-        return result_list
-
 
     """
     The type of the container tells you what the type of the items should be,
@@ -197,7 +187,7 @@ class FuGenericValue():
     to ensure that an array of pointers is created.
 
     Also for all the cases where the container_gtype indicates
-    contained_gtype is a primitive type
+    contained_gtype is a fundamental type
     (e.g. GimpStringArray indicates contained_gtype is string),
     I am not sure we actually need to pass the correct contained_gtype
     to libgimp's factory method,
@@ -279,30 +269,34 @@ class FuGenericValue():
             proceed(f"Exception in list_for_actual_arg: _actual_arg: {self._actual_arg}, {err}")
 
         """
-        assert list is-a list, but items are wrapped or primitive types
+        assert list is-a list, but items are wrapped or fundamental types
         But we don't know much about the contained items.
         (They were passed as arguments by Author.)
         Could be:
            wrapped GObjects
            ??? unwrapped GObjects (responds to .__gtype__)
-           primitive types
+           fundamental types
         """
 
         # setter i.e. factory method needs gtype of contained items.
         # hack
-        # use any boxed type, setter doesn't actually use it???
+        # use any GIMP boxed type, setter doesn't actually use it???
         # TEMP This works but is not general
         # it works only when testing GimpObjectArray
-
         contained_gtype = Gimp.Layer.__gtype__
 
+
+        # setter requires fundamental or GIMP types, not GimpFu wrapped types
+        from adaption.marshal import Marshal
         if self.is_contained_gtype_a_boxed_type(to_container_gtype):
-            # TODO For now assume everything is wrapped, how could it not be?
-            list = self.unwrap_items(list)
-        else:
+            # Each item should be wrapped, how could it not be???
+            # But unwrap_homogenous_sequence doesn't require it.
+            # unwrap_homogenous_sequence does check each item is same unwrapped type
+            list = Marshal.unwrap_homogenous_sequence(list)
+        else:   # elements are fundamental types
             list = list
 
-        # assert list now contains unwrapped or primitive instances
+        # assert list now contains unwrapped or fundamental instances
 
         try:
             # create empty (i.e. no value) GValue of desired type,

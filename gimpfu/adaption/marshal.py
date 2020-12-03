@@ -145,20 +145,13 @@ class Marshal():
         # Unwrap wrapped types.
         if  is_gimpfu_unwrappable(arg) :
             # !!! Do not affect the original object by assigning to arg
-            # !!! arg knows how to unwrap itself
+            # assert arg isinstance(Adapter) and has method unwrap()
             result_arg = arg.unwrap()
         else:
             # arg is already Gimp type, or a fundamental type
             result_arg = arg
         Marshal.logger.info(f"unwrapped to: {result_arg}")
         return result_arg
-
-
-    '''
-    TODO Do we need this?
-    Knows how to unwrap a variable which is a container (list) or single instance
-    If arg is a list, result is a list.
-    '''
 
 
 
@@ -204,9 +197,9 @@ class Marshal():
 
 
     '''
-    wrap and unwrap list of things
+    wrap and unwrap sequence of things
     !!! note the 's'
-    Generally the list is incoming or outgoing arguments.
+    Generally the sequence is incoming or outgoing arguments.
     But distinct from arguments to the pdb, which are tuples.
     '''
 
@@ -232,10 +225,10 @@ class Marshal():
 
 
     @staticmethod
-    def unwrap_args(args):
+    def unwrap_heterogenous_sequence(args):
         '''
-        args is a sequence of possibly wrapped objects (class GimpfuFoo)
-        or fundamental types.
+        args is a sequence (Iterable) of possibly wrapped objects (class Gimpfu.Adapter)
+        or fundamental types (int, etc.)
         Unwrap instances that are wrapped.
         Returns list.
         '''
@@ -249,6 +242,34 @@ class Marshal():
         return result
 
 
+    # TODO we could have method that takes sequence of definitely wrapped items
+
+    @staticmethod
+    def unwrap_homogenous_sequence(args):
+        """
+        Return new list where each item in args was unwrapped.
+        Require each item in result is the same type.
+        (Usually a Gimp type.)
+
+        !!! Not require each item in args is a GimpFu wrapped type.
+        It could already be an unwrapped type.
+
+        Used to create GimpObjectArray, which are homogenous.
+        """
+        Marshal.logger.debug(f"unwrap_homogenous_sequence")
+        result_list = []
+        contained_type = None
+        for item in args:
+            # !!! This permits items already unwrapped
+            new_item = Marshal.unwrap(item)
+            if contained_type is not None:
+                if type(new_item) != contained_type:
+                    proceed(f"Unwrapped sequence is not type homogenous")
+            else:
+                contained_type = type(new_item)
+            result_list.append(Marshal.unwrap(new_item))
+
+        return result_list
 
 
 

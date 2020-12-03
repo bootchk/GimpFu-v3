@@ -93,7 +93,7 @@ class Adapter():
     '''
     def unwrap(self):
         ''' Return inner object, of a Gimp type, used when passing args back to Gimp'''
-        AdapterLogger.logger.debug(f"unwrap to {self._adaptee}")
+        AdapterLogger.logger.debug(f"unwrap to type: {self._adaptee}, gtype: {self.adaptee_gtype}")
         return self._adaptee
 
     @property
@@ -197,7 +197,7 @@ class Adapter():
         from adaption.marshal import Marshal
 
         # arg could be a wrapped type, convert to unwrapped type i.e. foreign type
-        unwrapped_args = Marshal.unwrap_args(args)
+        unwrapped_args = Marshal.unwrap_heterogenous_sequence(args)
 
         # call the callable
         # TODO Not sure why we need to use object.__...
