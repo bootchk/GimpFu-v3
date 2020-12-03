@@ -92,7 +92,7 @@ class GimpfuGimp():
          - a call to a GimpFu adapter constructor GimpFu<foo>(<bar>)
          - OR a call to a Gimp method Gimp.<foo>(<bar>)
         '''
-        self.logger.info(f"_adaptor_func called, args:  {*args}")
+        self.logger.info(f"_adaptor_func called, args: {args}")
 
         # test
 
