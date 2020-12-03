@@ -226,12 +226,18 @@ class MarshalPDB():
         For use as arg to PDB, which requires ParamSpec tuple.
 
         Only fundamental Python types and GTypes can be GObject.value()ed,
-        which is what Gimp does with ParamSpec
+        which is what Gimp does with ParamSpec.
+
+        Warns when result_arg is None, result_arg_type is NoneType
+        TODO Not acceptable in a call to PDB??
         '''
 
         # TODO, possible optimization if arg is already unwrapped, or lazy?
         result_arg = Marshal.unwrap(arg)
         result_arg_type = type(result_arg)
+
+        if result_arg is None:
+            MarshalPDB.logger.warning(f"_unwrap_to_param returns None, NoneType")
 
         MarshalPDB.logger.debug(f"_unwrap_to_param returns: {result_arg} of type {result_arg_type}")
         return result_arg, result_arg_type
