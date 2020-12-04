@@ -247,7 +247,7 @@ class FuGenericValue():
     For now, use Gimp.value_set_<foo>_array factory methods.
     That might be the only way, or maybe is a simpler implementation.
     """
-    def to_gimp_array(self, to_container_gtype, gvalue_setter ):
+    def to_gimp_array(self, to_container_gtype, gvalue_setter, is_setter_take_contained_type=False ):
         """
         Make self's GValue hold a Gimp<foo>Array
         where <foo> is determined by to_container_gtype,
@@ -259,7 +259,8 @@ class FuGenericValue():
         Contain item in a list and then to to_container_gtype.
 
         gvalue_setter is a method of Gimp e.g. Gimp.value_set_object_array.
-        It needs contained_gtype.
+
+        One setter (Gimp.value_set_object_array) has extra arg: contained_gtype.
         """
         self.logger.info(f"to_gimp_array {to_container_gtype}")
 
@@ -303,7 +304,7 @@ class FuGenericValue():
             self._gvalue = GObject.Value (to_container_gtype)
 
             """
-            set value into GValue
+            Invoke Gimp's setter to set value into GValue
 
             We are calling e.g. Gimp.value_set_object_array()
             whose C signature is like (...len, array...)
@@ -314,7 +315,10 @@ class FuGenericValue():
 
             Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
             """
-            gvalue_setter(self._gvalue, contained_gtype, list)
+            if is_setter_take_contained_type:
+                gvalue_setter(self._gvalue, contained_gtype, list)
+            else:
+                gvalue_setter(self._gvalue, list)
             self._did_create_gvalue = True
             self._did_convert = True
 
@@ -326,7 +330,9 @@ class FuGenericValue():
 
     def to_object_array(self):
         """ Make self own a GValue holding a GimpObjectArray """
-        self.to_gimp_array(Gimp.ObjectArray.__gtype__, Gimp.value_set_object_array )
+        self.to_gimp_array(Gimp.ObjectArray.__gtype__,
+                           Gimp.value_set_object_array,
+                           is_setter_take_contained_type = True)
 
     def to_float_array(self):
         """ Make self's GValue hold a GimpFloatArray created from self.actual_arg"""
@@ -335,7 +341,6 @@ class FuGenericValue():
     def to_string_array(self):
         """ Make self's GValue hold a GimpStringArray created from self.actual_arg"""
         self.to_gimp_array(Gimp.StringArray.__gtype__, Gimp.value_set_string_array )
-        # raise NotImplementedError
 
     def to_uint8_array(self):
         """ Make self's GValue hold a GimpUint8Array created from self.actual_arg"""
