@@ -14,23 +14,34 @@ class GimpProcedure:
 
     For introspection of the PDB.
 
-    !!! Distinct from FuProcedure.
+    !!! Distinct from FuProcedure
+    (GimpFu local knowledge of a author declared procedure.)
+
     This is not an adapter, an Author does not use this,
     only the GimpFu implementation uses it.
+    (Although we could expose it?)
     """
 
     def __init__(self, gimp_procedure):
+        assert isinstance(gimp_procedure, Gimp.Procedure)
         self._procedure = gimp_procedure
         self.logger = logging.getLogger("GimpFu.GimpProcedure")
 
     @property
     def argument_specs(self):
+        """ Returns list of GParamSpec for arguments. """
         # Another implementation: Gimp.get_pdb().run_procedure( proc_name , 'gimp-pdb-get-proc-argument', args)
         return self._procedure.get_arguments()
 
     @property
     def name(self):
         return self._procedure.get_name()
+
+    """ Compare to PDB procedure gimp-pdb-get-proc-info() """
+    @property
+    def type(self):
+        """ Returns value of type Gimp.PDBProcType """
+        return self._procedure.get_proc_type()
 
 
 
@@ -56,8 +67,15 @@ class GimpProcedure:
         return result
 
 
+    """
+    This is NOT reliable to determine whether to insert a run mode arg.
+    Some procedures that are type INTERNAL (NOT type PLUGIN)
+    take a first arg that is run mode.
+    e.g. gimp-file-load-layers.
+    """
     def _does_procedure_take_runmode_from_signature(self):
-        """ Examine signature of proc to determine whether it takes run_mode arg.
+        """
+        Examine signature of proc to determine whether it takes run_mode arg.
 
         The most reliable implementation:
         Get GParamSpec, and compare its type.name to 'GimpRunMode'
@@ -83,16 +101,22 @@ class GimpProcedure:
         return result
 
 
-    @property
-    def takes_runmode(self):
-        """ Does first formal arg signify run mode?
 
-        type GimpParamEnum ??? or GimpRunMode ???
+    @property
+    def should_insert_runmode_arg(self):
         """
-        # Alternative implementations
-        result = self._does_procedure_take_runmode_from_signature()
+        Is this PDB procedure one that GimpFu hides
+        the need for first argument of type RunMode
+        """
+        # only type Plugin requires insertion of run mode arg
+        result = self.type == Gimp.PDBProcType.PLUGIN
+
+        # TODO Alternative implementations, not all are correct
+        # relics from GimpFu v2
+        #result = self._does_procedure_take_runmode_from_signature()
         #result = self._does_procedure_take_runmode_from_name()
-        self.logger.debug(f"{self.name}: takes_runmode: {result}")
+
+        self.logger.debug(f"{self.name}: should_insert_runmode_arg: {result}")
         return result
 
     # TODO optimized, cache result from Gimp instead of getting it each call
