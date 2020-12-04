@@ -47,7 +47,7 @@ class FormalTypes():
     def is_object_array_type(type_name): return type_name in ('GimpParamObjectArray', )
     def is_float_array_type(type_name):   return type_name in ('GimpParamFloatArray', )
     def is_string_array_type(type_name):   return type_name in ('GimpParamStringArray', )
-    def is_uint8_array_type(type_name):   return type_name in ('GimpParamUint8Array', )
+    def is_uint8_array_type(type_name):   return type_name in ('GimpParamUInt8Array', )
     def is_int32_array_type(type_name):   return type_name in ('GimpParamInt32Array', )
 
     def is_file_descriptor_type(type_name):

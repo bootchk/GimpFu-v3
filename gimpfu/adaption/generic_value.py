@@ -339,11 +339,11 @@ class FuGenericValue():
 
     def to_uint8_array(self):
         """ Make self's GValue hold a GimpUint8Array created from self.actual_arg"""
-        self.to_gimp_array(Gimp.Uint8Array.__gtype__, Gimp.gimp_value_set_uint8_array )
+        self.to_gimp_array(Gimp.Uint8Array.__gtype__, Gimp.value_set_uint8_array )
 
     def to_int32_array(self):
         """ Make self's GValue hold a GimpInt32Array created from self.actual_arg"""
-        self.to_gimp_array(Gimp.Int32Array.__gtype__, Gimp.gimp_value_set_int32_array )
+        self.to_gimp_array(Gimp.Int32Array.__gtype__, Gimp.value_set_int32_array )
 
 
         # Cruft?

@@ -154,7 +154,7 @@ class Types():
                 (instance_type != cast_to_type)
             and FormalTypes.is_formal_type_equal_type(formal_arg_type, cast_to_type)
             )
-        Types.logger.info(f"_should_upcast_or_convert: {result}")
+        Types.logger.info(f"_should_upcast_or_convert => {result}")
         return result
 
 
@@ -170,6 +170,7 @@ class Types():
 
         Ordered by prevalence in PDB signatures.
         """
+        Types.logger.info(f"try_array_conversions ( {formal_arg_type} )")
         # dispatch on formal_arg_type
         formal_arg_type_name = formal_arg_type.name
         if FormalTypes.is_float_array_type(formal_arg_type_name):
@@ -184,6 +185,8 @@ class Types():
             gen_value.to_int32_array()
         else:
             Types.logger.info(f"try_array_conversions did NOT convert")
+            if isinstance(gen_value.actual_arg, tuple) or isinstance(gen_value.actual_arg, list):
+                Types.logger.warning(f"sequences SHOULD convert to arrays!")
 
         """
          OLD
