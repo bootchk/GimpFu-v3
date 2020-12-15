@@ -15,7 +15,7 @@ class GimpProcedure:
     For introspection of the PDB.
 
     !!! Distinct from FuProcedure
-    (GimpFu local knowledge of a author declared procedure.)
+    (GimpFu local knowledge of an author declared procedure.)
 
     This is not an adapter, an Author does not use this,
     only the GimpFu implementation uses it.

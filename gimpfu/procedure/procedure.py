@@ -31,7 +31,7 @@ class FuProcedure():
 
     Does NOT wrap Gimp.Procedure, only knows how to create one, for the current source
 
-    GimpFu procedure is slightly different from Gimp PluginProcedure.
+    FuProcedure is slightly different from Gimp.Procedure.
     This hides the differences.
     Differences:
        plugin_type not required of

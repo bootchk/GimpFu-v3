@@ -428,13 +428,14 @@ containers:
     # --disable-vector-icons was working until Jan. 12
 
     # preface: CFLAGS="-fsanitize=address -fno-omit-frame-pointer"
-    # option for autogen.sh --with-pdbgen
+    # option to rebuild PDB      autogen.sh --with-pdbgen
 
+    # make -j4
     # build
     - !Sh |
         cd /home/gimp
-        CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs  --enable-debug
-        make -j4
+        CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs --enable-debug --with-pdbgen
+        make all-am
         make install
 
     # print out the options, after autogen.sh
@@ -779,7 +780,11 @@ commands:
       # Also fails: gimp --stack-trace-mode=always
       # should be space, not = ??
 
-      /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode always
+      export GIMP_PLUGIN_DEBUG=all,fatal-criticals
+      export GIMPFU_DEBUG=1
+
+      # /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode always
+      /usr/local/bin/gimp-2.99 --stack-trace-mode query
 
 
 
@@ -808,7 +813,11 @@ commands:
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
       export NO_AT_BRIDGE=1
 
-      /usr/local/bin/gimp-2.99 --verbose
+      export GIMP_PLUGIN_DEBUG=all,fatal-criticals
+      #export GIMPFU_DEBUG=1
+
+      # /usr/local/bin/gimp-2.99 --verbose
+      /usr/local/bin/gimp-2.99 --stack-trace-mode query
 
 
 
@@ -965,3 +974,10 @@ commands:
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
       export NO_AT_BRIDGE=1
       gdb gimp-2.99
+
+  termGimpMeson: !Command
+    description: Open terminal on container gimpMesonLocal, use vagga --use-env DISPLAY termGimpMeson, wait for container
+    container: gimpMesonLocal
+    run: |
+      echo "Opening terminal on the GIMP run container"
+      /usr/bin/gnome-terminal
