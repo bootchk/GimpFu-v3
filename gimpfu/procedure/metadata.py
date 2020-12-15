@@ -6,7 +6,7 @@ from message.deprecation import Deprecation
 
 from procedure.formal_params import FuFormalParams
 
-from gimpfu_enums import *  # PF_ enums
+from enums.gimpfu_enums import *  # PF_ enums
 
 # introspection of Python code
 from inspect import signature

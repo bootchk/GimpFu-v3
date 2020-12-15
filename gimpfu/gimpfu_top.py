@@ -153,10 +153,15 @@ Expose to Authors: Gimp enums
 Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
 Name "gimpenums" retained for FBC, some non-GimpFu plugins may import
 '''
-from gimpenums import *
+# cases not handled programatically
+from enums.backward_enums import *
 
-''' Expose to Authors: v3 GimpFu enums  e.g. PF_INT '''
-from gimpfu_enums import *
+# cases handled programatically
+from enums.gimpenums import define_backward_enums_programatically
+define_backward_enums_programatically()
+
+''' Expose to Authors: GimpFu enums e.g. PF_INT '''
+from enums.gimpfu_enums import *
 
 # v2 import gimpcolor
 

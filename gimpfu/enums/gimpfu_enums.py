@@ -1,18 +1,19 @@
 '''
 PF_foo enums defined by GimpFu.
 
-!!! To get in the Authors namespace,
-gimpfu_top executes "from gimpfu_enums import *"
-'''
+These constants describe parameter types AND GUI widget types.
+Used in args to register(), before the plugin is registered.
+We don't need mapping to Gimp.GimpPDB types (if any) until register() executes.
 
+There is no longer any correspondence to similar enums/constants that GIMP might define.
 
+FBC.  This may eventually go away.
 
+!!! To get in the Authors namespace, gimpfu_top executes "from gimpfu_enums import *"
+Remember everything here is evaluated and goes into the global namespace.
 
-
-'''
 v3 At import time, we don't have access to Gimp types yet.  Define PF enum without them.
-PF_TYPES enum (sic) is used in args to register(), before the plugin is registered.
-We don't need mapping to Gimp.GimpPDB types until register() executes.
+
 We don't use Python 3 enum class FBC.
 '''
 PF_INT8        = 1
@@ -57,10 +58,6 @@ PF_PALETTE     = 1010
 PF_FILENAME    = 1011
 PF_DIRNAME     = 1012
 PF_OPTION      = 1013
-
-
-
-
 
 
 '''

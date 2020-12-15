@@ -4,7 +4,7 @@ import gi
 from gi.repository import GObject
 from gi.repository import Gimp
 
-from gimpfu_enums import *
+from enums.gimpfu_enums import *
 
 from procedure.prop_holder_factory import PropHolderFactory
 

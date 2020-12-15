@@ -1,6 +1,6 @@
 
 from procedure.formal_param import FuFormalParam
-from gimpfu_enums import *  # PF_ enums
+from enums.gimpfu_enums import *  # PF_ enums
 
 from message.deprecation import Deprecation
 from message.proceed_error import proceed

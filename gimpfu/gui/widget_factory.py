@@ -1,6 +1,6 @@
 
 # WidgetFactory is main use of PF_enum
-from gimpfu_enums import *
+from enums.gimpfu_enums import *
 
 # No GI of Gimp here
 
