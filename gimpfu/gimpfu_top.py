@@ -157,8 +157,8 @@ Name "gimpenums" retained for FBC, some non-GimpFu plugins may import
 from enums.backward_enums import *
 
 # cases handled programatically
-from enums.gimpenums import define_backward_enums_programatically
-define_backward_enums_programatically()
+from enums.gimpenums import define_enums_into_global_namespace
+define_enums_into_global_namespace()
 
 ''' Expose to Authors: GimpFu enums e.g. PF_INT '''
 from enums.gimpfu_enums import *

@@ -19,6 +19,9 @@ def putEnumInNamespace(enum_type):
     """ Put enumerated names of gtype into the global namespace.
 
     See ts_init_enum() of scriptfu/scheme-wrapper.c
+
+    See Gimp 2.10/plugins/pygimp/gimpenumsmodule.c
+    Which used the old pygobject and pyg_enum_add_constants()
     """
 
     # Make sure the class exists
@@ -27,6 +30,21 @@ def putEnumInNamespace(enum_type):
 
     #GObject.TypeClass?? ObjectClass ???
     print(f"Has value table: {enum_type.has_value_table()}")
+
+    # Get qdata, is for compatibility???
+    quark = GLib.quark_from_static_string ("gimp-compat-enum")
+    otherTypeName = GObject.type_get_qdata (enum_type, quark)
+    if (otherTypeName !=0):
+        print(f"Other type: {otherTypeName}")
+
+    """
+    We don't need to use GObject: the names are already in Python.
+    """
+    # Look up values
+    # Fail: need GObject.EnumClass, to gobject.GType
+    # value = GObject.enum_get_value(enum_type, 0)
+
+
 
     # GObject.EnumClass is array of GObject.EnumValue.value_name
 

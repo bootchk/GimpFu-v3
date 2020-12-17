@@ -20,6 +20,9 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
+
+
+
 # TODO this is a don't care, because GimpFu adapts all functions that use it??
 FG_BG_RGB_MODE      = 1999
 
