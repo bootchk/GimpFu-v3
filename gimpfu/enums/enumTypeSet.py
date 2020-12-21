@@ -12,12 +12,15 @@ import logging
 
 
 
-class EnumWrangler():
+class EnumTypeSet():
     """
-    Knows how to put enum types defined by Gimp into the Python global namespace.
+    Knows the set of enum types defined in Gimp.
+    Know how to generate statements to define symbols for the enumerated values.
+    To help put enum types defined by Gimp into a Python global namespace.
 
     Checks them off.
     Knows which are not checked off.
+    Wraps a dictionary.
     """
 
     def __init__(self):
@@ -43,21 +46,24 @@ class EnumWrangler():
         return result
 
 
-    def define_symbols_for_unchecked_enums(self):
+    # Generator
+    def defining_statements_for_unchecked_enums(self):
+        """ Return defining statements for all enumerated values in all unchecked enum types. """
         for name in self.unchecked_names():
             # assert name is short name
             try:
                 enum_gtype = GimpType.type_from_short_name(name)
-                self.define_symbols_for_enum(enum_gtype)
+                for statement in self.defining_statements_for_enum(enum_gtype):
+                    yield statement
             except Exception as err:
                 self.logger.critical(f"Exception: {err}")
                 pass
 
 
-
-    def define_symbols_for_enum(self, enum, prefix="", suffix=""):
+    # Generator
+    def defining_statements_for_enum(self, enum, prefix="", suffix=""):
         '''
-        Define into the GimpFu Python global namespace:
+        Generate statements that will define
         all the constants defined by enum.
         Require enum is a Gimp type.
         enum is-a class.  type(enum) == 'type'
@@ -73,7 +79,6 @@ class EnumWrangler():
         Example:
         enum is Gimp.HistogramChannel
         Statements:
-            global CLIP_TO_IMAGE
             CLIP_TO_IMAGE = Gimp.MergeType.CLIP_TO_IMAGE
         '''
 
@@ -84,7 +89,7 @@ class EnumWrangler():
 
         self.checkOff(enum_class_name)
 
-        # search the names in the dir of the enum
+        # search the names in the dir of the enum type
         for attribute in dir(enum):
             # Crudity: assume anything upper case is what we want.
             if attribute.isupper():
@@ -98,7 +103,11 @@ class EnumWrangler():
                     self.logger.info(f"Not overwriting enum symbol already in globals: {enum_class_name} {defined_name}")
                 else:
                     self.logger.debug(f"Defining in globals: {defined_name}")
+                yield(defining_statement)
 
-                # Second argument insures definition goes into global namespace
-                # See Python docs for exec()
-                exec(defining_statement, globals())
+                """
+                Caller must exec defining_statement
+                in such a way that symbol is defined into the top global namespace
+                (not just the global namespace of this module).
+                """
+                # exec(defining_statement, globals())

@@ -6,6 +6,7 @@ Symbols that:
 - are aliases of the Gimp enums.
 - are shorter, abbreviations of Gimp enums.
 - are compatible with GimpFu v2, which also defined a set of symbols.
+- are in this module's namespace and can be "from gimpenums.py import *"
 
 Convenience for authors (save typing.)
 And for backward compatibility.
@@ -27,11 +28,26 @@ GimpFu enums:
 - some are defined statically, FBC: (sometimes deprecated or obsolete)
   see backward_enums.py
 
-
 !!! Since we have already "from gi.repository import Gimp",
-the machinery (PyGObject?) already put the enums in the namespace,
-just with long names like Gimp.ImageType.RGB_IMAGE
-We can crudely search the namespace.
+"Gimp" is in the namespace,
+and authors CAN use long names like Gimp.ImageType.RGB_IMAGE.
+Also, this module can access the original enum types e.g. Gimp.ImageType
+
+To test: start Gimp.  Filters>Development>Python Console.
+>from gimpfu import *
+>dir()
+That will show you the namespace that authors see.
+
+Implementation note:
+The symbols are defined into this module's namespace.
+We call modules to generate statements that define the symbols,
+but we exec() them here so the symbols are in THIS namespace.
+Second argument to exec "globals()" insures definitions in scope COME from global namespace.
+It does not ensure that defined symbols go INTO global namespace.
+See Python docs for exec()
+
+!!! Do not define functions in this module.
+They would remain in the global namespace when GimpFu imports this module.
 '''
 
 '''
@@ -66,7 +82,7 @@ Most enums are name like:
 - Gimp.FooType
 - Gimp.ChannelOps
 - Gimp.FooMode
-For each enum, in this code, insert a call to wrangler.define_symbols_for_enum(Gimp.MergeType).
+For each enum, in this code, insert a call to ets.defining_statements_for_enum(Gimp.MergeType).
 But if you don't have an example from GimpFu v2,
 you won't know whether you need a suffix, prefix, or neither.
 
@@ -79,7 +95,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from enums.enumTypeSet import EnumWrangler
+from enums.enumTypeSet import EnumTypeSet
 
 import logging
 
@@ -94,134 +110,153 @@ Usually Foo + [Type, Mode, Range]
 
 
 
-def define_enums_into_global_namespace():
 
-    wrangler = EnumWrangler()
+ets = EnumTypeSet()
 
-    module_logger.info("Defining adulterated backward compatible symbols for Gimp enums")
-    define_backward_enums(wrangler)
+module_logger.info("Defining adulterated backward compatible symbols for Gimp enums")
 
-    module_logger.info("Defining unadulterated backward compatible symbols for Gimp enums")
-    define_backward_abbreviations(wrangler)
+"""
+Define symbols for Gimp enums, for backward compatibility.
 
-    """
-    Straight, unadulterated definition as an abbreviation.
-    No suffix or prefix.
-    For all that we have not already defined for backward compatibility.
-    TODO or for all,
-    i.e. define both PALLETTE_MONO and MONO
+Each case is a pattern we divulged by reading GimpFu v2 or plugins using it.
 
-    This is controversial.
-    Why should we clutter up the namespace?
+Symbols are adulterated from symbols used in Gimp V3, for backward compatibility.
+In other words, Gimp and GimpFu v2 lacked consistency of naming,
+and this keeps the inconsistent names.
 
-    Possibly we need to do it in a certain order.
-    For example, Gimp.ImageBaseType and Gimp.ImageType have conflicts,
-    would try to define the same abbreviations for different enum values.
-    """
-    module_logger.info("Defining more abbreviations for Gimp enums")
-    wrangler.define_symbols_for_unchecked_enums()
+The patterns:
 
+Pattern                                          Example Gimp type
+Suffix: Gimp.FooMode.Bar => BAR_MODE              LayerMode     NORMAL_MODE
+Prefix: Gimp.FooMode.Bar => FOO_BAR               RepeatMode    REPEAT_NONE
+Prefix: Gimp.FooType.Bar => FOO_BAR               GradientType  GRADIENT_RADIAL
+Prefix shorten: Gimp.FooZedType.Bar => FOO_BAR    HistogramChannel HISTOGRAM_VALUE
+Prefix plurality change: Gimp.Foos.Bar => FOO_BAR ChannelOps    CHANNEL_OP_REPLACE
+Prefix word change: FooType.Bar =>  FOOTION_BAR   RotationType  ROTATE_90
+Combination:  ZedFooType.Bar => FOO_BAR           ConvertPaletteType PALLETTE_MONO
+"""
 
-def define_backward_enums(wrangler):
-    """
-    Define symbols for Gimp enums, for backward compatibility.
+# Note we use the dotted name of the Gimp enums
 
-    Each case is a pattern we divulged from reading
-    GimpFu v2 or plugins using it.
+for statement in ets.defining_statements_for_enum(Gimp.LayerMode, suffix='_MODE'):
+    exec(statement)
+#NORMAL_MODE         = Gimp.LayerMode.NORMAL
+#MULTIPLY_MODE       = Gimp.LayerMode.MULTIPLY
 
-    Symbols are adulterated from symbols used in Gimp V3, for backward compatibility.
+for statement in ets.defining_statements_for_enum(Gimp.FillType, suffix='_FILL'):
+    exec(statement)
+# TODO some wild plugins refer to e.g. FILL_TRANSPARENT, with a prefix
+#BACKGROUND_FILL     = Gimp.FillType.BACKGROUND
+#WHITE_FILL          = Gimp.FillType.WHITE
 
-    The patterns:
+for statement in ets.defining_statements_for_enum(Gimp.ChannelOps, prefix='CHANNEL_OP_'):
+    exec(statement)
+#CHANNEL_OP_REPLACE  = Gimp.ChannelOps.REPLACE
 
-    Pattern                                          Example Gimp type
-    Suffix: Gimp.FooMode.Bar => BAR_MODE              LayerMode     NORMAL_MODE
-    Prefix: Gimp.FooMode.Bar => FOO_BAR               RepeatMode    REPEAT_NONE
-    Prefix: Gimp.FooType.Bar => FOO_BAR               GradientType  GRADIENT_RADIAL
-    Prefix shorten: Gimp.FooZedType.Bar => FOO_BAR    HistogramChannel HISTORRAM_VALUE
-    Prefix plurality change: Gimp.Foos.Bar => FOO_BAR ChannelOps    CHANNEL_OP_REPLACE
-    Prefix word change: FooType.Bar =>  FOOTION_BAR   RotationType  ROTATE_90
-    Combination:  ZedFooType.Bar => FOO_BAR           ConvertPaletteType PALLETTE_MONO
-    """
+for statement in ets.defining_statements_for_enum(Gimp.GradientType, prefix='GRADIENT_'):
+    exec(statement)
+#GRADIENT_RADIAL     = Gimp.GradientType.RADIAL
 
-    # Note we use the dotted name of the Gimp enums
+for statement in ets.defining_statements_for_enum(Gimp.RepeatMode, prefix='REPEAT_'):
+    exec(statement)
+#REPEAT_NONE         = Gimp.RepeatMode.NONE
 
-    wrangler.define_symbols_for_enum(Gimp.LayerMode, suffix='_MODE')
-    #NORMAL_MODE         = Gimp.LayerMode.NORMAL
-    #MULTIPLY_MODE       = Gimp.LayerMode.MULTIPLY
+for statement in ets.defining_statements_for_enum(Gimp.HistogramChannel, prefix='HISTOGRAM_'):
+    exec(statement)
+#HISTOGRAM_VALUE      = Gimp.HistogramChannel.VALUE
 
-    wrangler.define_symbols_for_enum(Gimp.FillType, suffix='_FILL')
-    # TODO some wild plugins refer to e.g. FILL_TRANSPARENT, with a prefix
-    #BACKGROUND_FILL     = Gimp.FillType.BACKGROUND
-    #WHITE_FILL          = Gimp.FillType.WHITE
+for statement in ets.defining_statements_for_enum(Gimp.MaskApplyMode, prefix='MASK_'):
+    exec(statement)
+#MASK_APPLY           = Gimp.MaskApplyMode.APPLY
 
-    wrangler.define_symbols_for_enum(Gimp.ChannelOps, prefix='CHANNEL_OP_')
-    #CHANNEL_OP_REPLACE  = Gimp.ChannelOps.REPLACE
+# New to v3, or possibly since 2.8
+# Prefix and suffix?  ADD_ALPHA_TRANSFER_MASK seen in feather_paste.py
+for statement in ets.defining_statements_for_enum(Gimp.AddMaskType, prefix='ADD_MASK_'):
+    exec(statement)
+# ADD_MASK_SELECTION = Gimp.AddMaskType.SELECTION
 
-    wrangler.define_symbols_for_enum(Gimp.GradientType, prefix='GRADIENT_')
-    #GRADIENT_RADIAL     = Gimp.GradientType.RADIAL
+for statement in ets.defining_statements_for_enum(Gimp.HueRange, prefix='HUE_RANGE_'):
+    exec(statement)
+# HUE_RANGE_ALL = Gimp.HueRange.ALL
 
-    wrangler.define_symbols_for_enum(Gimp.RepeatMode, prefix='REPEAT_')
-    #REPEAT_NONE         = Gimp.RepeatMode.NONE
+# TODO this is a guess, find a test case in the wild
+for statement in ets.defining_statements_for_enum(Gimp.DesaturateMode, prefix='DESATURATE_'):
+    exec(statement)
+# DESATURATE_LIGHNTESS = Gimp.DesaturateMode.LIGHTNESS
 
-    wrangler.define_symbols_for_enum(Gimp.HistogramChannel, prefix='HISTOGRAM_')
-    #HISTOGRAM_VALUE      = Gimp.HistogramChannel.VALUE
+# For image conversions
 
-    wrangler.define_symbols_for_enum(Gimp.MaskApplyMode, prefix='MASK_')
-    #MASK_APPLY           = Gimp.MaskApplyMode.APPLY
+for statement in ets.defining_statements_for_enum(Gimp.ConvertDitherType, prefix='DITHER_'):
+    exec(statement)
+# scale conversion
+# DITHER_NONE = Gimp.ConvertDitherType.None
 
-    # New to v3, or possibly since 2.8
-    # Prefix and suffix?  ADD_ALPHA_TRANSFER_MASK seen in feather_paste.py
-    wrangler.define_symbols_for_enum(Gimp.AddMaskType, prefix='ADD_MASK_')
-    # ADD_MASK_SELECTION = Gimp.AddMaskType.SELECTION
+for statement in ets.defining_statements_for_enum(Gimp.ConvertPaletteType, prefix='PALETTE_'):
+    exec(statement)
+# mode conversion
+# PALETTE_MONO = Gimp.ConvertPaletteType.MONO
 
-    wrangler.define_symbols_for_enum(Gimp.HueRange, prefix='HUE_RANGE_')
-    # HUE_RANGE_ALL = Gimp.HueRange.ALL
-
-    # TODO this is a guess, find a test case in the wild
-    wrangler.define_symbols_for_enum(Gimp.DesaturateMode, prefix='DESATURATE_')
-    # DESATURATE_LIGHNTESS = Gimp.DesaturateMode.LIGHTNESS
-
-    # For image conversions
-
-    wrangler.define_symbols_for_enum(Gimp.ConvertDitherType, prefix='DITHER_')
-    # scale conversion
-    # DITHER_NONE = Gimp.ConvertDitherType.None
-
-    wrangler.define_symbols_for_enum(Gimp.ConvertPaletteType, prefix='PALETTE_')
-    # mode conversion
-    # PALETTE_MONO = Gimp.ConvertPaletteType.MONO
-
-    wrangler.define_symbols_for_enum(Gimp.RotationType, prefix='ROTATE_')
-    # ROTATE_90 = Gimp.RotationType.90
+for statement in ets.defining_statements_for_enum(Gimp.RotationType, prefix='ROTATE_'):
+    exec(statement)
+# ROTATE_90 = Gimp.RotationType.90
 
 
 
 
-def define_backward_abbreviations(wrangler):
-    """
-    Define unadulterated  symbols for Gimp enums.
-    For a limited set that GimpFu v2 defined.
+module_logger.info("Defining unadulterated backward compatible symbols for Gimp enums")
 
-    Not adulterated, same symbol as used in Gimp V3.
-    But an abbreviation (not in dot notation.)
-    """
+"""
+Define unadulterated  symbols for Gimp enums.
+For a limited set that GimpFu v2 defined.
 
-    wrangler.define_symbols_for_enum(Gimp.SizeType)
-    # PIXELS = Gimp.SizeType.PIXELS,     POINTS
-    wrangler.define_symbols_for_enum(Gimp.MergeType)
-    # Layer merge types
-    # FLATTEN_IMAGE = Gimp.MergeType.FLATTEN_IMAGE
+Not adulterated, same symbol as used in Gimp V3.
+But an abbreviation (not in dot notation.)
+"""
 
-    wrangler.define_symbols_for_enum(Gimp.ImageBaseType)
-    # ImageBaseType is superset of ImageType, i.e. RGB => RGB, RGBA, etc.
-    #RGB                 = Gimp.ImageBaseType.RGB  # GRAY, INDEXED
+for statement in ets.defining_statements_for_enum(Gimp.SizeType):
+    exec(statement)
+# PIXELS = Gimp.SizeType.PIXELS,     POINTS
+for statement in ets.defining_statements_for_enum(Gimp.MergeType):
+    exec(statement)
+# Layer merge types
+# FLATTEN_IMAGE = Gimp.MergeType.FLATTEN_IMAGE
 
-    wrangler.define_symbols_for_enum(Gimp.ImageType)
-    #RGB_IMAGE           = Gimp.ImageType.RGB_IMAGE
+for statement in ets.defining_statements_for_enum(Gimp.ImageBaseType):
+    exec(statement)
+# ImageBaseType is superset of ImageType, i.e. RGB => RGB, RGBA, etc.
+#RGB                 = Gimp.ImageBaseType.RGB  # GRAY, INDEXED
+
+for statement in ets.defining_statements_for_enum(Gimp.ImageType):
+    exec(statement)
+#RGB_IMAGE           = Gimp.ImageType.RGB_IMAGE
 
 
+"""
+Straight, unadulterated definition as an abbreviation.
+No suffix or prefix.
+For all that we have not already defined for backward compatibility.
+TODO or for all,
+i.e. define both PALLETTE_MONO and MONO
+
+This is controversial.
+Why should we clutter up the namespace?
+
+Possibly we need to do it in a certain order.
+For example, Gimp.ImageBaseType and Gimp.ImageType have conflicts,
+would try to define the same abbreviations for different enum values.
+"""
+module_logger.info("Defining more abbreviations for Gimp enums")
+
+for statement in ets.defining_statements_for_unchecked_enums():
+    exec(statement)
 
 
+"""
+Finally, del superflous symbols from namespace of this module.
+"""
+del ets
+del module_logger
+del EnumTypeSet
 
 
 

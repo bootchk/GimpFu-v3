@@ -27,8 +27,11 @@ containers:
     # 19.10, which has meson 51
     # - !Ubuntu eoan
     # 20.4 LTS
-    - !Ubuntu focal
+    # - !Ubuntu focal
     # June 16, 2020 focal fails at dbus_cil package from glib2_test package
+    # 20.10
+    - !Ubuntu groovy
+
 
     # enable universe repository (where gimp lives)
     - !UbuntuUniverse
@@ -675,14 +678,25 @@ commands:
   #    ninja test
 
 
-  gimpBuildMeson: !Command
-    description: Build gimp using meson
+  gimpMesonVersions: !Command
+    description: describe versions in container gimpMesonDev (where built Gimp)
     container: gimpMesonDev
     run: |
-      echo "Gegl version"
-      dpkg -l | grep gegl
+      export HOME=/work/.home
+      export GIMP_PREFIX="/usr/local"
       export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
+      echo "LD_LIBRARY_PATH"
       echo $LD_LIBRARY_PATH
+      echo "Gegl version from dpkg"
+      dpkg -l | grep gegl
+      echo "GLib version from pkg-config"
+      pkg-config --modversion glib-2.0
+      echo "Python version from python3 --version"
+      python3 --version
+      echo "PyGObject version from python"
+      python3 -c "from gi.repository import GObject
+      GObject.pygobject_version"
+      echo "Gimp version from gimp-2.99 --version"
       /usr/local/bin/gimp-2.99 --version
 
 

@@ -4,7 +4,7 @@ FBC (for backward compatibility)
 
 Put certain constants into global namespace.
 
-These are case that the code that defined Gimp enums can't handle.
+These are cases that the code that defines Gimp enums can't handle.
 That is, they don't seem to fit any pattern that can be done programatically.
 They date from the early days of Gimp and GimpFu.
 

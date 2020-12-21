@@ -149,16 +149,17 @@ logger = FuLogger.get_logger()
 
 
 '''
-Expose to Authors: Gimp enums
+Expose to Authors: abbreviated and backward compatible symbols Gimp enums.
 Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
-Name "gimpenums" retained for FBC, some non-GimpFu plugins may import
+Name "gimpenums" retained for FBC, some non-GimpFu plugins may "from gimpenums import *"
 '''
 # cases not handled programatically
 from enums.backward_enums import *
 
 # cases handled programatically
-from enums.gimpenums import define_enums_into_global_namespace
-define_enums_into_global_namespace()
+from enums.gimpenums import *
+# import define_enums_into_global_namespace
+#define_enums_into_global_namespace()
 
 ''' Expose to Authors: GimpFu enums e.g. PF_INT '''
 from enums.gimpfu_enums import *
