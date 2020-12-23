@@ -795,7 +795,7 @@ commands:
       # should be space, not = ??
 
       export GIMP_PLUGIN_DEBUG=all,fatal-criticals
-      export GIMPFU_DEBUG=1
+      #export GIMPFU_DEBUG=1
 
       # /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode always
       /usr/local/bin/gimp-2.99 --stack-trace-mode query
