@@ -18,6 +18,9 @@ class GimpType():
     """
 
     logger = logging.getLogger("GimpFu.GimpType")
+    # !!! voluminous, so enable logging separately from GIMPFU_DEBUG
+    logger.setLevel(logging.WARNING)
+
 
     @classmethod
     def list_gimp_enums(cls):

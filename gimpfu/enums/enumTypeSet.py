@@ -24,7 +24,9 @@ class EnumTypeSet():
     """
 
     def __init__(self):
-        self.logger = logging.getLogger("GimpFu.EnumWrangler")
+        self.logger = logging.getLogger("GimpFu.EnumTypeSet")
+        # !!! voluminous, so enable logging separately from GIMPFU_DEBUG
+        self.logger.setLevel(logging.WARNING)
         self.checked = {}
         for name in GimpType.list_gimp_enums():
             self.checked[name] = False

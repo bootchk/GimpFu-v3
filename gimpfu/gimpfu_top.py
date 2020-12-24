@@ -226,20 +226,19 @@ gettext.install = override_gettext_install
 
 
 """
-The GimpFu API:
+The GimpFu API: (consider these as keywords, or primary phrases)
    - register()
    - main()
    - pdb instance
    - gimp instance
 """
-# TODO should warn() be in the API?  gimp.message will already work.
+# TODO should warn(), fail() be in the API?  gimp.message will already work.
 
 '''
 Register locally with GimpFu, not with Gimp.
 
 Each Authors source may contain many calls to register(), i.e. many procedures.
 '''
-# A primary phrase in GimpFu language
 def register(proc_name, blurb, help, author, copyright,
             date, label, imagetypes,
             params, results, function,
@@ -258,14 +257,18 @@ def register(proc_name, blurb, help, author, copyright,
     # !!! Have not conveyed to Gimp yet
 
 
-# A primary phrase in GimpFu language
 def main():
-    """This should be called after registering the plug-in."""
-    # v2:   gimp.main(None, None, _query, _run)
+    """Authors should call this after register()."""
     logger.info('GimpFu main called')
     Gimp.main(GimpFu.__gtype__, sys.argv)
-
-# TODO fail() is primary phrase???
+    """
+    Gimp will put this plugin in the PDB,
+    and eventually call "function" the so-called "run func" when this plugin is invoked
+    either from the GUI or from another plugin.
+    The actual method that Gimp will call is
+    a method of FuRunner (see runner.py)
+    which interposes between Gimp and Author's "function".
+    """
 
 
 

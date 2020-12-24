@@ -72,7 +72,7 @@ class FuRunner:
 
 
     @staticmethod
-    def _interact(procedure, list_gvalues_all_args, config):
+    def _interact(procedure, list_wrapped_args, config):
         '''
         Show GUI when guiable args, then execute run_func.
         Progress will show in Gimp window, not dialog window.
@@ -82,12 +82,12 @@ class FuRunner:
         '''
         Note display/window is global state, not passed.
         # TODO assume first arg is likely an image
-        # display = Display.get(proc_name, list_gvalues_all_args[0])
+        # display = Display.get(proc_name, list_wrapped_args[0])
 
         from gui.display import Display
         display = Display.get_window(proc_name)
         '''
-        FuRunner.logger.info(f"_interact, {procedure}, {list_gvalues_all_args}")
+        FuRunner.logger.info(f"_interact, {procedure}, {list_wrapped_args}")
 
         # get name from instance of Gimp.Procedure
         proc_name = procedure.get_name()
@@ -96,14 +96,12 @@ class FuRunner:
 
         function = gf_procedure.metadata.FUNCTION
 
-        wrapped_in_actual_args = Marshal.wrap_args(list_gvalues_all_args)
-
         guiable_formal_params =  gf_procedure.guiable_formal_params
 
         """
         CRUFT from implementation where dialog executed run_script
         guiable_formal_params =  gf_procedure.guiable_formal_params
-        nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_in_actual_args)
+        nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(list_wrapped_args)
 
         # effectively a closure, partially bound to function, nonguiable_actual_args
         # passed to show_plugin_dialog to be executed after dialog
@@ -129,7 +127,7 @@ class FuRunner:
             FuRunner.logger.info("no guiable parameters")
             was_canceled = False
             # !!! no gui can change the in_args
-            result = FuRunner._try_run_func(proc_name, function, wrapped_in_actual_args)
+            result = FuRunner._try_run_func(proc_name, function, list_wrapped_args)
         else:
             # create GUI from guiable formal args, let user edit actual args
 
@@ -146,7 +144,7 @@ class FuRunner:
                 guiable_actual_args,
                 guiable_formal_params, run_script)
             '''
-            nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(wrapped_in_actual_args)
+            nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(list_wrapped_args)
 
             '''
             If you omit this next step, it does not use last_values, instead
@@ -220,14 +218,13 @@ class FuRunner:
         FuRunner.logger.info(f"run_imageprocedure , {procedure}, {run_mode}, {image}, {drawable}, {original_args}")
 
         '''
-        Create GimpValueArray of *most* args.
-        !!! We  pass GimpValueArray of Gimp types to lower level methods.
-        That might change when the lower level methods are fleshed out to persist values.
+        Create list of *most* args.
         *most* means (image, drawable, *original_args), but not run_mode!
+        List elements are GValues, not wrapped yet!
         '''
-        list_gvalues_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, drawable)
+        list_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, drawable)
 
-        result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
+        result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_all_args, original_args, data)
         # ensure result is-a GValueArray whose first element is a PDB_STATUS
         # and whose other elements have types matching registered return value types
         return result
@@ -246,16 +243,12 @@ class FuRunner:
         '''
         FuRunner.logger.info(f"run_context_procedure , {procedure}, {original_args}, {data}")
 
-        '''
-        Rearrange args to fit _run_procedure_in_mode()
-        '''
         list_gvalues_all_args = Marshal.convert_gimpvaluearray_to_list_of_gvalue(original_args)
         # assert is (runmode, image, <Gimp data object>, guiable_args)
         FuRunner.logger.info(f"run_context_procedure, args: {list_gvalues_all_args}")
 
         # context_procedure may have a run-mode
         run_mode = list_gvalues_all_args[0]  # Gimp.RunMode.NONINTERACTIVE
-
         # GimpFu always hides run mode, delete first element
         list_gvalues_all_args.pop(0)
 
@@ -271,7 +264,7 @@ class FuRunner:
 
 
     @staticmethod
-    def _run_procedure_in_mode(procedure, run_mode, image, list_gvalues_all_args, original_args, data):
+    def _run_procedure_in_mode(procedure, run_mode, image, list_all_args, original_args, data):
         '''
         Understands run_mode.
         Different ways to invoke procedure batch, or interactive.
@@ -280,20 +273,22 @@ class FuRunner:
         I.E. their run_func signature does not have run_mode.
 
         require procedure is-a Gimp.Procedure.
-        require original_arges is-a Gimp.ValueArray.
-        require list_gvalues_all_args is a list of GValues
+        require original_args is-a Gimp.ValueArray.
+        require list_all_args is a list of GValues
         '''
-        # args have already been marshalled into native types
-        assert isinstance(list_gvalues_all_args, list)
+        # args are in a list, but are GValues
+        assert isinstance(list_all_args, list)
+
+        list_wrapped_args = Marshal.wrap_args(list_all_args)
 
         # To know the Python name of a Gimp.Procedure method (e.g. gimp_procedure_get_name)
         # see gimp/libgimp/gimpprocedure.h, and then remove the prefix gimp_procedure_
         name = procedure.get_name()
 
-        FuRunner.logger.info(f"_run_procedure_in_mode: {name}, {run_mode}, {list_gvalues_all_args}")
+        FuRunner.logger.info(f"_run_procedure_in_mode: {name}, {run_mode}, {list_wrapped_args}")
         '''
-        list_gvalues_all_args are one-to-one with formal params.
-        list_gvalues_all_args may include some args that are not guiable (i.e. image, drawable)
+        list_wrapped_args are one-to-one with formal params.
+        list_wrapped_args may include some args that are not guiable (i.e. image, drawable)
         '''
 
         gf_procedure = FuProcedures.get_by_name(name)
@@ -312,7 +307,7 @@ class FuRunner:
         The ProcedureConfig should have length equal to ????
         original_args is-a GimpValueArray
         """
-        # config = FuProcedureConfig(procedure, len(list_gvalues_all_args)-2 )
+        # config = FuProcedureConfig(procedure, len(list_wrapped_args)-2 )
         config = FuProcedureConfig(gf_procedure, procedure, original_args.length() )
         config.begin_run(image, run_mode, original_args)
 
@@ -320,14 +315,12 @@ class FuRunner:
            try:
                # invoke func with unpacked args.  Since Python3, apply() gone.
                # TODO is this the correct set of args? E.G. Gimp is handling RUN_WITH_LAST_VALS, etc. ???
-               result = func(*list_gvalues_all_args)
+               result = func(*list_wrapped_args)
                # TODO add result values
                final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
            except:
                final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
         else:
-           # pass list of args
-
            '''
            Not enclosed in try:except: since then you don't get a good traceback.
            Any exceptions in showing a dialog are hard programming errors.
@@ -335,7 +328,7 @@ class FuRunner:
            either by calling our own dialog or by calling a Gimp.ErrorDialog (not exist)
            or by passing the exception string back to Gimp.
            '''
-           was_canceled, result = FuRunner._interact(procedure, list_gvalues_all_args, config)
+           was_canceled, result = FuRunner._interact(procedure, list_wrapped_args, config)
            if was_canceled:
                final_result = procedure.new_return_values(Gimp.PDBStatusType.CANCEL, GLib.Error())
                config.end_run(Gimp.PDBStatusType.CANCEL)

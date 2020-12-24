@@ -55,12 +55,16 @@ class Marshal():
     '''
     def prefix_image_drawable_to_run_args(actual_args, image=None, drawable=None):
         '''
-        return a list [image, drawable, *actual_args]
-        Where:
-            actual_args is-a Gimp.ValueArray
-            image, drawable are optional GObjects
-        !!! Returns Python list of GValue, not a Gimp.ValueArray
+        Requires:
+            - actual_args is-a Gimp.ValueArray
+            - image, drawable are optional GObjects
+
+        Return a list of the incoming items,
+        where the items are still GValues
+
+        !!! Returns Python list, not a Gimp.ValueArray
         '''
+        Marshal.logger.info(f"prefix_image_drawable_to_run_args")
 
         args_list = Types.convert_gimpvaluearray_to_list_of_gvalue(actual_args)
 
@@ -68,7 +72,7 @@ class Marshal():
         if drawable:
             args_list.insert(0, drawable)
         if image:
-            args_list.insert(0,image)
+            args_list.insert(0, image)
 
         # ensure result is-a list, but might be empty
         return args_list

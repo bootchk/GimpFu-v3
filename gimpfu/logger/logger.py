@@ -24,6 +24,8 @@ class FuLogger:
         logger = logging.getLogger('GimpFu')
 
         # possible levels are DEBUG, INFO, WARNING, ERROR, CRITICAL
+        # Some sub loggers setLevel separately, and must be enabled by code changes
+        # E.G. GimpTypes module is voluminous and does its own setLevel
         if os.getenv("GIMPFU_DEBUG") is not None:
             logger.setLevel(logging.DEBUG)  # Show every log message
         else:
