@@ -33,6 +33,16 @@ class FuFormalParam(GObject.Object):
 
     Knows how to convey to Gimp.
 
+    For now, this one class suffices for IN and OUT formal params.
+    IN params should have a non-null default value.
+    OUT params (return values) should not have a default value,
+    but we store None for them anyway.
+    And don't enforce things properly.
+    """
+
+    """
+    OLD is working now?
+
     For now, conveyance is broken:
     all it accomplishes is to tell Gimp the count of parameters
     (and not the types and defaults: we tell Gimp every formal parameter is an int)
@@ -53,7 +63,12 @@ class FuFormalParam(GObject.Object):
     prop_holder_factory = PropHolderFactory()
 
 
-    def __init__(self, pf_type, label, desc, default_value, extras = [] ):
+    def __init__(self, pf_type, label, desc, default_value=None, extras = [] ):
+
+        # not allow none default, our conveyance methods choke
+        if default_value is None:
+            default_value = 0
+
         self.PF_TYPE= pf_type
         self.LABEL= label
         self.DESC= desc

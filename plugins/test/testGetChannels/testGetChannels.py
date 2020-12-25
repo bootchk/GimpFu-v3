@@ -11,18 +11,23 @@ def plugin_func(image, drawable):
     count, channels = pdb.gimp_image_get_channels(image)
     # returns a Gimp.ObjectArray
     print(f"Count {count} channels {channels}")
+
+    count, strings = pdb.gimp_context_list_paint_methods()
+    # returns a Gimp.StringArray
+    print(f"Count: {count} paint method names: {strings}")
+
     color = channels[0].get_color()
     print(color)
 
 
 register(
-      "python-fu-test-array-testGetChannels",
+      "python-fu-test-array-results",
       "blurb",
       "help message",
       "author",
       "copyright",
       "year",
-      "Returns list of Channels...",
+      "Test procedures that return Array...",
       "*",
       [
           (PF_IMAGE, "image", "Input image", None),

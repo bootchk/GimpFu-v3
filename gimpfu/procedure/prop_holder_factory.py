@@ -89,7 +89,13 @@ class Foo(GObject.GObject):
         # !!! need strings but str() and repr() don't work for type
         # dispatch on type
         if type is int:
+            """
+            ??? TODO
+            For IN args, default must be specified.
+            For OUT args, default can be None.
+            """
             if not (isinstance(default, int) or isinstance(default, bool)):
+                #self.logger.warning(f"Default is None.  If this is not an IN parameter, default should not be None.")
                 raise RuntimeError(f"default: {default} having type: {type(default)} class: {default.__class__}, should be of type int.")
             template = string.Template(self.template_string_numeric)
             code_string = template.substitute(type="int", name=unique_prop_name, default=default, min=min, max=max)

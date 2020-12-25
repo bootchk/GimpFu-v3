@@ -4,11 +4,6 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-# For GLib.Error()
-# ??? Require 2.32 for GArray instead of GValueArray
-from gi.repository import GLib
-
-
 from procedure.procedure_config import FuProcedureConfig
 from procedures.procedures import FuProcedures
 
@@ -18,12 +13,17 @@ from message.proceed_error import *
 from message.deprecation import Deprecation
 from message.suggest import Suggest
 
+from runner.result import FuResult
+
 import logging
 
 
 """
 Understands how to run a GimpFu procedure
 from Gimp's callback to the registered run function.
+An author registers a run_func,
+GimpFu interposes and registers a wrapped run_func
+e.g. run_imageprocedure which calls the author's run_func
 
 Hides:
 - adaption of signatures
@@ -225,8 +225,6 @@ class FuRunner:
         list_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, drawable)
 
         result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_all_args, original_args, data)
-        # ensure result is-a GValueArray whose first element is a PDB_STATUS
-        # and whose other elements have types matching registered return value types
         return result
 
 
@@ -315,11 +313,10 @@ class FuRunner:
            try:
                # invoke func with unpacked args.  Since Python3, apply() gone.
                # TODO is this the correct set of args? E.G. Gimp is handling RUN_WITH_LAST_VALS, etc. ???
-               result = func(*list_wrapped_args)
-               # TODO add result values
-               final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
+               runfunc_result = func(*list_wrapped_args)
+               final_result = FuResult.make(procedure, Gimp.PDBStatusType.SUCCESS, runfunc_result)
            except:
-               final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
+               final_result = FuResult.make(procedure, Gimp.PDBStatusType.EXECUTION_ERROR)
         else:
            '''
            Not enclosed in try:except: since then you don't get a good traceback.
@@ -328,14 +325,12 @@ class FuRunner:
            either by calling our own dialog or by calling a Gimp.ErrorDialog (not exist)
            or by passing the exception string back to Gimp.
            '''
-           was_canceled, result = FuRunner._interact(procedure, list_wrapped_args, config)
+           was_canceled, runfunc_result = FuRunner._interact(procedure, list_wrapped_args, config)
            if was_canceled:
-               final_result = procedure.new_return_values(Gimp.PDBStatusType.CANCEL, GLib.Error())
+               final_result = FuResult.make(procedure, Gimp.PDBStatusType.CANCEL)
                config.end_run(Gimp.PDBStatusType.CANCEL)
            else:
-               # TODO add result values to Gimp  procedure.add_return_value ....
-               # trigger Gimp create all return values from this status and prior add_return_value
-               final_result = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
+               final_result = FuResult.make(procedure, Gimp.PDBStatusType.SUCCESS, runfunc_result)
                config.end_run(Gimp.PDBStatusType.SUCCESS)
            """
            OLD above was enclosed in try
@@ -347,7 +342,7 @@ class FuRunner:
                But it might be author programming code (e.g. invalid PARAMS)
                '''
                proceed(f"Exception opening plugin dialog: {err}")
-               final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
+               final_result = FuResult.make(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
            """
 
         '''
@@ -370,15 +365,9 @@ class FuRunner:
             """
             msg = "GimpFu detected errors.  See console for a summary."
             Gimp.message(msg)
-            final_result = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, GLib.Error())
-
-            # TODO can't get this to work
-            #glib_error = GLib.Error( GLib.quark_from_string("GimpFu"), 0, msg )
-            #GLib.quark_from_string("GimpFu"), 0,
-            # final_result = procedure.new_return_values( Gimp.PDBStatusType.EXECUTION_ERROR, glib_error)
+            final_result = FuResult.make(procedure, Gimp.PDBStatusType.EXECUTION_ERROR)
 
             # Alternatively: raise Exception(msg) but that is confusing to Author
-
 
         # ensure final_result is type GimpValueArray
         return final_result
