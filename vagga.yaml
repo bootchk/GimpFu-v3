@@ -687,8 +687,11 @@ commands:
       export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
       echo "LD_LIBRARY_PATH"
       echo $LD_LIBRARY_PATH
-      echo "Gegl version from dpkg"
-      dpkg -l | grep gegl
+      # Note gegl is not in dpkg
+      #echo "Gegl version from dpkg"
+      #dpkg -l | grep gegl
+      echo "Gegl version from pkg-config"
+      pkg-config --modversion gegl-0.4
       echo "GLib version from pkg-config"
       pkg-config --modversion glib-2.0
       echo "Python version from python3 --version"
@@ -876,11 +879,11 @@ commands:
       #cp -r /work/plugins/wild/* /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Copying selected nonGimpfu plugins"
-      cp -r /work/plugins/nonGimpFu/testEmptyArgs /work/.home/.config/GIMP/2.99/plug-ins
+      cp -r /work/plugins/nonGimpFu/myMinPlugin /work/.home/.config/GIMP/2.99/plug-ins
+      cp -r /work/plugins/nonGimpFu/testGegl    /work/.home/.config/GIMP/2.99/plug-ins
 
       echo "Copying all my test plugins"
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
-
 
       # Copy some plugins from volumes of the container
 
@@ -893,13 +896,7 @@ commands:
       cp -r /work/testGimpPDB/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
 
 
-      # Scraps for copying selected plugins, if not all are copied
-      # testGimpPDB
-      #cp -r /work/plug-ins/mega*      /work/.home/.config/GIMP/2.99/plug-ins
-      # testColor
-      #cp -r /work/testPlugins/testRGB /work/.home/.config/GIMP/2.99/plug-ins
-      # test
-      #cp -r /work/testPlugins/testArrayResult /work/.home/.config/GIMP/2.99/plug-ins
+
 
       echo "Chmoding test plugins"
       # find -D exec /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' + -print
@@ -920,7 +917,7 @@ commands:
       # export GIMP_PLUGIN_DEBUG=file-png,fatal-warnings
       export GIMP_PLUGIN_DEBUG=all,fatal-criticals
 
-      export GIMPFU_DEBUG=1
+      #export GIMPFU_DEBUG=1
 
       # print all G_MESSAGES
       # export G_MESSAGES_DEBUG=all

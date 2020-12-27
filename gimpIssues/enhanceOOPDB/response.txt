@@ -1,0 +1,43 @@
+The issue is about the PDB API, not about bindings per se.
+The bindings (to libgimp) are fine.
+
+The PDB API is what you (a plugin author) sees when you use Filters>Development>PythonConsole>Browse.
+
+The issue is about the difference between the signatures you see in a binding to libgimp versus the PDB.
+For example, the function edit-copy, taking a sequence of drawables:
+
+   - In bound Python the signature is: Gimp.edit_copy( drawables:list )
+   - In the PDB the signature is: gimp-edit-copy( num_drawables:int, drawables:list)
+
+The issue is trying to say: the PDB signature could be more OO, and exactly like the bound signature.
+The patch shows there might not be any technical impediment.
+
+I think the layers are:
+
+```
+plugin in a bound language
+binding
+libgimp
+PDB
+core
+```
+
+But from a plugin, you CAN directly invoke a PDB procedure e.g. using Gimp.get_pdb().run_procedure(),
+and then you need to pass parameters using the PDB signature.
+(you are calling a libgimp function that lets you call pdb procedures, i.e. tunneling through the libgimp layer,
+so to speak.)
+
+You could argue, if everything is available in libgimp (which it usually is), why do plugin authors need to invoke PDB procedures?
+Maybe they don't need to, but they can.
+
+Its partly aesthetic, but it also might be a safety issue.
+For example, maliciously, in Python:
+```
+Gimp.get_pdb().run_procedure('gimp-edit-copy',
+  [
+     GObject.Value(GObject.TYPE_INT, 666),
+     GObject.Value(Gimp.ObjectArray, [drawable]),
+  ])
+```
+Might be a read buffer-overflow, past the end of memory.
+(might not be valid code, I haven't tested in ASAN that it does overflow.)
