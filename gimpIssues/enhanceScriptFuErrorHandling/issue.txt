@@ -1,0 +1,19 @@
+
+Enhance ScriptFu error handling to fix these issues:
+
+1. omits domain on g_set_error which throws
+GLib-WARNING **: 11:29:10.711: (../../../glib/gerror.c:412):g_error_new_valist: runtime check failed: (domain != 0)
+
+2. On many script error messages, fails to provide useful details.
+For example, "Invalid type for argument"
+fails to say:
+- what formal Gimp type was expected (e.g. Gimp.FloatArray)
+- what actual Lisp type was expected  (e.g. vector)
+- what actual Lisp type was received (e.g. list )
+
+3. Debugging code is implemented by #ifdef spread throughout the code
+making it hard to read.
+
+4. Debugging code no longer compiles.
+
+5. There is no test suite for scriptfu 

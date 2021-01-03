@@ -1,0 +1,94 @@
+From 4fa5ba388bf4815d2e370b129fc4453ecf420304 Mon Sep 17 00:00:00 2001
+From: bootchk <bootchk@users.noreply.github.com>
+Date: Wed, 2 Dec 2020 10:22:47 -0500
+Subject: [PATCH 1/2] iss6033_fail_call_PDB_with_void_args
+
+---
+ libgimp/gimppdb.c            |  3 +--
+ libgimp/gimppdb.h            |  2 +-
+ libgimpbase/gimpvaluearray.c | 12 +++++++-----
+ libgimpbase/gimpvaluearray.h |  2 +-
+ 4 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/libgimp/gimppdb.c b/libgimp/gimppdb.c
+index 1b961b6d44..f909c67052 100644
+--- a/libgimp/gimppdb.c
++++ b/libgimp/gimppdb.c
+@@ -296,14 +296,13 @@ GimpValueArray *
+ gimp_pdb_run_procedure_argv (GimpPDB      *pdb,
+                              const gchar  *procedure_name,
+                              const GValue *arguments,
+-                             gint          n_arguments)
++                             guint         n_arguments)
+ {
+   GimpValueArray *args;
+   GimpValueArray *return_values;
+ 
+   g_return_val_if_fail (GIMP_IS_PDB (pdb), NULL);
+   g_return_val_if_fail (gimp_is_canonical_identifier (procedure_name), NULL);
+-  g_return_val_if_fail (arguments != NULL, NULL);
+ 
+   args = gimp_value_array_new_from_values (arguments, n_arguments);
+   return_values = gimp_pdb_run_procedure_array (pdb, procedure_name, args);
+diff --git a/libgimp/gimppdb.h b/libgimp/gimppdb.h
+index af16d3249a..c300ddb402 100644
+--- a/libgimp/gimppdb.h
++++ b/libgimp/gimppdb.h
+@@ -84,7 +84,7 @@ GimpValueArray * gimp_pdb_run_procedure_valist (GimpPDB              *pdb,
+ GimpValueArray * gimp_pdb_run_procedure_argv   (GimpPDB              *pdb,
+                                                 const gchar          *procedure_name,
+                                                 const GValue         *arguments,
+-                                                gint                  n_arguments);
++                                                guint                 n_arguments);
+ GimpValueArray * gimp_pdb_run_procedure_array  (GimpPDB              *pdb,
+                                                 const gchar          *procedure_name,
+                                                 const GimpValueArray *arguments);
+diff --git a/libgimpbase/gimpvaluearray.c b/libgimpbase/gimpvaluearray.c
+index 6923e47647..d99b17f74e 100644
+--- a/libgimpbase/gimpvaluearray.c
++++ b/libgimpbase/gimpvaluearray.c
+@@ -256,7 +256,7 @@ gimp_value_array_new_from_types_valist (gchar   **error_msg,
+  * @n_values: the number of value elements
+  *
+  * Allocate and initialize a new #GimpValueArray, and fill it with
+- * the given #GValues.
++ * any given #GValues.  When n_values is zero, returns empty #GimpValueArray.
+  *
+  * Returns: a newly allocated #GimpValueArray.
+  *
+@@ -264,13 +264,15 @@ gimp_value_array_new_from_types_valist (gchar   **error_msg,
+  */
+ GimpValueArray *
+ gimp_value_array_new_from_values (const GValue *values,
+-                                  gint          n_values)
++                                  guint         n_values)
+ {
+   GimpValueArray *value_array;
+-  gint i;
++  guint i;
+ 
+-  g_return_val_if_fail (values != NULL, NULL);
+-  g_return_val_if_fail (n_values > 0, NULL);
++  /* n_values == 0 implies values == NULL*/
++  g_return_val_if_fail (n_values > 0 || values == NULL, NULL);
++  /* n_values > 0 implies values != NULL*/
++  g_return_val_if_fail (n_values == 0 || values != NULL, NULL);
+ 
+   value_array = gimp_value_array_new (n_values);
+ 
+diff --git a/libgimpbase/gimpvaluearray.h b/libgimpbase/gimpvaluearray.h
+index ec27cbb48e..c6610fd3ec 100644
+--- a/libgimpbase/gimpvaluearray.h
++++ b/libgimpbase/gimpvaluearray.h
+@@ -51,7 +51,7 @@ GimpValueArray * gimp_value_array_new_from_types_valist
+                                             va_list               va_args);
+ GimpValueArray * gimp_value_array_new_from_values
+                                            (const GValue *values,
+-                                            gint          n_values);
++                                            guint         n_values);
+ 
+ GimpValueArray * gimp_value_array_ref      (GimpValueArray       *value_array);
+ void             gimp_value_array_unref    (GimpValueArray       *value_array);
+-- 
+2.17.1
+

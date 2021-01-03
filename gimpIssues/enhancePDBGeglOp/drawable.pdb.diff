@@ -1,0 +1,152 @@
+diff --git a/pdb/groups/drawable.pdb b/pdb/groups/drawable.pdb
+index 2032ac6537..09bb38e522 100644
+--- a/pdb/groups/drawable.pdb
++++ b/pdb/groups/drawable.pdb
+@@ -90,6 +90,139 @@ CODE
+     );
+ }
+ 
++
++
++
++sub drawable_apply_operation_by_name {
++    $blurb = 'Filter the drawable with the named GEGL operation.';
++
++    $help = <<'HELP';
++This procedure sets specified properties (controls) of the named GEGL operation
++and then applies the operation to the drawable.
++Controls are specified as name value pairs.
++Any specified controls override default values of the operation.
++Fails on invalid operation name or invalid property name,
++with no effect on drawable.
++
++You should only use this procedure as a fallback when the GEGL operation
++is not already wrapped by a PDB procedure.
++HELP
++
++    $author    = 'Lloyd Konneker';
++    $copyright = 'Lloyd Konneker';
++    $date      = '2021';
++    $since     = '3.0';
++
++    @inargs = (
++  	{ name => 'drawable', type => 'drawable',
++  	  desc => 'The drawable' },
++  	{ name => 'operation_name', type => 'string',
++  	  desc => 'Name of the GEGL operation to apply' },
++    { name => 'control_names', type => 'stringarray',
++      desc => 'Names of the operation properties to set',
++       no_validate => 1,
++       array => { name => 'num_names',
++                  type => '0 <= int32',
++                  desc => "Number of names" } },
++    { name => 'control_values', type => 'floatarray',
++  	  desc => 'Values to set on operation properties',
++      no_validate => 1,
++      array => { name => 'num_values',
++                 type => '0 <= int32',
++                 desc => "Number of values" } }
++    );
++
++    %invoke = (
++	headers => [ qw("core/gimpdrawable-operation.h") ],
++	code => <<'CODE'
++{
++  /* Disallow group kind of drawables, and unmodifiable drawables. */
++  if ( gimp_pdb_item_is_modifiable (GIMP_ITEM (drawable),
++                                   GIMP_PDB_ITEM_CONTENT, error) &&
++      gimp_pdb_item_is_not_group (GIMP_ITEM (drawable), error) &&
++      num_names == num_values &&
++      gegl_has_operation(operation_name))
++    {
++       GeglNode *node =
++       gegl_node_new_child (NULL,
++                            "operation", operation_name,
++                            NULL);
++      /* We preflighted operation exists, but could fail for other reasons. */
++      if (node == NULL ||
++          gegl_node_get_operation(node) == NULL )
++        {
++          g_object_unref (node);
++          success = FALSE;
++        }
++      else
++        {
++          for (int i=0; i<num_names; i++)
++             {
++                GValue new_value         = G_VALUE_INIT;
++                GValue current_value     = G_VALUE_INIT;
++
++                /* Unset before reuse */
++                g_value_unset(&new_value);
++                g_value_unset(&current_value);
++
++                gegl_node_get_property( node, control_names[i], &current_value);
++                /* When name not valid, GEGL will issue G_OBJECT_WARN_INVALID_PROPERTY
++                 * and subsequent dispatch on property type will abort
++                 * with SUCCESS==false.
++                 */
++
++                /* Convert given float gvalue to gvalue of type of property.
++                 * Only property types that Gegl operations use for controls.
++                 * Use explicit C cast since narrowing conversion from float.
++                 */
++                if ( G_VALUE_HOLDS(&current_value, G_TYPE_ENUM))
++                  {
++                    g_value_init (&new_value, G_TYPE_ENUM);
++                    g_value_set_enum (&new_value, (int) control_values[i]);
++                  }
++                else if ( G_VALUE_HOLDS(&current_value, G_TYPE_BOOLEAN))
++                  {
++                    g_value_init (&new_value, G_TYPE_BOOLEAN);
++                    g_value_set_boolean (&new_value, (int) control_values[i]);
++                  }
++                else if ( G_VALUE_HOLDS(&current_value, G_TYPE_INT))
++                  {
++                    g_value_init (&new_value, G_TYPE_INT);
++                    g_value_set_int (&new_value, (int) control_values[i]);
++                  }
++                else if ( G_VALUE_HOLDS(&current_value, G_TYPE_DOUBLE))
++                  {
++                   g_value_init (&new_value, G_TYPE_DOUBLE);
++                   g_value_set_double (&new_value, control_values[i]);
++                  }
++                else
++                   {
++                     success = FALSE;
++                     break;
++                   }
++                gegl_node_set_property( node, control_names[i], &new_value );
++             }
++
++        if (success)
++          gimp_drawable_apply_operation (drawable,
++                                         NULL,
++                                         C_("undo-type", "PDB Gegl Op"),
++                                         node);
++        g_object_unref (node);
++      }
++    }
++  else
++    success = FALSE;
++}
++CODE
++    );
++}
++
++
++
++
++
++
+ sub drawable_fill {
+     $blurb = 'Fill the drawable with the specified fill mode.';
+ 
+@@ -1029,6 +1162,7 @@ CODE
+             drawable_free_shadow
+             drawable_update
+             drawable_get_pixel drawable_set_pixel
++      drawable_apply_operation_by_name
+ 	    drawable_fill
+             drawable_offset
+             drawable_thumbnail

@@ -1,0 +1,92 @@
+
+Enhance: expose gimp_drawable_apply_operation_by_name in the PDB
+
+Patch attached.
+
+This enhancement lets plugins apply any Gegl op to a drawable, especially ops that are new to Gegl.
+
+Currently, most Gegl ops are wrapped by a PDB procedure, but some are missing.
+A GEGL op could be missing because:
+- GIMP development is separate and lags GEGL development
+- GEGL ops are dynamically loaded and could be custom to a user
+- some users may build their own newer version of GEGL out of sync with GIMP
+- not actually missing, just that script author is ignorant of the PDB wrapper function
+  (e.g. what was once known as gegl:white-balance is now known by an obscure name in the PDB?)
+
+See #1686, which reports this issue, and for which this is a fix.
+That issue discusses another alternative, a third party Python plugin that gives access to Gegl ops.
+
+Gegl ops currently seem to be missing from Gimp PDB:
+- gegl:median-blur
+- gegl:mean-curvature-blur
+- gegl:mantiuk06
+- gegl:high-pass
+
+
+# Alternatives:
+
+1) simply define compatibility PDB procedures for the missing Gegl ops.
+However that does not provide a fallback for the case of a user's own Gegl ops,
+and the case where GIMP falls behind may arise again.
+
+2) Let plugins create Gegl nodes and pass them in a PDB procedure.
+That would let a plugin use Gegl to a fuller extent, e.g. creating a graph of nodes.
+However, that seems to require more extensive changes to Gimp.
+e.g. changing the Gimp Protocol between GIMP and plugins to pass a Gegl node.
+
+# About the enhancement
+
+A plugin author must know the name and signature,
+i.e. parameter names/types/ranges,
+of a GEGL op.
+
+Only numeric valued parameters can be passed.
+(Most Gegl op properties are numeric values, but it might be that some use a color?)
+
+An author only needs to pass values to override defaults for a Gegl op.
+
+The PDB procedure sets properties (controls) on Gegl ops.
+Names and values for controls of a gegl op
+are passed in two same-length arrays that act like a dictionary.
+Names are passed in a string array.
+Values are passed in a float array.
+
+The PDB procedure introspects the GEGL op properties by passed name,
+and converts passed values to the required type using explicit C conversions (aka casts.)
+I.E. floats passed by the caller are converted to boolean, enums, ints
+that a property may require.
+
+# Example code from plugins:
+
+ScriptFu:
+
+( gimp_drawable_apply_operation_by_name drawable "gegl:median-blur" 1 '("radius") 1 #(10.0))
+
+!!! Note that '() is a list literal but #() is a lisp vector literal.
+ScriptFu wants vector type for numeric Gimp array types.
+
+Here the script author must provide the array size arguments,
+since ScriptFu uses the PDB procedure, not the libgimp procedure.
+
+Python:
+
+drawable.apply_operation_by_name('gegl:median-blur', ['radius'], [10.0] )
+
+Here PyGObject binding provides the array size arguments to call the libgimp procedure.
+
+
+GimpFu: as above for a drawable instance or:
+
+pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:median-blur",
+       2, ["radius", "neighborhood"], 2, [10.0, 1.0])
+
+
+# Testing
+
+I have a Python plugin that tests:
+- invalid op name
+- invalid property name
+- array lengths differ
+- excludes layer group
+
+I have a ScriptFu plugin that tests calling the PDB procedure.

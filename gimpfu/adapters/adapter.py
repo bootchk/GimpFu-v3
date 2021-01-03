@@ -193,7 +193,10 @@ class Adapter():
     def _adapter_func(self, *args):
         ''' intercepts calls to previously accessed attribute '''
 
-        AdapterLogger.logger.debug(f"_adapter_func called, args: { {*args} }")
+        # This must be improved: for an arg is-a list, raises "unhashable type"
+        # Note that you can't unpack inside a fstring
+        # AdapterLogger.logger.debug(f"_adapter_func called, args: { {*args} }")
+
         from adaption.marshal import Marshal
 
         # arg could be a wrapped type, convert to unwrapped type i.e. foreign type

@@ -32,6 +32,9 @@ def testGegl(procedure, run_mode, image, drawable, args, data):
 
     print(f"Version: {Gegl.get_version()}")
 
+    # Why doesn't this work?
+    print(f"Operations: {Gegl.list_operations()}")
+
     print(f"Has op median-blur: {Gegl.has_operation('gegl:median-blur')}")
     print(f"Has op ripple: {Gegl.has_operation('gegl:ripple')}")
 
@@ -58,8 +61,17 @@ def testGegl(procedure, run_mode, image, drawable, args, data):
     # set the properties of the operation onto the processing node
     processing_node.set_property("neighborhood", 1)
     # print("Set neighborhood property")
+    """
+    Accept the defaults?
+    processing_node.set_property("radius", 1)
+    processing_node.set_property("percentile", 100.0)
+    processing_node.set_property("alpha-percentile", 100.0)
+    processing_node.set_property("neighborhood", 1)
+    """
 
     # gimp_drawable_apply_operation is not exposed in libgimp?????
+    drawable.apply_operation(processing_node)
+    print(f"Apply operation")
 
     """
     from pdb/plug_in_compat.pdb for a PDB procedure that calls gegl

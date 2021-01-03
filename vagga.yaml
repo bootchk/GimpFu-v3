@@ -241,9 +241,10 @@ containers:
     #   git clone https://gitlab.gnome.org/GNOME/babl.git /home/babl
 
     # OR most most recent release archive
-    # 1.72=>1.74=>1.78
+    # 1.72=>1.74=>1.78=>1.84
+    # When you change this, also change below the cd
     - !Tar
-      url: https://download.gimp.org/pub/babl/0.1/babl-0.1.78.tar.xz
+      url: https://download.gimp.org/pub/babl/0.1/babl-0.1.84.tar.xz
       path: /home
 
 
@@ -264,12 +265,16 @@ containers:
     # !!! Must specify a revision, else vagga will, the first time get the latest
     # !!! and subsequently cache it indefinitely.  See vagga docs.
     # !!! But you can't get the latest revision until it is released.
-    # So just refresh the whole container sequence when gegl changes
-    #  revision: 4.27
+    # So delete contents of the cache ~/.cache/vagga/cache when gegl changes
+    # Or delete the directory ...cache/git
+    # Or specify the revision that GIMP wants
+    #  Fail: revision: 4.27
+    # Only a specific commit seems to work, look it up at gitlab gegl
 
     - !Git
       url: https://gitlab.gnome.org/GNOME/gegl
       path: /home/gegl
+      revision: 811bd306
 
 
 
@@ -308,7 +313,7 @@ containers:
     # WAS: cd /home/babl-0.1.74 => 1.78
 
     - !Sh |
-        cd /home/babl-0.1.78
+        cd /home/babl-0.1.84
         meson _build \
          --buildtype=release \
           -Db_lto=true
@@ -360,7 +365,7 @@ containers:
     # Show installed version
     - !Sh |
        echo "trying: pkg-config gegl"
-       pkg-config gegl-0.4 --modversion
+       pkg-config --modversion gegl-0.4
 
     # Using !Git, but that does not create a git repository so this doesn't work
     # cd /home/gegl
@@ -377,13 +382,17 @@ containers:
 
 
 
-  # With gimp source and built gimp
-  # Uses automake variant of build system for Gimp
+  # With built gimp
+  # Uses AM automake variant of build system for Gimp
+  # Formerly copied source into container
   gimpAMDev:
     setup:
     - !Container bablGeglDev
 
     # rebuild container when changed: local clone of gimp repository (in /work i.e. project directory )
+    # !!! The build must not put the _build directory in this directory, else container will fail
+    # with: Can't write image usage info: No such file or directory (os error 2)
+    # meaning the dependency changed during container build
     - !Depends gimp
 
     # Get Gimp sources
@@ -393,21 +402,8 @@ containers:
     #  url: https://gitlab.gnome.org/GNOME/gimp.git
     #  path: /home/gimp
 
-    # copy files from my hacked git repo into the container
-    # note /work/gimp is in the containing, project directory
-    # First remove it in case meson build futzed with it???
-
-    - !Copy
-      source: /work/gimp
-      path:  /home/gimp
-
     # Options
     # See INSTALL or INSTALL.in file in repository.  Seems definitive
-
-    # list the options
-    #- !Sh |
-    #   cd /home/gimp
-    #   ./configure --help
 
     - !Env LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
     - !Env XDG_DATA_DIRS: "/usr/local/share:/usr/share"
@@ -418,7 +414,7 @@ containers:
     - !Sh echo "introspection path ->"  $XDG_DATA_DIRS
     - !Sh echo "binary path ->" $PATH
 
-    # require libtool now (for autotools build
+    # Build gimp
 
     # My customization of the bare commands
     # disabling docs, python, vector-icons
@@ -432,18 +428,33 @@ containers:
 
     # preface: CFLAGS="-fsanitize=address -fno-omit-frame-pointer"
     # option to rebuild PDB      autogen.sh --with-pdbgen
-
     # make -j4
-    # build
+
+    # Build in a directory copied into the container (in tree since it creates _build?)
+    - !Copy
+      source: /work/gimp
+      path:  /home/gimp
+
     - !Sh |
         cd /home/gimp
         CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs --enable-debug --with-pdbgen
-        make all-am
+        make all-am -j4
         make install
+
+    # Build out of source tree, but build in the container
+    # This doesn't work yet.
+    #- !EnsureDir /gimpBuild
+    #- !Sh |
+    #    cd gimpBuild
+    #    export SRCTREE=/work/gimp
+    #    CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs --enable-debug --with-pdbgen
+    #    /work/gimp/configure
+    #    make all-am -j4
+    #    make install
 
     # print out the options, after autogen.sh
     - !Sh |
-        cd /home/gimp
+        cd /work/gimp
         ./configure --help
 
     # remove DNS file that vagga will recreate after build
@@ -461,13 +472,14 @@ containers:
 
 
   # build gimp using meson
+  # !!! source is not in the container
   gimpMesonDev:
     setup:
     - !Container bablGeglDev
 
-    - !Copy
-      source: /work/gimp
-      path:  /home/gimp
+    #- !Copy
+    #  source: /work/gimp
+    #  path:  /home/gimp
 
     # resolve FAILED: cursors/gimp-tool-cursors.c   Related to vector icons?
     - !Env  XDG_DATA_DIRS: "/usr/local/share:/usr/share"
@@ -496,7 +508,7 @@ containers:
 
     # build
     - !Sh |
-        cd /home/gimp
+        cd /work/gimp
         meson _build \
          --buildtype=debug \
          -Djavascript=false \
@@ -504,20 +516,9 @@ containers:
          -Dpython=true \
          -Dgtk-doc=false
 
-
         cd _build
         ninja
         ninja install
-
-    # Generate documentation for Python language bindings to Gimp, etc.
-    # Same documents for GLib, GObj, Gio webbed at "PyGObject API Reference"
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimpui-doc /usr/local/share/gir-1.0/GimpUi-3.0.gir
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
-    ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
-
-
 
 
 
@@ -582,6 +583,25 @@ containers:
     setup:
     # Choice:
     - !Container gimpAMDev
+
+    # Generate documentation for Python language bindings to Gimp, etc.
+    # Same documents for GLib, GObj, Gio webbed at "PyGObject API Reference"
+    #
+    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+
+    #- !Sh g-ir-doc-tool --language=Python -o /work/.home/gimpui-doc /usr/local/share/gir-1.0/GimpUi-3.0.gir
+    #- !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
+    #- !Sh g-ir-doc-tool --language=Python -o /work/.home/gobj-doc /usr/share/gir-1.0/GObject-2.0.gir
+    ## crashes: - !Sh g-ir-doc-tool --language=Python -o /work/.home/gio-doc /usr/share/gir-1.0/Gio-2.0.gir
+
+    # pgi-docgen produces nicer documents
+    # See my static html copy at ~/PythonGIDocs
+
+    # Generate latest copy only for Gimp
+    # WIP needs pgi-docgen and many dependencies
+    #- !Sh |
+    #    pgi-docgen create /work/.home/_docs Gimp-3.0
+    #    pgi-docgen build /work/.home/_docs /work/.home/_docs/_build
 
     # rebuild container if test plugin source (in /work i.e. project directory ) changes
     - !Depends plugins
@@ -747,6 +767,10 @@ commands:
       # !!! outside the container
       mkdir /work/.home/.config/GIMP/2.99/plug-ins
 
+      # Copy a scheme script
+      cp -rv /work/plugins/nonGimpFu/testGeglOp.scm /work/.home/.config/GIMP/2.99/scripts
+
+
       # Refresh installation of gimpfu from development gimp_directory
       # Copy entire directory into the plug-ins directory
       echo "Copying gimpfu to local"
@@ -785,7 +809,7 @@ commands:
       export LD_PRELOAD=$(gcc -print-file-name=libasan.so)
 
       # stop glib at warnings
-      export G_DEBUG=fatal-warnings
+      #export G_DEBUG=fatal-warnings
 
       # Per devel-docs/debugging
       # Mostly GUI messages
@@ -940,8 +964,6 @@ commands:
     run: |
        g-ir-doc-tool --language=Python -o /work/.home/gimp-doc   /usr/local/share/gir-1.0/Gimp-3.0.gir
        g-ir-doc-tool --language=Python -o /work/.home/gimpui-doc /usr/local/share/gir-1.0/GimpUi-3.0.gir
-       g-ir-doc-tool --language=Python -o /work/.home/glib-doc   /usr/share/gir-1.0/GLib-2.0.gir
-       g-ir-doc-tool --language=Python -o /work/.home/gobj-doc   /usr/share/gir-1.0/GObject-2.0.gir
        echo "Generated to .home/gimp-doc"
 
   showEnv: !Command
@@ -955,16 +977,6 @@ commands:
     run: |
       ls -alR $HOME/.config/GIMP/2.99/plug-ins
       cat $HOME/.config/GIMP/2.99/plug-ins/test/test.py
-
-  # CRUFT, pygimp is obsolete
-  # uncomment ## in gimp/plug-ins/Makefile.am
-  # not working, read-only file system
-  makePyGimp: !Command
-    description: Remake PyGimp in gimpdev container
-    container: gimpDev
-    run: |
-      cd /home/gimp
-      make
 
   runUbuntuBug: !Command
     description: Run ubuntu-bug in the container

@@ -1,0 +1,63 @@
+snippert from pdb/groups/drawable.pdb
+
+
+
+sub drawable_apply_operation {
+    $blurb = 'Filter the drawable with the GEGL operation.';
+
+    $help = <<'HELP';
+This procedure filters the drawable.
+HELP
+
+    &std_pdb_misc;
+
+    @inargs = (
+	{ name => 'drawable', type => 'drawable',
+	  desc => 'The drawable' },
+	{ name => 'operation', type => 'node',
+	  desc => 'The operation' }
+    );
+
+    %invoke = (
+	headers => [ qw("core/gimpdrawable-operation.h") ],
+	code => <<'CODE'
+{
+  if (gimp_pdb_item_is_modifiable (GIMP_ITEM (drawable),
+                                   GIMP_PDB_ITEM_CONTENT, error) &&
+      gimp_pdb_item_is_not_group (GIMP_ITEM (drawable), error))
+    {
+      gimp_drawable_apply_operation (drawable,
+                                     NULL,
+                                     C_("undo-type", "Gegl Op"),
+                                     operation);
+    }
+  else
+    success = FALSE;
+}
+CODE
+    );
+}
+
+
+
+
+snippet from pdb/app.pl
+
+
+
+elsif ($pdbtype eq 'node') {
+$pspec = <<CODE;
+g_param_spec_object ("$name",
+                 "$nick",
+                 "$blurb",
+                 GEGL_TYPE_NODE,
+                 $flags)
+CODE
+}
+
+snippert from drawable.pdb
+
+{ name => 'control_names', type => 'stringarray',
+  desc => 'Operation properties to set' },
+{ name => 'control_values', type => 'floatarray',
+  desc => 'Values to set on operation properties' }
