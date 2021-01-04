@@ -14,8 +14,8 @@ def plugin_func(image, drawable):
       print("plugin_func called")
 
 
-      # pass: passing float for float
-      #pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:median-blur", 1, ["radius"], 1, [100.0])
+      #pass no params
+      pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:median-blur", 0, [], 0, [])
 
       # pass float for enum
       pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:median-blur",
@@ -29,10 +29,11 @@ def plugin_func(image, drawable):
       pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:median-blur",
           3, ["radius", "neighborhood", "high-precision"], 3, [10.0, 1.0, True])
 
-      # Non GimpFu
+      # Non PDB
       drawable.apply_operation_by_name('gegl:median-blur', ['radius'], [100.0] )
 
       """
+      Not GimpFu, straight GI
       Fails: expected boxed.
       StringArray not working in GI??
 
@@ -49,22 +50,27 @@ def plugin_func(image, drawable):
 
       # Fail cases
 
+      print("Test case lengths not same.")
       # Dictionary not same length
       pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:median-blur",
           1, ["radius"], 3, [10.0, 1.0, True])
 
+      print("Test case unknown op.")
       # unknown op
       pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:foo",
           2, ["radius", "neighborhood"], 2, [10.0, 1.0])
 
+      print("Test case unknown property.")
+      print("Expect fail, and GEGL warning.")
       # unknown property
       pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:median-blur",
           1, ["foo"], 1, [1.0])
 
+      print("Test case layer group.")
       # layer group
       # Not mixing gimpfu with Gimp
-      # or aLayerGroup = Gimp.Layer.group_new(image.unwrap())
-      aLayerGroup = gimp.Layer.group_new(image)
+      aLayerGroup = Gimp.Layer.group_new(image.unwrap())
+      #aLayerGroup = gimp.Layer.group_new(image)
       # Note not attached: image.insert_layer(aLayerGroup)
       pdb.gimp_drawable_apply_operation_by_name( aLayerGroup, "gegl:median-blur", 1, ["radius"], 1, [100.0] )
 

@@ -9,7 +9,7 @@ Currently, most Gegl ops are wrapped by a PDB procedure, but some are missing.
 A GEGL op could be missing because:
 - GIMP development is separate and lags GEGL development
 - GEGL ops are dynamically loaded and could be custom to a user
-- some users may build their own newer version of GEGL out of sync with GIMP
+  Users may build their own newer version of GEGL out of sync with GIMP
 - not actually missing, just that script author is ignorant of the PDB wrapper function
   (e.g. what was once known as gegl:white-balance is now known by an obscure name in the PDB?)
 
@@ -56,7 +56,7 @@ and converts passed values to the required type using explicit C conversions (ak
 I.E. floats passed by the caller are converted to boolean, enums, ints
 that a property may require.
 
-# Example code from plugins:
+# Example usage in plugin code:
 
 ScriptFu:
 
@@ -66,7 +66,7 @@ ScriptFu:
 ScriptFu wants vector type for numeric Gimp array types.
 
 Here the script author must provide the array size arguments,
-since ScriptFu uses the PDB procedure, not the libgimp procedure.
+since ScriptFu uses the PDB procedure which requires array size.
 
 Python:
 
@@ -75,7 +75,7 @@ drawable.apply_operation_by_name('gegl:median-blur', ['radius'], [10.0] )
 Here PyGObject binding provides the array size arguments to call the libgimp procedure.
 
 
-GimpFu: as above for a drawable instance or:
+GimpFu or a Python GI call to a PDB procedure : as above for a drawable instance or:
 
 pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:median-blur",
        2, ["radius", "neighborhood"], 2, [10.0, 1.0])
@@ -83,10 +83,12 @@ pdb.gimp_drawable_apply_operation_by_name(drawable, "gegl:median-blur",
 
 # Testing
 
+I tested most paths of the procedure.
+I tested in both Python and ScriptFu plugins.
+
 I have a Python plugin that tests:
+- valid calls with 0, 1, 2 properties
 - invalid op name
 - invalid property name
 - array lengths differ
 - excludes layer group
-
-I have a ScriptFu plugin that tests calling the PDB procedure.

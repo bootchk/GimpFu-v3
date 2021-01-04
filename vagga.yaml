@@ -452,11 +452,6 @@ containers:
     #    make all-am -j4
     #    make install
 
-    # print out the options, after autogen.sh
-    - !Sh |
-        cd /work/gimp
-        ./configure --help
-
     # remove DNS file that vagga will recreate after build
     - !Sh "rm /etc/resolv.conf"
 
@@ -587,7 +582,7 @@ containers:
     # Generate documentation for Python language bindings to Gimp, etc.
     # Same documents for GLib, GObj, Gio webbed at "PyGObject API Reference"
     #
-    - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
+    # - !Sh g-ir-doc-tool --language=Python -o /work/.home/gimp-doc /usr/local/share/gir-1.0/Gimp-3.0.gir
 
     #- !Sh g-ir-doc-tool --language=Python -o /work/.home/gimpui-doc /usr/local/share/gir-1.0/GimpUi-3.0.gir
     #- !Sh g-ir-doc-tool --language=Python -o /work/.home/glib-doc /usr/share/gir-1.0/GLib-2.0.gir
@@ -723,13 +718,20 @@ commands:
       /usr/local/bin/gimp-2.99 --version
 
 
-  gimpVersion: !Command
-    description: Run gimp command line in gimpdev container
+  gimpAMVersion: !Command
+    description: Get version of gimp in gimpLocal container
     container: gimpLocal
     run: |
       export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
       echo $LD_LIBRARY_PATH
       /usr/local/bin/gimp-2.99 --version
+
+  gimpAMConfig: !Command
+    description: Get config options of gimp in gimpLocal container
+    container: gimpLocal
+    run: |
+      cd /home/gimp
+      ./configure --help
 
   # if you have yelp installed outside the container, and pwd is vaggaGimp, just "yelp .home/gimp-doc"
   gimpBrowse: !Command

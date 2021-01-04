@@ -15,7 +15,7 @@ from message.suggest import Suggest
 
 from adaption.formal_types import FormalTypes
 
-import collections.abc      # ABC for sequences
+from collections.abc import Sequence    # ABC for sequences
 import logging
 
 
@@ -164,7 +164,7 @@ class FuGenericValue():
         if isinstance(obj, str):
             # Python thinks a str is a sequence, but we treat it as a single item
             return False
-        return isinstance(obj, collections.Sequence)
+        return isinstance(obj, Sequence)
 
 
     """
@@ -223,23 +223,24 @@ class FuGenericValue():
         return container_gtype.name == 'GimpObjectArray'
 
 
-    def list_for_actual_arg(self):
+    def sequence_for_actual_arg(self):
         """
-        Return list from self.actual_arg.
+        Return sequence from self.actual_arg.
 
-        self.actual_arg might already be a list.
-        Require any such list is non-empty.
-        Else contain self.actual_arg in a list.
+        self.actual_arg might already be a list, possibly empty.
+        Else contain self.actual_arg in a non-empty list.
         """
         if self.is_tuple_or_list(self._actual_arg):
             # already a list
             result = self._actual_arg
+            # could be empty list
         else:
             # an item, contain it
             result = [self._actual_arg,]
+            assert(len(result)>0)
 
         # items in list might still be wrapped
-        assert(len(result)>0)
+        assert isinstance(result, Sequence)
         return result
 
 
@@ -265,12 +266,12 @@ class FuGenericValue():
         self.logger.info(f"to_gimp_array {to_container_gtype}")
 
         try:
-            list = self.list_for_actual_arg()
+            list = self.sequence_for_actual_arg()
         except Exception as err:
-            proceed(f"Exception in list_for_actual_arg: _actual_arg: {self._actual_arg}, {err}")
+            proceed(f"Exception in sequence_for_actual_arg: _actual_arg: {self._actual_arg}, {err}")
 
         """
-        assert list is-a list, but items are wrapped or fundamental types
+        assert list is-a list, but is empty, or items are wrapped or fundamental types
         But we don't know much about the contained items.
         (They were passed as arguments by Author.)
         Could be:
@@ -297,7 +298,7 @@ class FuGenericValue():
         else:   # elements are fundamental types
             list = list
 
-        # assert list now contains unwrapped or fundamental instances
+        # assert list now is empty or contains unwrapped or fundamental instances
 
         try:
             # create empty (i.e. no value) GValue of desired type,
