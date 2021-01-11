@@ -8,7 +8,7 @@ This enhancement lets plugins apply any Gegl op to a drawable, especially ops th
 Currently, most Gegl ops are wrapped by a PDB procedure, but some are missing.
 A GEGL op could be missing because:
 - GIMP development is separate and lags GEGL development
-- GEGL ops are dynamically loaded and could be custom to a user
+- GEGL ops are dynamically loaded and could be custom to a user.
   Users may build their own newer version of GEGL out of sync with GIMP
 - not actually missing, just that script author is ignorant of the PDB wrapper function
   (e.g. what was once known as gegl:white-balance is now known by an obscure name in the PDB?)
@@ -20,12 +20,14 @@ Gegl ops currently seem to be missing from Gimp PDB:
 - gegl:median-blur
 - gegl:mean-curvature-blur
 - gegl:mantiuk06
-- gegl:high-pass
+- gegl:high-passE
+
+
 
 
 # Alternatives:
 
-1) simply define compatibility PDB procedures for the missing Gegl ops.
+1) simply define wrapper PDB procedures for the missing Gegl ops.
 However that does not provide a fallback for the case of a user's own Gegl ops,
 and the case where GIMP falls behind may arise again.
 

@@ -345,8 +345,8 @@ containers:
     - !Sh echo ">>>>>>"
 
     # !!! Not using     --prefix=${GIMP_PREFIX} \
-    # WAS  cd /home/gegl-0.4.xx for a tar pull
-    # WAS cd /home/gegl for a git pull
+    # Use cd /home/gegl-0.4.xx for a tar pull
+    # Use cd /home/gegl for a git pull
     - !Sh |
         cd /home/gegl
         meson _build \
@@ -359,17 +359,21 @@ containers:
     # remove DNS file that vagga will recreate after build
     - !Sh "rm /etc/resolv.conf"
 
-    # Show that it installed .so
-    - !Sh ls /usr/local/lib/x86_64-linux-gnu
-
-    # Show installed version
-    - !Sh |
-       echo "trying: pkg-config gegl"
-       pkg-config --modversion gegl-0.4
-
     # Using !Git, but that does not create a git repository so this doesn't work
     # cd /home/gegl
     # git status
+
+    # setup for building gimp
+    # Source is out of the container; is code we are changing
+    # build dir is not in the container
+    - !Sh |
+        cd /work/gimp
+        meson /work/gimpBuild \
+         --buildtype=debug \
+         -Djavascript=false \
+         -Dlua=false \
+         -Dpython=true \
+         -Dgtk-doc=false
 
 
 
@@ -466,15 +470,21 @@ containers:
 
 
 
-  # build gimp using meson
-  # !!! source is not in the container
-  gimpMesonDev:
+  # Container with installed gimp, built using meson
+  # !!! source is not in the container, but container depends on it and vagga
+  # will rebuild container if gimp source changes.
+
+  # !!! Build directory is not in the container.
+  # When the container builds, meson should not do much Since
+  # the build directory hasn't changed???
+
+  # Local custom Gimp plugins not in the container.
+  gimpMesonInstalled:
     setup:
     - !Container bablGeglDev
 
-    #- !Copy
-    #  source: /work/gimp
-    #  path:  /home/gimp
+    # This tells vagga that this container depends on changed gimp source
+    - !Depends /work/gimp
 
     # resolve FAILED: cursors/gimp-tool-cursors.c   Related to vector icons?
     - !Env  XDG_DATA_DIRS: "/usr/local/share:/usr/share"
@@ -501,66 +511,28 @@ containers:
 
     # -v      verbose
 
-    # build
-    - !Sh |
-        cd /work/gimp
-        meson _build \
-         --buildtype=debug \
-         -Djavascript=false \
-         -Dlua=false \
-         -Dpython=true \
-         -Dgtk-doc=false
+    # setup build
+    #- !Sh |
+    #    cd /work/gimp
+    #    meson _build \
+    #     --buildtype=debug \
+    #     -Djavascript=false \
+    #     -Dlua=false \
+    #     -Dpython=true \
+    #     -Dgtk-doc=false
 
-        cd _build
+    # Build from the build directory.
+    # Installs into the container
+    - !Sh |
+        cd /work/gimpBuild
         ninja
         ninja install
 
-
-
-
-  # Final container with a few more customizations
-  # Faster if a command does this.
-  gimpMesonLocal:
-    setup:
-    # Choice:
-    - !Container gimpMesonDev
-
-    # rebuild container if test plugin source (in /work i.e. project directory ) changes
-    - !Depends plugins
-
-    # create container user's .config for GIMP, to hold locally installed plug-ins
-    - !EnsureDir /work/.home/.config/GIMP/2.99/plug-ins
-
-    # Remove old test.py
-    # - !Sh rm /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
-
-    # install test plugins from repository to container's home  (not exactly in the container?)
-    # Copy to the conventional directory for local customization of  Linux apps, specically GIMP ($HOME/.config/.... etc.)
-    # When GIMP starts, it will find these plugin files and execute them (to register the plug-in)
-    # Plugins must be in subdirectory, and executable?
-    # Can't use the originals, since they have hash bang #! python2
-
-    - !Copy
-      source: /work/plugins/wild
-      path: /work/.home/.config/GIMP/2.99/plug-ins
-
-    # make test plugins executable, Gimp requires it
-    # e.g. - !Sh chmod +x /work/.home/.config/GIMP/2.99/plug-ins/test/test.py
-    - !Sh find /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' +
-
-    # Copy hacked gimpfu sources into the install location from the project directory
-    # Copy entire directory
-    # Must be a Python package, directory having a ????
-    # First remove the bad gimpfu.py at the top?  Build should not have installed it
-    ##- !Remove /usr/local/lib/gimp/2.99/python/gimpfu.py
-    #- !Copy
-    #  source: /work/gimpfu
-    #  path:  /usr/local/lib/gimp/2.99/python
-    # TODO use include-regex expression in Copy
-
+    # Also volumes for test plugins
     volumes:
       /work/testGimpPDB: !BindRO /volumes/testGimpPDB
       /work/testGimpExportImport: !BindRO /volumes/testGimpExportImport
+      /work/testGimpScriptFuBinding: !BindRO /volumes/testGimpScriptFuBinding
 
       # Larger /tmp for testing
       # 100Mi is default, not enough to create many image files
@@ -607,6 +579,7 @@ containers:
     # ensure a directory to mount to
     - !EnsureDir /work/testGimpPDB
     - !EnsureDir /work/testGimpExportImport
+    - !EnsureDir /work/testGimpScriptFuBinding
 
     # mount directories from outside the container
     # /volumes/ is defined in .config/vagga/settings.html
@@ -618,6 +591,7 @@ containers:
     volumes:
       /work/testGimpPDB: !BindRO /volumes/testGimpPDB
       /work/testGimpExportImport: !BindRO /volumes/testGimpExportImport
+      /work/testGimpScriptFuBinding: !BindRO /volumes/testGimpScriptFuBinding
 
       # Larger /tmp for testing
       # 100Mi is default, not enough to create many image files
@@ -672,17 +646,17 @@ commands:
       pkg-config gegl-0.4 --modversion
 
 
-  testBablGegl: !Command
-    description: Get version of and test built babl and gegl
+  bablGeglVersions: !Command
+    description: Get version of built babl and gegl in bablGeglDev
     container: bablGeglDev
     run: |
-      ls /home/babl
-      ls /home/gegl
       echo "$PKG_CONFIG_PATH is:" $PKG_CONFIG_PATH
       export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
-      echo "$PKG_CONFIG_PATH is:" $PKG_CONFIG_PATH
-      echo "trying: pkg-config gegl"
-      pkg-config gegl-0.4 --modversion
+      echo "$PKG_CONFIG_PATH is:" $PKG_CONFIG_PATH# Show that it installed .so
+      echo "Listing /usr/local/lib/x86_64-linux-gnu"
+      ls /usr/local/lib/x86_64-linux-gnu
+      echo "Version of gegl using: pkg-config gegl"
+      pkg-config --modversion gegl-0.4
 
   # It doesn't seems to matter that /usr/local/lib/x86_64-linux-gnu/pkgconfig is not in PKG_CONFIG_PATH
 
@@ -694,8 +668,8 @@ commands:
 
 
   gimpMesonVersions: !Command
-    description: describe versions in container gimpMesonDev (where built Gimp)
-    container: gimpMesonDev
+    description: describe versions in container gimpMesonInstalled (where built Gimp)
+    container: gimpMesonInstalled
     run: |
       export HOME=/work/.home
       export GIMP_PREFIX="/usr/local"
@@ -770,7 +744,9 @@ commands:
       mkdir /work/.home/.config/GIMP/2.99/plug-ins
 
       # Copy a scheme script
+      echo "Copying defectscript soap"
       cp -rv /work/plugins/nonGimpFu/testGeglOp.scm /work/.home/.config/GIMP/2.99/scripts
+      #cp -rv /work/plugins/nonGimpFu/defectsript-v01.scm /work/.home/.config/GIMP/2.99/scripts
 
 
       # Refresh installation of gimpfu from development gimp_directory
@@ -789,6 +765,10 @@ commands:
       # Copy from a volume of the container
       mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
       cp -r /work/testGimpExportImport/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+
+      echo "Copying testGimpScriptFuBinding"
+      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
+      cp -r /work/testGimpScriptFuBinding/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
 
       # -O -   means: pipe to stdout
       #wget https://github.com/bootchk/testGimpPDB/tarball/master
@@ -812,6 +792,8 @@ commands:
 
       # stop glib at warnings
       #export G_DEBUG=fatal-warnings
+      # all domains, info and debug
+      # export G_MESSAGES_DEBUG=all
 
       # Per devel-docs/debugging
       # Mostly GUI messages
@@ -827,7 +809,7 @@ commands:
       #export GIMPFU_DEBUG=1
 
       # /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode always
-      /usr/local/bin/gimp-2.99 --stack-trace-mode query
+      /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
 
 
 
@@ -838,8 +820,8 @@ commands:
   # export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
 
   gimpMesonGUI: !Command
-    description: Run meson gimp GUI in gimpMesonDev container (need --use-env DISPLAY), w/o plugins
-    container: gimpMesonDev
+    description: Run meson gimp GUI in gimpMesonInstalled container (need --use-env DISPLAY), w/o plugins
+    container: gimpMesonInstalled
     run: |
       export HOME=/work/.home
       echo "HOME" $HOME
@@ -859,6 +841,8 @@ commands:
       export GIMP_PLUGIN_DEBUG=all,fatal-criticals
       #export GIMPFU_DEBUG=1
 
+      export G_MESSAGES_DEBUG=script-fu
+
       # /usr/local/bin/gimp-2.99 --verbose
       /usr/local/bin/gimp-2.99 --stack-trace-mode query
 
@@ -876,8 +860,8 @@ commands:
   #curl -L  https://github.com/bootchk/testGimpExportImport/tarball/master | tar xz -C /work/.home/.config/GIMP/2.99/plug-ins
 
   gimpMesonTestGUI: !Command
-    description: Run gimp GUI in gimpMesonDev container, creating user's plugins in home
-    container:  gimpMesonLocal
+    description: Run gimp GUI in gimpMesonInstalled container, creating user's plugins in home
+    container:  gimpMesonInstalled
     run: |
       export HOME=/work/.home
       export GIMP_PREFIX="/usr/local"
@@ -921,8 +905,8 @@ commands:
       mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
       cp -r /work/testGimpPDB/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
 
-
-
+      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
+      cp -r /work/testGimpScriptFuBinding/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
 
       echo "Chmoding test plugins"
       # find -D exec /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' + -print
@@ -936,7 +920,7 @@ commands:
       echo $PYTHONPATH
 
       # stop glib at critical
-      # export G_DEBUG=fatal-critical
+      export G_DEBUG=fatal-critical
 
       # tell Gimp to debug certain plugins
       # all,fatal-warnings
@@ -947,13 +931,9 @@ commands:
 
       # print all G_MESSAGES
       # export G_MESSAGES_DEBUG=all
+      export G_MESSAGES_DEBUG=scriptfu
 
-      # /usr/local/bin/gimp-2.99 --verbose --no-data
-
-      #which gnome-terminal
-      #/usr/bin/gnome-terminal &
-
-      # --verbose
+      # --verbose --no-data
       # gdb
       /usr/local/bin/gimp-2.99 --stack-trace-mode query
 
@@ -961,16 +941,16 @@ commands:
 
   # quicker startup
   generateGIDocs: !Command
-    description: Generate GI docs from  gimpMesonDev container to work/.home
-    container:  gimpMesonDev
+    description: Generate GI docs from  gimpMesonInstalled container to work/.home
+    container:  gimpMesonInstalled
     run: |
        g-ir-doc-tool --language=Python -o /work/.home/gimp-doc   /usr/local/share/gir-1.0/Gimp-3.0.gir
        g-ir-doc-tool --language=Python -o /work/.home/gimpui-doc /usr/local/share/gir-1.0/GimpUi-3.0.gir
        echo "Generated to .home/gimp-doc"
 
   showEnv: !Command
-    description: env in gimpMesonDev
-    container:  gimpMesonDev
+    description: env in gimpMesonInstalled
+    container:  gimpMesonInstalled
     run: env
 
   gimpListPlugins: !Command
@@ -982,13 +962,13 @@ commands:
 
   runUbuntuBug: !Command
     description: Run ubuntu-bug in the container
-    container: gimpMesonDev
+    container: gimpMesonInstalled
     run: |
       ubuntu-bug gkt3
 
   gdbGimp: !Command
-    description: Run gdb on gimp in container gimpMesonDev
-    container: gimpMesonDev
+    description: Run gdb on gimp in container gimpMesonInstalled
+    container: gimpMesonInstalled
     run: |
       export HOME=/work/.home
       export GIMP_PREFIX="/usr/local"
@@ -1001,8 +981,8 @@ commands:
       gdb gimp-2.99
 
   termGimpMeson: !Command
-    description: Open terminal on container gimpMesonLocal, use vagga --use-env DISPLAY termGimpMeson, wait for container
-    container: gimpMesonLocal
+    description: Open terminal on container gimpMesonInstalled, use vagga --use-env DISPLAY termGimpMeson, wait for container
+    container: gimpMesonInstalled
     run: |
       echo "Opening terminal on the GIMP run container"
       /usr/bin/gnome-terminal

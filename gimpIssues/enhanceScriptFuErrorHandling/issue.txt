@@ -1,19 +1,83 @@
 
-Enhance ScriptFu error handling to fix these issues:
+2.99 Enhance ScriptFu error handling and debug
 
-1. omits domain on g_set_error which throws
+
+# To fix these issues:
+
+1. omits domain on g_error_new_literal which throws
 GLib-WARNING **: 11:29:10.711: (../../../glib/gerror.c:412):g_error_new_valist: runtime check failed: (domain != 0)
 
 2. On many script error messages, fails to provide useful details.
 For example, "Invalid type for argument"
 fails to say:
-- what formal Gimp type was expected (e.g. Gimp.FloatArray)
-- what actual Lisp type was expected  (e.g. vector)
-- what actual Lisp type was received (e.g. list )
+- what formal Lisp type was expected (e.g. vector, list, number, string)
+Also, messages fail to distinguish between errors by script authors
+from errors by the ScriptFu developers.
 
 3. Debugging code is implemented by #ifdef spread throughout the code
 making it hard to read.
 
-4. Debugging code no longer compiles.
+4. Debugging code has not been maintained and no longer compiles.
 
-5. There is no test suite for scriptfu 
+5. There is no test suite
+
+6. Miscellaneous other small bugs/improvements
+
+
+#About the patch
+
+For reviewers of the patch.
+
+TLDR: makes the code easier to read/change, and reduces size of
+scheme-wrapper.c by hundreds of lines.  No change in behaviour,
+except for changes in error message texts or debug log.
+
+Refactors by extracting functions for declaring errors in scripts.
+The functions/errors are of two kinds:
+- plugin author's errors in scripts
+- implementation errors in ScriptFu or in called PDB procedures
+Functions are extracted to script-fu-errors.c
+
+Refactors by extracting functions for debugging (dumping large structs)
+Functions are extracted to script-fu-errors.c (same as functions for errors)
+
+Uses GLib logging (g_debug convenience function) instead of g_printerr and #ifdef.
+Thus debugging ScriptFu is now:
+- controllable at runtime by defining G_MESSAGE_DEBUG=scriptfu
+- log messages are standard and print the domain "scriptfu"
+
+If you are worried about performance,
+one could in the future:
+- easily conditionally compile the debug functions that were extracted.
+- additionally wrap all the g_debug() calls remaining in scheme-wrapper.c
+  into a conditionally compiled wrapper function
+
+In my opinion, there is no need to worry about performance in ScriptFu.
+
+#Related issues
+
+I suggest applying this patch first.
+Then other needed patches will be easier.
+
+Some discussion of the future of ScriptFu re GI in #5402, #5426
+
+Other scriptfu issues:
+
+- #5402 (ScriptFu  unhandled GIMP types)
+- #5426 (need compatibility for changed PDB API re ID vs object)
+- #6026 (need compatibility for changed PDB API re multilayer)
+
+# Testing
+
+I tested thoroughly (if not quite exhaustively.)
+I did not test exhaustively because it is more important
+to fix other issues in ScriptFu that are extant in GIMP repository scripts,
+(which will add test cases)
+than to test cases that are extremely rare, e.g. in arg is STRING_ARRAY.
+Since there is still some question about the future of ScriptFu re GI,
+no point in testing something that might be scrapped.
+
+A test plugin is at https://github.com/bootchk/testGimpScriptFuBinding.git
+It is a GimpFu Python plugin that calls plugin-script-fu-eval
+on Scheme constructs, once per test case.
+Since is Python, easy to add test cases.

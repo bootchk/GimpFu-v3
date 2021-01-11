@@ -1,6 +1,7 @@
 .vagga
 .home
 gimp
+gimpBuild
 gimpfu/__pycache__
 pygimpv2
 pdb.txt
