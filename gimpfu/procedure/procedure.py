@@ -107,13 +107,16 @@ class FuProcedure():
     def guiable_formal_params(self):
         # computable property
         # TODO and image_type is not empty
-        if self.is_image_procedure_type:
+        if self.type == FuProcedureType.Image:
             # slice off prefix of formal param descriptions (i.e. image and drawable)
             # leaving only descriptions of GUI-time params
             result = self.metadata.params.PARAMS[2:]
-        else:
-            # is LoadProcedure
+        elif (self.type == FuProcedureType.Load
+            or self.type == FuProcedureType.Other):
+            # all params guiable
             result = self.metadata.params.PARAMS
+        else:
+            Exception("Unhandled procedure type in guiable_formal_params()")
 
         self.logger.info(f"has guiable_formal_params: {result}")
         return result
@@ -178,12 +181,9 @@ class FuProcedure():
     '''
 
     ''' Delegate: Metatdata knows the type of procedure. '''
+    @property
+    def type(self):  return self.metadata.type
 
-    @property
-    def is_image_procedure_type(self):  return self.metadata.is_image_procedure_type
-    @property
-    # OLD def is_vectors_procedure_type(self):  return self.metadata.is_vectors_procedure_type
-    def is_context_procedure_type(self):  return self.metadata.is_context_procedure_type
 
     """
     OLD

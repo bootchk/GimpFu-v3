@@ -4,6 +4,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
+from procedure.type import FuProcedureType
 
 """
 Knows how to create a procedure in Gimp.
@@ -96,14 +97,14 @@ class FuProcedureCreator:
         e.g. by the menu path and by the signature of the formal args.
         And use a different wrapped_run_runc for each subclass.
         '''
-        if gf_procedure.is_image_procedure_type:
+        if gf_procedure.type == FuProcedureType.Image:
             procedure =  cls._create_image_procedure(plugin, name, gf_procedure, wrapped_run_func)
-        elif gf_procedure.is_context_procedure_type:
+        elif gf_procedure.type == FuProcedureType.Context:
             procedure =  cls._create_context_procedure(plugin, name, gf_procedure, wrapped_context_run_func)
         else:
             # TODO Better message, since this error depends on authored code
             # TODO preflight this at registration time.
-            raise Exception("Unknown type of Gimp.Procedure")
+            raise Exception("Unknown procedure type")
         # ensure result is-a Gimp.Procedure
         return procedure
 

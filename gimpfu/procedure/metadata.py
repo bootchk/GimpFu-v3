@@ -5,6 +5,7 @@ from message.proceed_error import  proceed
 from message.deprecation import Deprecation
 
 from procedure.formal_params import FuFormalParams
+from procedure.type import FuProcedureType
 
 from enums.gimpfu_enums import *  # PF_ enums
 
@@ -140,44 +141,33 @@ class FuProcedureMetadata():
 
 
     '''
-    Don't call these until metadata initialized and fixed up.
+    Don't call until metadata initialized and fixed up.
     I.E. we look at fixed up menupath and not at any path that was in label (old style).
     See asserts.
     '''
     @property
-    def is_image_procedure_type(self):
-        '''
-        !!! ImageType mean that args necessarily include (image, drawable)
-        '''
+    def type(self):
+        """ Returns FuProcedureType """
         assert self.MENUPATH is not None
-        result = ( self.MENUPATH.startswith("<Image>") )
+
+        if self.MENUPATH.startswith("<Image>") :
+            result = FuProcedureType.Image
+        elif ( self.MENUPATH.startswith("<Vectors>")
+            or self.MENUPATH.startswith("<Layers>")
+            or self.MENUPATH.startswith("<Palettes>")
+            ) :
+            #TODO: other gimp_data monikers e.g. Brush
+            result = FuProcedureType.Context
+        elif self.MENUPATH.startswith("<Save>") :
+            result = FuProcedureType.Save
+        elif self.MENUPATH.startswith("<Load>") :
+            result = FuProcedureType.Load
+        elif self.MENUPATH == "" :
+            result = FuProcedureType.Other
+        else :
+            Exception("Could not determine procedure type from menu path")
+        print(result)   # TODO logging
         return result
-
-    @property
-    def is_context_procedure_type(self):
-        ''' Installs to a context menu, receives current selected item from said menu.
-        where context menu for items:
-        - Gimp data not specific to an image e.g. Brush
-        - data created on a specific image, but not pixel data e.g. Vectors
-        - structures of a specific image e.g. Layer
-        '''
-        assert self.MENUPATH is not None
-        result = ( self.MENUPATH.startswith("<Vectors>")
-                or self.MENUPATH.startswith("<Layers>")
-                or self.MENUPATH.startswith("<Palettes>")
-                )
-        return result
-        #TODO: other gimp_data monikers e.g. Brush
-
-    @property
-    def is_save_procedure_type(self):
-        assert self.MENUPATH is not None
-        return self.MENUPATH.startswith("<Save>")
-
-    @property
-    def is_load_procedure_type(self):
-        assert self.MENUPATH is not None
-        return self.MENUPATH.startswith("<Load>")
 
 
 

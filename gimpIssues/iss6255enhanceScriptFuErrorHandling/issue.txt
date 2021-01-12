@@ -1,5 +1,5 @@
 
-2.99 Enhance ScriptFu error handling and debug
+2.99 Enhance ScriptFu error handling and debug, patch attached
 
 
 # To fix these issues:
@@ -7,24 +7,24 @@
 1. omits domain on g_error_new_literal which throws
 GLib-WARNING **: 11:29:10.711: (../../../glib/gerror.c:412):g_error_new_valist: runtime check failed: (domain != 0)
 
-2. On many script error messages, fails to provide useful details.
+2. Many script error messages do not provide useful details.
 For example, "Invalid type for argument"
-fails to say:
-- what formal Lisp type was expected (e.g. vector, list, number, string)
-Also, messages fail to distinguish between errors by script authors
+omits to says what formal Lisp type was expected (e.g. vector, list, number, string)
+
+3. messages do not distinguish errors by script authors
 from errors by the ScriptFu developers.
 
-3. Debugging code is implemented by #ifdef spread throughout the code
+4. Debugging code is implemented by #ifdef spread throughout the code
 making it hard to read.
 
-4. Debugging code has not been maintained and no longer compiles.
+5. Debugging code has not been maintained and does not compile.
 
-5. There is no test suite
+6. There is no test suite
 
-6. Miscellaneous other small bugs/improvements
+7. A few other small bugs (e.g. missing break on one switch case)
 
 
-#About the patch
+# About the patch
 
 For reviewers of the patch.
 
@@ -35,7 +35,8 @@ except for changes in error message texts or debug log.
 Refactors by extracting functions for declaring errors in scripts.
 The functions/errors are of two kinds:
 - plugin author's errors in scripts
-- implementation errors in ScriptFu or in called PDB procedures
+- implementation errors in ScriptFu or in called PDB procedures.
+
 Functions are extracted to script-fu-errors.c
 
 Refactors by extracting functions for debugging (dumping large structs)
@@ -44,17 +45,17 @@ Functions are extracted to script-fu-errors.c (same as functions for errors)
 Uses GLib logging (g_debug convenience function) instead of g_printerr and #ifdef.
 Thus debugging ScriptFu is now:
 - controllable at runtime by defining G_MESSAGE_DEBUG=scriptfu
-- log messages are standard and print the domain "scriptfu"
+- log messages follow conventions and print the domain "scriptfu"
 
-If you are worried about performance,
-one could in the future:
-- easily conditionally compile the debug functions that were extracted.
+In my opinion, there is no need to worry about performance in ScriptFu.
+However, in the future one could easily:
+- conditionally compile the debug functions that were extracted.
 - additionally wrap all the g_debug() calls remaining in scheme-wrapper.c
   into a conditionally compiled wrapper function
 
-In my opinion, there is no need to worry about performance in ScriptFu.
 
-#Related issues
+
+# Related issues
 
 I suggest applying this patch first.
 Then other needed patches will be easier.
@@ -71,7 +72,7 @@ Other scriptfu issues:
 
 I tested thoroughly (if not quite exhaustively.)
 I did not test exhaustively because it is more important
-to fix other issues in ScriptFu that are extant in GIMP repository scripts,
+to fix other issues in ScriptFu that are extant in GIMP repository scripts
 (which will add test cases)
 than to test cases that are extremely rare, e.g. in arg is STRING_ARRAY.
 Since there is still some question about the future of ScriptFu re GI,

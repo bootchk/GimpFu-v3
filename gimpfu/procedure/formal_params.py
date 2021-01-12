@@ -1,5 +1,7 @@
 
 from procedure.formal_param import FuFormalParam
+from procedure.type import FuProcedureType
+
 from enums.gimpfu_enums import *  # PF_ enums
 
 from message.deprecation import Deprecation
@@ -96,21 +98,19 @@ class FuFormalParams():
         if metadata.is_new_style_registration:
             # specified params are explict, requires no fix
             pass
-        elif metadata.is_load_procedure_type:
+        elif metadata.type == FuProcedureType.Load :
             # insert into slice
             self.PARAMS[0:0] = FuFormalParams.file_params
-            message = f" Fixing two file params for Load plugin"
-            Deprecation.say(message)
+            Deprecation.say(" Fixing two file params for Load plugin")
             result = True
-        elif metadata.is_image_procedure_type or metadata.is_save_procedure_type:
+        elif ( metadata.type == FuProcedureType.Image
+             or metadata.type == FuProcedureType.Save) :
             self.PARAMS.insert(0, FuFormalParams.image_param)
             self.PARAMS.insert(1, FuFormalParams.drawable_param)
-            message = f" Fixing two image params for Image or Save plugin"
-            Deprecation.say(message)
+            Deprecation.say(" Fixing two image params for Image or Save plugin")
             if metadata.is_save_procedure_type:
                 self.PARAMS[2:2] = file_params
-                message = f" Fixing two file params for Save plugin"
-                Deprecation.say(message)
+                Deprecation.say(" Fixing two file params for Save plugin")
             result = True
         #print(self.PARAMS)
         return result
@@ -137,15 +137,20 @@ class FuFormalParams():
         result = False
         # if missing params (never there, or not fixed by earlier patch)
         # TODO if params are missing altogether
-        if ( metadata.is_image_procedure_type
-            and self.PARAMS[0].PF_TYPE != PF_IMAGE
-            and self.PARAMS[1].PF_TYPE != PF_DRAWABLE
-            ):
-            self.PARAMS.insert(0, FuFormalParams.image_param)
-            self.PARAMS.insert(1, FuFormalParams.drawable_param)
-            message = f" Fixing two image params for Image plugin"
-            Deprecation.say(message)
-            result = True
+        if ( metadata.type == FuProcedureType.Image ) :
+            # fix missing image declaration
+            if ( (len(self.PARAMS) > 0)
+                and self.PARAMS[0].PF_TYPE != PF_IMAGE
+                ) :
+                Deprecation.say("Missing image param for Image plugin")
+                self.PARAMS.insert(0, FuFormalParams.image_param)
+                result = True
+            if ( (len(self.PARAMS) > 1)
+                and self.PARAMS[1].PF_TYPE != PF_DRAWABLE
+                ) :
+                Deprecation.say("Missing drawable param for Image plugin")
+                self.PARAMS.insert(1, FuFormalParams.drawable_param)
+                result = True
         return result
 
 
