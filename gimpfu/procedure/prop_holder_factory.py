@@ -75,8 +75,17 @@ class Foo(GObject.GObject):
 
 
 
-
+    """
+    TODO also pass blurb and nick, substitute into template
+    """
     def produce(self, unique_prop_name, type, default, min, max):
+        """
+        Produce an instance of GObject with a property as described by the args.
+        We will use the instance to convey to Gimp a
+        formal declaration of an argument of a PDB procedure.
+        Again, ideally we would just use a GParamSpec.
+        Its very convoluted.
+        """
 
         # assert type is a Python type
 

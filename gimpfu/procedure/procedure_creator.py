@@ -73,7 +73,8 @@ class FuProcedureCreator:
 
     @classmethod
     def _create_context_procedure(cls, plugin, name, gf_procedure, wrapped_run_func):
-        # !!! Uses superclass Gimp.Procedure, to which we convey specialized args
+        # !!! Pass the type Gimp.Procedure, which we will new(),
+        # and then to the instance we convey specialized args
         procedure = cls._create_gimp_procedure(Gimp.Procedure, plugin, name, gf_procedure, wrapped_run_func)
 
         '''
@@ -81,6 +82,18 @@ class FuProcedureCreator:
         '''
         gf_procedure.convey_runmode_arg_declaration_to_gimp()
         # Author formally declared params (image, <gimp_data>, guiable_args)
+        gf_procedure.set_nonguiable_arg_count(0)    # TODO 0, 1 ???
+        gf_procedure.convey_procedure_guiable_arg_declarations_to_gimp()
+        return procedure
+
+    @classmethod
+    def _create_other_procedure(cls, plugin, name, gf_procedure, wrapped_run_func):
+        procedure = cls._create_gimp_procedure(Gimp.Procedure, plugin, name, gf_procedure, wrapped_run_func)
+        '''
+        Gimp plugin operating out of the blue (no image or other object)
+        requires ( just the declared args)
+        '''
+        # Author formally declared params (guiable_args)
         gf_procedure.set_nonguiable_arg_count(0)    # TODO 0, 1 ???
         gf_procedure.convey_procedure_guiable_arg_declarations_to_gimp()
         return procedure
@@ -101,6 +114,8 @@ class FuProcedureCreator:
             procedure =  cls._create_image_procedure(plugin, name, gf_procedure, wrapped_run_func)
         elif gf_procedure.type == FuProcedureType.Context:
             procedure =  cls._create_context_procedure(plugin, name, gf_procedure, wrapped_context_run_func)
+        elif gf_procedure.type == FuProcedureType.Other:
+            procedure =  cls._create_other_procedure(plugin, name, gf_procedure, wrapped_context_run_func)
         else:
             # TODO Better message, since this error depends on authored code
             # TODO preflight this at registration time.

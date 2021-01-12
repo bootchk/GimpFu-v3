@@ -124,13 +124,22 @@ class FuProcedureMetadata():
         procedure.set_documentation (self.BLURB,
                                      self.HELP,
                                      name)
-        procedure.set_menu_label(self.MENUITEMLABEL)
+
         procedure.set_attribution(self.AUTHOR,
                                   self.COPYRIGHT,
                                   self.DATE)
-        # TODO apparently GIMP can declare error (see console)
-        # TODO is there are result of this call that we can check?
-        procedure.add_menu_path (self.MENUPATH)
+        """
+        Some procedures don't appear in menus.
+
+        GIMP can warn in console for empty menu path,
+        but the procedure will still exist.
+        TODO is there are result of this call that we can check?
+
+        Why is it called "add", can a procedure be in more than one place in menus?
+        """
+        if self.MENUPATH != "" :    # TODO or None ?
+            procedure.set_menu_label(self.MENUITEMLABEL)
+            procedure.add_menu_path (self.MENUPATH)
 
 
     def convey_in_args_to_gimp(self, procedure):

@@ -9,8 +9,8 @@ that:
 from gimpfu import *
 
 
-def plugin_func(name):
-    print("Called")
+def plugin_func(testedName):
+    print(f"Called w: {deprecatedName}")
 
 
 
@@ -19,15 +19,15 @@ def plugin_func(name):
 
 register(
       "python-fu-map-PDB-name",
-      "blurb",
+      "Map a deprecated PDB procedure name to the new name",
       "help message",
       "author",
       "copyright",
       "year",
-      "Map PDB name",
-      "*",
-      [],
-      [],
+      "",   # No menu item
+      "",   # No image types
+      [ (PF_STRING, "testedName", "Possibly deprecated name to map", ""), ],
+      [ (PF_STRING, "mappedName", "Mapped name (deprecated name or unchanged name", ""), ],
       plugin_func,
-      menu="")
+      menu="")  # Not appear in menus
 main()

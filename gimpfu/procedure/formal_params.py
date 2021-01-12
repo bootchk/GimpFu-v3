@@ -25,6 +25,7 @@ class FuFormalParams():
     '''
 
     # Constant class data
+    # These are GimpFu instance representing required formal params of the PDB procedure
     file_params = [FuFormalParam(PF_STRING, "filename", "The name of the file", ""),
                    FuFormalParam(PF_STRING, "raw-filename", "The name of the file", "")]
     image_param = FuFormalParam(PF_IMAGE, "image", "Input image", None)
