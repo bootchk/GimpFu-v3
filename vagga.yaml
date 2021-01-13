@@ -927,7 +927,7 @@ commands:
       # export GIMP_PLUGIN_DEBUG=file-png,fatal-warnings
       export GIMP_PLUGIN_DEBUG=all,fatal-criticals
 
-      #export GIMPFU_DEBUG=1
+      export GIMPFU_DEBUG=1
 
       # print all G_MESSAGES
       # export G_MESSAGES_DEBUG=all

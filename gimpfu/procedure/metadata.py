@@ -9,8 +9,8 @@ from procedure.type import FuProcedureType
 
 from enums.gimpfu_enums import *  # PF_ enums
 
-# introspection of Python code
 from inspect import signature
+import logging
 
 
 # v3 _registered_plugins_ is a dictionary of FuProcedureMetadata
@@ -57,9 +57,12 @@ class FuProcedureMetadata():
        function, menu, domain,
        on_query, on_run):
 
-        label =FuProcedureMetadata.substitute_empty_string_for_none(label, "label")
-        imagetypes = FuProcedureMetadata.substitute_empty_string_for_none(imagetypes, "imagetypes")
-        menu = FuProcedureMetadata.substitute_empty_string_for_none(menu, "menupath")
+        self.logger = logging.getLogger("GimpFu.FuProcMetadata")
+
+        # Deprecated: Allow string args to be nullable with "None"
+        label =self.substitute_empty_string_for_none(label, "label")
+        imagetypes = self.substitute_empty_string_for_none(imagetypes, "imagetypes")
+        menu = self.substitute_empty_string_for_none(menu, "menupath")
 
         # wild data, soon to be fixed up
         self.BLURB=blurb
@@ -115,6 +118,7 @@ class FuProcedureMetadata():
         if not self.does_gimpfu_signature_differ_from_gimp_signature:
             self.does_gimpfu_signature_differ_from_gimp_signature = self.params.deriveMissingImageParams(self)
 
+
     def set_nonguiable_arg_count(self, count):
         self._nonguiable_arg_count = count
 
@@ -158,25 +162,36 @@ class FuProcedureMetadata():
     def type(self):
         """ Returns FuProcedureType """
         assert self.MENUPATH is not None
+        result = FuProcedureMetadata.type_from_menu_path(self.MENUPATH)
+        self.logger.debug(f"{result}")
+        return result
 
-        if self.MENUPATH.startswith("<Image>") :
+    @classmethod
+    def type_from_menu_path(cls, menuPath):
+        """
+        This seems to be the only way to reliably determine
+        our notion of type (which tells whether procedure takes a run mode arg)
+
+        Returns FuProcedureType
+        """
+        if menuPath.startswith("<Image>") :
             result = FuProcedureType.Image
-        elif ( self.MENUPATH.startswith("<Vectors>")
-            or self.MENUPATH.startswith("<Layers>")
-            or self.MENUPATH.startswith("<Palettes>")
+        elif ( menuPath.startswith("<Vectors>")
+            or menuPath.startswith("<Layers>")
+            or menuPath.startswith("<Palettes>")
             ) :
             #TODO: other gimp_data monikers e.g. Brush
             result = FuProcedureType.Context
-        elif self.MENUPATH.startswith("<Save>") :
+        elif menuPath.startswith("<Save>") :
             result = FuProcedureType.Save
-        elif self.MENUPATH.startswith("<Load>") :
+        elif menuPath.startswith("<Load>") :
             result = FuProcedureType.Load
-        elif self.MENUPATH == "" :
+        elif menuPath == "" :
             result = FuProcedureType.Other
         else :
             Exception("Could not determine procedure type from menu path")
-        print(result)   # TODO logging
         return result
+
 
 
 
@@ -263,7 +278,7 @@ class FuProcedureMetadata():
     '''
     Utility functions
     '''
-    def substitute_empty_string_for_none(arg, argname):
+    def substitute_empty_string_for_none(self, arg, argname):
         if arg is None:
             Deprecation.say(f"Deprecated: Registered {argname} should be empty string, not None")
             result = ""
@@ -317,12 +332,8 @@ class FuProcedureMetadata():
                 if fields:
                     self.MENUITEMLABEL = fields.pop()
                     self.MENUPATH = "/".join(fields)
-
                     result = True
-
-                    message = (f" Use the 'menu' parameter instead"
-                               f" of passing a full menu path in 'label'.")
-                    Deprecation.say(message)
+                    Deprecation.say(f" Use the 'menu' parameter instead of passing a full menu path in 'label'.")
                 else:
                     # 'label' is not a path, can't derive menu path
                     # TODO will GIMP show it in the GUI in a fallback place?
@@ -330,10 +341,8 @@ class FuProcedureMetadata():
             else:
                 # no menu and no label
                 # Normal, user intends to create plugin only callable by other plugins
-                message = (f" No 'menu' and no 'label'."
-                           f"Plugin will not appear in Gimp GUI.")
+                Deprecation.say(f"No 'menu' and no 'label'.  Plugin will not appear in Gimp GUI.")
                 # TODO Not really a deprecation, a UserWarning??
-                Deprecation.say(message)
         else:
             if  self.MENUITEMLABEL:
                 # menu and label given

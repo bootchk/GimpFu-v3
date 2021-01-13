@@ -403,7 +403,10 @@ class GimpFu (Gimp.PlugIn):
         gf_procedure = FuProcedures.get_by_name(name)
 
         # pass all the flavors of wrapped_run_funcs
-        procedure = FuProcedureCreator.create(self, name, gf_procedure, FuRunner.run_imageprocedure, FuRunner.run_context_procedure)
+        procedure = FuProcedureCreator.create(self, name, gf_procedure,
+            FuRunner.run_imageprocedure,
+            FuRunner.run_context_procedure,
+            FuRunner.run_other_procedure)
 
         # ensure result is-a Gimp.Procedure
         return procedure

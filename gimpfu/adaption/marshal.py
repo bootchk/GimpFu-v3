@@ -218,6 +218,9 @@ class Marshal():
         - from Gimp calling back the plugin.
         - from the plugin calling Gimp
         '''
+        # args are in a list, but are GValues
+        assert isinstance(args, list)
+
         result = []
         for instance in args:
             if is_gimpfu_wrappable(instance):

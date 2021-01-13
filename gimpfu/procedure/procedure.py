@@ -2,6 +2,7 @@
 
 from procedure.metadata import FuProcedureMetadata
 from procedure.prop_holder import PropHolder
+from procedure.type import FuProcedureType
 
 import logging
 
@@ -220,7 +221,9 @@ class FuProcedure():
 
 
     def get_authors_function(self):
-        return self.metadata.get_authors_function()
+        result = self.metadata.get_authors_function()
+        self.logger.debug(f"func: {result}")
+        return result
 
 
 

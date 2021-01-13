@@ -121,7 +121,12 @@ class GimpfuPDB():
             # marshaled_args is-a list of GValues, but it could be an empty list.
             # PyGObject will marshall the list into a GimpValueArray
 
-            # Not a try: except????
+            """
+            This is almost always a segfaulted callee plugin,
+            a separate process that crashed and is failing to respond to IPC.
+            We assert and don't try/except/proceed because the error is
+            serious and external to Author's plugin.
+            """
             inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
             assert inner_result is not None, "PDB procedure call failed to return value array."
 

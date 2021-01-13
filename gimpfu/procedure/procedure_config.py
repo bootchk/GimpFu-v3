@@ -56,7 +56,7 @@ class FuProcedureConfig():
         # Hack, try + 2
         #self._length = length + 2
 
-        self.logger = logging.getLogger("GimpFu.FuProcedureConfig")
+        self.logger = logging.getLogger("GimpFu.FuProcConfig")
         self.logger.debug(f"__init__, length: {length}")
 
 

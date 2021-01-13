@@ -38,69 +38,99 @@ class FuResult():
     # ????
 
     @staticmethod
-    def makeGLibError(status):
+    def makeGLibError(status, message=""):
         """
         Make a GLib error.
         It carries more information into a result?
-        The message?
         Gimp.Procedure.new_return_values() takes one.
         """
+        FuResult.logger.info(f"makeGLibError for status: {status}")
         if status == Gimp.PDBStatusType.SUCCESS:
+            # ??? creates an empty but valid GLib.Error ????
             result = GLib.Error()
         else:
             # Seems wierd that a "literal" is a Glib.Error
             quark = GLib.quark_from_string("GimpFu")
-            result = GLib.Error.new_literal( quark, "foo", 0 )
+            result = GLib.Error.new_literal( quark, message, 0 )
+        assert isinstance(result, GLib.Error)
+        # a GLib.Error seems to have a good repr() method
+        # i.e. prints a tuple (domain string, message string, code numeric )
         FuResult.logger.info(f"makeGLibError result: {result}")
         return result
 
 
     @staticmethod
-    def make(procedure, status, runfunc_result=None):
+    def do_formal_and_actual_results_match(formal_result, actual_result):
+        #resultArray.length() - 1 != len(runfunc_result) :
+        # TODO
+        return True
+
+
+    @staticmethod
+    def makeSuccess(procedure, runfunc_result=None):
         """
         Make a result for a PDB procedure, i.e. a GimpValueArray:
         - whose first element is a PDB_STATUS
         - and whose other elements have types matching registered return value types
 
-        Require status is-a Gimp.PDBStatusType
         Require runfunc_result is some Python object, or None
 
         status == SUCCESS not imply runfunc_result is not None:
         a procedure returning void returns result==None.
         """
 
-        error = FuResult.makeGLibError(status)
-        resultArray = procedure.new_return_values(status, error) # GLib.Error())
-        """
-        assert resultArray is-a GimpValueArray
-        of size corresponding to count of procedure's registered return values
-        whose first item is a status with given value
-        but whose any other items are arbitrary or default values?
-        """
-        FuResult.logger.info(f"resultArray is: {resultArray}")
 
-        if (status == Gimp.PDBStatusType.SUCCESS):
-            FuResult.logger.info(f"runfunc_result is: {runfunc_result}")
-            if runfunc_result is not None:
-                targetItem = 1  # Start past the status item
+        error = FuResult.makeGLibError(Gimp.PDBStatusType.SUCCESS)
+        resultArray = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, error) # GLib.Error())
+        """
+        assert resultArray is-a GValueArray (GimpValueArray?).
+        Length is count of procedure's registered return values plus one for status.
+        First item is a status with value taken from error which is type GLib.Error
+        Any other items are arbitrary or default values, until we set them.
+        """
+        #FuResult.logger.info(f"resultArray is: {resultArray}")
+        assert isinstance(resultArray, Gimp.ValueArray)
+        #FuResult.logger.info(f"resultArray[0] is: {resultArray.index(0)}")
+        assert isinstance(resultArray.index(0), Gimp.PDBStatusType)
 
-                if isinstance(runfunc_result, Iterable):
-                    for item in runfunc_result:
-                        resultArray.insert(targetItem, item)
-                        targetItem += 1
-                else:
-                    # runfunc_result is elementary, not iterable
-                    resultArray.insert(targetItem, runfunc_result)
-                    # Note this is not correct:
-                    #gvalue = resultArray.index(targetItem)
-                    #gvalue.set_value(item)
-        else:
-            """
-            Else assert the resultArray has a valid status.
-            Don't care what any other values are, Gimp will ignore them.
-            """
-            pass
+        # see GIR docs for Gimp, section: Structs, item: Gimp.ValueArray
+        FuResult.logger.info(f"result length: {resultArray.length()}")
+
+        if not FuResult.do_formal_and_actual_results_match(resultArray, runfunc_result):
+            FuResult.logger.warning(f"run func returned wrong count or type of results")
+            # TODO make an Exception result rather than return mixed results
+            # TODO preflight the procedure formal args versus run func args
+
+        FuResult.logger.info(f"runfunc_result is: {runfunc_result}")
+        if runfunc_result is not None:
+            targetItem = 1  # Start past the status item
+
+            if isinstance(runfunc_result, Iterable):
+                # TODO exclude string, which is iterable
+                for item in runfunc_result:
+                    resultArray.insert(targetItem, item)
+                    targetItem += 1
+            else:
+                # runfunc_result is elementary, not iterable
+                resultArray.insert(targetItem, runfunc_result)
+                # Note this is not correct:
+                #gvalue = resultArray.index(targetItem)
+                #gvalue.set_value(item)
 
         assert isinstance(resultArray, Gimp.ValueArray)
-        FuResult.logger.info(f"resultArray is: {resultArray}")
+        # This log conveys little info
+        #FuResult.logger.info(f"resultArray is: {resultArray}")
+        return resultArray
+
+
+    @staticmethod
+    def makeException(procedure, err_message) :
+        error = FuResult.makeGLibError(Gimp.PDBStatusType.EXECUTION_ERROR, err_message)
+        resultArray = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, error)
+        return resultArray
+
+    @staticmethod
+    def makeCancel(procedure) :
+        error = FuResult.makeGLibError(Gimp.PDBStatusType.Gimp.CANCEL, "User canceled.")
+        resultArray = procedure.new_return_values(Gimp.PDBStatusType.CANCEL, error)
         return resultArray

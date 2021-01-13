@@ -111,7 +111,7 @@ class MarshalPDB():
         formal_args_index = 0
 
         procedure =  GimpPDB.get_procedure_by_name(proc_name)
-        if procedure.should_insert_runmode_arg:
+        if procedure._takes_runmode_arg:
             # no GUI, this is a call from a plugin
 
             a_gvalue = FuGenericValue.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)

@@ -100,7 +100,10 @@ class FuProcedureCreator:
 
 
     @classmethod
-    def create(cls, plugin, name, gf_procedure, wrapped_run_func, wrapped_context_run_func):
+    def create(cls, plugin, name, gf_procedure,
+       wrapped_image_run_func,
+       wrapped_context_run_func,
+       wrapped_other_run_func):
         '''
         Create and return a subclass of Gimp.Procedure, from GimpFuProcedure.
 
@@ -111,11 +114,11 @@ class FuProcedureCreator:
         And use a different wrapped_run_runc for each subclass.
         '''
         if gf_procedure.type == FuProcedureType.Image:
-            procedure =  cls._create_image_procedure(plugin, name, gf_procedure, wrapped_run_func)
+            procedure =  cls._create_image_procedure(plugin, name, gf_procedure, wrapped_image_run_func)
         elif gf_procedure.type == FuProcedureType.Context:
             procedure =  cls._create_context_procedure(plugin, name, gf_procedure, wrapped_context_run_func)
         elif gf_procedure.type == FuProcedureType.Other:
-            procedure =  cls._create_other_procedure(plugin, name, gf_procedure, wrapped_context_run_func)
+            procedure =  cls._create_other_procedure(plugin, name, gf_procedure, wrapped_other_run_func)
         else:
             # TODO Better message, since this error depends on authored code
             # TODO preflight this at registration time.

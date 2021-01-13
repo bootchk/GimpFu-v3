@@ -180,9 +180,23 @@ class FuRunner:
 
 
     """
-    These are the main exposed methods.
+    The main exposed methods.
 
-    Registered with Gimp as the run_func of Gimp procedures.
+    These are registered with Gimp as the run_func of GimpFu procedures.
+    These are callbacks from Gimp.
+
+    These are GimpFu wrappers of the Authors "main" function, aka run_func.
+    That is, Gimp calls these, and these call the Author's run_func,
+    after mangling args.
+
+    There are several variants, each specializing mangling of args.
+    Mangle args to fit our generic runner: _run_procedure_in_mode
+
+    The call tree for example is:
+      Gimp
+      run_imageprocedure or a variant
+      _run_procedure_in_mode
+      Author's run_func
     """
 
     '''
@@ -210,10 +224,11 @@ class FuRunner:
     '''
     @staticmethod
     def run_imageprocedure(procedure, run_mode, image, drawable, original_args, data):
-        ''' Callback from Gimp.
+        """
+        Mangle args for a procedure of type/signature Image
 
-        GimpFu wrapper of the Authors "main" function, aka run_func
-        '''
+        Signature is (run mode, image, drawable, ...)
+        """
 
         FuRunner.logger.info(f"run_imageprocedure , {procedure}, {run_mode}, {image}, {drawable}, {original_args}")
 
@@ -231,23 +246,25 @@ class FuRunner:
 
     @staticmethod
     def run_context_procedure(procedure, original_args, data):
-        ''' Callback from Gimp for a Gimp.Procedure class of procedure.
+        """ Mangle args for a procedure of type/signature Context
 
-        For a procedure invoked from a context menu, operating on an instance of "Gimp data" e.g. Vectors, Brush, ...
-
-        GimpFu wrapper of the Authors "main" function, aka run_func
+        For a procedure invoked from a context menu,
+        operating on an instance of a "Gimp resource".
+        Resource is "Gimp data" e.g. Vectors, Brush, ... OR a Drawable ???
 
         The signature is as defined by Gimp C code.
-        '''
+        (run mode, image, resource, ...)
+        """
         FuRunner.logger.info(f"run_context_procedure , {procedure}, {original_args}, {data}")
 
         list_gvalues_all_args = Marshal.convert_gimpvaluearray_to_list_of_gvalue(original_args)
         # assert is (runmode, image, <Gimp data object>, guiable_args)
         FuRunner.logger.info(f"run_context_procedure, args: {list_gvalues_all_args}")
 
-        # context_procedure may have a run-mode
-        run_mode = list_gvalues_all_args[0]  # Gimp.RunMode.NONINTERACTIVE
-        # GimpFu always hides run mode, delete first element
+        # context procedures have a run-mode
+        run_mode = list_gvalues_all_args[0]  #
+        # move run mode arg out of passed GimpValueArray
+        # We use the current run mode
         list_gvalues_all_args.pop(0)
 
         image = list_gvalues_all_args[0]
@@ -258,6 +275,29 @@ class FuRunner:
 
         result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
         return result
+
+
+    @staticmethod
+    def run_other_procedure(procedure, original_args, data):
+       """ Mangle args for a procedure of type/signature Other """
+       FuRunner.logger.info(f"run_other_procedure: {procedure}, {original_args}, {data}")
+
+       list_gvalues_all_args = Marshal.convert_gimpvaluearray_to_list_of_gvalue(original_args)
+
+       # Gimp passes run_mode to other procedures
+
+       # remove run mode arg from passed GimpValueArray
+       #list_gvalues_all_args.pop(0)
+
+       # Always NONINTERACTIVE, run mode not passed by GIMP
+       run_mode = Gimp.RunMode.NONINTERACTIVE
+       image = None
+
+       # No assertions about the the args, could be empty
+
+       result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_gvalues_all_args, original_args, data)
+       return result
+
 
 
 
@@ -274,9 +314,6 @@ class FuRunner:
         require original_args is-a Gimp.ValueArray.
         require list_all_args is a list of GValues
         '''
-        # args are in a list, but are GValues
-        assert isinstance(list_all_args, list)
-
         list_wrapped_args = Marshal.wrap_args(list_all_args)
 
         # To know the Python name of a Gimp.Procedure method (e.g. gimp_procedure_get_name)
@@ -314,9 +351,12 @@ class FuRunner:
                # invoke func with unpacked args.  Since Python3, apply() gone.
                # TODO is this the correct set of args? E.G. Gimp is handling RUN_WITH_LAST_VALS, etc. ???
                runfunc_result = func(*list_wrapped_args)
-               final_result = FuResult.make(procedure, Gimp.PDBStatusType.SUCCESS, runfunc_result)
-           except:
-               final_result = FuResult.make(procedure, Gimp.PDBStatusType.EXECUTION_ERROR)
+               final_result = FuResult.makeSuccess(procedure, runfunc_result)
+           except Exception as err:
+               # TODO print the Exception type
+               err_message = f"In plugin: {name}, function: {func}, Exception: {err}"
+               FuRunner.logger.warning(err_message)
+               final_result = FuResult.makeException(procedure, err_message)
         else:
            '''
            Not enclosed in try:except: since then you don't get a good traceback.
@@ -327,10 +367,10 @@ class FuRunner:
            '''
            was_canceled, runfunc_result = FuRunner._interact(procedure, list_wrapped_args, config)
            if was_canceled:
-               final_result = FuResult.make(procedure, Gimp.PDBStatusType.CANCEL)
+               final_result = FuResult.makeCancel(procedure)
                config.end_run(Gimp.PDBStatusType.CANCEL)
            else:
-               final_result = FuResult.make(procedure, Gimp.PDBStatusType.SUCCESS, runfunc_result)
+               final_result = FuResult.makeSuccess(procedure, runfunc_result)
                config.end_run(Gimp.PDBStatusType.SUCCESS)
            """
            OLD above was enclosed in try
@@ -365,7 +405,7 @@ class FuRunner:
             """
             msg = "GimpFu detected errors.  See console for a summary."
             Gimp.message(msg)
-            final_result = FuResult.make(procedure, Gimp.PDBStatusType.EXECUTION_ERROR)
+            final_result = FuResult.makeException(procedure, msg)
 
             # Alternatively: raise Exception(msg) but that is confusing to Author
 

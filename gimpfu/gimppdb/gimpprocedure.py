@@ -4,18 +4,23 @@ from gi.repository import Gimp
 from gi.repository import GObject   # types
 
 from message.proceed_error import proceed
+
+from procedure.metadata import FuProcedureMetadata
+from procedure.type import FuProcedureType
+
 import logging
 
 
 
 
 class GimpProcedure:
-    """ Thin wrapper around Gimp.Procedure
+    """
+    Knows how to introspect a PDB procedure's metadata.
 
-    For introspection of the PDB.
-
+    Thin wrapper around Gimp.Procedure
     !!! Distinct from FuProcedure
     (GimpFu local knowledge of an author declared procedure.)
+    FUTURE use FuProcedureMetadata for both GimpProcedure and FuProcedure
 
     This is not an adapter, an Author does not use this,
     only the GimpFu implementation uses it.
@@ -26,6 +31,11 @@ class GimpProcedure:
         assert isinstance(gimp_procedure, Gimp.Procedure)
         self._procedure = gimp_procedure
         self.logger = logging.getLogger("GimpFu.GimpProcedure")
+
+
+    """
+    Delegated to the wrapped instance of Gimp.Procedure
+    """
 
     @property
     def argument_specs(self):
@@ -43,10 +53,29 @@ class GimpProcedure:
         """ Returns value of type Gimp.PDBProcType """
         return self._procedure.get_proc_type()
 
+    @property
+    def menu_path(self):
+        """ Returns string for the single menu path?
+        TODO Why would a procedure have many menu paths?
+        """
+        paths = self._procedure.get_menu_paths()
+        if len(paths) == 0:
+            result = ""
+        elif len(paths) == 1:
+            result = paths[0]
+        else :
+            raise Exception("Can't handle many menu paths")
+        self.logger.debug(f"menu path: {result}")
+        return result
 
 
 
-    def _does_procedure_take_runmode_from_name(self):
+    """
+    Much of this is non-working cruft, 
+    but it documents v2 ways, and ways we can't use.
+    """
+
+    def _takes_runmode_from_name(self):
         """ Parse name of proc to determine whether it should take a run_mode arg.
 
         Implementation as in GimpFu v2.
@@ -59,6 +88,8 @@ class GimpProcedure:
         """
         # TODO file load and save
         # TODO gimp-file-load and other anomalously named plug-ins ??
+
+        # TODO move this to procedure/metadata.py
         proc_name = self.name
         result = ( proc_name.startswith('plug-in-')
                 or proc_name.startswith('script-fu-')
@@ -73,7 +104,7 @@ class GimpProcedure:
     take a first arg that is run mode.
     e.g. gimp-file-load-layers.
     """
-    def _does_procedure_take_runmode_from_signature(self):
+    def _takes_runmode_from_signature(self):
         """
         Examine signature of proc to determine whether it takes run_mode arg.
 
@@ -86,6 +117,11 @@ class GimpProcedure:
         if len(arg_specs) > 0:
             # run-mode is the first arg
             type_name = self.get_formal_argument_type_name(0)
+
+            """
+            Fails to work because actual gtype name is GParamEnum
+            which is not specific enough for GimpRunMode.
+            """
             result = (type_name == 'GimpRunMode')
 
             """
@@ -101,22 +137,37 @@ class GimpProcedure:
         return result
 
 
+    def _takes_runmode_from_menu_path(self):
+        """
+        Uses GimpFu classes to understand which PDB procedures take run mode.
 
+        Not creating an instance of FuProcedureMetadata, just using one of its class methods.
+
+        Only type Other does not take a run mode arg
+        """
+        type = FuProcedureMetadata.type_from_menu_path(self.menu_path)
+        return type != FuProcedureType.Other
+
+
+
+    """
+    GimpFu hides the need for runmode in Author scripts.
+    """
     @property
-    def should_insert_runmode_arg(self):
-        """
-        Is this PDB procedure one that GimpFu hides
-        the need for first argument of type RunMode
-        """
-        # only type Plugin requires insertion of run mode arg
-        result = self.type == Gimp.PDBProcType.PLUGIN
+    def _takes_runmode_arg(self):
+        """ is first argument a "run mode" arg, loosely speaking """
+        result = self._takes_runmode_from_menu_path()
 
         # TODO Alternative implementations, not all are correct
-        # relics from GimpFu v2
-        #result = self._does_procedure_take_runmode_from_signature()
-        #result = self._does_procedure_take_runmode_from_name()
 
-        self.logger.debug(f"{self.name}: should_insert_runmode_arg: {result}")
+        # only type Plugin requires insertion of run mode arg
+        #result = self.type == Gimp.PDBProcType.PLUGIN
+
+        # relics from GimpFu v2
+        #result = self._takes_runmode_from_signature()
+        #result = self._takes_runmode_from_name()
+
+        self.logger.debug(f"_takes_runmode_arg for: {self.name} returns: {result}")
         return result
 
     # TODO optimized, cache result from Gimp instead of getting it each call
