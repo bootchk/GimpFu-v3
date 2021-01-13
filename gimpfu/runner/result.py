@@ -60,10 +60,24 @@ class FuResult():
 
 
     @staticmethod
+    def len_actual_result(actual_result):
+        """ Length of a Python instance that is None, a single item, or a sequence. """
+        if actual_result is None:
+            result = 0
+        elif isinstance(actual_result, Iterable) and not isinstance(actual_result, str):
+            result = len(actual_result)
+        else :
+            result = 1
+        return result
+
+    @staticmethod
     def do_formal_and_actual_results_match(formal_result, actual_result):
-        #resultArray.length() - 1 != len(runfunc_result) :
-        # TODO
-        return True
+        """
+        formal_result is-a Gimp.ValueArray
+        Subtract one for status in first element.
+        """
+        return FuResult.len_actual_result(actual_result) == formal_result.length() - 1
+
 
 
     @staticmethod
@@ -80,8 +94,9 @@ class FuResult():
         """
 
 
-        error = FuResult.makeGLibError(Gimp.PDBStatusType.SUCCESS)
-        resultArray = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, error) # GLib.Error())
+        # No GLib.Error when SUCCESS
+        # error = FuResult.makeGLibError(Gimp.PDBStatusType.SUCCESS)
+        resultArray = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS)
         """
         assert resultArray is-a GValueArray (GimpValueArray?).
         Length is count of procedure's registered return values plus one for status.
@@ -102,11 +117,11 @@ class FuResult():
             # TODO preflight the procedure formal args versus run func args
 
         FuResult.logger.info(f"runfunc_result is: {runfunc_result}")
-        if runfunc_result is not None:
+        length = FuResult.len_actual_result(runfunc_result)
+        if length >= 1:
             targetItem = 1  # Start past the status item
 
-            if isinstance(runfunc_result, Iterable):
-                # TODO exclude string, which is iterable
+            if length >1:
                 for item in runfunc_result:
                     resultArray.insert(targetItem, item)
                     targetItem += 1

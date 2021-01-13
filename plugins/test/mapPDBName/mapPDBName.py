@@ -8,19 +8,28 @@ that:
 
 from gimpfu import *
 
+map = {
+    "gimp-image-is-valid": "gimp-image-ID-is-valid",
+}
 
 def plugin_func(testedName):
     print(f"Called w: {testedName}")
-    # TODO if mapped, map it, else
-    return "testedName"
+
+    try:
+        result = map[testedName]
+    except KeyError:
+        result = testedName
+    return result
 
 def plugin_func2(image, drawable, testedName):
+
     # A name not deprecated
-    print ( pdb.python_fu_map_PDB_name("foo"))
+    print ( f"Mapped name: {pdb.python_fu_map_PDB_name('foo')[0]}")
+    # Note always returns a list, but why does it have a trailing empty string?
     # Expect print "foo"
 
     # A deprecated name
-    print ( pdb.python_fu_map_PDB_name("bar"))
+    print ( f"Mapped name: {pdb.python_fu_map_PDB_name('gimp-image-is-valid')[0]}")
     # Expect print "barbar"
 
 
@@ -54,7 +63,7 @@ register(
       "",   # No image types
       # GimpFu will fix up missing image, drawable
       [ (PF_STRING, "testedName", "Possibly deprecated name to map", ""), ],
-      [],   # no results
+      [],   # void result
       plugin_func2,
       menu="<Image>/Test")
 main()
