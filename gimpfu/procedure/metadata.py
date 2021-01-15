@@ -51,6 +51,7 @@ class FuProcedureMetadata():
     May raise exceptions
     '''
     def __init__(self,
+       name,
        blurb, help, author, copyright,
        date, label, imagetypes,
        plugin_type, params, results,
@@ -59,7 +60,11 @@ class FuProcedureMetadata():
 
         self.logger = logging.getLogger("GimpFu.FuProcMetadata")
 
-        # Deprecated: Allow string args to be nullable with "None"
+        # Retain name for debugging, but owner of metadata knows the name, not us
+        # Rather than make the metadata know the owner of the metadata
+        self._name = self.makeProcNamePrefixCanonical(name)
+
+        # Fixup deprecated: Allow string args to be nullable with "None"
         label =self.substitute_empty_string_for_none(label, "label")
         imagetypes = self.substitute_empty_string_for_none(imagetypes, "imagetypes")
         menu = self.substitute_empty_string_for_none(menu, "menupath")
@@ -82,14 +87,14 @@ class FuProcedureMetadata():
 
         # Retain the old, but not very descriptive, names "params" and "results"
         # IN formal args
-        self.params = FuFormalParams()
+        self.params = FuFormalParams(owner_name=self._name)
         for param in params:
              # assert param is a tuple, unpack when passing
              self.params.append(*param)
         # OUT formal args
         # TODO some docs say (type, name, description) but other docs say ...default_value
         # Why would there be a default value for a return value?
-        self.results = FuFormalParams()
+        self.results = FuFormalParams(owner_name=self._name)
         for param in results:
              # assert param is a tuple, unpack when passing
              self.results.append(*param)
@@ -333,16 +338,15 @@ class FuProcedureMetadata():
                     self.MENUITEMLABEL = fields.pop()
                     self.MENUPATH = "/".join(fields)
                     result = True
-                    Deprecation.say(f" Use the 'menu' parameter instead of passing a full menu path in 'label'.")
+                    Deprecation.say(f"Use the 'menu' parameter instead of passing a full menu path in 'label'.")
                 else:
                     # 'label' is not a path, can't derive menu path
                     # TODO will GIMP show it in the GUI in a fallback place?
-                    Deprecation.say(f" Simple menu item 'label' without 'menu' path.")
+                    Deprecation.say(f"Simple menu item 'label' without 'menu' path.")
             else:
                 # no menu and no label
-                # Normal, user intends to create plugin only callable by other plugins
-                Deprecation.say(f"No 'menu' and no 'label'.  Plugin will not appear in Gimp GUI.")
-                # TODO Not really a deprecation, a UserWarning??
+                # Normal, not a deprecation. Plugin only callable by other plugins
+                self.logger.debug(f"No 'menu' and no 'label'.  Plugin {self._name} will not appear in Gimp GUI.")
         else:
             if  self.MENUITEMLABEL:
                 # menu and label given

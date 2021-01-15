@@ -35,7 +35,8 @@ class FuFormalParams():
 
 
 
-    def __init__(self):
+    def __init__(self, owner_name):
+        self.owner_name = owner_name
         self.PARAMS= []
 
 
@@ -143,7 +144,8 @@ class FuFormalParams():
             if ( (len(self.PARAMS) > 0)
                 and self.PARAMS[0].PF_TYPE != PF_IMAGE
                 ) :
-                Deprecation.say("Missing image param for Image plugin")
+                # FuFormalParams.logger
+                Deprecation.say(f"Missing image param for Image type plugin {self.owner_name}")
                 self.PARAMS.insert(0, FuFormalParams.image_param)
                 result = True
             if ( (len(self.PARAMS) > 1)

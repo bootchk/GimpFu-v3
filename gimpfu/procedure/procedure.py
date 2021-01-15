@@ -84,11 +84,13 @@ class FuProcedure():
         # TODO a hack, Gimpfu never use plugin_type?
         plugin_type = 1
 
-        self.metadata = FuProcedureMetadata(blurb, help, author, copyright,
-                                        date, label, imagetypes,
-                                        plugin_type, params, results,
-                                        function, menu, domain,
-                                        on_query, on_run)
+        self.metadata = FuProcedureMetadata(
+            proc_name,
+            blurb, help, author, copyright,
+            date, label, imagetypes,
+            plugin_type, params, results,
+            function, menu, domain,
+            on_query, on_run)
 
         # name is not part of metadata, but is the key
         # and metadata knows how to make it canonical
