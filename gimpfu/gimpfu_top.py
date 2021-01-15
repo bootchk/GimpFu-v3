@@ -374,8 +374,9 @@ class GimpFu (Gimp.PlugIn):
         # return list of all procedures implemented in the Authors source code
         # For testing: result =[ gf_procedure.name, ]
         keys = FuProcedures.names()
+        # keys is not a list in Python 3
 
-        # Ensure result is GLib.List () (a Python list suffices) but keys is not a list in Python 3
+        # Ensure result is GLib.List () (a Python list suffices)
         result = list(keys)
 
         return result

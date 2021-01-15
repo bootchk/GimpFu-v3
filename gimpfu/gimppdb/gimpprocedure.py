@@ -3,10 +3,8 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 from gi.repository import GObject   # types
 
+from gimppdb.runmode import RunMode
 from message.proceed_error import proceed
-
-from procedure.metadata import FuProcedureMetadata
-from procedure.type import FuProcedureType
 
 import logging
 
@@ -41,6 +39,7 @@ class GimpProcedure:
     def argument_specs(self):
         """ Returns list of GParamSpec for arguments. """
         # Another implementation: Gimp.get_pdb().run_procedure( proc_name , 'gimp-pdb-get-proc-argument', args)
+        # Method of wrapped Gimp.Procedure
         return self._procedure.get_arguments()
 
     @property
@@ -69,94 +68,13 @@ class GimpProcedure:
         return result
 
 
-
-    """
-    Much of this is non-working cruft, 
-    but it documents v2 ways, and ways we can't use.
-    """
-
-    def _takes_runmode_from_name(self):
-        """ Parse name of proc to determine whether it should take a run_mode arg.
-
-        Implementation as in GimpFu v2.
-        Implemented using string compares.
-        We don't use the field plug-type,
-        since it can be:
-           "Temporary Procedure" : Gimp.org and Author submitted plugins
-           or "GIMP Plug-In"  : Gimp.org and Author submitted plugins
-           or "Internal Gimp Procedure" : e.g. gimp-file-load by Gimp.org
-        """
-        # TODO file load and save
-        # TODO gimp-file-load and other anomalously named plug-ins ??
-
-        # TODO move this to procedure/metadata.py
-        proc_name = self.name
-        result = ( proc_name.startswith('plug-in-')
-                or proc_name.startswith('script-fu-')
-                or proc_name.startswith('python-fu-')
-                )
-        return result
-
-
-    """
-    This is NOT reliable to determine whether to insert a run mode arg.
-    Some procedures that are type INTERNAL (NOT type PLUGIN)
-    take a first arg that is run mode.
-    e.g. gimp-file-load-layers.
-    """
-    def _takes_runmode_from_signature(self):
-        """
-        Examine signature of proc to determine whether it takes run_mode arg.
-
-        The most reliable implementation:
-        Get GParamSpec, and compare its type.name to 'GimpRunMode'
-        """
-
-        arg_specs = self.argument_specs
-        # assert arg_specs is-a list of GObject.GParamSpec or subclass thereof
-        if len(arg_specs) > 0:
-            # run-mode is the first arg
-            type_name = self.get_formal_argument_type_name(0)
-
-            """
-            Fails to work because actual gtype name is GParamEnum
-            which is not specific enough for GimpRunMode.
-            """
-            result = (type_name == 'GimpRunMode')
-
-            """
-            We cannot examine the name of the ParamSpec, instead of the type,
-            because some are named 'run-mode' and some 'dummy-param'.
-            file-gbr-save is aberrant, first arg name is "dummy-param"
-
-            param_name = arg_specs[0].name
-            result = ( param_name == 'run-mode')
-            """
-        else:
-            result = False
-        return result
-
-
-    def _takes_runmode_from_menu_path(self):
-        """
-        Uses GimpFu classes to understand which PDB procedures take run mode.
-
-        Not creating an instance of FuProcedureMetadata, just using one of its class methods.
-
-        Only type Other does not take a run mode arg
-        """
-        type = FuProcedureMetadata.type_from_menu_path(self.menu_path)
-        return type != FuProcedureType.Other
-
-
-
     """
     GimpFu hides the need for runmode in Author scripts.
     """
     @property
-    def _takes_runmode_arg(self):
+    def takes_runmode_arg(self):
         """ is first argument a "run mode" arg, loosely speaking """
-        result = self._takes_runmode_from_menu_path()
+        result = RunMode.takes_runmode_from_menu_path(self)
 
         # TODO Alternative implementations, not all are correct
 
@@ -173,11 +91,6 @@ class GimpProcedure:
     # TODO optimized, cache result from Gimp instead of getting it each call
 
 
-
-
-
-
-
     """
     to dump a GParamSpec:    print(dir(arg_specs[0]))
     We find that it has attributes 'name' and 'value_type' and '__gtype__'
@@ -192,6 +105,12 @@ class GimpProcedure:
     Fails: type comparison param_type == Gimp.RunMode  ???
     !!! Gimp.RunMode is-a class, i.e. a type, why can't we compare types?
     """
+
+    @property
+    def formal_arg_count(self):
+        result = len(self.argument_specs)
+        self.logger.debug(f"formal_arg_count returns: {result}")
+        return result
 
 
     def get_formal_argument_type_name(self, index):

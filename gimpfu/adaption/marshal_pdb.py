@@ -88,7 +88,10 @@ class MarshalPDB():
 
 
 
-
+    @staticmethod
+    def synthesize_marshalled_run_mode(proc_name, *args):
+        MarshalPDB.logger.debug(f"Synthesized runmode NONINTERACTIVE")
+        return FuGenericValue.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)
 
 
     @staticmethod
@@ -96,37 +99,56 @@ class MarshalPDB():
         '''
         Marshal args to a PDB procedure.
 
-        1. Gather many args  into a sequence and return it.
-        2. Optionally prefix args with run mode
-        GimpFu feature: hide run_mode from calling author
-        3. Unwrap wrapped arguments so all args are GObjects
-        4. Upcasts and conversions
-        5. Check error FunctionInfo
+        Accepts: sequence of wrapped or primitive args
+        Returns: sequence of GValue
 
-        !!! Returns sequence of GValue
+        (We are returning a sequence, not a GValueArray.
+        If it were a GValueArray, we would use: result.insert(index, gvalue) )
+
+        Optionally synthesize (prefix result) with run mode
+        GimpFu feature: hide run_mode from calling author
+
+        For each arg:
+        - Unwrap wrapped arguments so result is GObjects (not a GimpFu object)
+        - Upcasts and conversions
+        - check for error "passing func" FunctionInfo
         '''
 
         result = []
 
         formal_args_index = 0
 
+        # Called procedure knows its formal parameters
         procedure =  GimpPDB.get_procedure_by_name(proc_name)
-        if procedure._takes_runmode_arg:
-            # no GUI, this is a call from a plugin
 
-            a_gvalue = FuGenericValue.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)
-            result.append( a_gvalue )
-            # Run mode is in the formal args, not in passed actual args
-            formal_args_index = 1
+        """
+        Check count of formal versus actual args.
 
-        '''
-        If more actual args than formal_args (from GI introspection), conversion will fail
-        since we can't know the formal type of the excess actual args.
-        If less actual args than formal_args, we convert the given args,
-        but Gimp might return an error when we call the PDB procedure with too few args.
-        '''
+        GimpFu allows count actual args to be less by one,
+        if the procedure takes runmode, and then we insert it.
+        But some callers may have passed runmode
+        (did not use the GimpFu shortcut.)
+        """
+        if (len(args) == procedure.formal_arg_count - 1
+           and procedure.takes_runmode_arg) :
+           """
+           Assume the case that run mode is in the formal args, not in passed actual args.
+           Synthesizing runmode might now work, the caller might have made an error
+           and not just using the GimpFu convention of not passing runmode.
+           """
+           result.append( synthesizeRunMode() )
+           # skip to the next formal arg
+           formal_args_index = 1
+        elif len(args) != procedure.formal_arg_count :
+            '''
+            If more actual args than formal_args we can't know the formal type of the excess actual args.
+            If less actual args than formal_args, we could convert the given args,
+            but Gimp would return an error when we call the PDB procedure with too few args.
+            '''
+            proceed(f"Mismatched count of formal versus actual args for {proc_name}")
+
         for x in args:
-            MarshalPDB.logger.debug(f"marshalling arg: {x} index: {formal_args_index}" )
+            MarshalPDB.logger.debug(f"marshalling arg value: {x} index: {formal_args_index}" )
             # to dump more uncomment this
             # MarshalPDB.logger.debug(f"cumulative marshalled args: {result}" )
 
@@ -151,20 +173,12 @@ class MarshalPDB():
 
             formal_args_index += 1
 
-            """
-            cruft
-            try:
-                marshalled_args.insert(index, gvalue)
-            except Exception as err:
-                proceed(f"Exception inserting {gvalue}, index {index}, to pdb, {err}")
-                # ??? After this exception, often get: LibGimpBase-CRITICAL **: ...
-                # gimp_value_array_insert: assertion 'index <= value_array->n_values' failed
-                # The PDB procedure call is usually going to fail anyway.
-            """
-
         MarshalPDB.logger.debug(f"marshal_args returns: {result}" )
 
-        # result sequence could be empty, or have errors (see proceed above)
+        """
+        result sequence could be empty (normal)
+        or may be short or long, since we may have proceeded past an error.
+        """
         return result
 
 
