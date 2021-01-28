@@ -3,6 +3,7 @@ A GimpFu plugin
 
 tests plugin mapPDBName
 """
+from gimpfu import *
 
 def plugin_func(image, drawable, testedName):
 

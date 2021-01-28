@@ -49,3 +49,43 @@ void set_scriptfu_log_handler(void)
                      NULL);
 }
 // TODO should be WARNING???
+
+
+
+
+
+/* get new name if deprecated, else proc_name remains the same. */
+/*
+{
+  GValue           value    = G_VALUE_INIT;
+  GimpValueArray  *args;
+  GimpValueArray  *values = NULL;
+  gchar           *new_proc_name;
+
+  args = gimp_value_array_new (1);
+  g_value_init (&value, G_TYPE_STRING);
+  g_value_set_string (&value, proc_name);
+  debug_gvalue(&value);
+  gimp_value_array_append (args, &value);
+
+  values = gimp_pdb_run_procedure_array (gimp_get_pdb (),
+                              "python-fu-map-pdb-name",
+                              args);
+  if (! values)
+     return script_error (sc, "Failed call to deprecate", 0);
+  new_proc_name = GIMP_VALUES_GET_STRING (values, 1);
+  // new_proc_name points into values
+  g_debug ("New proc name: %s", proc_name);
+  if (strcmp(proc_name, new_proc_name) != 0)
+  {
+    g_debug ("Deprecating: %s to:%s", proc_name, new_proc_name);
+    // Is deprecated
+    // Free old name and replace with copy of new name
+    g_free (proc_name);
+    proc_name = g_strdup (new_proc_name);
+  }
+
+  gimp_value_array_unref (values);
+  gimp_value_array_unref (args);
+}
+*/

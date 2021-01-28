@@ -146,6 +146,7 @@ class FuResult():
 
     @staticmethod
     def makeCancel(procedure) :
-        error = FuResult.makeGLibError(Gimp.PDBStatusType.Gimp.CANCEL, "User canceled.")
-        resultArray = procedure.new_return_values(Gimp.PDBStatusType.CANCEL, error)
+        pdbStatus = Gimp.PDBStatusType.CANCEL
+        error = FuResult.makeGLibError(pdbStatus, "User canceled.")
+        resultArray = procedure.new_return_values(pdbStatus, error)
         return resultArray
