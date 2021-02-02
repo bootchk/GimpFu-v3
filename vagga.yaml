@@ -494,6 +494,8 @@ containers:
     # resolve ../plug-ins/common/file-pdf-load.c:32:10: fatal error: poppler.h: No such file or directory
     - !Env LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
 
+    - !EnsureDir /work/gimpBuild
+
     #### Options for GIMP build
     # -Dpoppler=false => -Dpdf=false is not correct
     # -Dpoppler=false still fails to build
@@ -950,7 +952,7 @@ commands:
       export GIMP_PLUGIN_DEBUG=file-png,fatal-warnings
       #export GIMP_PLUGIN_DEBUG=all,fatal-criticals
 
-      # export GIMPFU_DEBUG=1
+      export GIMPFU_DEBUG=1
 
       # print all G_MESSAGES
       # export G_MESSAGES_DEBUG=all

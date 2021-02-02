@@ -36,6 +36,9 @@ class FormalTypes():
     """
     These classify groups/sets of typenames.
     assert isinstance(type_name, str)
+
+    These allow type names from either array of GParamSpec
+    or Gimp.ValueArray which is array of Gtype
     """
     def is_float_type(type_name):        return type_name in ('GParamFloat', 'GParamDouble')
     def is_str_type(type_name):          return type_name in ('GParamString', )
@@ -44,11 +47,11 @@ class FormalTypes():
     def is_unsigned_char_type(type_name): return type_name in ('GParamUChar', )
 
     # !!!! GimpParam... not GParam...
-    def is_object_array_type(type_name): return type_name in ('GimpParamObjectArray', )
-    def is_float_array_type(type_name):   return type_name in ('GimpParamFloatArray', )
-    def is_string_array_type(type_name):   return type_name in ('GimpParamStringArray', )
-    def is_uint8_array_type(type_name):   return type_name in ('GimpParamUInt8Array', )
-    def is_int32_array_type(type_name):   return type_name in ('GimpParamInt32Array', )
+    def is_object_array_type(type_name): return type_name in ('GimpParamObjectArray', 'GimpObjectArray')
+    def is_float_array_type(type_name):   return type_name in ('GimpParamFloatArray', 'GimpFloatArray')
+    def is_string_array_type(type_name):   return type_name in ('GimpParamStringArray', 'GimpStringArray' )
+    def is_uint8_array_type(type_name):   return type_name in ('GimpParamUInt8Array', 'GimpUInt8Array' )
+    def is_int32_array_type(type_name):   return type_name in ('GimpParamInt32Array', 'GimpInt32Array')
 
     def is_file_descriptor_type(type_name):
         # ??? PDB Browser says 'GFile' but is 'GParamObject'

@@ -24,28 +24,28 @@ class Upcast():
     logger = logging.getLogger("GimpFu.Upcast")
 
     @staticmethod
-    def try_gimp_upcasts(formal_arg_type, gen_value, index):
+    def try_gimp_upcasts(formal_arg_type, gen_value):
         """
         Try the upcasts required by Gimp PDB.
         """
-        Upcast.try_to_drawable(formal_arg_type, gen_value, index)
+        Upcast.try_to_drawable(formal_arg_type, gen_value)
         if gen_value.did_upcast:
             return
-        Upcast.try_to_item(formal_arg_type, gen_value, index)
+        Upcast.try_to_item(formal_arg_type, gen_value)
         if gen_value.did_upcast:
             return
-        Upcast.try_to_layer(formal_arg_type, gen_value, index)
+        Upcast.try_to_layer(formal_arg_type, gen_value)
         if gen_value.did_upcast:
             return
-        Upcast.try_to_color(formal_arg_type, gen_value, index)
+        Upcast.try_to_color(formal_arg_type, gen_value)
 
 
 
     @staticmethod
-    def _try_to_type(formal_arg_type, gen_value, index, cast_to_type):
+    def _try_to_type(formal_arg_type, gen_value, cast_to_type):
         '''
         When gen_value.actual_arg_type is subclass of cast_to_type
-        and procedure has signature with formal_arg_type at index (proc expects cast_to_type at index)
+        and procedure has signature expecting cast_to_type,
         return cast_to_type, else return original type.
         Does not actually change type i.e. no conversion, just casting.
 
@@ -85,20 +85,20 @@ class Upcast():
 
     # TODO replace this with data driven single procedure
     @staticmethod
-    def try_to_drawable(formal_arg_type, gen_value, index):
-        Upcast._try_to_type(formal_arg_type, gen_value, index, Gimp.Drawable)
+    def try_to_drawable(formal_arg_type, gen_value):
+        Upcast._try_to_type(formal_arg_type, gen_value, Gimp.Drawable)
 
     @staticmethod
-    def try_to_item(formal_arg_type, gen_value, index):
-        Upcast._try_to_type(formal_arg_type, gen_value, index, Gimp.Item)
+    def try_to_item(formal_arg_type, gen_value):
+        Upcast._try_to_type(formal_arg_type, gen_value, Gimp.Item)
 
     @staticmethod
-    def try_to_layer(formal_arg_type, gen_value, index):
-        Upcast._try_to_type(formal_arg_type, gen_value, index, Gimp.Layer)
+    def try_to_layer(formal_arg_type, gen_value):
+        Upcast._try_to_type(formal_arg_type, gen_value, Gimp.Layer)
 
     @staticmethod
-    def try_to_color(formal_arg_type, gen_value, index):
-        Upcast._try_to_type(formal_arg_type, gen_value, index, Gimp.RGB)
+    def try_to_color(formal_arg_type, gen_value):
+        Upcast._try_to_type(formal_arg_type, gen_value, Gimp.RGB)
         if gen_value.did_upcast:
             # also convert value
             try:

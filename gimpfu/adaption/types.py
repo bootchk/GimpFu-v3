@@ -6,7 +6,6 @@ from gi.repository import Gimp
 from gi.repository import GObject    # GObject type constants
 
 from adaption.formal_types import FormalTypes
-from adaption.generic_value import FuGenericValue
 
 from gimppdb.gimppdb import GimpPDB
 
@@ -173,6 +172,7 @@ class Types():
         Types.logger.info(f"try_array_conversions ( {formal_arg_type} )")
         # dispatch on formal_arg_type
         formal_arg_type_name = formal_arg_type.name
+        Types.logger.info(f"try_array_conversions formal type name: {formal_arg_type_name}")
         if FormalTypes.is_float_array_type(formal_arg_type_name):
             gen_value.to_float_array()
         elif FormalTypes.is_object_array_type(formal_arg_type_name):
@@ -269,7 +269,7 @@ class Types():
 
     @staticmethod
     def try_convert_string_array_to_list_of_str(item):
-        ''' Try convert item from to list(str). Returns item, possibly converted.'''
+        ''' Try convert item from Gimp.StringArray to list(str). Returns item, possibly converted.'''
         if isinstance(item, Gimp.StringArray):
             # Gimp.StringArray has fields, not methods
             Types.logger.info(f"StringArray length: {item.length}")

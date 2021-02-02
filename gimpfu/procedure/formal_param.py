@@ -295,7 +295,7 @@ class FuFormalParam(GObject.Object):
                 self._on_extras_error("Missing extras")
         else:
             # Could be missing code in GimpFu ?
-            self._on_extras_error("Unhandled extras type")
+            self._on_extras_error(f"Unhandled extras type: {extras_type} on PF_TYPE: {self.PF_TYPE}")
 
         return (min, max)
 
@@ -368,18 +368,29 @@ map_PF_TYPE_to_type = {
     PF_FILENAME:  str,
     PF_DIRNAME:   str,
 
+    #PF_INT8ARRAY   = PDB_INT8ARRAY
+    #PF_INT16ARRAY  = PDB_INT16ARRAY
+    #PF_INT32ARRAY  = PDB_INT32ARRAY
+    #PF_INTARRAY    = PF_INT32ARRAY
+    #PF_FLOATARRAY  = PDB_FLOATARRAY
+    PF_STRINGARRAY: "Gimp.StringArray",
+    # Object, Value
+
 }
 
 """
 EXTRAS is a mini language or format of gimpfu
 The tuples describe both the GUI widget and the valid ranges for parameter.
 
-extras type   example
+extras type  Python type of extras                     example
 0            no extras (typically string or other non-ordered types)
-1            (min, max, default)
-2            (("label", min), ("label", max))
-3            ("label", ...)  each label is name of an int-valued choice
+1            a three-tuple                             (min, max, default)
+2            extras is a tuple of two-tuple dict       (("label", min), ("label", max))
+3            tuple of strings                          ("label", ...)
+                       each label is name of an int-valued choice
 """
+
+# TODO all 'int' below is wrong, should be in range [0,3]
 map_PF_TYPE_to_extras_type = {
     PF_INT8:      1,
     PF_INT16:     1,
@@ -387,16 +398,18 @@ map_PF_TYPE_to_extras_type = {
     PF_INT:       1,
     PF_FLOAT:     1,
     PF_STRING:    0,
-    PF_VALUE:     int,
+    PF_VALUE:     int,  # TODO
+    # GUI is Gimp chooser widget, but no extras
     PF_COLOR:     0,
     PF_COLOUR:    0,
-    PF_ITEM:      int,
-    PF_DISPLAY:   int,
-    PF_IMAGE:     int,
-    PF_LAYER:     int,
-    PF_CHANNEL:   int,
-    PF_DRAWABLE:  int,
-    PF_VECTORS:   int,
+    PF_ITEM:      0,
+    PF_DISPLAY:   0,
+    PF_IMAGE:     0,
+    PF_LAYER:     0,
+    PF_CHANNEL:   0,
+    PF_DRAWABLE:  0,
+    PF_VECTORS:   0,
+
     PF_TOGGLE:    int, # int/bool valued checkbox or toggle widget
     PF_BOOL:      2,  # alias for TOGGLE
     PF_SLIDER:    1,
@@ -413,4 +426,7 @@ map_PF_TYPE_to_extras_type = {
     PF_FILENAME:  0,
     PF_DIRNAME:   0,
     PF_OPTION:    3,    # alias for RADIO
+
+    # Arrays have no extras
+    PF_STRINGARRAY: 0,
 }

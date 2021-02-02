@@ -14,6 +14,8 @@ from message.proceed_error import proceed
 from message.suggest import Suggest
 
 from adaption.formal_types import FormalTypes
+from adaption.types import Types
+from adaption.upcast import Upcast
 
 from collections.abc import Sequence    # ABC for sequences
 import logging
@@ -25,7 +27,7 @@ import logging
 class FuGenericValue():
     '''
     A (type, value) that holds any ('generic') value.
-    A thin class around GValue.
+    A thin class around Gimp.Value aka the C GValue struct.
 
     Adapts Python types to GTypes.
 
@@ -67,7 +69,9 @@ class FuGenericValue():
 
 
     def get_gvalue(self):
-        ''' Return gvalue for original arg with all conversions and upcasts applied.  '''
+        '''
+        Return Gimp.Value for original arg with all conversions and upcasts applied.
+        '''
         if self._did_create_gvalue:
             result_gvalue = self._gvalue
         elif self._did_convert or self._did_upcast:
@@ -396,7 +400,8 @@ class FuGenericValue():
 
 
     '''
-    upcasts
+    upcasts.
+    See also adaption/upcast.py Upcast
     '''
 
     def upcast(self, cast_to_type):
@@ -421,11 +426,46 @@ class FuGenericValue():
 
 
 
+    def tryConversionsAndUpcasts(self, formalArgType):
+        '''
+        Try convert or upcast self to formalArgType.
+
+        Any upcast or conversion is the sole upcast or conversion (return early.)
+        But an upcast may also internally convert.
+        We don't upcast and also convert in this list.
+
+        The order is not important as we only expect one upcast or convert.
+
+        Try a sequence of upcasts and conversions.
+        TODO just get the formal argument type and dispatch on it???
+        I.E. invert this logic.
+        '''
+
+        Upcast.try_gimp_upcasts(formalArgType, self)
+        if self.did_upcast:
+            return
+
+        Types.try_usual_python_conversion(formalArgType, self)
+        if self.did_convert:
+            return
+
+        Types.try_array_conversions(formalArgType, self)
+        if self.did_convert:
+            return
+
+        Types.try_file_descriptor_conversion(formalArgType, self)
+
+        # !!! We don't upcast deprecated constant TRUE to G_TYPE_BOOLEAN
+
+        # TODO is this necessary? I think it is only drawable that gets passed None
+        # Types.try_convert_to_null(proc_name, self)
+
 
     '''
     Utility.
     Here for lack of a better place for it.
     Not quite private.
+    TODO move this
     '''
 
     '''

@@ -7,7 +7,6 @@ from gi.repository import Gimp
 from adaption.wrappable import *
 from adaption.marshal import Marshal
 from adaption.types import Types
-from adaption.upcast import Upcast
 from adaption.generic_value import FuGenericValue
 
 from gimppdb.gimppdb import GimpPDB
@@ -45,16 +44,6 @@ class MarshalPDB():
         # TODO optimize, getting type is simpler when is fundamental
         # We could retain that the arg is fundamental during unwrapping
 
-        '''
-        Any upcast or conversion is the sole upcast or conversion.
-        (But un upcast may also internally convert)
-        We don't upcast and also convert in this list.
-
-        The order is not important as we only expect one upcast or convert.
-
-        Try a sequence of upcasts and conversions.
-        TODO just get the formal argument type and dispatch on it???
-        '''
         MarshalPDB.logger.debug(f"_try_type_conversions: index {index}" )
 
         formal_arg_type = procedure.get_formal_argument_type(index)
@@ -65,26 +54,10 @@ class MarshalPDB():
 
         MarshalPDB.logger.debug(f"_try_type_conversions: index {index} formal type: {formal_arg_type}" )
 
-        Upcast.try_gimp_upcasts(formal_arg_type, gen_value, index)
-        if gen_value.did_upcast:
-            return
+        gen_value.tryConversionsAndUpcasts(formal_arg_type);
 
-        Types.try_usual_python_conversion(formal_arg_type, gen_value)
-        if gen_value.did_convert:
-            return
-
-        Types.try_array_conversions(formal_arg_type, gen_value)
-        if gen_value.did_convert:
-            return
-
-        Types.try_file_descriptor_conversion(formal_arg_type, gen_value)
         if not gen_value.did_convert:
             MarshalPDB.logger.debug(f"No type conversions: index {index} formal type: {formal_arg_type}" )
-
-        # !!! We don't upcast deprecated constant TRUE to G_TYPE_BOOLEAN
-
-        # TODO is this necessary? I think it is only drawable that gets passed None
-        # Types.try_convert_to_null(proc_name, gen_value)
 
 
 

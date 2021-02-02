@@ -43,6 +43,12 @@ class GimpProcedure:
         return self._procedure.get_arguments()
 
     @property
+    def return_specs(self):
+        """ Returns list of GParamSpec for return values. """
+        # Method of wrapped Gimp.Procedure
+        return self._procedure.get_return_values()
+
+    @property
     def name(self):
         return self._procedure.get_name()
 
