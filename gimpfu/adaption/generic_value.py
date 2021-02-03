@@ -289,7 +289,7 @@ class FuGenericValue():
         # use any GIMP boxed type, setter doesn't actually use it???
         # TEMP This works but is not general
         # it works only when testing GimpObjectArray
-        contained_gtype = Gimp.Layer.__gtype__
+        contained_gtype = Gimp.Item.__gtype__
 
 
         # setter requires fundamental or GIMP types, not GimpFu wrapped types
@@ -302,7 +302,17 @@ class FuGenericValue():
         else:   # elements are fundamental types
             list = list
 
-        # assert list now is empty or contains unwrapped or fundamental instances
+        """
+        assert list is one of:
+        - empty
+        - contains unwrapped Gimp types
+        - fundamental types
+        - fundamental types that can be converted to Gimp types (e.g. RGB)
+        """
+
+        if to_container_gtype.name == 'GimpRGBArray':
+            list = GimpfuRGB.colors_from_list_of_python_type(list)
+            # assert list is now a list of Gimp.RGB
 
         try:
             # create empty (i.e. no value) GValue of desired type,
@@ -321,6 +331,7 @@ class FuGenericValue():
             Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
             """
             if is_setter_take_contained_type:
+                self.logger.debug(f"Setting array, contained_gtype: {contained_gtype}")
                 gvalue_setter(self._gvalue, contained_gtype, list)
             else:
                 gvalue_setter(self._gvalue, list)
@@ -354,6 +365,10 @@ class FuGenericValue():
     def to_int32_array(self):
         """ Make self's GValue hold a GimpInt32Array created from self.actual_arg"""
         self.to_gimp_array(Gimp.Int32Array.__gtype__, Gimp.value_set_int32_array )
+
+    def to_color_array(self):
+        """ Make self's GValue hold a GimpRGBArray created from self.actual_arg"""
+        self.to_gimp_array(Gimp.RGBArray.__gtype__, Gimp.value_set_rgb_array )
 
 
         # Cruft?

@@ -145,6 +145,8 @@ class GimpfuRGB(Adapter):
     def color_from_python_type(cls, value):
         """ Create a Gimp.RGB from a string or 3-tuple of ints.
 
+        !!! Not a GimpFuRGB, a Gimp.RGB, i.e. an unwrapped Gimp type
+
         Convenience method on the class.
         """
         if isinstance(value, str):
@@ -157,7 +159,21 @@ class GimpfuRGB(Adapter):
             result = GimpfuRGB.create_RGB_from_string("orange")
         return result
 
+    @classmethod
+    def colors_from_list_of_python_type(cls, list):
+        """ Create a list of Gimp.RGB from a list of  string or 3-tuple of ints.
 
+        Convenience method on the class.
+        """
+        result = []
+        try:
+            for item in list:
+                color = GimpfuRGB.color_from_python_type(item)
+                result.append(color)
+        except:
+            proceed(f"Failed to convert list element to Gimp.RGB: {item}.")
+        # assert result is-a list of Gimp.RGB
+        return result
 
 
     '''

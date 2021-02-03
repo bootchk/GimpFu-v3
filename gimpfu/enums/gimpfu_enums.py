@@ -56,13 +56,18 @@ PF_FILENAME    = 1011
 PF_DIRNAME     = 1012
 PF_OPTION      = 1013
 
-# Arrays.  GimpFu has no widgets.  Only useful to declare types of return values.
-#PF_INT8ARRAY   = PDB_INT8ARRAY
-#PF_INT16ARRAY  = PDB_INT16ARRAY
-#PF_INT32ARRAY  = PDB_INT32ARRAY
-#PF_INTARRAY    = PF_INT32ARRAY
-#PF_FLOATARRAY  = PDB_FLOATARRAY
-PF_STRINGARRAY = 1020
+# Arrays.  GimpFu has no widgets for these.  Only useful to declare types of return values.
+PF_INT8ARRAY   = 1020
+PF_INT32ARRAY  = 1021
+PF_INTARRAY    = 1022
+PF_FLOATARRAY  = 1023
+PF_STRINGARRAY = 1024
+PF_GIMP_OBJECT_ARRAY = 1025   # Array of Gimp objects
+PF_GIMP_RGB_ARRAY    = 1026   # Array of Gimp RGB objects (colors)
+
+#PF_INT16ARRAY  = PDB_INT16ARRAY   # Obsolete
+# No plugin can return Gimp.ParamArray or Gimp.ParamObjectArray ???
+# RGBArray ???
 
 
 '''

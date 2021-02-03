@@ -52,6 +52,7 @@ class FormalTypes():
     def is_string_array_type(type_name):   return type_name in ('GimpParamStringArray', 'GimpStringArray' )
     def is_uint8_array_type(type_name):   return type_name in ('GimpParamUInt8Array', 'GimpUInt8Array' )
     def is_int32_array_type(type_name):   return type_name in ('GimpParamInt32Array', 'GimpInt32Array')
+    def is_color_array_type(type_name):   return type_name in ('GimpParamRGBArray', 'GimpRGBArray')
 
     def is_file_descriptor_type(type_name):
         # ??? PDB Browser says 'GFile' but is 'GParamObject'

@@ -11,7 +11,12 @@ def plugin_func(image, drawable):
     return (
         image,
         drawable,
-        ["foo", "bar"]
+        [1, 2],         # 8
+        #[1, 2],         #32
+        [1.01, 2.01],   # float
+        ["foo", "bar"], # str
+        ["black", "white"], # rgb
+        [drawable, drawable] # object
         )
 
 
@@ -29,9 +34,15 @@ register(
           (PF_DRAWABLE, "drawable", "Input drawable", None),
       ],
       [
-          (PF_IMAGE, "image", "Input image", None),
-          (PF_DRAWABLE, "drawable", "Input drawable", None),
-          (PF_STRINGARRAY, "returned_strings", "returned strings", None),
+          (PF_IMAGE,             "image",      "foo", None),
+          (PF_DRAWABLE,          "drawable",   "foo", None),
+          (PF_INT8ARRAY,         "int8array",  "foo", None),
+          #(PF_INT32ARRAY,        "int32array", "foo", None),
+          # (PF_INTARRAY,          "intarray",   "foo", None),    # Why?
+          (PF_FLOATARRAY,        "floatarray", "foo", None),
+          (PF_STRINGARRAY,       "strings",    "foo", None),
+          (PF_GIMP_RGB_ARRAY,    "colors",     "foo", None),
+          (PF_GIMP_OBJECT_ARRAY, "objects",    "foo", None),
       ],
       plugin_func,
       menu="<Image>/Test")

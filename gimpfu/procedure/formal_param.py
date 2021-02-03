@@ -316,7 +316,7 @@ that specifies widget kind and format of extras.
 """
 
 """
-PF_TYPE >> python type or Gimp type
+Map PF_TYPE >> python type or Gimp type
 Many to one.
 !!! We return a string for Gimp types, not an instance of Type.
 
@@ -368,14 +368,22 @@ map_PF_TYPE_to_type = {
     PF_FILENAME:  str,
     PF_DIRNAME:   str,
 
-    #PF_INT8ARRAY   = PDB_INT8ARRAY
-    #PF_INT16ARRAY  = PDB_INT16ARRAY
-    #PF_INT32ARRAY  = PDB_INT32ARRAY
-    #PF_INTARRAY    = PF_INT32ARRAY
-    #PF_FLOATARRAY  = PDB_FLOATARRAY
-    PF_STRINGARRAY: "Gimp.StringArray",
-    # Object, Value
+    # Arrays of primitives (fixed size elements)
+    PF_INT8ARRAY:          "Gimp.Uint8Array",    # ??? GObject.Array or GimpParamSpecUInt8Array
+    PF_INT32ARRAY:         "Gimp.Int32Array",
+    # PF_INTARRAY:           "Gimp.Array",
+    PF_FLOATARRAY:         "Gimp.FloatArray",
 
+    # Arrays of variables size elements
+    PF_STRINGARRAY:        "Gimp.StringArray",
+
+    # Arrays of pointers (fixed size) to Gimp objects
+    # TODO how does this cross the wire protocol?
+    PF_GIMP_OBJECT_ARRAY:  "Gimp.ObjectArray",
+    PF_GIMP_RGB_ARRAY:     "Gimp.RGBArray",
+
+    # Gimp.ValueArray  Only used to receive args and return values
+    # No plugin author can use.
 }
 
 """
@@ -428,5 +436,11 @@ map_PF_TYPE_to_extras_type = {
     PF_OPTION:    3,    # alias for RADIO
 
     # Arrays have no extras
+    PF_INT8ARRAY:   0,
+    PF_INT32ARRAY:  0,
+    PF_INTARRAY:    0,
+    PF_FLOATARRAY:  0,
     PF_STRINGARRAY: 0,
+    PF_GIMP_OBJECT_ARRAY: 0,
+    PF_GIMP_RGB_ARRAY:    0,
 }

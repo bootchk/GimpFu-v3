@@ -183,8 +183,10 @@ class Types():
             gen_value.to_uint8_array()
         elif FormalTypes.is_int32_array_type(formal_arg_type_name):
             gen_value.to_int32_array()
+        elif FormalTypes.is_color_array_type(formal_arg_type_name):
+            gen_value.to_color_array()
         else:
-            Types.logger.info(f"try_array_conversions did NOT convert")
+            Types.logger.info(f"try_array_conversions did NOT convert: {formal_arg_type_name}")
             if isinstance(gen_value.actual_arg, tuple) or isinstance(gen_value.actual_arg, list):
                 Types.logger.warning(f"sequences SHOULD convert to arrays!")
 
