@@ -438,7 +438,6 @@ map_PF_TYPE_to_extras_type = {
     # Arrays have no extras
     PF_INT8ARRAY:   0,
     PF_INT32ARRAY:  0,
-    PF_INTARRAY:    0,
     PF_FLOATARRAY:  0,
     PF_STRINGARRAY: 0,
     PF_GIMP_OBJECT_ARRAY: 0,

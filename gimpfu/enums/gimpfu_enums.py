@@ -16,18 +16,18 @@ v3 At import time, we don't have access to Gimp types yet.  Define PF enum witho
 
 We don't use Python 3 enum class FBC.
 '''
-PF_INT8        = 1
-PF_INT16       = 2
+PF_INT8        = 1  # Should be UINT8
+PF_INT16       = 2  # Should be obsolete
 PF_INT32       = 3
 PF_INT         = 4
 PF_FLOAT       = 5
 PF_STRING      = 6
-PF_VALUE       = 7
+PF_VALUE       = 7  # ??? Meaning ???
 
 
 
 PF_COLOR       = 8
-PF_COLOUR      = 9
+PF_COLOUR      = 9  # FBC, an alias
 PF_ITEM        = 10
 PF_DISPLAY     = 11
 PF_IMAGE       = 12
@@ -35,6 +35,7 @@ PF_LAYER       = 13
 PF_CHANNEL     = 14
 PF_DRAWABLE    = 15
 PF_VECTORS     = 16
+
 #PF_SELECTION   = PDB_SELECTION
 #PF_BOUNDARY    = PDB_BOUNDARY
 #PF_PATH        = PDB_PATH
@@ -57,17 +58,17 @@ PF_DIRNAME     = 1012
 PF_OPTION      = 1013
 
 # Arrays.  GimpFu has no widgets for these.  Only useful to declare types of return values.
+
+# PF_INTARRAY Obsolete.  Could be an alias for INT32 FBC, but it was never defined in v2
+# PF_INT16ARRAY  was never defined in v2, and won't be implemented in v3
+# No plugin can return Gimp.ParamArray or Gimp.ParamObjectArray ???
+
 PF_INT8ARRAY   = 1020
 PF_INT32ARRAY  = 1021
-PF_INTARRAY    = 1022
 PF_FLOATARRAY  = 1023
 PF_STRINGARRAY = 1024
 PF_GIMP_OBJECT_ARRAY = 1025   # Array of Gimp objects
 PF_GIMP_RGB_ARRAY    = 1026   # Array of Gimp RGB objects (colors)
-
-#PF_INT16ARRAY  = PDB_INT16ARRAY   # Obsolete
-# No plugin can return Gimp.ParamArray or Gimp.ParamObjectArray ???
-# RGBArray ???
 
 
 '''

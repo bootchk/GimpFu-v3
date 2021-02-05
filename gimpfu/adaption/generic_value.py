@@ -27,12 +27,16 @@ import logging
 class FuGenericValue():
     '''
     A (type, value) that holds any ('generic') value.
-    A thin class around Gimp.Value aka the C GValue struct.
+    A thin class around GObject.Value aka the C GValue struct.
 
     Adapts Python types to GTypes.
 
     Stateful:
     Operations in this sequence:  init, apply conversions and upcasts, get_gvalue
+    That is, initially the owned GValue is None.
+    Then, any conversions/upcasts may set owned GValue.
+    Finally, a call to get_gvalue will return the set owned GValue,
+    or create a GValue to return.
 
     In type is a GType or Python type.
     Result type is also GType or Python type.
@@ -42,7 +46,7 @@ class FuGenericValue():
     - performing conversions and Upcasts
     - produce a Gvalue
 
-    Is not a singleton, but only one is ever in use.
+    Is not a singleton.
     '''
 
 
@@ -67,7 +71,7 @@ class FuGenericValue():
                          str(self._result_arg), str(self._result_arg_type),
                          str(self._did_convert), str(self._did_upcast) ))
 
-
+    # TODO rename getWrappedGValue
     def get_gvalue(self):
         '''
         Return Gimp.Value for original arg with all conversions and upcasts applied.
@@ -267,8 +271,15 @@ class FuGenericValue():
 
         One setter (Gimp.value_set_object_array) has extra arg: contained_gtype.
         """
-        self.logger.info(f"to_gimp_array {to_container_gtype}")
+        self.logger.info(f"to_gimp_array type: {to_container_gtype}")
+        #self.logger.info(f"to_gimp_array type of type: {type(to_container_gtype)}")
+        # prints: <class 'gobject.GType'>
+        #print(dir(to_container_gtype))
+        #print(dir(GObject.GType))
+        #foo =GObject.GType.from_name("GimpObjectArray")
+        #self.logger.info(f"to_gimp_array type of type: {type(foo)}")
 
+        # require a list to create an array
         try:
             list = self.sequence_for_actual_arg()
         except Exception as err:
@@ -299,8 +310,7 @@ class FuGenericValue():
             # But unwrap_homogenous_sequence doesn't require it.
             # unwrap_homogenous_sequence does check each item is same unwrapped type
             list = Marshal.unwrap_homogenous_sequence(list)
-        else:   # elements are fundamental types
-            list = list
+        # else list elements are fundamental types
 
         """
         assert list is one of:
@@ -314,12 +324,19 @@ class FuGenericValue():
             list = GimpfuRGB.colors_from_list_of_python_type(list)
             # assert list is now a list of Gimp.RGB
 
+        # Require a GObject.Value to holds a boxed Gimp type
         try:
             # create empty (i.e. no value) GValue of desired type,
             self._gvalue = GObject.Value (to_container_gtype)
+            # Maybe ??? self._gvalue = GObject.Value (GObject.GBoxed)
+        except Exception as err:
+            proceed(f"Fail to create GObject.Value for array: {err}.")
 
+
+        try:
             """
-            Invoke Gimp's setter to set value into GValue
+            Invoke Gimp's setter to set value into GValue.
+            Invoking via GI i.e. gvalue_setter is-a callable.
 
             We are calling e.g. Gimp.value_set_object_array()
             whose C signature is like (...len, array...)
@@ -331,9 +348,17 @@ class FuGenericValue():
             Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
             """
             if is_setter_take_contained_type:
-                self.logger.debug(f"Setting array, contained_gtype: {contained_gtype}")
+                # Fail GObject.Type.ensure(GimpObjectArray)
+                # Fail GObject.GType.is_a(Gimp.ObjectArray)
+                self.logger.debug(f"Setting array of type: {to_container_gtype.name}, contained_gtype: {contained_gtype}")
+                # !!! Must pass a __gtype__, not a Python type
+                # assert contained_gtype is-a GObject.GType
+                assert isinstance(contained_gtype, GObject.GType)
                 gvalue_setter(self._gvalue, contained_gtype, list)
+                #foo = self._gvalue.get_boxed() # Gvalue should hold a boxed type
+                #print(foo.__gtype__ )
             else:
+                self.logger.debug(f"Setting array of type: {to_container_gtype.name}")
                 gvalue_setter(self._gvalue, list)
             self._did_create_gvalue = True
             self._did_convert = True

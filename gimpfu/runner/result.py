@@ -5,12 +5,12 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-# For GLib.Error()
-# ??? Require 2.32 for GArray instead of GValueArray
-from gi.repository import GLib
+from gi.repository import GLib  # For GLib.Error()
+from gi.repository import GObject
 
 from adaption.marshal import Marshal
 from adaption.generic_value import FuGenericValue
+from runner.resultArray import FuResultArray
 
 import logging
 from collections.abc import Iterable
@@ -63,10 +63,13 @@ class FuResult():
 
 
     @staticmethod
-    def len_actual_result(actual_result):
-        """ Length of a Python instance that is None, a single item, or a sequence. """
+    def lenActualResult(actual_result):
+        """ Length of a Python instance that is None, a single item, or a sequence.
+        A Python func can return a tuple.
+        """
+        # TODO this is wrong
         if actual_result is None:
-            result = 0
+            result = 1
         elif isinstance(actual_result, Iterable) and not isinstance(actual_result, str):
             result = len(actual_result)
         else :
@@ -74,131 +77,181 @@ class FuResult():
         return result
 
     @staticmethod
-    def do_formal_and_actual_results_len_match(formal_result, actual_result):
+    def doFormalAndActualResultsLenMatch(formalResultLength, actual_result):
         """
-        formal_result is-a Gimp.ValueArray
+        Is the length of the result of the run_func OK?
+
+        Note that a single result of None is wrong only when the procedure
+        declared it would return more than one value.
+        In Python, there is no concept of a procedure that returns no value whatsoever.
+        A run_func returning None matches a PDB procedure returning no values.
+
+        In Gimp, there is no general concept of a value that is not nullable.
+        When None is a result, we do conversions to e.g. -1
+        to indicate that a None was returned
+        (where we can reasonably infer the value should be not nullable. )
+
+        formalResultLength is-a unsigned int
         Subtract one for status in first element.
         """
-        return FuResult.len_actual_result(actual_result) == formal_result.length() - 1
+        # TODO this is wrong
+        return FuResult.lenActualResult(actual_result) == formalResultLength
 
 
     @staticmethod
-    def insertResultOfTypeIntoResultsAt(result, formalType, results, targetIndex):
+    def setResultOfTypeIntoResults(result, formalType, results):
         """
-        Insert an elementary result into a resultArray
-
-        Note resultArray is a Gimp.ValueArray, whose convenience methods
-        are only for the values, not for GValues!!!
-        This is not correct:
-           gvalue = resultArray.index(targetIndex)   does not return a GValue
-           gvalue.set_value(item)
-        There is no method resultArray.get_type(index)
+        Set a result into a FuResultArray
 
         The result may be:
         - a primitive,
         - a wrapped Gimp type
         - a list of primitive (FloatArray)
         - a list of wrapped Gimp types (Gimp.ObjectArray)
-        GimpFu also allows result primitive to be a convertable type
+
+        GimpFu allows result primitive to be a convertable type
         e.g. an int where a float is required.
+        Try conversions here to achieve formalType if possible.
         """
         FuResult.logger.info(f"Required formal type of result: {formalType}")
 
         unwrappedResult = Marshal.unwrap(result)
-        FuResult.logger.info(f"result {targetIndex} of type: {type(unwrappedResult)}")
+        FuResult.logger.info(f"result of type: {type(unwrappedResult)}")
 
         # Use our GValue wrapper to do conversions of unwrapped result
         tempGValue = FuGenericValue(unwrappedResult, type(unwrappedResult))
         tempGValue.tryConversionsAndUpcasts(formalType)
 
-        # FuGenericValue owns a Gobject.Value
-        # Insert that into the resultArray.
-        # resultArray is a Gimp.ValueArray of Gimp.Value.
-        # Its not clear whether the resultArray already holds a Gimp.Value
-        # nor whether the insert() will fail if the types don't match.
         finalValue = tempGValue.get_gvalue()
-        FuResult.logger.info(f"insert final value {finalValue}")
-        results.insert(targetIndex, finalValue)
+        FuResult.logger.info(f"final value {finalValue}")
 
+        """
+        OLD
+        destValue = results.index(targetIndex)
+        print(type(destValue))
+        assert isinstance(destValue, GObject.Value)
+        # Copy converted value from our GValue into destination GValue in result
+        finalValue.copy(destValue)
+        """
+        results.append(finalValue)
+
+
+    """
+    Notes on new_return_values()
+
+    Returns a Gimp.ValueArray,
+    which is-a array of GObject.Value (aka GValue in C aka "generic value")
+    Length is count of procedure's registered return values plus one for status.
+    First item is a status (type Gimp.PDBStatusType)
+    Any other items are GObject.Value
+    - whose value is Nones, until we set them,
+    - whose type is the type the procedure registered
+      (a GObject.Value knows its own type.)
+    See GIR docs for Gimp:
+    - section: Structs, item: Gimp.ValueArray
+    - section: Classes, item: Gimp.Procedure
+    """
 
     @staticmethod
     def makeSuccess(procedure, runfuncResult=None):
         """
-        Make a result for a PDB procedure, i.e. a GimpValueArray:
-        - whose first element is a PDB_STATUS
-        - and whose other elements have types matching registered return value types
+        Make a result for a PDB procedure, as described above
 
         Require runfuncResult is some Python object, or None
 
         status == SUCCESS not imply runfuncResult is not None:
-        a procedure returning void returns result==None.
+        Since this is Python, the run_func for a PDB procedure declared returning void
+        returns result==None.
+
+        Check for wrong count of results from runfunc.
+        Check runfunc actual result types match declared formal types,
+        after trying to convert/upcast.
         """
         assert isinstance(procedure, Gimp.Procedure) # !!! Not our GimpProcedure wrapper
+        FuResult.logger.info(f"procedure: {procedure.get_name()}, runfuncResult is: {runfuncResult}")
+        # FuResult.logger.info(f"result length: {resultArray.length()}")
 
-        # No GLib.Error when SUCCESS
-        # error = FuResult.makeGLibError(Gimp.PDBStatusType.SUCCESS)
-        resultArray = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS)
-        """
-        assert resultArray is-a Gimp.ValueArray, which is NOT a GArray of GValue.
-        Length is count of procedure's registered return values plus one for status.
-        First item is a status with value taken from error which is type GLib.Error
-        Any other items are have None values, until we set them.
-        """
-        #FuResult.logger.info(f"resultArray is: {resultArray}")
-        assert isinstance(resultArray, Gimp.ValueArray)
-        #FuResult.logger.info(f"resultArray[0] is: {resultArray.index(0)}")
-        assert isinstance(resultArray.index(0), Gimp.PDBStatusType)
-
+        # Get formal specs
         resultSpecs = procedure.get_return_values()
         """
         assert resultSpecs is-a list of GParamSpec.
         assert len(resultSpecs) == len(runfuncResult)
         """
+        formalLength = len(resultSpecs)
+        FuResult.logger.info(f"length formal results is: {formalLength}")
 
-        # see GIR docs for Gimp, section: Structs, item: Gimp.ValueArray
-        FuResult.logger.info(f"result length: {resultArray.length()}")
+        if not FuResult.doFormalAndActualResultsLenMatch(formalLength, runfuncResult):
+            return FuResult.makeWrongLengthReturned(procedure)
 
-        if not FuResult.do_formal_and_actual_results_len_match(resultArray, runfuncResult):
-            FuResult.logger.warning(f"run func returned wrong count of results")
-            # TODO make an Exception result rather than return mixed results
+        """
+        OLD
+        # No need to make a GLib.Error when SUCCESS
+        # Not:  error = FuResult.makeGLibError(Gimp.PDBStatusType.SUCCESS)
+        resultArray = procedure.new_return_values(Gimp.PDBStatusType.SUCCESS)
+        FuResult.logger.info(f"out result length: {resultArray.length()}")
+        """
+        resultArray = FuResultArray(formalLength)
 
-            # TODO preflight the procedure formal OUT args versus author's run func return
-            # Will Python tell us the types of a callable's results?
+        # Gimp.ValueArray.index is broken and returns the GValue.value, not the GValue
 
-        FuResult.logger.info(f"runfuncResult is: {runfuncResult}")
+        # TODO a single result that is a list should be nested like ((1)) ???
+        # We must contain the result before this so we know it is always a sequence
 
-        # TODO a result that is a list should be nested like ((1)) ???
-        length = FuResult.len_actual_result(runfuncResult)
-        if length >= 1:
-            targetIndex = 1  # Start past the status item
+        if formalLength == 0:
+            # procedure declared returning void
+            # assert we already checked that actual result was None
+            # ensure status is set to "SUCCESS"
+            return resultArray
 
-            if length >1:
-                for item in runfuncResult:
-                    formalType = resultSpecs[targetIndex-1].value_type
-                    FuResult.insertResultOfTypeIntoResultsAt(item, formalType, resultArray, targetIndex)
-                    targetIndex += 1
-            else:
-                # runfuncResult is elementary, not iterable
-                # TODO it could still be a list, where formal result type is array?
-                formalType = resultSpecs[0]
-                FuResult.insertResultOfTypeIntoResultsAt(runfuncResult, formalType, resultArray, targetIndex, )
-        # else void result (except for PDB status)
+        # Put actual results into resultArray
 
-        assert isinstance(resultArray, Gimp.ValueArray)
+        # TODO ensure runFuncResult is an iterable, always iterate
+        length = FuResult.lenActualResult(runfuncResult)
+        if length > 0:
+            index = 0
+            for item in runfuncResult:
+                formalType = resultSpecs[index].value_type
+                FuResult.setResultOfTypeIntoResults(item, formalType, resultArray)
+                index += 1
+        else:
+            # runfuncResult is elementary, not iterable
+            # TODO it could still be a list, where formal result type is array?
+            formalType = resultSpecs[0].value_type
+            FuResult.setResultOfTypeIntoResults(runfuncResult, formalType, resultArray)
+
         # This log conveys little info
         #FuResult.logger.info(f"resultArray is: {resultArray}")
+        return resultArray.getWrappedValueArray()
+
+
+
+
+    @staticmethod
+    def makeBad(procedure, status, message) :
+        """
+        Make return values for "not success".
+
+        status is type Gimp.PDBStatusType
+        message is a string
+        """
+        error = FuResult.makeGLibError(status, message)
+        resultArray = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, error)
+        # ensure resultArray is-a Gimp.ValueArray whose first element is a GLib.Error??
+        # ensure length of resultArray is length the procedure formal declared ???
         return resultArray
 
+
+    # Convenience methods on makeBad
 
     @staticmethod
     def makeException(procedure, err_message) :
-        error = FuResult.makeGLibError(Gimp.PDBStatusType.EXECUTION_ERROR, err_message)
-        resultArray = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, error)
-        return resultArray
+        return FuResult.makeBad(procedure, Gimp.PDBStatusType.EXECUTION_ERROR, err_message)
 
     @staticmethod
     def makeCancel(procedure) :
-        pdbStatus = Gimp.PDBStatusType.CANCEL
-        error = FuResult.makeGLibError(pdbStatus, "User canceled.")
-        resultArray = procedure.new_return_values(pdbStatus, error)
-        return resultArray
+        return FuResult.makeBad(procedure, Gimp.PDBStatusType.CANCEL, "User canceled.")
+
+    @staticmethod
+    def makeWrongLengthReturned(procedure) :
+        return FuResult.makeBad(procedure, Gimp.PDBStatusType.EXECUTION_ERROR,
+            "Runfunc returned wrong count of results.")

@@ -50,7 +50,8 @@ class FormalTypes():
     def is_object_array_type(type_name): return type_name in ('GimpParamObjectArray', 'GimpObjectArray')
     def is_float_array_type(type_name):   return type_name in ('GimpParamFloatArray', 'GimpFloatArray')
     def is_string_array_type(type_name):   return type_name in ('GimpParamStringArray', 'GimpStringArray' )
-    def is_uint8_array_type(type_name):   return type_name in ('GimpParamUInt8Array', 'GimpUInt8Array' )
+    # !!! Uint8, not UInt8
+    def is_uint8_array_type(type_name):   return type_name in ('GimpParamUInt8Array', 'GimpUint8Array' )
     def is_int32_array_type(type_name):   return type_name in ('GimpParamInt32Array', 'GimpInt32Array')
     def is_color_array_type(type_name):   return type_name in ('GimpParamRGBArray', 'GimpRGBArray')
 

@@ -187,6 +187,7 @@ class Types():
             gen_value.to_color_array()
         else:
             Types.logger.info(f"try_array_conversions did NOT convert: {formal_arg_type_name}")
+            Types.logger.info(f"Check GimpFu code for typos in type names.")
             if isinstance(gen_value.actual_arg, tuple) or isinstance(gen_value.actual_arg, list):
                 Types.logger.warning(f"sequences SHOULD convert to arrays!")
 
