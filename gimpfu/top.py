@@ -19,10 +19,11 @@
 
 """
 Simple interface to write GIMP plug-ins in Python.
-An alternative is to use GObject Introspection
-and a template plugin that does not import GimpFu.
+An alternative is to use GObject Introspection and not import GimpFu.
 
-GimpFu provides a simple register() function that registers your plug-in.
+GimpFu provides a simpler API, only two methods:
+   register() to register your plug-in
+   main() to enter the machinery for plugins when your plugin is executed.
 
 Gimp will call your plug-in function as needed.
 Gimp will also show a dialog to let a user edit plug-in
@@ -34,7 +35,8 @@ when a user runs your plug-in interactively.
 All these features are provided by Gimp, whether or not you use GimpFu,
 since Gimp 3.
 
-When registering the plug-in, you need not specify the run_type parameter.
+The register() function of GimpFu is similar to the Gimp methods
+for registering a plugin, but simplified.
 
 A typical gimpfu plug-in would look like this:
   from gimpfu import *
@@ -90,10 +92,10 @@ your choice to make a new sub-menu.
 Omitting the menu path description is deprecated (highly discouraged).
 "*" denotes image_types the plugin will accept, from a small set:
 "RGB", "RGBA", "RGB*", "GRAY", "GRAYA", "GRAY*"
+
 TODO or a tuple???
 TODO return values.
 TODO domain
-
 
 To localize your plug-in, add an optional domain parameter to
 the register call. It can be the name of the translation domain or a
@@ -110,41 +112,44 @@ Notations used in the comments:
 'Author' denotes a writer of plugins, not a programmer of this code
 """
 
-# Using GI, convention is first letter capital e.g. "Gimp."
-# FBC GimpFu provides uncapitalized aliases in the namespace: "gimp" and "pdb"
+"""
+This is a discusssion about what we import and expose in the Author's namespace.
+An author uses "from gimpfu import *" which gets everything here.
+!!! By design, we limit what we expose.
+These are judgement calls, and may change.
+FBC we may expose more than we would if a complete redesign.
 
-# GimpFu attempts to hide GI, but GimpFu plugins MAY also use GI.
+We expose the GimpFu API: (consider these as keywords, or primary phrases)
+   - register()
+   - main()
+   - pdb and gimp instances (aliases)
+   - GimpFu enums (e.g. PF_)
+   - GimpFu aliases for Gimp enums (e.g. )
+   - i18n methods (gettext)
 
+We do NOT expose:  (Authors must import themselves)
+- GI, but Author's plugins MAY use GI.  GimpFu heavily uses GI.
+- math i.e. "import math" although v2 did
 
-# Expose to Authors: math.  v2 did? v3, Authors must import it themselves
-# v2 import math
+TODO should warn(), fail() be in the API?  gimp.message will already work.
+TODO v2 import gimpcolor
+TODO v2 class error(RuntimeError): pass
+TODO v2 class CancelError(RuntimeError): pass
+"""
+
+#
 
 #print("gimpfu_top begin imports")
-import sys
-
-'''
-Expose to authors: GI
-GI is also heavily used by GimpFu
-'''
-import gi
-
-gi.require_version("Gimp", "3.0")
-from gi.repository import Gimp
-from gi.repository import Gio
-# from gi.repository import GObject   # for g_param_spec and properties
 
 
-# imports  for implementation.  Intended to be private from Authors
-from gimpfu.runner.runner import FuRunner
+# implementation of register() requires FuProcedure
 from gimpfu.procedure.procedure import FuProcedure
-from gimpfu.procedure.procedure_creator import FuProcedureCreator
 from gimpfu.procedures.procedures import FuProcedures
 
 
-
+# TODO should this be exposed?
 from gimpfu.logger.logger import FuLogger
-logger = FuLogger.get_logger()
-
+logger = FuLogger.getGimpFuLogger()
 
 
 '''
@@ -163,23 +168,24 @@ from gimpfu.enums.gimpenums import *
 ''' Expose to Authors: GimpFu enums e.g. PF_INT '''
 from gimpfu.enums.gimpfu_enums import *
 
-# v2 import gimpcolor
-
 
 
 '''
-Expose to Authors : alias symbols "gimp" and "pdb" to
+Expose to Authors : alias symbols "gimp" and "pdb"
 It is not as simple as:
     pdb=Gimp.get_pdb()
     OR from gi.repository import Gimp as gimp
 These are adapters.
+
+Using GI, convention is first letter capital e.g. "Gimp."
+"Gimp" symbol is NOT equivalent to the "gimp" symbol,
+but they have similar methods/attributes.
 '''
 from gimpfu.aliases.pdb import GimpfuPDB
 pdb = GimpfuPDB()
 
 from gimpfu.aliases.gimp import GimpfuGimp
 gimp = GimpfuGimp()
-
 
 
 
@@ -217,21 +223,6 @@ def override_gettext_install(name, locale, **kwargs):
 gettext.install = override_gettext_install
 '''
 
-# v2 cruft
-#class error(RuntimeError): pass
-#class CancelError(RuntimeError): pass
-
-
-
-
-"""
-The GimpFu API: (consider these as keywords, or primary phrases)
-   - register()
-   - main()
-   - pdb instance
-   - gimp instance
-"""
-# TODO should warn(), fail() be in the API?  gimp.message will already work.
 
 '''
 Register locally with GimpFu, not with Gimp.
@@ -244,7 +235,7 @@ def register(proc_name, blurb, help, author, copyright,
             menu=None, domain=None, on_query=None, on_run=None):
     """ GimpFu method that registers a plug-in. May be called many times from same source file."""
 
-    logger.info(f"register procedure: {proc_name}")
+    logger.info(f"register() called with: {proc_name}")
 
     gf_procedure = FuProcedure(proc_name, blurb, help, author, copyright,
                             date, label, imagetypes,
@@ -258,11 +249,21 @@ def register(proc_name, blurb, help, author, copyright,
 
 def main():
     """Authors should call this after register()."""
-    logger.info('GimpFu main called')
-    Gimp.main(GimpFu.__gtype__, sys.argv)
+    logger.info('main() called')
+
+    # Late imports so not in Author's namespace
+    import sys
+    import gi
+    gi.require_version("Gimp", "3.0")
+    from gi.repository import Gimp
+    from gimpfu.plugin import FuPlugin
+
+    # !!! Pass a GType which is a class defining a plugin, that Gimp will instantiate.
+    Gimp.main(FuPlugin.__gtype__, sys.argv)
     """
     Gimp will put this plugin in the PDB,
-    and eventually call "function" the so-called "run func" when this plugin is invoked
+    and eventually call registered "function"
+    the so-called "run func" when this plugin is invoked
     either from the GUI or from another plugin.
     The actual method that Gimp will call is
     a method of FuRunner (see runner.py)
@@ -312,101 +313,3 @@ def _query():
         if on_query:
             on_query()
 """
-
-
-
-
-
-
-
-
-
-'''
-See header comments for type Gimp.Plugin in Gimp docs or Gimp C code.
-
-A plugin must define (but not instantiate) a subclass of Gimp.Plugin.
-GimpFu is a subclass of Gimp.Plugin.
-At runtime, only methods of such a subclass have access to Gimp and its PDB.
-
-GimpFu is wrapper.
-Has no properties itself.
-More generally (unwrapped) properties  represent params (sic arguments) to ultimate plugin.
-
-_run() above wraps Authors "function" i.e. ultimate plugin method,
-which is referred to as "run_func" here and in Gimp documents.
-
-All methods are invoked (callbacks) from Gimp.
-Callbacks occur:
-- at Gimp startup: do_query_procedures() and do_create_procedure()
-- at Gimp execution time:  the <run method chain>
-   - when user interacts with Gimp GUI (INTERACTIVE)
-   - when another plugin calls a plugin (NONINTERACTIVE)
-
- The <run method chain>:
-    Gimp invokes the run_func registered for the procedure.
-    That is some method that Gimpfu has registered such as _run_imageprocedure.
-    Thus the call chain is:  Gimp => _run_imageprocedure() or similar => _run()  => <the Authors function>()
-    The middle two are wrappers of the Authors function, and manipulate the args for GimpFu purposes.
-
-TODO: Gimp calls all methods from C code using GI after starting the Gimp interpreter?
-
-TODO: why do we not provide concrete implementation of virtual methods: init_procedures() and quit() ?
-'''
-
-class GimpFu (Gimp.PlugIn):
-
-    # See prop_holder.py for GProperty stuff
-
-    ## GimpPlugIn virtual methods ##
-    '''
-    Called at install time,
-    OR when ~/.config/GIMP/2.99/pluginrc (a cache of installed plugins) is being recreated.
-    '''
-    def do_query_procedures(self):
-        logger.info("do_query_procedures")
-
-        # TODO Why set the locale again?
-        # Maybe this is a requirement documented for class Gimp.Plugin????
-        self.set_translation_domain("Gimp30-python",
-                                    Gio.file_new_for_path(Gimp.locale_directory()))
-
-        # return list of all procedures implemented in the Authors source code
-        # For testing: result =[ gf_procedure.name, ]
-        keys = FuProcedures.names()
-        # keys is not a list in Python 3
-
-        # Ensure result is GLib.List () (a Python list suffices)
-        result = list(keys)
-
-        return result
-
-
-    '''
-    "run-mode"
-
-    Gimp docs says that Gimp calls this back when plugin is executed.
-    ??? But it seems to be called back at installation time also,
-    once per call of do_query_procedures.
-
-    In the GimpFu source code: at a call to main(), which calls Gimp.main(), which calls back.
-    Thus in the source code AFTER the calls to GimpFu register().
-    Thus the GimpFu plugin is GimpFu registered in the local cache.
-    It also was registered with Gimp (at installation time.)
-    '''
-
-
-    def do_create_procedure(self, name):
-
-        logger.info (f"do_create_procedure: {name}")
-
-        # We need the kind of plugin, and to ensure the passed name is know to us
-        gf_procedure = FuProcedures.get_by_name(name)
-
-        # pass all the flavors of wrapped_run_funcs
-        procedure = FuProcedureCreator.create(self, name, gf_procedure,
-            FuRunner.run_imageprocedure,
-            FuRunner.run_context_procedure,
-            FuRunner.run_other_procedure)
-
-        # ensure result is-a Gimp.Procedure
-        return procedure

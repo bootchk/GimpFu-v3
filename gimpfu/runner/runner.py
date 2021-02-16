@@ -51,7 +51,7 @@ class FuRunner:
             result = function(*args)
         except:
             # Show dialog here, or pass exception string back to Gimp???
-            from gui.exception_dialog import ExceptionDialog
+            from gimpfu.gui.exception_dialog import ExceptionDialog
 
             ExceptionDialog.show(proc_name)
 

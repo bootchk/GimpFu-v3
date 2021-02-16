@@ -2,14 +2,12 @@
 
 import gi
 from gi.repository import GObject
+gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 from gimpfu.enums.gimpfu_enums import *
 
 from gimpfu.procedure.prop_holder_factory import PropHolderFactory
-
-# TODO not used
-import sys
 
 from gimpfu.message.deprecation import Deprecation
 from gimpfu.message.proceed_error import proceed

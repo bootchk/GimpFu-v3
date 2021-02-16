@@ -7,7 +7,7 @@ import os
 """
 Logging for Gimpfu
 
-Only used by gimpfu_top.
+Only used by top.py
 Other modules import logging and do like:
 logger = logging.getLogger("GimpFu.MarshalPDB")
 
@@ -18,7 +18,7 @@ recipe https://docs.python.org/3/howto/logging-cookbook.html#logging-cookbook
 class FuLogger:
 
     @staticmethod
-    def get_logger():
+    def getGimpFuLogger():
         """ Initialize and return the root logger for GimpFu. """
 
         logger = logging.getLogger('GimpFu')
