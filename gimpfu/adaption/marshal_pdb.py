@@ -11,7 +11,7 @@ from gimpfu.adaption.generic_value import FuGenericValue
 
 from gimpfu.gimppdb.gimppdb import GimpPDB
 
-from gimpfu.message.proceed_error import proceed
+from gimpfu.message.proceed import proceed
 
 import logging
 

@@ -7,7 +7,7 @@ from gi.repository import GObject    # GObject type constants
 
 from gimpfu.adaption.formal_types import FormalTypes
 from gimpfu.gimppdb.gimppdb import GimpPDB
-from gimpfu.message.proceed_error import proceed
+from gimpfu.message.proceed import proceed
 
 import logging
 

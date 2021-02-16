@@ -55,8 +55,8 @@ framestack is usually a sequence of frameinfo's like this:
 (this for the case where plugin source and gimpfu source all in /plug-ins/ directory)
 filename                                  code_context               what the code is
 ---------------------------------------------------------------------------------
-.../plug-ins/gimpfu/message.proceed_error.py   framestack.inspect(stack)  the current line from this source file
-.../plug-ins/gimpfu/message.proceed_error.py   source_text=...            the calling line
+.../plug-ins/gimpfu/message.proceed.py   framestack.inspect(stack)  the current line from this source file
+.../plug-ins/gimpfu/message.proceed.py   source_text=...            the calling line
 ...
 .../plug-ins/gimpfu/gimpfu.py             <something>                lines from gimpfu source
 ...

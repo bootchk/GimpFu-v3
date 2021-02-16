@@ -4,7 +4,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 from gimpfu.adaption.wrappable import *    # is_subclass_of_type
-from gimpfu.message.proceed_error import proceed
+from gimpfu.message.proceed import proceed
 
 import logging
 

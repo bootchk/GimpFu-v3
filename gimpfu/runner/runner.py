@@ -9,7 +9,7 @@ from gimpfu.procedures.procedures import FuProcedures
 
 from gimpfu.adaption.marshal import Marshal
 
-from gimpfu.message.proceed_error import *
+from gimpfu.message.proceed import summarize_proceed_errors
 from gimpfu.message.deprecation import Deprecation
 from gimpfu.message.suggest import Suggest
 

@@ -1,7 +1,7 @@
 
 
 
-from gimpfu.message.proceed_error import  proceed
+from gimpfu.message.proceed import  proceed
 from gimpfu.message.deprecation import Deprecation
 
 from gimpfu.procedure.formal_params import FuFormalParams

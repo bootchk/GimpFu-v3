@@ -15,7 +15,7 @@ from gimpfu.adapters.vectors import GimpfuVectors
 from gimpfu.adapters.rgb import GimpfuRGB
 from gimpfu.adapters.display import GimpfuDisplay
 
-from gimpfu.message.proceed_error import *
+from gimpfu.message.proceed import proceed
 
 import logging
 

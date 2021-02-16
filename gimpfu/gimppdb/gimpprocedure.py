@@ -4,7 +4,7 @@ from gi.repository import Gimp
 from gi.repository import GObject   # types
 
 from gimpfu.gimppdb.runmode import RunMode
-from gimpfu.message.proceed_error import proceed
+from gimpfu.message.proceed import proceed
 
 import logging
 
@@ -146,7 +146,7 @@ class GimpProcedure:
         for argument with ordinal: index.
         Returns an instance of GParamSpec
         '''
-        # not require index is in range (will proceed_error)
+        # not require index is in range (will proceed)
 
         arg_specs = self.argument_specs    # some docs say it returns a count
         # assert arg_specs is-a list of GParamSpec
@@ -180,7 +180,7 @@ class GimpProcedure:
         for argument with ordinal: index.
         Returns an instance of GType e.g. GObject.TYPE_INT
         '''
-        # not require index is in range (will proceed_error)
+        # not require index is in range (will proceed)
 
         arg_spec = self.get_formal_argument_spec(index)
 

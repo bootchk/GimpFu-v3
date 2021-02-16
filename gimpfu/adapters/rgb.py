@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from gimpfu.message.proceed_error import *
+from gimpfu.message.proceed import proceed
 
 from gimpfu.adapters.adapter import Adapter
 

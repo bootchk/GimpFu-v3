@@ -10,7 +10,7 @@ from gi.repository import Gio   # Gio.File
 
 from gimpfu.adapters.rgb import GimpfuRGB
 
-from gimpfu.message.proceed_error import proceed
+from gimpfu.message.proceed import proceed
 from gimpfu.message.suggest import Suggest
 
 from gimpfu.adaption.formal_types import FormalTypes

@@ -10,7 +10,7 @@ from gimpfu.adaption.types import Types
 from gimpfu.adaption.value_array import FuValueArray
 from gimpfu.adaption.generic_value import FuGenericValue
 
-from gimpfu.message.proceed_error import proceed
+from gimpfu.message.proceed import proceed
 
 import logging
 

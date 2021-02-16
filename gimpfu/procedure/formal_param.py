@@ -10,7 +10,7 @@ from gimpfu.enums.gimpfu_enums import *
 from gimpfu.procedure.prop_holder_factory import PropHolderFactory
 
 from gimpfu.message.deprecation import Deprecation
-from gimpfu.message.proceed_error import proceed
+from gimpfu.message.proceed import proceed
 
 
 import logging

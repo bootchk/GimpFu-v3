@@ -18,7 +18,7 @@ from gimpfu.adaption.marshal import Marshal
 from gimpfu.adaption.wrappable import *
 from gimpfu.adaption.compatibility import gimp_name_map
 
-from gimpfu.message.proceed_error import *
+from gimpfu.message.proceed import proceed
 
 import logging
 
@@ -185,7 +185,7 @@ class GimpfuGimp():
     Rare: see crop_flatten_save.py.
     Most authors just use 'pdb.foo()'
     I.E. can we make 'pdb' appear in the 'gimp' namespace,
-    or just obsolete it?  See proceed_error below.
+    or just obsolete it?  See proceed below.
     '''
 
     def __getattr__(self, name):

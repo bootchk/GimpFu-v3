@@ -8,7 +8,7 @@ from gi.repository import GObject    # marshalling
 from gimpfu.adaption.marshal_pdb import MarshalPDB
 from gimpfu.adaption.compatibility import pdb_name_map
 
-from gimpfu.message.proceed_error import *
+from gimpfu.message.proceed import proceed
 
 import logging
 
