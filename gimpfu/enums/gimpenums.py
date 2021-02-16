@@ -91,15 +91,26 @@ Search the GimpFu v2 code for abberant enum definitions.
 Insert code to define them.
 '''
 
-import gi
-gi.require_version("Gimp", "3.0")
-from gi.repository import Gimp
+import logging
+module_logger = logging.getLogger('GimpFu.gimpenums')
+
+
+"""
+Log before, and try.
+Because this is the first import from gi
+and may indicate errors in environment or installation.
+"""
+module_logger.info("from gi.repository import Gimp")
+try:
+    import gi
+    gi.require_version("Gimp", "3.0")
+    from gi.repository import Gimp
+except:
+    raise RuntimeError("Failed to import Gimp from gi.repository")
 
 from gimpfu.enums.enumTypeSet import EnumTypeSet
 
-import logging
 
-module_logger = logging.getLogger('GimpFu.gimpenums')
 
 
 """
