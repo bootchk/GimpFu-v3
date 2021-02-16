@@ -25,7 +25,7 @@ from gi.repository import Gimp  # only for locale?
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from gui.value_error import EntryValueError
+from gimpfu.gui.value_error import EntryValueError
 
 
 import gettext

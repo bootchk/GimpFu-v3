@@ -4,14 +4,15 @@ import gi
 from gi.repository import GObject
 from gi.repository import Gimp
 
-from enums.gimpfu_enums import *
+from gimpfu.enums.gimpfu_enums import *
 
-from procedure.prop_holder_factory import PropHolderFactory
+from gimpfu.procedure.prop_holder_factory import PropHolderFactory
 
+# TODO not used
 import sys
 
-from message.deprecation import Deprecation
-from message.proceed_error import proceed
+from gimpfu.message.deprecation import Deprecation
+from gimpfu.message.proceed_error import proceed
 
 
 import logging
@@ -55,7 +56,7 @@ class FuFormalParam(GObject.Object):
     Constant class data
     '''
     # Temp hack ???
-    from procedure.prop_holder import PropHolder
+    from gimpfu.procedure.prop_holder import PropHolder
     prop_holder = PropHolder()
     #self.logger.debug("prop_holder.props", prop_holder.props)
     #self.logger.debug("prop_holder.props.IntProp:", prop_holder.props.IntProp1)

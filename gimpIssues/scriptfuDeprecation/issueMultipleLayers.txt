@@ -1,0 +1,53 @@
+Discuss backward compatibility for multilayer changes to v3 PDB API
+
+
+The v3 PDB API has changes for multilayer capability.
+For example this signature change: gimp-edit-copy(drawable) => gimp-edit-copy(drawableArray).
+This breaks some scripts in the GIMP repository and some third party plugins.
+
+To provide backward compatibility means allow existing scripts to work for a defined period.
+(say from 2.99 until 3.1).
+That allows users time to adjust their scripts.
+
+If we don't provide backward compatibility, it is a logistics problem:
+third party script authors must prepare an updated copy of their scripts,
+and change over immediately when they change from 2.10 to 3.0.
+
+Some scripts in GIMP 2.99 are broken now since the API was changed but scripts were not updated.
+If we provide backward compatibility,
+the GIMP developers can fix the scripts in the repository at their leisure.
+
+Because the name has stayed the same but the signature changed,
+to provide backward compatibility could be considered
+a problem of overloaded functions.
+
+One backward compatible solution is to implement overloading in scriptfu:
+whenever calling a PDB procedure, examine the actual arguments:
+if an arg is a single drawable, convert to a drawable array.
+(You could also do the same in GimpFu v3, if any.)
+
+An easier solution is to revert the signature change.
+Instead add a new PDB procedure gimp-edit-copy-multiple(drawableArray).
+Also redefine the body of gimp-edit-copy(drawable)
+to convert to an array and call the core function taking drawableArray.
+
+In other words, the old gimp-edit-copy(drawable) becomes a 'convenience' procedure
+for the more generic gimp-edit-copy-multiple(drawableArray.)
+You could also think of it as a "compatibility" procedure and warn that it is deprecated.
+
+Then if you don't want the PDB full of convenience/compatibility procedures,
+you could obsolete the procedure later (at say v3.1).
+
+You could also argue that the original meaning of gimp-edit-copy is more natural.
+Few script authors are even thinking about multiple layers.
+
+Relation to issues on ScriptFu:
+This is issue #6026.
+Some other backward compatiblity issues are dealt with by MR 403, but not this one.
+A fix to scriptfu for #5402 is also necessary, but is not 'for backward compatibililty.'
+
+Some have suggested that ScriptFu could use GObject Introspection (using say Guile-GI)
+in which case all scripts would need to be rewritten to use GI
+at least to deal with the broken PDB calls.
+Some hard-core lisp programmer would also need to step forward 
+to integrate Guile-GI (or some other) with ScriptFu.

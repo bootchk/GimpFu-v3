@@ -95,7 +95,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from enums.enumTypeSet import EnumTypeSet
+from gimpfu.enums.enumTypeSet import EnumTypeSet
 
 import logging
 

@@ -5,10 +5,10 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 from gi.repository import GObject    # marshalling
 
-from adaption.marshal_pdb import MarshalPDB
-from adaption.compatibility import pdb_name_map
+from gimpfu.adaption.marshal_pdb import MarshalPDB
+from gimpfu.adaption.compatibility import pdb_name_map
 
-from message.proceed_error import *
+from gimpfu.message.proceed_error import *
 
 import logging
 

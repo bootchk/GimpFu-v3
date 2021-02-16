@@ -4,16 +4,16 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from procedure.procedure_config import FuProcedureConfig
-from procedures.procedures import FuProcedures
+from gimpfu.procedure.procedure_config import FuProcedureConfig
+from gimpfu.procedures.procedures import FuProcedures
 
-from adaption.marshal import Marshal
+from gimpfu.adaption.marshal import Marshal
 
-from message.proceed_error import *
-from message.deprecation import Deprecation
-from message.suggest import Suggest
+from gimpfu.message.proceed_error import *
+from gimpfu.message.deprecation import Deprecation
+from gimpfu.message.suggest import Suggest
 
-from runner.result import FuResult
+from gimpfu.runner.result import FuResult
 
 import logging
 
@@ -134,7 +134,7 @@ class FuRunner:
             #TODO duplicate??
             gf_procedure.on_run()
 
-            from gui.control_dialog import PluginControlDialog
+            from gimpfu.gui.control_dialog import PluginControlDialog
 
             '''
             v2

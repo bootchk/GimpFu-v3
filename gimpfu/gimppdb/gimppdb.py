@@ -3,12 +3,9 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from gimppdb.gimpprocedure import GimpProcedure
-
+from gimpfu.gimppdb.gimpprocedure import GimpProcedure
 
 import logging
-
-
 
 
 class GimpPDB:

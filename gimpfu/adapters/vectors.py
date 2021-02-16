@@ -3,7 +3,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 # !!! Vectors => Drawable => Item => Adapter
-from adapters.drawable import GimpfuDrawable
+from gimpfu.adapters.drawable import GimpfuDrawable
 
 
 

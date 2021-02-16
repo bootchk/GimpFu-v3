@@ -1,14 +1,15 @@
 
+
+
+from gimpfu.message.proceed_error import  proceed
+from gimpfu.message.deprecation import Deprecation
+
+from gimpfu.procedure.formal_params import FuFormalParams
+from gimpfu.procedure.type import FuProcedureType
+
+from gimpfu.enums.gimpfu_enums import *  # PF_ enums
+
 import string   # v2 as _string to hide from authors
-
-from message.proceed_error import  proceed
-from message.deprecation import Deprecation
-
-from procedure.formal_params import FuFormalParams
-from procedure.type import FuProcedureType
-
-from enums.gimpfu_enums import *  # PF_ enums
-
 from inspect import signature
 import logging
 

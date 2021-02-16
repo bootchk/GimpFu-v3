@@ -3,12 +3,10 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 from gi.repository import GObject   # types
 
-from gimppdb.runmode import RunMode
-from message.proceed_error import proceed
+from gimpfu.gimppdb.runmode import RunMode
+from gimpfu.message.proceed_error import proceed
 
 import logging
-
-
 
 
 class GimpProcedure:

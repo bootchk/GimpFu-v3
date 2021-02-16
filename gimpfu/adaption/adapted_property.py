@@ -152,14 +152,14 @@ class AdaptedProperty():
         ''' Call method_name of adaptee to get a property value. '''
         unwrapped_result = cls._eval_statement_on_adaptee(adaptee, method_name, prefix = 'get_')
         # !!! result can be a container of wrappable types.  Usually a fundamental type.
-        from adaption.marshal import Marshal
+        from gimpfu.adaption.marshal import Marshal
         result = Marshal.wrap_adaptee_results(unwrapped_result)
         return result
 
     @classmethod
     def set(cls, adaptee, method_name, value):
         ''' Call method_name of adaptee to set a property value. '''
-        from adaption.marshal import Marshal
+        from gimpfu.adaption.marshal import Marshal
         unwrapped_value = Marshal.unwrap(value)
         return cls._eval_statement_on_adaptee(adaptee, method_name, prefix = 'set_', setting_value = unwrapped_value)
 

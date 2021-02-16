@@ -1,6 +1,6 @@
 
-from procedure.metadata import FuProcedureMetadata
-from procedure.type import FuProcedureType
+from gimpfu.procedure.metadata import FuProcedureMetadata
+from gimpfu.procedure.type import FuProcedureType
 
 
 """

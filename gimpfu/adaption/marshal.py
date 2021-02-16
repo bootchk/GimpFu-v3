@@ -3,19 +3,19 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adaption.wrappable import *
-from adaption.types import Types
+from gimpfu.adaption.wrappable import *
+from gimpfu.adaption.types import Types
 
 # import wrapper classes
 # These inherit Adapter which wants to use Marshal, avoid circular import
 # in Adapter by selectively import Marshal
-from adapters.image import GimpfuImage
-from adapters.layer import GimpfuLayer
-from adapters.vectors import GimpfuVectors
-from adapters.rgb import GimpfuRGB
-from adapters.display import GimpfuDisplay
+from gimpfu.adapters.image import GimpfuImage
+from gimpfu.adapters.layer import GimpfuLayer
+from gimpfu.adapters.vectors import GimpfuVectors
+from gimpfu.adapters.rgb import GimpfuRGB
+from gimpfu.adapters.display import GimpfuDisplay
 
-from message.proceed_error import *
+from gimpfu.message.proceed_error import *
 
 import logging
 

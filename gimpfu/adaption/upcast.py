@@ -3,8 +3,8 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adaption.wrappable import *    # is_subclass_of_type
-from message.proceed_error import proceed
+from gimpfu.adaption.wrappable import *    # is_subclass_of_type
+from gimpfu.message.proceed_error import proceed
 
 import logging
 
@@ -56,7 +56,7 @@ class Upcast():
 
         Upcast.logger.info(f"Attempt upcast: {gen_value.actual_arg_type} to : {cast_to_type.__name__}")
 
-        from adaption.types import Types
+        from gimpfu.adaption.types import Types
 
         if Types._should_upcast_or_convert(gen_value.actual_arg_type, formal_arg_type, cast_to_type):
             if is_subclass_of_type(gen_value.actual_arg, cast_to_type):

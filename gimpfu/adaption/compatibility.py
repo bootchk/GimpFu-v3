@@ -2,7 +2,7 @@
 from collections.abc import Mapping
 
 
-from message.deprecation import Deprecation
+from gimpfu.message.deprecation import Deprecation
 
 
 '''

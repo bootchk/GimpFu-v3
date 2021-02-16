@@ -4,13 +4,13 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adaption.marshal import Marshal
-from adaption.types import Types
+from gimpfu.adaption.marshal import Marshal
+from gimpfu.adaption.types import Types
 
-from adaption.value_array import FuValueArray
-from adaption.generic_value import FuGenericValue
+from gimpfu.adaption.value_array import FuValueArray
+from gimpfu.adaption.generic_value import FuGenericValue
 
-from message.proceed_error import proceed
+from gimpfu.message.proceed_error import proceed
 
 import logging
 

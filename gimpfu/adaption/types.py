@@ -5,11 +5,9 @@ from gi.repository import Gimp
 
 from gi.repository import GObject    # GObject type constants
 
-from adaption.formal_types import FormalTypes
-
-from gimppdb.gimppdb import GimpPDB
-
-from message.proceed_error import proceed
+from gimpfu.adaption.formal_types import FormalTypes
+from gimpfu.gimppdb.gimppdb import GimpPDB
+from gimpfu.message.proceed_error import proceed
 
 import logging
 

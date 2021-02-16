@@ -6,10 +6,10 @@ is_test = False
 # !!! Can't import Marshal yet, circular
 # See below, import Marshal selectively
 
-from adaption.wrappable import *
-from adaption.adapted_property import AdaptedProperty
+from gimpfu.adaption.wrappable import *
+from gimpfu.adaption.adapted_property import AdaptedProperty
 
-from adapters.adapter_logger import AdapterLogger
+from gimpfu.adapters.adapter_logger import AdapterLogger
 
 
 '''

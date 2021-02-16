@@ -1,12 +1,11 @@
 
-
 import gi
 
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adaption.generic_value import FuGenericValue
-from message.proceed_error import *
+from gimpfu.adaption.generic_value import FuGenericValue
+from gimpfu.message.proceed_error import *
 
 import logging
 

@@ -122,7 +122,6 @@ Notations used in the comments:
 #print("gimpfu_top begin imports")
 import sys
 
-
 '''
 Expose to authors: GI
 GI is also heavily used by GimpFu
@@ -136,14 +135,14 @@ from gi.repository import Gio
 
 
 # imports  for implementation.  Intended to be private from Authors
-from runner.runner import FuRunner
-from procedure.procedure import FuProcedure
-from procedure.procedure_creator import FuProcedureCreator
-from procedures.procedures import FuProcedures
+from gimpfu.runner.runner import FuRunner
+from gimpfu.procedure.procedure import FuProcedure
+from gimpfu.procedure.procedure_creator import FuProcedureCreator
+from gimpfu.procedures.procedures import FuProcedures
 
 
 
-from logger.logger import FuLogger
+from gimpfu.logger.logger import FuLogger
 logger = FuLogger.get_logger()
 
 
@@ -154,15 +153,15 @@ Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
 Name "gimpenums" retained for FBC, some non-GimpFu plugins may "from gimpenums import *"
 '''
 # cases not handled programatically
-from enums.backward_enums import *
+from gimpfu.enums.backward_enums import *
 
 # cases handled programatically
-from enums.gimpenums import *
+from gimpfu.enums.gimpenums import *
 # import define_enums_into_global_namespace
 #define_enums_into_global_namespace()
 
 ''' Expose to Authors: GimpFu enums e.g. PF_INT '''
-from enums.gimpfu_enums import *
+from gimpfu.enums.gimpfu_enums import *
 
 # v2 import gimpcolor
 
@@ -175,10 +174,10 @@ It is not as simple as:
     OR from gi.repository import Gimp as gimp
 These are adapters.
 '''
-from aliases.pdb import GimpfuPDB
+from gimpfu.aliases.pdb import GimpfuPDB
 pdb = GimpfuPDB()
 
-from aliases.gimp import GimpfuGimp
+from gimpfu.aliases.gimp import GimpfuGimp
 gimp = GimpfuGimp()
 
 

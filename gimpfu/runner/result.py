@@ -8,9 +8,9 @@ from gi.repository import Gimp
 from gi.repository import GLib  # For GLib.Error()
 from gi.repository import GObject
 
-from adaption.marshal import Marshal
-from adaption.generic_value import FuGenericValue
-from runner.resultArray import FuResultArray
+from gimpfu.adaption.marshal import Marshal
+from gimpfu.adaption.generic_value import FuGenericValue
+from gimpfu.runner.resultArray import FuResultArray
 
 import logging
 from collections.abc import Iterable

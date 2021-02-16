@@ -1,14 +1,13 @@
 
-# WidgetFactory is main use of PF_enum
-from enums.gimpfu_enums import *
 
-# No GI of Gimp here
+# WidgetFactory is main use of PF_enum
+from gimpfu.enums.gimpfu_enums import *
 
 # WidgetFactory is main use of Widget constructors
-from gui.widgets import *
-from gui.gimp_widgets import *
+from gimpfu.gui.widgets import *
+from gimpfu.gui.gimp_widgets import *
 
-from adapters.rgb import GimpfuRGB
+from gimpfu.adapters.rgb import GimpfuRGB
 
 import logging
 

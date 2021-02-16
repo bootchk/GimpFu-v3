@@ -2,6 +2,7 @@
 .home
 gimp
 gimpBuild
+guile-gi
 gimpfu/__pycache__
 pygimpv2
 pdb.txt

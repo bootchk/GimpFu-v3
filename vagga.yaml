@@ -518,7 +518,7 @@ containers:
         meson setup /work/gimpBuild \
          --buildtype=debug \
          -Djavascript=false \
-         -Dlua=false \
+         -Dlua=true \
          -Dpython=true \
          -Dgtk-doc=false
 
@@ -526,10 +526,39 @@ containers:
       HOME: /work/.home
 
 
+  # Container with Guile and Guile-GI
+  gimpGuileGIInstalled:
+    setup:
+    - !Container bablGeglDev
+
+    # guile package for development
+    - !Install [ guile-3.0-dev ]
+
+    # missing command makeinfo
+    - !Install [ texinfo ]
+
+
+    # Clone Guile-GI
+    - !Git
+      url: https://github.com/spk121/guile-gi.git
+      path: /work/guile-gi
+    # Build it
+    # ACLOCAL_PATH=/usr/local/share/aclocal ./bootstrap
+    - !Sh |
+        cd /work/guile-gi
+        ./bootstrap
+        ./configure
+        make
+        make install
+
+
+
   # Container with GIMP installed
+  # Base on gimpMesonDev usually
   gimpMesonInstalled:
     setup:
-    - !Container gimpMesonDev
+    - !Container gimpGuileGIInstalled
+    # - !Install [ libmypaint-dev]
 
     # This tells vagga that this container depends on changed gimp source
     # We don't need that because meson knows when it needs to rebuild ??
@@ -937,11 +966,12 @@ commands:
       # find -D exec /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' + -print
       find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
 
-      echo "Copying gimpfu source directory to local plugin directory"
-      cp -r /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
+      #echo "Copying gimpfu source directory to local plugin directory"
+      #cp -r /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
+      #export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
 
-      echo "Altering PYTHONPATH to point to local plug-ins"
-      export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
+      echo "Altering PYTHONPATH to find GimpFu"
+      export PYTHONPATH=/work:${PYTHONPATH}
       echo $PYTHONPATH
 
       # stop glib at critical
@@ -952,16 +982,19 @@ commands:
       export GIMP_PLUGIN_DEBUG=file-png,fatal-warnings
       #export GIMP_PLUGIN_DEBUG=all,fatal-criticals
 
-      export GIMPFU_DEBUG=1
+      #export GIMPFU_DEBUG=1
 
       # print all G_MESSAGES
       # export G_MESSAGES_DEBUG=all
-      #export G_MESSAGES_DEBUG=scriptfu
+      # export G_MESSAGES_DEBUG=scriptfu
 
       # build Gimp
       #cd /work/gimpBuild
       #ninja -j 4
       #ninja install
+
+      # start in a different directory to test PYTHONPATH
+      #cd /work/docs
 
       # --verbose --no-data
       # gdb
@@ -1026,3 +1059,18 @@ commands:
     run: |
       echo "Opening terminal on the GIMP run container"
       /usr/bin/gnome-terminal
+
+  testGuile: !Command
+    description: Run guile in container gimpGuileGIInstalled
+    container: gimpGuileGIInstalled
+    run: |
+      echo "Starting guile"
+      guile
+
+  testGuileGimp: !Command
+    description: Run guile in container gimpMesonInstalled
+    container: gimpMesonInstalled
+    run: |
+      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      echo "Starting guile"
+      guile

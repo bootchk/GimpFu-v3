@@ -4,7 +4,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from procedure.type import FuProcedureType
+from gimpfu.procedure.type import FuProcedureType
 
 """
 Knows how to create a procedure in Gimp.

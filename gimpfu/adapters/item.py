@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from adapters.adapter import Adapter
+from gimpfu.adapters.adapter import Adapter
 
 
 

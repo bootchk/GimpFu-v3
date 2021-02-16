@@ -4,8 +4,8 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 
-from adapters.item import GimpfuItem
-from adapters.adapter_logger import AdapterLogger
+from gimpfu.adapters.item import GimpfuItem
+from gimpfu.adapters.adapter_logger import AdapterLogger
 
 
 '''

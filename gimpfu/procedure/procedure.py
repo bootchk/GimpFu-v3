@@ -1,8 +1,8 @@
 
 
-from procedure.metadata import FuProcedureMetadata
-from procedure.prop_holder import PropHolder
-from procedure.type import FuProcedureType
+from gimpfu.procedure.metadata import FuProcedureMetadata
+from gimpfu.procedure.prop_holder import PropHolder
+from gimpfu.procedure.type import FuProcedureType
 
 import logging
 

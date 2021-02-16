@@ -5,7 +5,6 @@ This all should go away when Gimp support for auto plugin GUI lands in Gimp 3.
 Not well known that such support is on the roadmap.
 '''
 
-
 import gi
 
 gi.require_version("Gimp", "3.0")
@@ -15,14 +14,12 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 #from gi.repository import GObject
 
+from gimpfu.gui.dialog import Dialog
+from gimpfu.gui.warning_dialog import WarningDialog
+from gimpfu.gui.value_error import EntryValueError
+from gimpfu.gui.widget_factory import WidgetFactory
 
-
-from gui.dialog import Dialog
-from gui.warning_dialog import WarningDialog
-from gui.value_error import EntryValueError
-from gui.widget_factory import WidgetFactory
-
-from message.deprecation import Deprecation
+from gimpfu.message.deprecation import Deprecation
 
 import logging
 
@@ -30,10 +27,6 @@ import logging
 import gettext
 t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
 _ = t.gettext
-
-
-
-
 
 
 

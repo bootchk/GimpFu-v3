@@ -4,13 +4,11 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
+from gimpfu.adapters.adapter import Adapter
+from gimpfu.adapters.adapter_logger import AdapterLogger
 
-# absolute from SYSPATH that points to top of gimpfu package
-from adapters.adapter import Adapter
-from adapters.adapter_logger import AdapterLogger
 
 '''
-
 Adapts (wraps) Gimp.Image.
 
 Constructor appears in GimpFu plugin code as e.g. : gimp.Image(w, h, RGB)

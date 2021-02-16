@@ -1,5 +1,5 @@
 '''
-PF_foo enums defined by GimpFu.
+PF_ enums defined by GimpFu.
 
 These constants describe parameter types AND GUI widget types.
 Used in args to register(), before the plugin is registered.

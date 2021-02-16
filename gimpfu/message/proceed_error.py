@@ -1,5 +1,5 @@
 
-from message.framestack import Framestack
+from gimpfu.message.framestack import Framestack
 
 import logging
 

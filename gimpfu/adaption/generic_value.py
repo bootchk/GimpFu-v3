@@ -8,14 +8,14 @@ from gi.repository import Gimp
 # from gi.repository import GLib  # GLib.guint ???
 from gi.repository import Gio   # Gio.File
 
-from adapters.rgb import GimpfuRGB
+from gimpfu.adapters.rgb import GimpfuRGB
 
-from message.proceed_error import proceed
-from message.suggest import Suggest
+from gimpfu.message.proceed_error import proceed
+from gimpfu.message.suggest import Suggest
 
-from adaption.formal_types import FormalTypes
-from adaption.types import Types
-from adaption.upcast import Upcast
+from gimpfu.adaption.formal_types import FormalTypes
+from gimpfu.adaption.types import Types
+from gimpfu.adaption.upcast import Upcast
 
 from collections.abc import Sequence    # ABC for sequences
 import logging
@@ -304,7 +304,7 @@ class FuGenericValue():
 
 
         # setter requires fundamental or GIMP types, not GimpFu wrapped types
-        from adaption.marshal import Marshal
+        from gimpfu.adaption.marshal import Marshal
         if self.is_contained_gtype_a_boxed_type(to_container_gtype):
             # Each item should be wrapped, how could it not be???
             # But unwrap_homogenous_sequence doesn't require it.

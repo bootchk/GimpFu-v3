@@ -1,11 +1,11 @@
 
-from procedure.formal_param import FuFormalParam
-from procedure.type import FuProcedureType
+from gimpfu.procedure.formal_param import FuFormalParam
+from gimpfu.procedure.type import FuProcedureType
 
-from enums.gimpfu_enums import *  # PF_ enums
+from gimpfu.enums.gimpfu_enums import *  # PF_ enums
 
-from message.deprecation import Deprecation
-from message.proceed_error import proceed
+from gimpfu.message.deprecation import Deprecation
+from gimpfu.message.proceed_error import proceed
 
 import logging
 

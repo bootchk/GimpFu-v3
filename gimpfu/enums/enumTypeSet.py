@@ -5,7 +5,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 # !!! We use Gimp in exec'd statements
 
-from enums.gimpType import GimpType
+from gimpfu.enums.gimpType import GimpType
 
 import logging
 

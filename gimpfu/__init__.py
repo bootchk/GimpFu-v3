@@ -1,3 +1,8 @@
 
-# define aliases and adapters into author's namespace
-from gimpfu_top import *
+"""
+define into author's namespace:
+ - aliases
+ - enums
+ - FuPlugin
+"""
+from gimpfu.top import *

@@ -7,18 +7,18 @@ from gi.repository import GObject    # marshalling
 
 
 # import wrapper classes because we call their constructors
-# in phrases like gimp.Layer
-from adapters.image import GimpfuImage
-from adapters.layer import GimpfuLayer
-from adapters.display import GimpfuDisplay
-from adapters.vectors import GimpfuVectors
+# for author phrases like "gimp.Layer"
+from gimpfu.adapters.image import GimpfuImage
+from gimpfu.adapters.layer import GimpfuLayer
+from gimpfu.adapters.display import GimpfuDisplay
+from gimpfu.adapters.vectors import GimpfuVectors
 # TODO channel, etc.
 
-from adaption.marshal import Marshal
-from adaption.wrappable import *
-from adaption.compatibility import gimp_name_map
+from gimpfu.adaption.marshal import Marshal
+from gimpfu.adaption.wrappable import *
+from gimpfu.adaption.compatibility import gimp_name_map
 
-from message.proceed_error import *
+from gimpfu.message.proceed_error import *
 
 import logging
 
