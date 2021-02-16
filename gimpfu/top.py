@@ -137,21 +137,17 @@ TODO v2 class error(RuntimeError): pass
 TODO v2 class CancelError(RuntimeError): pass
 """
 
-#
 
-#print("gimpfu_top begin imports")
-
-
-# implementation of register() requires FuProcedure
-from gimpfu.procedure.procedure import FuProcedure
-from gimpfu.procedures.procedures import FuProcedures
-
-
+"""
+Log this top level, because Gimp gives uninformative "wire error"
+when Python crashes.
+"""
 # TODO should this be exposed?
 from gimpfu.logger.logger import FuLogger
 logger = FuLogger.getGimpFuLogger()
 
 
+logger.info("defining enums")
 '''
 Expose to Authors: abbreviated and backward compatible symbols Gimp enums.
 Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
@@ -165,11 +161,12 @@ from gimpfu.enums.gimpenums import *
 # import define_enums_into_global_namespace
 #define_enums_into_global_namespace()
 
-''' Expose to Authors: GimpFu enums e.g. PF_INT '''
+''' GimpFu enums e.g. PF_INT '''
 from gimpfu.enums.gimpfu_enums import *
 
 
 
+logger.info("defining pdb and gimp aliases")
 '''
 Expose to Authors : alias symbols "gimp" and "pdb"
 It is not as simple as:
@@ -189,8 +186,9 @@ gimp = GimpfuGimp()
 
 
 
-# localization, i18n
 
+logger.info("Initializing i18n")
+# localization, i18n
 # Python 3 ugettext() is deprecated, use gettext() which also returns unicode
 import gettext
 '''
@@ -236,6 +234,8 @@ def register(proc_name, blurb, help, author, copyright,
     """ GimpFu method that registers a plug-in. May be called many times from same source file."""
 
     logger.info(f"register() called with: {proc_name}")
+    from gimpfu.procedure.procedure import FuProcedure
+    from gimpfu.procedures.procedures import FuProcedures
 
     gf_procedure = FuProcedure(proc_name, blurb, help, author, copyright,
                             date, label, imagetypes,
@@ -270,7 +270,7 @@ def main():
     which interposes between Gimp and Author's "function".
     """
 
-
+logger.info("Done with import from top")
 
 """
 CRUFT
