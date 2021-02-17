@@ -203,7 +203,7 @@ t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
 _ = t.gettext
 '''
 
-gettext.install("gimp30-python", Gimp.locale_directory,)
+gettext.install("gimp30-python", Gimp.locale_directory())
 
 # v2 defined this.  FBC, keep it in v3.
 # But most plugins that use it are probably not doing runtime localization.
