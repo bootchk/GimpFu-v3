@@ -66,23 +66,52 @@ def is_wrapped_function(instance):
 '''
 Taken from "GIMP App Ref Manual>Class Hierarchy"
 Note the names are not prefixed with "Gimp."
+
+Authors cannot instantiate Item or Drawable, only their subclasses.
+Drawable and Item are virtual base classes.
+
+"Item"  virtual
+    "Drawable"  virtual
+        "Layer",
+           "GroupLayer",
+           "TextLayer"
+        "Channel",
+           "LayerMask",
+           "Selection",
+    "Vectors"
 '''
 DrawableTypeNames = (
     "Layer",
        "GroupLayer",
-       "TextLayer"
+       "TextLayer",
     "Channel",
        "LayerMask",
        "Selection",
 )
 
-# Authors cannot instantiate Drawable so it does not need to be here
-# Authors cannot instantiate Item.
-# Drawable and Item are virtual base classes.
 ItemTypeNames = (
     "Drawable",
     "Vectors"
 )
+
+module_logger.info(f"DrawableTypeNames: {DrawableTypeNames}")
+module_logger.info(f"ItemTypeNames: {ItemTypeNames}")
+
+# ItemTypeNames = DrawableTypeNames + ("Vectors",)
+
+"""
+Test cases:
+
+Single level to Item
+Drawable is subclass of Item
+Vectors is subclass of Item
+
+Single level to Drawable
+Channel is subclass of Drawable
+
+Two levels to Item
+Channel is subclass of Item
+"""
 
 
 '''
@@ -118,11 +147,14 @@ def is_subclass_of_type(instance, super_type):
     elif  super_type_name == 'Drawable':
         result =  instance_type_name in DrawableTypeNames
     elif super_type_name == 'Item':
-        result = instance_type_name in ItemTypeNames or instance_type_name in DrawableTypeNames
+        result = (instance_type_name in ItemTypeNames or instance_type_name in DrawableTypeNames)
     elif super_type_name == 'RGB':
         result = instance_type_name in ColorTypeNames
+    else :
+        module_logger.warning(f"is_subclass_of_type, unhandled super_type_name {super_type_name}")
 
     module_logger.info(f"is_subclass_of_type ( {instance_type_name}, {super_type_name}) returns {result}")
+
     if result:
         module_logger.debug(f"is_subclass_of_type ( {instance_type_name}, {super_type_name}) returns {result}")
     return result

@@ -1,7 +1,9 @@
 .vagga
 .home
 gimp
+resynthesizer
 gimpBuild
+resynthBuild
 guile-gi
 gimpfu/__pycache__
 pygimpv2

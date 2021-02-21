@@ -527,16 +527,15 @@ containers:
 
 
   # Container with Guile and Guile-GI
+  # Container NOT have Gimp
   gimpGuileGIInstalled:
     setup:
     - !Container bablGeglDev
 
     # guile package for development
     - !Install [ guile-3.0-dev ]
-
     # missing command makeinfo
     - !Install [ texinfo ]
-
 
     # Clone Guile-GI
     - !Git
@@ -590,6 +589,50 @@ containers:
 
     environ:
       HOME: /work/.home
+
+
+  # Container with AM built resynthesizer plugin
+  resynthAMInstalled:
+    setup:
+    - !Container gimpMesonInstalled
+
+    # Make it build if the source changes.  But this always rebuilds since in-tree
+    - !Depends /work/resynthesizer
+
+    # Clone
+    #- !Git
+    #  url: https://github.com/bootchk/resynthesizer.git
+    #  path: /work/resynthesizer
+
+    # Build
+    - !Sh |
+        cd /work/resynthesizer
+        ./autogen.sh
+        make
+        make install
+
+    environ:
+      HOME: /work/.home
+
+  # Container with AM built resynthesizer plugin on top of meson built Gimp
+  resynthMesonInstalled:
+    setup:
+    - !Container gimpMesonInstalled
+
+    # Make it build if the source changes.
+    - !Depends /work/resynthesizer
+
+    - !Sh |
+        cd /work/resynthesizer
+        meson setup /work/resynthBuild
+        cd /work/resynthBuild
+        ninja
+        ninja install
+
+
+    environ:
+      HOME: /work/.home
+
 
 
   # Container with installed gimp, built using meson
@@ -716,8 +759,6 @@ commands:
 
 
 
-  #   cd /home/gegl-0.4.18/_build
-  #    ninja test
 
 
   gimpMesonVersions: !Command
@@ -736,6 +777,8 @@ commands:
       pkg-config --modversion gegl-0.4
       echo "GLib version from pkg-config"
       pkg-config --modversion glib-2.0
+      echo "Gimp version from pkg-config"
+      pkg-config --modversion gimp-3.0
       echo "Python version from python3 --version"
       python3 --version
       echo "PyGObject version from python"
@@ -1074,3 +1117,41 @@ commands:
       export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
       echo "Starting guile"
       guile
+
+  testResynthesizer: !Command
+    description: Build resynthesizer plugin in container resynthesizerInstalled
+    container: resynthesizerInstalled
+    run: |
+      ls ~/.config/GIMP/2.99/plug-ins
+      echo ls install dir for resynthesizer python plugins
+      ls /usr/local/lib/gimp/2.0/plug-ins
+      echo ls install dir for resynthesizer C plugin
+      # ??? It installs to root?
+      ls /plug-ins
+      echo ls installed Gimp plugins
+      ls /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins
+      cd /usr && find . -name despeckle
+
+  testMesonResynth: !Command
+    description: Meson build resynthesizer plugin in container resynthMesonInstalled
+    container: resynthMesonInstalled
+    run: |
+      echo ls install dir for resynthesizer python plugins TODO
+      ls /usr/local/lib/gimp/2.0/plug-ins
+      echo ls installed Gimp plugins, should see resynthesizer
+      ls /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins
+      # Use this to find where:   cd /usr && find . -name despeckle
+
+      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
+      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      export NO_AT_BRIDGE=1
+
+      # Refresh installation of gimpfu from development gimp_directory
+      # Copy entire directory into the plug-ins directory
+      echo "Copying gimpfu to local"
+      cp -rv /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
+      export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins:${PYTHONPATH}
+
+      export GIMP_PLUGIN_DEBUG=all,fatal-warnings
+      export GIMPFU_DEBUG=1
+      gimp-2.99 --verbose
