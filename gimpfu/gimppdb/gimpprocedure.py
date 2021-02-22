@@ -51,6 +51,7 @@ class GimpProcedure:
         return self._procedure.get_name()
 
     """ Compare to PDB procedure gimp-pdb-get-proc-info() """
+    # TODO rename procType
     @property
     def type(self):
         """ Returns value of type Gimp.PDBProcType """
@@ -77,18 +78,8 @@ class GimpProcedure:
     """
     @property
     def takes_runmode_arg(self):
-        """ is first argument a "run mode" arg, loosely speaking """
-        result = RunMode.takes_runmode_from_menu_path(self)
-
-        # TODO Alternative implementations, not all are correct
-
-        # only type Plugin requires insertion of run mode arg
-        #result = self.type == Gimp.PDBProcType.PLUGIN
-
-        # relics from GimpFu v2
-        #result = self._takes_runmode_from_signature()
-        #result = self._takes_runmode_from_name()
-
+        """ is first argument a "run mode" arg """
+        result = RunMode.does_procedure_take_runmode_arg(self)
         self.logger.debug(f"_takes_runmode_arg for: {self.name} returns: {result}")
         return result
 

@@ -62,7 +62,8 @@ class MarshalPDB():
 
 
     @staticmethod
-    def synthesize_marshalled_run_mode(proc_name, *args):
+    def synthesize_marshalled_run_mode():
+        """ Return an unwrapped value of Gimp.RunMode.NONINTERACTIVE """
         MarshalPDB.logger.debug(f"Synthesized runmode NONINTERACTIVE")
         return FuGenericValue.new_gvalue( Gimp.RunMode.__gtype__, Gimp.RunMode.NONINTERACTIVE)
 
@@ -109,7 +110,7 @@ class MarshalPDB():
            Synthesizing runmode might now work, the caller might have made an error
            and not just using the GimpFu convention of not passing runmode.
            """
-           result.append( synthesizeRunMode() )
+           result.append( MarshalPDB.synthesize_marshalled_run_mode() )
            # skip to the next formal arg
            formal_args_index = 1
         elif len(args) != procedure.formal_arg_count :

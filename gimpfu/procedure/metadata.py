@@ -168,12 +168,12 @@ class FuProcedureMetadata():
     def type(self):
         """ Returns FuProcedureType """
         assert self.MENUPATH is not None
-        result = FuProcedureMetadata.type_from_menu_path(self.MENUPATH)
-        self.logger.debug(f"{result}")
+        result = FuProcedureMetadata._type_from_menu_path(self.MENUPATH)
+        self.logger.debug(f"FuProcedureType: {result}")
         return result
 
     @classmethod
-    def type_from_menu_path(cls, menuPath):
+    def _type_from_menu_path(cls, menuPath):
         """
         This seems to be the only way to reliably determine
         our notion of type (which tells whether procedure takes a run mode arg)

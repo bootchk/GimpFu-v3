@@ -66,17 +66,22 @@ class Types():
     @staticmethod
     def try_usual_python_conversion(formal_arg_type, gen_value):
         '''
-        Perform the usual automatic Python conversion from int to (str, float).
+        Perform the usual automatic Python conversions.
 
-        Return converted actual arg to an other type if is type int
-        and PDB procedure wants the other type.
-        (procedure's formal parameter type in (GObject.TYPE_FLOAT, TYPE_STRING).
+        Given:
+           author's actual arg in Python (in a FuGenericValue)
+           a GObject type (formal_arg_type) that a PDB procedure requires.
+        Returns:
+            Returns a FuGenericValue (wrapper of GValue), possibly converted.
+            I.E. side effects on gen_value.
 
-        Returns a GValue, possibly converted.
+        Procedure's formal parameter type in (GObject.TYPE_FLOAT, TYPE_STRING).
+
         !!! Note that the caller must ensure that the original variable is not converted,
         only the variable being passed to Gimp.
 
-        GObject also converts Python fundamental types to GTypes as they are passed to Gimp.
+        PyGObject also converts Python fundamental types to GTypes as they are passed to Gimp.
+        This is similar, but for our marshalling of calls to PDB.
         '''
         # require type(actual_arg_type) is Python type or a GType
 
@@ -84,12 +89,13 @@ class Types():
         # TODO make the converter log what the conversion was
         '''
         A table of conversions:
-        Python type => Gimp C types
+        Python type => Gimp C types (GObject types)
         ---------------------------
-        int => float, str, unsigned int, unsigned char, unsigned 64
-        float => int, str
+        int   => boolean, float, str, unsigned int, unsigned char, unsigned 64
+        float => boolean, int,   str
+
         TODO str => float, int ???
-        TODO True/False => int
+        TODO True/False => boolean
         TODO unsigned 64
         '''
 
@@ -97,7 +103,7 @@ class Types():
         # ("     Formal arg type ", formal_arg_type.name )
         assert formal_arg_type is not None
 
-        # FormalTypes.is_foo() wants a str
+        # FormalTypes.is_foo() requires str
         formal_arg_type_name = formal_arg_type.name
         assert isinstance(formal_arg_type_name, str)
 
@@ -115,9 +121,10 @@ class Types():
                 gen_value.int()
             elif FormalTypes.is_str_type(formal_arg_type_name):
                 gen_value.str()
-        # else not a usual Python conversion, or doesn't need conversion
-
-
+        else:
+            Types.logger.info(f"try_usual_python_conversion {gen_value.actual_arg_type}"
+               "is not a usual Python conversion"
+               )
 
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
         # likewise for value of result_arg
