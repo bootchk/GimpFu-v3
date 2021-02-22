@@ -113,19 +113,21 @@ class Marshal():
         Marshal.logger.info(f"Wrap: {gimp_instance}")
         result = None
 
-        if is_gimpfu_wrappable(gimp_instance):
-            gimp_type_name = get_type_name(gimp_instance)
-            statement = 'Gimpfu' + gimp_type_name + '(adaptee=gimp_instance)'
-            # e.g. statement  'GimpfuImage(adaptee=gimp_instance)'
-            Marshal.logger.info(f"attempting to eval: {statement}")
-            try:
-                result = eval(statement)
-            except Exception as err:
-                """ Exception in Gimpfu code e.g. missing wrapper. """
-                proceed(f"Wrapping: {err}")
-        else:
-            exception_str = f"GimpFu: can't wrap gimp type {gimp_type_name}"
-            proceed(exception_str)
+        wrapper_type_name = wrapper_type_name_for_instance(gimp_instance)
+        if wrapper_type_name is None:
+            proceed(f"GimpFu: can't wrap gimp type {get_type_name(gimp_instance)}")
+            return result
+
+        statement =  wrapper_type_name + '(adaptee=gimp_instance)'
+
+        # e.g. statement  'GimpfuImage(adaptee=gimp_instance)'
+        Marshal.logger.info(f"attempting to eval: {statement}")
+        try:
+            result = eval(statement)
+        except Exception as err:
+            """ Exception in Gimpfu code e.g. missing wrapper. """
+            proceed(f"Wrapping: {err}")
+
         return result
 
 
@@ -169,6 +171,7 @@ class Marshal():
             result = Marshal.wrap(instance)
         else:   # fundamental
             result = instance
+        Marshal.logger.info(f"_try_wrap returns: {result}")
         return result
 
 
@@ -181,6 +184,7 @@ class Marshal():
         Result is iterable list if args is iterable, a non-iterable if args is not iterable.
         Except: strings are iterable but also fundamental.
         '''
+        Marshal.logger.info(f"wrap_adaptee_results: {args}")
         try:
             unused_iterator = iter(args)
         except TypeError:
@@ -190,10 +194,12 @@ class Marshal():
             # iterable, but could be a string
             if isinstance(args, str):
                 # No need to unwrap
+                Marshal.logger.info(f"wrap_adaptee_results returns: a string")
                 result = args
             else:
                 # is container, return container of unwrapped
                 result = [Marshal._try_wrap(item) for item in args]
+        Marshal.logger.info(f"wrap_adaptee_results returns: {result}")
         return result
 
 

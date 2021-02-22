@@ -38,6 +38,17 @@ class FuRunner:
     logger = logging.getLogger('GimpFu.FuRunner')
 
     @staticmethod
+    def show_exception_dialog(procname):
+        """ Show a modal exception dialog. """
+        # TODO seems to be modal, is it?
+        from gimpfu.gui.exception_dialog import ExceptionDialog
+
+        ExceptionDialog.show(proc_name)
+        exc_str, exc_only_str = ExceptionDialog.create_exception_str()
+        return exc_str, exc_only_str
+
+
+    @staticmethod
     def _try_run_func(proc_name, function, args):
         '''
         Run the plugin's run_func with args, catching exceptions.
@@ -49,14 +60,29 @@ class FuRunner:
         '''
         try:
             result = function(*args)
-        except:
-            # Show dialog here, or pass exception string back to Gimp???
+        except TypeError:
+            # TODO catch this earlier
             from gimpfu.gui.exception_dialog import ExceptionDialog
-
-            ExceptionDialog.show(proc_name)
 
             exc_str, exc_only_str = ExceptionDialog.create_exception_str()
 
+            # Show a more informative message for a limitation of GimpFu
+            if "'gi.FunctionInfo' object is not subscriptable" in exc_str:
+                """
+                TODO Fix this ???
+                Example author code:
+                  frisketBounds = grownSelection.mask_bounds
+                  frisketLowerLeftX = frisketBounds[0]
+                This means either:
+                1. GimpFu forgot to implement property mask_bounds
+                2. or author combined property with [] e.g. grownSelection.mask_bounds[0]
+                """
+                FuRunner.logger.critical(f"GimpFu can't subscript pdb methods.  Split the statement.")
+                # TODO show a Gimp dialog?
+            raise
+        except:
+            # TODO Show dialog here, or pass exception string back to Gimp or both ???
+            exc_str, exc_only_str = FuRunner.show_exception_dialog(proc_name)
             FuRunner.logger.critical(f"{exc_str}, {exc_only_str}")
             result = None
             # TODO either pass exc_str back so Gimp shows in dialog,

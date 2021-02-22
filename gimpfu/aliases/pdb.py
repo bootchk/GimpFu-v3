@@ -128,10 +128,10 @@ class GimpfuPDB():
             serious and external to Author's plugin.
             """
             inner_result = Gimp.get_pdb().run_procedure( proc_name , marshaled_args)
-            assert inner_result is not None, "PDB procedure call failed to return value array."
+            assert inner_result is not None, f"PDB procedure {proc_name} failed to return value array."
 
             # The first element of result is the PDB status
-            self.logger.debug(f"run_procedure result is: {inner_result.index(0)}")
+            self.logger.debug(f"run_procedure {proc_name}, result is: {inner_result.index(0)}")
 
             # pdb is stateful for errors, i.e. gets error from last invoke, and resets on next invoke
             error_str = Gimp.get_pdb().get_last_error()

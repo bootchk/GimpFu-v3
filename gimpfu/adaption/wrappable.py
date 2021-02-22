@@ -22,30 +22,52 @@ def get_type_name(instance):
 def get_name_of_type(a_type):
     return a_type.__name__
 
+
 '''
-!!! Keep these in correspondence with each other,
-and with wrap() dispatch.
+!!! Keep in correspondence with  wrap() dispatch.
 (unwrap is in the adapter)
 I.E. to add a wrapper Foo:
  - add Foo.py in adapters/
  - add literals like 'Foo' in three places in this file.
 
-wrap is symmetrical with unwrap.
-We wrap Drawable, Item, etc. but the Author cannot create instances,
-only instance of subclasses.
+ wrap is symmetrical with unwrap.
+
+ Drawable, Item, are virtual, an Author cannot create instances,
+ only instance of subclasses.
 '''
+# TODO other leaf types, LayerMask etc.
+gimp_type_to_wrapper_type_map = {
+    'Image':   "GimpfuImage",
+    'Layer':   "GimpfuLayer",
+    'Display': "GimpfuDisplay",
+    'Vectors': "GimpfuVectors",
+    'RGB':     "GimpfuRGB",
+}
+
 def is_gimpfu_wrappable_name(name):
-    return name in ('Image', 'Layer', 'Display', 'Vectors', 'RGB')
+    result = name in gimp_type_to_wrapper_type_map.keys()
+    module_logger.info(f"is_gimpfu_wrappable_name: {name} returns {result}")
+    return result
 
-def is_gimpfu_unwrappable( instance):
-    return get_type_name(instance) in ("GimpfuImage", "GimpfuLayer", "GimpfuDisplay", "GimpfuVectors", "GimpfuRGB")
-
-
+def is_gimpfu_unwrappable_name(name):
+    result = name in gimp_type_to_wrapper_type_map.values()
+    module_logger.info(f"is_gimpfu_unwrappable_name: {name} returns {result}")
+    return result
 
 # TODO rename is_instance_gimpfu_wrappable
 def is_gimpfu_wrappable(instance):
     return is_gimpfu_wrappable_name(get_type_name(instance))
+def is_gimpfu_unwrappable(instance):
+    return is_gimpfu_unwrappable_name(get_type_name(instance))
 
+def wrapper_type_name_for_instance(instance):
+    """
+    return name of Python type for wrapper (like GimpfuLayer) or None
+    """
+    name = get_type_name(instance)
+    result = gimp_type_to_wrapper_type_map[name]
+    module_logger.info(f"wrapper_name_for_instance: {name} returns {result}")
+    return result
 
 
 
