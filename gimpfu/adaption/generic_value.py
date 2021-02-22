@@ -152,6 +152,17 @@ class FuGenericValue():
     def int(self):
         self.convert(int)
 
+    '''
+    Conversions that are simple casts.
+
+    The value stays the same, we just label the GValue with a different type.
+    Assuming in some cases that GObject is also permissive,
+    e.g. allowing any integer to represent a boolean
+    (and not requiring only a binary 1 or 0)
+    '''
+    def boolean(self):
+        self.upcast(GObject.TYPE_BOOLEAN)
+
     def unsigned_int(self):
         # Not a conversion, an upcast only?
         # TODO need to check for negative value?
@@ -452,6 +463,7 @@ class FuGenericValue():
         self._result_arg_type = cast_to_type
         self._result_arg = self._actual_arg
         self._did_upcast = True
+        self.logger.info(f"upcast: {cast_to_type}")
 
 
     def upcast_to_None(self, cast_to_type):
@@ -485,8 +497,9 @@ class FuGenericValue():
         if self.did_upcast:
             return
 
+        # TODO rename try_usual_python_conversion_and_upcast
         Types.try_usual_python_conversion(formalArgType, self)
-        if self.did_convert:
+        if self.did_convert or self.did_upcast:
             return
 
         Types.try_array_conversions(formalArgType, self)

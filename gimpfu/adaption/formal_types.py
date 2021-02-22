@@ -40,6 +40,7 @@ class FormalTypes():
     These allow type names from either array of GParamSpec
     or Gimp.ValueArray which is array of Gtype
     """
+    def is_boolean_type(type_name):      return type_name in ('GParamBoolean', )
     def is_float_type(type_name):        return type_name in ('GParamFloat', 'GParamDouble')
     def is_str_type(type_name):          return type_name in ('GParamString', )
     def is_int_type(type_name):          return type_name in ('GParamInt', )

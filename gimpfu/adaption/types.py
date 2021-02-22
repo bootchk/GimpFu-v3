@@ -108,7 +108,9 @@ class Types():
         assert isinstance(formal_arg_type_name, str)
 
         if gen_value.actual_arg_type is int:
-            if FormalTypes.is_float_type(formal_arg_type_name):
+            if FormalTypes.is_boolean_type(formal_arg_type_name):
+                gen_value.boolean()
+            elif FormalTypes.is_float_type(formal_arg_type_name):
                 gen_value.float()
             elif FormalTypes.is_str_type(formal_arg_type_name):
                 gen_value.str()
@@ -117,14 +119,16 @@ class Types():
             elif FormalTypes.is_unsigned_char_type(formal_arg_type_name):
                 gen_value.unsigned_char()
         elif gen_value.actual_arg_type is float:
+            # TODO convert float to boolean
             if FormalTypes.is_int_type(formal_arg_type_name):
                 gen_value.int()
             elif FormalTypes.is_str_type(formal_arg_type_name):
                 gen_value.str()
         else:
+            # TODO convert str to usual types a la SNOBOL
+            # !!! That will require more work, not simple upcasts.
             Types.logger.info(f"try_usual_python_conversion {gen_value.actual_arg_type}"
-               "is not a usual Python conversion"
-               )
+               "is not a usual Python conversion")
 
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
         # likewise for value of result_arg
