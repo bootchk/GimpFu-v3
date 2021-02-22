@@ -101,6 +101,7 @@ class FuGenericValue():
     def actual_arg(self):
         return self._actual_arg
 
+    # TODO combine these into one isCoherent()
     @property
     def did_convert(self):
         return self._did_convert
@@ -497,6 +498,7 @@ class FuGenericValue():
         if self.did_upcast:
             return
 
+        # TODO do this first because it shortcuts coherent types
         # TODO rename try_usual_python_conversion_and_upcast
         Types.try_usual_python_conversion(formalArgType, self)
         if self.did_convert or self.did_upcast:

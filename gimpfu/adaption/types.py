@@ -108,7 +108,11 @@ class Types():
         assert isinstance(formal_arg_type_name, str)
 
         if gen_value.actual_arg_type is int:
-            if FormalTypes.is_boolean_type(formal_arg_type_name):
+            if FormalTypes.is_int_type(formal_arg_type_name):
+                # TODO make this just set a flag. For now, do an unnecessary upcast.
+                gen_value.int()
+                Types.logger.info(f"try_usual_python_conversion: already proper type")
+            elif FormalTypes.is_boolean_type(formal_arg_type_name):
                 gen_value.boolean()
             elif FormalTypes.is_float_type(formal_arg_type_name):
                 gen_value.float()
