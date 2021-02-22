@@ -11,6 +11,7 @@ from gimpfu.adaption.types import Types
 # in Adapter by selectively import Marshal
 from gimpfu.adapters.image import GimpfuImage
 from gimpfu.adapters.layer import GimpfuLayer
+from gimpfu.adapters.channel import GimpfuChannel
 from gimpfu.adapters.vectors import GimpfuVectors
 from gimpfu.adapters.rgb import GimpfuRGB
 from gimpfu.adapters.display import GimpfuDisplay

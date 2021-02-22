@@ -37,11 +37,12 @@ I.E. to add a wrapper Foo:
 '''
 # TODO other leaf types, LayerMask etc.
 gimp_type_to_wrapper_type_map = {
-    'Image':   "GimpfuImage",
-    'Layer':   "GimpfuLayer",
+    'Image'  : "GimpfuImage",
+    'Layer'  : "GimpfuLayer",
+    'Channel': "GimpfuChannel",
     'Display': "GimpfuDisplay",
     'Vectors': "GimpfuVectors",
-    'RGB':     "GimpfuRGB",
+    'RGB'    : "GimpfuRGB",
 }
 
 def is_gimpfu_wrappable_name(name):

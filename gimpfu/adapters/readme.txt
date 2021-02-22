@@ -13,3 +13,12 @@ E.G. it defines the adapted properties of the class.
 Code near the bottom is specialized.
 Mostly FBC.
 E.G. define methods that GimpFu v2 defined that are not in Gimp itself.
+
+Process to add an adapter:
+  copy an <adapter>.py
+  modify it:
+    change name
+    change properties according to GimpFu v2 documents
+    change the new method according to GimpFu v3 documents
+
+  import it into adatption/marshal.py
