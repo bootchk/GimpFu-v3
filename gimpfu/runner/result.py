@@ -64,27 +64,29 @@ class FuResult():
 
     @staticmethod
     def lenActualResult(actual_result):
-        """ Length of a Python instance that is None, a single item, or a sequence.
-        A Python func can return a tuple.
+        """
+        Length of a Python result of a call that is None, a single item, or a sequence.
+        A Python call can return a tuple.
         """
         # TODO this is wrong
         if actual_result is None:
-            result = 1
+            result = 0
         elif isinstance(actual_result, Iterable) and not isinstance(actual_result, str):
             result = len(actual_result)
         else :
+            # is a string or not an iterable
             result = 1
         return result
 
     @staticmethod
     def doFormalAndActualResultsLenMatch(formalResultLength, actual_result):
         """
-        Is the length of the result of the run_func OK?
+        Does length of the Python result of the run_func OK?
 
         Note that a single result of None is wrong only when the procedure
         declared it would return more than one value.
-        In Python, there is no concept of a procedure that returns no value whatsoever.
-        A run_func returning None matches a PDB procedure returning no values.
+        In Python, there is no concept of a void procedure that returns no value whatsoever.
+        A Python result of None matches a PDB procedure returning no values.
 
         In Gimp, there is no general concept of a value that is not nullable.
         When None is a result, we do conversions to e.g. -1
@@ -168,7 +170,7 @@ class FuResult():
         after trying to convert/upcast.
         """
         assert isinstance(procedure, Gimp.Procedure) # !!! Not our GimpProcedure wrapper
-        FuResult.logger.info(f"procedure: {procedure.get_name()}, runfuncResult is: {runfuncResult}")
+        FuResult.logger.info(f"Success, procedure: {procedure.get_name()}, runfuncResult is: {runfuncResult}")
         # FuResult.logger.info(f"result length: {resultArray.length()}")
 
         # Get formal specs
@@ -201,27 +203,27 @@ class FuResult():
             # procedure declared returning void
             # assert we already checked that actual result was None
             # ensure status is set to "SUCCESS"
-            return resultArray
-
-        # Put actual results into resultArray
-
-        # TODO ensure runFuncResult is an iterable, always iterate
-        length = FuResult.lenActualResult(runfuncResult)
-        if length > 0:
-            index = 0
-            for item in runfuncResult:
-                formalType = resultSpecs[index].value_type
-                FuResult.setResultOfTypeIntoResults(item, formalType, resultArray)
-                index += 1
+            pass
         else:
-            # runfuncResult is elementary, not iterable
-            # TODO it could still be a list, where formal result type is array?
-            formalType = resultSpecs[0].value_type
-            FuResult.setResultOfTypeIntoResults(runfuncResult, formalType, resultArray)
+            # Put actual results into resultArray
 
-        # This log conveys little info
-        #FuResult.logger.info(f"resultArray is: {resultArray}")
-        return resultArray.getWrappedValueArray()
+            # TODO ensure runFuncResult is an iterable, always iterate
+            length = FuResult.lenActualResult(runfuncResult)
+            if length > 0:
+                index = 0
+                for item in runfuncResult:
+                    formalType = resultSpecs[index].value_type
+                    FuResult.setResultOfTypeIntoResults(item, formalType, resultArray)
+                    index += 1
+            else:
+                # runfuncResult is elementary, not iterable
+                # TODO it could still be a list, where formal result type is array?
+                formalType = resultSpecs[0].value_type
+                FuResult.setResultOfTypeIntoResults(runfuncResult, formalType, resultArray)
+
+        result = resultArray.getWrappedValueArray()
+        assert isinstance(result, Gimp.ValueArray)
+        return result
 
 
 
@@ -238,6 +240,7 @@ class FuResult():
         resultArray = procedure.new_return_values(Gimp.PDBStatusType.EXECUTION_ERROR, error)
         # ensure resultArray is-a Gimp.ValueArray whose first element is a GLib.Error??
         # ensure length of resultArray is length the procedure formal declared ???
+        assert isinstance(resultArray, Gimp.ValueArray)
         return resultArray
 
 

@@ -435,8 +435,9 @@ class FuRunner:
 
             # Alternatively: raise Exception(msg) but that is confusing to Author
 
-        FuRunner.logger.debug(f"Returning from: {name}")
+        FuRunner.logger.debug(f"Returning from: {name} with result:{final_result}")
         # ensure final_result is type GimpValueArray
+        assert isinstance( final_result, Gimp.ValueArray)
         return final_result
 
 
