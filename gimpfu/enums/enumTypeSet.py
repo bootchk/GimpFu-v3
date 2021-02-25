@@ -12,6 +12,7 @@ import logging
 
 
 
+
 class EnumTypeSet():
     """
     Knows the set of enum types defined in Gimp.
@@ -27,13 +28,21 @@ class EnumTypeSet():
         self.logger = logging.getLogger("GimpFu.EnumTypeSet")
         # !!! voluminous, so enable logging separately from GIMPFU_DEBUG
         self.logger.setLevel(logging.WARNING)
+
+        # Map from short, upper case enum name to its enum type.
+        self.defined_enums = {}
+
+        # map from GimpType of an enum to a boolean
         self.checked = {}
-        for name in GimpType.list_gimp_enums():
-            self.checked[name] = False
+        for short_name in GimpType.list_gimp_enums():
+            # assert name is a short name
+            assert not "." in short_name
+            self.checked[short_name] = False
 
 
     def checkOff(self, name):
-        # assert name is dotted name
+        # assert name is short name
+        assert not "." in name
         self.checked[name] = True
 
 
@@ -44,11 +53,21 @@ class EnumTypeSet():
             # assert is dotted name
             if self.checked[name] == False:
                 result.append(name)
-        self.logger.info(f"unchecked_names {result}")    # TODO info
+        self.logger.info(f"unchecked_names {result}")
         return result
 
+    def is_defined(self, enum_class_name, name):
+        """ Side effect is keep separate list of defined enums. """
+        result = name in self.defined_enums.keys()
+        if result:
+            self.logger.warning(f"Not overwriting: {enum_class_name} {name}, already defined: {self.defined_enums[name]} ")
+        else:
+            self.logger.debug(f"Defining enum: {name}")
+            self.defined_enums[name] = enum_class_name
+        return result
 
     # Generator
+    # Note this calls the generator below, which checks for names already in globals
     def defining_statements_for_unchecked_enums(self):
         """ Return defining statements for all enumerated values in all unchecked enum types. """
         for name in self.unchecked_names():
@@ -87,9 +106,11 @@ class EnumTypeSet():
         self.logger.debug(f"define_symbols_for_enum {enum}")
         # prints: <class 'gi.repository.Gimp.LayerMode'>
 
-        enum_class_name = GimpType.dotted_name_of_type(enum)
+        # import ..top
 
-        self.checkOff(enum_class_name)
+        enum_class_name = GimpType.dotted_name_of_type(enum)
+        enum_short_name = GimpType.short_name_of_dotted_name(enum_class_name)
+        self.checkOff(enum_short_name)
 
         # search the names in the dir of the enum type
         for attribute in dir(enum):
@@ -100,12 +121,10 @@ class EnumTypeSet():
                 # !!! a reference to Gimp is in the defining_statement, must import Gimp
                 #print(defining_statement)
 
-                # Ensure its not already in the global namespace
-                if defined_name in globals():
-                    self.logger.info(f"Not overwriting enum symbol already in globals: {enum_class_name} {defined_name}")
-                else:
-                    self.logger.debug(f"Defining in globals: {defined_name}")
-                yield(defining_statement)
+                # Skip defining statements for names already in the global namespace
+                # if not is_defined_in_top_globals(enum_class_name, defined_name):
+                if not self.is_defined(enum_short_name, defined_name):
+                    yield(defining_statement)
 
                 """
                 Caller must exec defining_statement
@@ -113,3 +132,7 @@ class EnumTypeSet():
                 (not just the global namespace of this module).
                 """
                 # exec(defining_statement, globals())
+            else:
+                # Log is almost useless since it includes all the dunders and functions
+                # self.logger.warning(f"GIMP enum name not uppper case: {attribute}")
+                pass

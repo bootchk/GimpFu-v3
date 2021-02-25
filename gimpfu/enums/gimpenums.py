@@ -211,6 +211,10 @@ for statement in ets.defining_statements_for_enum(Gimp.RotationType, prefix='ROT
     exec(statement)
 # ROTATE_90 = Gimp.RotationType.90
 
+for statement in ets.defining_statements_for_enum(Gimp.RunMode, prefix='RUN_'):
+    exec(statement)
+# RUN_INTERACTIVE = Gimp.RunMode.INTERACTIVE
+
 
 
 

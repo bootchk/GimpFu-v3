@@ -54,6 +54,11 @@ class GimpType():
         return type_name.replace("Gimp", "")
 
     @classmethod
+    def short_name_of_dotted_name(cls, dotted_name):
+        # assert type_name like "Gimp.MergeType" !!! a string
+        return dotted_name.replace("Gimp.", "")
+
+    @classmethod
     def type_name_from_short_name(cls, short_name):
         # Reconstruct the GType name
         name = "Gimp" + short_name

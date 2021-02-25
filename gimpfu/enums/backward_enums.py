@@ -21,6 +21,7 @@ gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
 
+# TODO put these in a list and warn of deprecated use by defining __getattr__ on top module
 
 
 # TODO this is a don't care, because GimpFu adapts all functions that use it??

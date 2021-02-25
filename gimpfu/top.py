@@ -142,22 +142,31 @@ TODO v2 class CancelError(RuntimeError): pass
 Log this top level, because Gimp gives uninformative "wire error"
 when Python crashes.
 """
-# TODO should this be exposed?
+# TODO should this be exposed? Rename to gimpfuLogger so name clash less likely
 from gimpfu.logger.logger import FuLogger
 logger = FuLogger.getGimpFuLogger()
 
 
-logger.info("defining enums")
+"""
+TODO see PEP 562 module __getattr__
+Define __getattr__ for this module to warn of deprecated enums
+"""
+
 '''
 Expose to Authors: abbreviated and backward compatible symbols Gimp enums.
 Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
+
 Name "gimpenums" retained for FBC, some non-GimpFu plugins may "from gimpenums import *"
 '''
-# cases not handled programatically
+logger.info("defining enums")
+
+# backward compatible, deprecated
 from gimpfu.enums.backward_enums import *
 
-# cases handled programatically
+# generated short names of long names of GI types
 from gimpfu.enums.gimpenums import *
+
+# CRUFT?
 # import define_enums_into_global_namespace
 #define_enums_into_global_namespace()
 
