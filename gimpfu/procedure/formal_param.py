@@ -206,8 +206,23 @@ class FuFormalParam(GObject.Object):
         # produce an instance having a property with the given attributes
         instance = FuFormalParam.prop_holder_factory.produce(property_name, type, default, min, max)
 
+        """
+        Call Gimp.Procedure.add_argument_from_property()
+        That should return a GObject.ParamSpec.
+        It does not seem to return None on an error.
+        There are common errors:
+           1. LibGimp warns if property of same name already exists.
+           2. ??? later get _gimp_gp_param_def_to_param_spec: GParamSpec type 'GParamBoxed' is not handled
+              for a layer property ??? TODO
+
+        1. occurs if author chooses a name that is already a stock property name e.g. 'image'
+        """
+
+        self.logger.info(f"convey_using_dynamic_class_property, name: {property_name} ")
         if is_in_arg:
-            procedure.add_argument_from_property(instance, property_name)
+            paramspec = procedure.add_argument_from_property(instance, property_name)
+            print(paramspec)
+            assert(paramspec is not None)
         else:
             procedure.add_return_value_from_property(instance, property_name)
 
@@ -218,7 +233,7 @@ class FuFormalParam(GObject.Object):
         """ Convey self as part of the signature of a GimpProcedure procedure.
         is_in_arg: whether formal arg is IN (an arg) or OUT (a return value)
         """
-        self.logger.debug(f"Convey: {self}")
+        self.logger.debug(f"convey_to_gimp: {self}")
         # TODO choice of implementation
         #self.convey_using_static_property(procedure)
         self.convey_using_dynamic_class_property(procedure, is_in_arg)
@@ -300,12 +315,14 @@ class FuFormalParam(GObject.Object):
 
 
     def _get_type(self):
-        result = map_PF_TYPE_to_type[self.PF_TYPE]
+        ''' Python type to represent self. '''
+        result = map_PF_TYPE_to_python_type[self.PF_TYPE]
 
         # special case FBC
         if self.PF_TYPE == PF_RADIO and isinstance(self.DEFAULT_VALUE, str):
             # author intends string valued radio buttons
             result = str
+        self.logger.info(f"_get_type: {result}")
         return result
 
 
@@ -322,8 +339,10 @@ Many to one.
 This is not entirely accurate.
 v2 allowed PF_RADIO to be str or int type.
 See special case
+
+!!! If there are aliases, put only one here.
 """
-map_PF_TYPE_to_type = {
+map_PF_TYPE_to_python_type = {
     # fundamental types, with simple look-and-feel widgets
     PF_INT8:      int,
     PF_INT16:     int,
@@ -347,10 +366,10 @@ map_PF_TYPE_to_type = {
     # constrained (by EXTRAS) fundamental types,
     # but with sophisticated look-and feel widgets
     # that do the constraining
-    PF_TOGGLE:    int,
+    # PF_TOGGLE is alias for PF_BOOL
     PF_SLIDER:    float,
     PF_SPINNER:   float,
-    PF_ADJUSTMENT: int,
+    # PF_ADJUSTMENT is alias for SPINNER
     PF_OPTION:    int,
     PF_RADIO:     int,
     # Gimp resource objects, identified by name of type str
@@ -405,7 +424,9 @@ map_PF_TYPE_to_extras_type = {
     PF_INT:       1,
     PF_FLOAT:     1,
     PF_STRING:    0,
-    PF_VALUE:     int,  # TODO
+    PF_TEXT:      0,    # an alternate string valued chooser
+
+    PF_VALUE:     int,  # TODO what is this??
     # GUI is Gimp chooser widget, but no extras
     PF_COLOR:     0,
     PF_COLOUR:    0,
@@ -418,21 +439,24 @@ map_PF_TYPE_to_extras_type = {
     PF_VECTORS:   0,
 
     PF_TOGGLE:    int, # int/bool valued checkbox or toggle widget
-    PF_BOOL:      2,  # alias for TOGGLE
+    PF_BOOL:      2,  # alias for TOGGLE, different widget?
     PF_SLIDER:    1,
     PF_SPINNER:   1,
     PF_ADJUSTMENT: 1,
+    PF_RADIO:     3,    # radio buttons for a int or string valued enum
+    PF_OPTION:    3,    # alias for RADIO
+
     PF_FONT:      0,
-    PF_FILE:      str,  # ??? GFile?
+    PF_FILE:      0,
+    # These are wrong.
+    # Should be 0 for no extras?
     PF_BRUSH:     int,
     PF_PATTERN:   int,
     PF_GRADIENT:  int,
-    PF_RADIO:     3,    # radio buttons
-    PF_TEXT:      0,
     PF_PALETTE:   int,
-    PF_FILENAME:  0,
-    PF_DIRNAME:   0,
-    PF_OPTION:    3,    # alias for RADIO
+
+    PF_FILENAME:  0,    # GFile valued file chooser widget
+    PF_DIRNAME:   0,    # ???
 
     # Arrays have no extras
     PF_INT8ARRAY:   0,

@@ -55,6 +55,11 @@ class FuFormalParams():
 
 
     def sanity_test(self, metadata):
+        unique_names = []
+        # since we are using the names to convey properties to Gimp,
+        # disallow names already used by Gimp for properties
+        unique_names.append("image")
+        unique_names.append("drawable")
         for param in self.PARAMS:
             """
             TODO
@@ -69,14 +74,22 @@ class FuFormalParams():
                 raise Exception(exception_str)
 
 
-            # Common mistake is a space in the LABEL
+            # Fixup common mistake is a space in the LABEL
             param.LABEL = param.LABEL.replace( ' ' , '_')
 
             if not metadata.letterCheck(param.LABEL, metadata.param_name_allowed):
                 # Not fatal since we don't use it, args are a sequence, not by keyword
                 # But Gimp may yet complain.
                 # TODO transliterate space to underbar
-                proceed(f"parameter name '{param.LABEL}'' contains illegal characters")
+                proceed(f"parameter name '{param.LABEL}' contains illegal characters")
+
+            # Check for unique names.  To convey to Gimp, must be unique.
+            # Names do NOT need to match the formal params of the run_func
+            if param.LABEL in unique_names:
+                proceed(f"parameter name '{param.LABEL}' is not unique")
+            else:
+                unique_names.append(param.LABEL)
+
 
 
     def deriveMissingParams(self, metadata):
@@ -166,4 +179,4 @@ class FuFormalParams():
             # FuFormalParams.logger.debug(f"Convey arg type {self.PARAMS[i]}")
             self.PARAMS[i].convey_to_gimp(procedure, i, is_in_arg)
             count += 1
-        FuFormalParams.logger.debug(f"Conveyed args, count: {count}")
+        FuFormalParams.logger.debug(f"convey_to_gimp, conveyed count: {count}")

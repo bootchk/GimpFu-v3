@@ -256,6 +256,16 @@ class GimpfuPDB():
         """
         Gimp.Drawable.edit_bucket_fill(layer.unwrap(), fill_type, x, y)
 
+    """
+    These PDB procedures in v2 took integer ID.
+    In v3 PDB, the procedures don't exist, instead there is e.g. gimp_item_ID_is_layer().
+    An author could convert v2 to v3 by:
+    gimp_item_is_layer(item) => gimp_item_ID_is_layer(item.ID).
+    But FBC, here GimpFu provides adaptor procedure.
+    """
+    def gimp_item_is_layer(self, item):      return Gimp.Item.is_layer(item.unwrap())
+    # TODO there are many more
+
 
     """
     WIP

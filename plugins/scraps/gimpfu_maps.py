@@ -1,4 +1,6 @@
 
+# Just OLD CODE from v2
+
 '''
 lkk temporary comment out
 PF_INT8        = PDB_INT8
@@ -107,7 +109,7 @@ _obj_mapping = {
 
     PF_TOGGLE      : bool,
     PF_SLIDER      : float,
-    PF_SPINNER     : int,
+    PF_SPINNER     : float,
 
     PF_FONT        : str,
     PF_FILE        : str,
@@ -129,16 +131,16 @@ end lkk comment out
 Map PF_TYPE to WidgetFactoryMethod
 '''
 
+"""
 _edit_mapping = {
-'''
         PF_INT8        : IntEntry,
         PF_INT16       : IntEntry,
         PF_INT32       : IntEntry,
         PF_FLOAT       : FloatEntry,
-'''
+
         PF_INT         : IntEntry,
         PF_STRING      : StringEntry,
-'''
+
         #PF_INT8ARRAY   : ArrayEntry,
         #PF_INT16ARRAY  : ArrayEntry,
         #PF_INT32ARRAY  : ArrayEntry,
@@ -167,5 +169,5 @@ _edit_mapping = {
         PF_GRADIENT    : gimpui.GradientSelector,
         PF_PALETTE     : gimpui.PaletteSelector,
         PF_TEXT        : TextEntry
-'''
 }
+"""

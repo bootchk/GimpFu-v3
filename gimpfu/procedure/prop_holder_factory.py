@@ -89,7 +89,7 @@ class Foo(GObject.GObject):
 
         # assert type is a Python type
 
-        self.logger.info(f"Producing property type: {type} default: {default}, min: {min}, max: {max}")
+        self.logger.info(f"produce property, name: {unique_prop_name} type: {type} default: {default}, min: {min}, max: {max}")
 
         # OLD generate a name
         # unique_prop_name = name_generator.get_unique_name()
@@ -128,11 +128,14 @@ class Foo(GObject.GObject):
         #self.logger.info(f"exec( {code_string} )")
 
         # create class Foo in globals by exec template
+
+        self.logger.info(f"exec> {code_string} <to define class for property")
         exec(code_string)
 
         # create instance of class
         instance = Foo()
         # assert instance is-a GObject with property as specified
+        assert instance is not None
 
         # OLD also return generated name
         return instance

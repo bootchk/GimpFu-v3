@@ -53,6 +53,7 @@ class FuColorEntry(GimpUi.ColorButton):
         # critical : gimp_color_button_set_title: assertion 'title != NULL' failed but works anyway?
         # We will ignore it.
 
+        module_logger.debug(f"FuColorEntry: set_title")
         self.set_title(title)
         # self.set_title("Border")
 
@@ -85,6 +86,13 @@ class FuFontEntry(GimpUi.FontSelectButton):
     def get_value(self):
         return self.get_font()
 
+
+"""
+Image, Drawable, etc.
+
+These all return an ID of type integer.
+"""
+
 class FuImageEntry(GimpUi.ImageComboBox):
     def __init__(self, default="" ):
         module_logger.debug(f"FuImageEntry: default: {default}")
@@ -101,6 +109,22 @@ class FuImageEntry(GimpUi.ImageComboBox):
         # TODO gir shows no methods??
         # return self.get_image()
         return None
+
+class FuDrawableEntry(GimpUi.DrawableComboBox):
+    def __init__(self, default="" ):
+        module_logger.debug(f"FuDrawableEntry: default: {default}")
+
+        # inherits Gtk.Widget.  Subclass has no init() method? GTK expects its __init__ to be called ???
+        Gtk.Widget.__init__(self)
+
+        # Has no set_title
+        # Not set default
+
+
+    def get_value(self):
+        return self.get_active_id()
+
+
 
 
 class FuPaletteEntry(GimpUi.PaletteSelectButton):

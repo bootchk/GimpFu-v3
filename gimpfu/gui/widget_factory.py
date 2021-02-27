@@ -113,7 +113,7 @@ class WidgetFactory:
             # TODO hack, should not even be a control
             # Omitted, use None
             args = [widget_initial_value,]
-        elif pf_type in (PF_IMAGE,):
+        elif pf_type in (PF_DISPLAY, PF_IMAGE, PF_ITEM, PF_DRAWABLE, PF_LAYER, PF_CHANNEL, PF_VECTORS):
             args = [None,]
         else:
             # PF_SPINNER,, PF_OPTION
@@ -199,7 +199,7 @@ _edit_map = {
         PF_IMAGE       : FuImageEntry,
         PF_LAYER       : OmittedEntry,
         PF_CHANNEL     : OmittedEntry,
-        PF_DRAWABLE    : OmittedEntry,
+        PF_DRAWABLE    : FuDrawableEntry,
         PF_VECTORS     : OmittedEntry,
 
         # Widgets provided by Gimp for Gimp data objects?

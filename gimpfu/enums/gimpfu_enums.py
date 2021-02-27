@@ -16,18 +16,17 @@ v3 At import time, we don't have access to Gimp types yet.  Define PF enum witho
 
 We don't use Python 3 enum class FBC.
 '''
-PF_INT8        = 1  # Should be UINT8
-PF_INT16       = 2  # Should be obsolete
-PF_INT32       = 3
+PF_INT8        = 1  # Should be UINT8 or PF_CHAR
+PF_INT16       = 2  # Should be obsolete, not supported in Gimp?
+PF_INT32       = 3  # Should be obsolete, same as PF_INT
 PF_INT         = 4
 PF_FLOAT       = 5
 PF_STRING      = 6
 PF_VALUE       = 7  # ??? Meaning ???
 
-
-
 PF_COLOR       = 8
-PF_COLOUR      = 9  # FBC, an alias
+PF_COLOUR      = 9  # FBC, not an alias, a separate value ???
+
 PF_ITEM        = 10
 PF_DISPLAY     = 11
 PF_IMAGE       = 12

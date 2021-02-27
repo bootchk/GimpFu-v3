@@ -17,8 +17,7 @@ so the plugin will run in Gimp 3.
 This is for plugins written in Python using GimpFu.
 In other words, if you import any of these modules:
    - gimpfu
-   - gimp
-   - gimpenums
+   - gimpenums (see below)
 
 This document talks in the present tense, but much is not implemented yet.
 As of this writing, the document is a specification for what should be implemented.
@@ -29,8 +28,8 @@ and is not sanctioned by the Gimp organization.
 Quickstart
 ----------
 
-The document "GIMP Python Documentation" is still mostly effective.
-It is NOT effective towards the end,
+The document "GIMP Python Documentation" is still mostly in effect.
+It is NOT in effect towards the end,
 where it talks about tiles, pixel regions, and the gimpplugin module.
 "GIMP Python Documentation" mostly describes
 what this document calls 'GimpFu', i.e. the gimpfu module.
@@ -62,9 +61,9 @@ Python3 syntax changed for a few language constructs.
 
 Examples:
 
-    except ValueError, e:    =>      except ValueError as e:
-
-    print Foo => print(Foo)
+    except ValueError, e:      =>   except ValueError as e:
+    raise RuntimeError, "msg"  =>   raise RuntimeError("msg")
+    print Foo                  =>   print(Foo)
 
 
 Standard module API
@@ -184,6 +183,31 @@ did not specify which colorspace they used.
 In v3, the modes are HSL_COLOR, HSV_SATURATION, HSV_HUE, and HSV_VALUE
 and their name tells you which colorspace they use.
 Note that the first uses "HSL" instead of "HSV" colorspace (it always has, even in v2.)
+
+ID versus object
+================
+
+Formerly, a Python plugin received integer ID's for references to GIMP objects, such as layers.
+(Note that ScriptFu Scheme plugins still receive integer ID's.)
+Most authors were not even aware that the GIMP objects were stored as integer ID's.
+
+Now a Python plugin receives a reference to a GObject (a pointer, more or less.)
+
+GimpFu mostly hides all that:
+
+Some PDB procedures, like gimp-item-is-layer(int ID) are no longer in the PDB (deprecated.)
+GimpFu provides a backward compatible definition for gimp-item-is-layer(GObject *),
+so you don't need to change code.
+
+Now the PDB v3 has gimp-item-ID-is-layer(int ID).
+Also ID is a property of an item.
+Thus if you want to revise to use ID's, gimp-item-ID-is-layer(item.ID) should also work.
+
+Passing ID's in most other calls to PDB procedures will no longer work.
+You will need to delete the trailing ".ID".
+Almost all PDB procedures now expect a GObject reference, not an ID.
+
+
 
 TODO other model changes
 
