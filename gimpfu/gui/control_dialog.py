@@ -108,13 +108,21 @@ class PluginControlDialog():
             # Grid right hand side is control widget
             control_widget = WidgetFactory.produce(a_formal_param, guiable_initial_values[i])
 
-            # e.g. control_widget = StringEntry(widget_initial_value)
-            label.set_mnemonic_widget(control_widget)
-            grid.attach(control_widget, 2, i, 1, 1)
+            if WidgetFactory.is_wrapped_widget(a_formal_param):
+                inner_widget = control_widget.get_inner_widget()
+            else:
+                inner_widget = control_widget
+            # assert inner_widget is a Gtk widget
 
-            PluginControlDialog._add_tooltip_to_widget(control_widget, a_formal_param )
+            """
+            Do stuff with the Gtk inner widget.
+            """
+            label.set_mnemonic_widget(inner_widget)
+            grid.attach(inner_widget, 2, i, 1, 1)
+            PluginControlDialog._add_tooltip_to_widget(inner_widget, a_formal_param )
+            inner_widget.show()
 
-            control_widget.show()
+            # Keep the outer widget
             control_widget.desc = a_formal_param.DESC
             control_widgets.append(control_widget)
 
@@ -169,10 +177,13 @@ class PluginControlDialog():
 
 
     '''
-    v2 this took a run_script and called it, returning its results.
-    I presume so that the dialog would stay up with its progress bar.
+    v2 this took a function argument run_script (the plugin algorithem)
+    and called it, returning its results.
+    So that the dialog would stay up with its progress bar
+    while the plugin algorithm executed.
 
-    v3 returns control_values and caller must invoke result=run_func(control_values)
+    v3 does not take a function argument.
+    Caller executes the plugin algorithm
     Progress is still shown, but in the image's display window's progress bar.
     '''
     @classmethod

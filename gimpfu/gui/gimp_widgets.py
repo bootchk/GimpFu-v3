@@ -39,10 +39,15 @@ class FuColorEntry(GimpUi.ColorButton):
     def __init__(self, default="", title = "Foo", ):
         module_logger.debug(f"ColorButton: default: {default} title: {title}")
 
+        # try setting title before superclass init
+        # throws not initialized
+        #module_logger.debug(f"FuColorEntry: set_title")
+        #self.set_title(title)
+
         # ColorButton has no init() method but GTK expects its __init__ to be called ???
-        Gtk.Button.__init__(self)
-
-
+        # Both the following yield the same result
+        #Gtk.Button.__init__(self)
+        super().__init__("foo")
 
         # Gimp requires title, so the pop-up ColorSelector can be titled.
         # Otherwise, at click time:  gimp_dialog_new: assertion 'title != NULL' failed
@@ -76,6 +81,7 @@ class FuFontEntry(GimpUi.FontSelectButton):
 
         # Gimp.FontSelectButton has no init() method but GTK expects its __init__ to be called ???
         # Gimp.FontSelectButton inherits Gtk.Widget
+        # TODO super().__init__()
         Gtk.Widget.__init__(self)
 
         # Has no set_title
@@ -99,7 +105,7 @@ class FuImageEntry(GimpUi.ImageComboBox):
 
         # Gimp.FontSelectButton has no init() method but GTK expects its __init__ to be called ???
         # Gimp.FontSelectButton inherits Gtk.Widget
-        Gtk.Widget.__init__(self)
+        super().__init__()
 
         # Has no set_title
 
@@ -110,19 +116,34 @@ class FuImageEntry(GimpUi.ImageComboBox):
         # return self.get_image()
         return None
 
-class FuDrawableEntry(GimpUi.DrawableComboBox):
+# class FuDrawableEntry(GimpUi.DrawableComboBox):
+# Not inherit
+# Widget wrapper
+class FuDrawableEntry():
     def __init__(self, default="" ):
         module_logger.debug(f"FuDrawableEntry: default: {default}")
 
+        self.widget = GimpUi.DrawableComboBox.new()
         # inherits Gtk.Widget.  Subclass has no init() method? GTK expects its __init__ to be called ???
-        Gtk.Widget.__init__(self)
+        # super().__init__()
 
         # Has no set_title
         # Not set default
 
+    def get_inner_widget(self):
+        return self.widget
 
     def get_value(self):
-        return self.get_active_id()
+        """ Returns Drawable.ID """
+        # Delegate to inner widget
+        active = self.widget.get_active()
+        # Discard first element, usually True
+        id = active[1]
+        #result = Gimp.Drawable.get_by_id(id)
+        # assert is-a Gimp.Drawable
+        result = id
+        module_logger.debug(f"FuDrawableEntry: get_value: {result}")
+        return result
 
 
 

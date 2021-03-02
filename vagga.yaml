@@ -552,12 +552,13 @@ containers:
 
 
 
-  # Container with GIMP installed
-  # Base on gimpMesonDev usually
+  # Container with meson built GIMP installed
+  # Base on gimpMesonDev usually but can depend on gimpGuileGIInstalled
+  # !!! source and build dirs not in the container, but container depends on it.
+  # vagga will rebuild container if gimp source changes.
   gimpMesonInstalled:
     setup:
-    - !Container gimpGuileGIInstalled
-    # - !Install [ libmypaint-dev]
+    - !Container gimpMesonDev
 
     # This tells vagga that this container depends on changed gimp source
     # We don't need that because meson knows when it needs to rebuild ??
@@ -591,7 +592,27 @@ containers:
       HOME: /work/.home
 
 
-  # Container with AM built resynthesizer plugin
+  # Container with pgi-docgen generated docs
+  gimpMesonDocs:
+    setup:
+    - !Container gimpMesonInstalled
+    # Arrange that pip installs transitive dependencies
+    # This means that requirements.txt need not contain ALL the transitive dependencies
+    - !PipConfig
+      dependencies: true
+    # Requirements of pgi-docgen
+    - !Py3Requirements "/work/docgen/requirements.txt"
+    # git clone tool pgi-docgen
+    - !Git
+      url: https://github.com/pygobject/pgi-docgen
+      path: /work/pgi-docgen
+    environ:
+      HOME: /work/.home
+
+
+
+
+  # Container with AM built resynthesizer plugin on top of meson built Gimp
   resynthAMInstalled:
     setup:
     - !Container gimpMesonInstalled
@@ -610,34 +631,26 @@ containers:
         ./autogen.sh
         make
         make install
-
     environ:
       HOME: /work/.home
+
+
 
   # Container with AM built resynthesizer plugin on top of meson built Gimp
   resynthMesonInstalled:
     setup:
     - !Container gimpMesonInstalled
-
     # Make it build if the source changes.
     - !Depends /work/resynthesizer
-
     - !Sh |
         cd /work/resynthesizer
         meson setup /work/resynthBuild
         cd /work/resynthBuild
         ninja
         ninja install
-
-
     environ:
       HOME: /work/.home
 
-
-
-  # Container with installed gimp, built using meson
-  # !!! source is not in the container, but container depends on it and vagga
-  # will rebuild container if gimp source changes.
 
 
   # Final container with a few more customizations
@@ -1155,3 +1168,41 @@ commands:
       export GIMP_PLUGIN_DEBUG=all,fatal-warnings
       export GIMPFU_DEBUG=1
       gimp-2.99 --verbose
+
+  testDocs: !Command
+    description: Generated and display Python docs
+    container: gimpMesonDocs
+    run: |
+      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
+      # export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
+      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      export NO_AT_BRIDGE=1
+
+      echo LD_LIBRARY_PATH is:
+      echo ${LD_LIBRARY_PATH}
+
+      echo finding libgobject-2.0.so.0
+      find / -name libgobject-2.0.so.0
+      # should be at /usr/lib/x86_64-linux-gnu/
+      echo finding libgtk-3.0.so.0
+      find / -name libgtk-3.0.so.0
+      echo pkgconfig gtk-3
+      pkg-config --modversion gtk-3.0
+      pkg-config --modversion gtk-3.0:amd64
+      #echo dpkg gtk-3
+      #dpkg -l | grep gtk
+      echo ls /usr/lib/x86_64-linux-gnu
+      ls -l /usr/lib/x86_64-linux-gnu/libgobj*
+
+      echo generating docs
+      cd /work/pgi-docgen
+      #./tools/build.sh Gimp-3.0
+      ./tools/build.sh GimpUi-3.0
+      #./tools/build.sh Gtk-3.0
+      #./tools/build.sh Gst-1.0
+
+      echo generating html
+      ./pgi-docgen build _docs _docs/_build
+
+      echo listing built docs
+      ls _docs/_build

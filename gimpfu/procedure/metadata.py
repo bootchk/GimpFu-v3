@@ -153,10 +153,18 @@ class FuProcedureMetadata():
 
 
     def convey_in_args_to_gimp(self, procedure):
-        #    ******                                                                 ****
-        self.params.convey_to_gimp(procedure, count_omitted_leading_args=self._nonguiable_arg_count, is_in_arg=True)
+        count_omitted_leading_args = self._nonguiable_arg_count
+        count = self.params.convey_to_gimp(procedure, count_omitted_leading_args=self._nonguiable_arg_count, is_in_arg=True)
+        # ensure Gimp.Procedure has proper count of args.
+        arg_count = len(procedure.get_arguments())
+        self.logger.info(f" Conveyed: {count}, arg_count {arg_count}, omitted: {count_omitted_leading_args}")
+        # add one for run mode
+        assert  arg_count == count + count_omitted_leading_args + 1
+
     def convey_out_args_to_gimp(self, procedure):
-        self.results.convey_to_gimp(procedure, count_omitted_leading_args=0, is_in_arg=False)
+        count = self.results.convey_to_gimp(procedure, count_omitted_leading_args=0, is_in_arg=False)
+        # ensure Gimp.Procedure has proper count of args.
+        assert len(procedure.get_return_values()) == count
 
 
     '''

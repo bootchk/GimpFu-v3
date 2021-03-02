@@ -5,6 +5,7 @@ resynthesizer
 gimpBuild
 resynthBuild
 guile-gi
+pgi-docgen
 gimpfu/__pycache__
 pygimpv2
 pdb.txt

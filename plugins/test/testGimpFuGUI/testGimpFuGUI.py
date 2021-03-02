@@ -14,10 +14,17 @@ from gimpfu import *
 
 def plugin_func(img, drw,
                 int8, int32, float, string,
-                file, color, font,
-                image, drawable, item, layer):
+                file,
+                #color, # GLib CRITICAL
+                font,  # selector not stay on top
+                image, # model is empty
+                drawable,
+                item,
+                layer):
     """ Does nothing. """
     # TODO or checks that each value is valid?
+    print(f"Test GIMP GUI results:")
+    print(f"Drawable: {drawable}")
     return
 
 
@@ -37,8 +44,8 @@ register(
           #                                    name
 
           # These are really not needed?
-          (PF_IMAGE,         "image",      "foo",      None),
-          (PF_DRAWABLE,      "drawable",      "foo",      None),
+          #(PF_IMAGE,         "image",      "foo",      None),
+          #(PF_DRAWABLE,      "drawable",      "foo",      None),
           # NO widgets for arrays
 
           # int primitives
@@ -58,7 +65,7 @@ register(
           (PF_FILE,          "file",        "file",     None),
           # GIMP objects
           # a button that opens a dialog that chooses a color
-          (PF_COLOR,         "color",       "color",    "red"),
+          #(PF_COLOR,         "color",       "color",    "red"),
           # a drop down menu button to choose a font
           (PF_FONT,          "font",        "font",     "Helvetica"),
           # a drop down menu button to choose an image that is open in Gimp app
@@ -66,9 +73,9 @@ register(
           # ???
           (PF_DRAWABLE,       "drw",        "drawable", None),
           # Not implemented
-          (PF_ITEM,         "item",         "foo", None),
+          (PF_ITEM,         "item",         "item", None),
           #(PF_DISPLAY,      "display",   "foo", None),
-          (PF_LAYER,        "layer",        "foo", None),
+          (PF_LAYER,        "layer",        "layer", None),
           #(PF_CHANNEL,      "channel",   "foo", None),
           #(PF_VECTORS,      "vectors",   "foo", None),
 

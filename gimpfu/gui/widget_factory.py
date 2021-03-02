@@ -45,9 +45,19 @@ class WidgetFactory:
         # tooltip_text = a_formal_param.tooltip_text)
 
         WidgetFactory.logger.debug(f"produce: {widget_constructor} specs: {factory_specs}")
-        result = widget_constructor(*factory_specs)
+        if factory_specs:
+            result = widget_constructor(*factory_specs)
+        else:
+            result = widget_constructor()
+
+        # # HACK:
+        #if a_formal_param.PF_TYPE == PF_DRAWABLE:
+        #    result = result.get_widget()
 
         return result
+
+    def is_wrapped_widget(a_formal_param):
+        return a_formal_param.PF_TYPE == PF_DRAWABLE
 
 
     def _enumerate_names(names_tuple):
@@ -114,7 +124,7 @@ class WidgetFactory:
             # Omitted, use None
             args = [widget_initial_value,]
         elif pf_type in (PF_DISPLAY, PF_IMAGE, PF_ITEM, PF_DRAWABLE, PF_LAYER, PF_CHANNEL, PF_VECTORS):
-            args = [None,]
+            args = None   # [None,]
         else:
             # PF_SPINNER,, PF_OPTION
             raise RuntimeError(f"Unhandled PF_ widget type {pf_type}.")
@@ -199,6 +209,8 @@ _edit_map = {
         PF_IMAGE       : FuImageEntry,
         PF_LAYER       : OmittedEntry,
         PF_CHANNEL     : OmittedEntry,
+        # Doesn't work to reference GimpUi.DrawableComboBox, the class is not a constructor??
+        # must call GimpUi.DrawableComboBox.new() by a G_OBJECT_WARN_INVALID_PROPERTY_ID
         PF_DRAWABLE    : FuDrawableEntry,
         PF_VECTORS     : OmittedEntry,
 

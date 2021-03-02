@@ -172,6 +172,9 @@ class FuFormalParams():
 
     def convey_to_gimp(self, procedure, count_omitted_leading_args, is_in_arg):
         ''' Convey  to Gimp a formal declaration of args to/from the procedure.
+        when is_in_arg, convey args to
+        else convey return args
+        Returns count of conveyed args.
         '''
 
         count = 0
@@ -180,3 +183,4 @@ class FuFormalParams():
             self.PARAMS[i].convey_to_gimp(procedure, i, is_in_arg)
             count += 1
         FuFormalParams.logger.debug(f"convey_to_gimp, conveyed count: {count}")
+        return count

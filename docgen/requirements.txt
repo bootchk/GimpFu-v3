@@ -1,0 +1,9 @@
+git+https://github.com/pygobject/pgi.git
+sphinx
+beautifulsoup4
+jinja2
+cairocffi
+lxml
+requests
+urllib3
+chardet

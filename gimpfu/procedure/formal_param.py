@@ -221,12 +221,15 @@ class FuFormalParam(GObject.Object):
         self.logger.info(f"convey_using_dynamic_class_property, name: {property_name} ")
         if is_in_arg:
             paramspec = procedure.add_argument_from_property(instance, property_name)
-            print(paramspec)
+            self.logger.debug(f"Paramspec for conveyed property: {paramspec}")
             assert(paramspec is not None)
         else:
             procedure.add_return_value_from_property(instance, property_name)
 
         #instance and property go out of scope i.e. they were short-lived
+
+        # ensure the property was conveyed
+        # TODO this is not correct, a formal arg was conveyed.  procedure.get_property(property_name)
 
 
     def convey_to_gimp(self, procedure, index, is_in_arg):

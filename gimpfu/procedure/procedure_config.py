@@ -56,7 +56,9 @@ class FuProcedureConfig():
         # Hack, try + 2
         #self._length = length + 2
 
-        self.logger = logging.getLogger("GimpFu.FuProcConfig")
+        self.is_disabled = True
+
+        self.logger = logging.getLogger("GimpFu.FuProcedureConfig")
         self.logger.debug(f"__init__, length: {length}")
 
 
@@ -85,7 +87,15 @@ class FuProcedureConfig():
         - values for case: passed from a caller
         - default values (at registration time) for case: invoked interactively
         '''
+        self.logger.debug(f"begin_run")
         self._config.begin_run (image, run_mode, args)
+
+
+    def end_run(self, is_success):
+        self.logger.debug(f"end_run")
+        self._config.end_run (Gimp.PDBStatusType.SUCCESS)
+
+
 
 
     #OLD Abandoned because of difficulties with getting matching types for GValueArray
@@ -129,7 +139,7 @@ class FuProcedureConfig():
 
             Permanently: return arbitrary GValue so we can proceed.
             """
-            proceed(f"GimpFu failed to register with Gimp property name: {name}.")
+            proceed(f"Fail get property name: {name} from procedure config.")
             if name == 'color':
                 result = FuGenericValue.new_rgb_value()
             else:
@@ -164,8 +174,13 @@ class FuProcedureConfig():
 
 
     def _get_values(self):
-        """ Get current values out of self. """
-        return self._get_values_using_config_properties()
+        """ Get current values out of self.
+        Returns Gimp.ValueArray.
+        """
+        # ??? choice of implementation
+        # result = _get_values_using_config_get_values
+        result = self._get_values_using_config_properties()
+        return result
 
 
 
@@ -200,23 +215,45 @@ class FuProcedureConfig():
         array.remove(index)
         array.insert(index, value)
 
+    def debug_procedure_config(self):
+        """ Check config vs procedure and log stuff. """
+        self.logger.info(f">>>>> Attributes of procedure and its config")
+
+        aux_args = self._procedure.get_aux_arguments()
+        self.logger.info(f"length aux_args: {len(aux_args)} aux_args: {aux_args}")
+
+        args = self._procedure.get_arguments()
+        self.logger.info(f"length args: {len(args)} args: {args}")
+
+        properties = self._config.list_properties()
+        self.logger.debug(f"Config's properties length: {len(properties)}, properties: {properties}")
+
+        # FAIL values = self._config.get_values()
+
+        # DEBUG, get properties of ProcedureConfig
+        # FAIL: print(self._procedure.type_name_from_class())
+
+        if self._length != len(properties):
+            self.logger.warning(f"Len procedure config does not match len of properties.")
+        #if self._length != len(values):
+        #    self.logger.warning(f"Len procedure config does not match len of values.")
+
+
 
 
     def set_changed_settings(self, users_args):
         """ Put last values of users_args (guiable) into self. """
         # require users_args is list of Python typed elements, for guiable args
+
+        if self.is_disabled:
+            # when it is crashing, during development
+            self.logger.info(f"******************set_changed_settings is DISABLED ********************")
+            return
+
+
         self.logger.info(f"set_changed_settings, length: {self._length}, len users_args: {len(users_args)}")
 
-        # DEBUG
-        aux_args = self._procedure.get_aux_arguments()
-        self.logger.info(f"length aux_args: {len(aux_args)}")
-        self.logger.info(f"aux_args: {aux_args}")
-        args = self._procedure.get_arguments()
-        self.logger.info(f"length args: {len(args)}")
-        self.logger.info(f"args: {args}")
-        # DEBUG, get properties of ProcedureConfig
-        # FAIL: print(self._procedure.type_name_from_class())
-        print(self._config.list_properties())
+        self.debug_procedure_config()
 
         """
         Get the current values in the Gimp.ProcedureConfig.
@@ -238,8 +275,5 @@ class FuProcedureConfig():
             self._set_value_at_index(value_array, value, dest_index)
             dest_index += 1
 
+        self.logger.info(f"Calling Gimp.ProcedureConfig.set_values")
         self._config.set_values(value_array)
-
-
-    def end_run(self, is_success):
-        self._config.end_run (Gimp.PDBStatusType.SUCCESS)
