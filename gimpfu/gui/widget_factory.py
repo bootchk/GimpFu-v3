@@ -4,8 +4,11 @@
 from gimpfu.enums.gimpfu_enums import *
 
 # WidgetFactory is main use of Widget constructors
+
+# widget classes groupd by how implemented
 from gimpfu.gui.widgets import *
-from gimpfu.gui.gimp_widgets import *
+from gimpfu.gui.widgets_gimp import *
+from gimpfu.gui.widgets_gtk import *
 
 from gimpfu.adapters.rgb import GimpfuRGB
 
@@ -204,15 +207,15 @@ _edit_map = {
         PF_VALUE       : OmittedEntry,
 
         # Widgets provided by Gimp for Gimp ephemeral objects
-        PF_ITEM        : OmittedEntry,
-        PF_DISPLAY     : OmittedEntry,
-        PF_IMAGE       : FuImageEntry,
-        PF_LAYER       : OmittedEntry,
-        PF_CHANNEL     : OmittedEntry,
         # Doesn't work to reference GimpUi.DrawableComboBox, the class is not a constructor??
         # must call GimpUi.DrawableComboBox.new() by a G_OBJECT_WARN_INVALID_PROPERTY_ID
-        PF_DRAWABLE    : FuDrawableEntry,
-        PF_VECTORS     : OmittedEntry,
+        PF_ITEM        : OmittedEntry,  # TODO user has no use for a generic item
+        PF_DISPLAY     : OmittedEntry,
+        PF_IMAGE       : FuImageWidget,
+        PF_LAYER       : FuLayerWidget,
+        PF_CHANNEL     : FuChannelWidget,
+        PF_DRAWABLE    : FuDrawableWidget,
+        PF_VECTORS     : FuVectorsWidget,
 
         # Widgets provided by Gimp for Gimp data objects?
         # "data" objects are loaded at run-time, not as ephemeral

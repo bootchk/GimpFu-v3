@@ -17,14 +17,15 @@ def plugin_func(img, drw,
                 file,
                 #color, # GLib CRITICAL
                 font,  # selector not stay on top
-                image, # model is empty
+                #image, # model is empty
                 drawable,
-                item,
-                layer):
+                #item,
+                layer,
+                channel):
     """ Does nothing. """
     # TODO or checks that each value is valid?
     print(f"Test GIMP GUI results:")
-    print(f"Drawable: {drawable}")
+    print(f"Drawable ID: {drawable}")
     return
 
 
@@ -69,14 +70,14 @@ register(
           # a drop down menu button to choose a font
           (PF_FONT,          "font",        "font",     "Helvetica"),
           # a drop down menu button to choose an image that is open in Gimp app
-          (PF_IMAGE,          "img",        "image",    None),
+          #(PF_IMAGE,          "img",        "image",    None),
           # ???
           (PF_DRAWABLE,       "drw",        "drawable", None),
           # Not implemented
-          (PF_ITEM,         "item",         "item", None),
+          #(PF_ITEM,         "item",         "item", None),
           #(PF_DISPLAY,      "display",   "foo", None),
-          (PF_LAYER,        "layer",        "layer", None),
-          #(PF_CHANNEL,      "channel",   "foo", None),
+          (PF_LAYER,        "layer",        "layer",    None),
+          (PF_CHANNEL,      "channel",      "channel",  None),
           #(PF_VECTORS,      "vectors",   "foo", None),
 
           # FILE, filename, dir
