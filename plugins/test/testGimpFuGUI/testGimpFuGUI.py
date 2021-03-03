@@ -8,6 +8,15 @@ See the dictionary _edit_map in gimpfu/gui/widget_factory.py
 that defines which PF_ values have widgets.
 
 See gimpfu/enums/gimpfu_enums.py for definition of PF_ enum
+
+To test:
+  Prep:
+    new image
+    create a vector
+    create a custom channel (doesn't list color or alpha channel)
+    invoke Test>GimpFu GUI
+  Expect:
+    in the console, every value returned by widgets is not -1 or otherwise None
 '''
 
 from gimpfu import *
@@ -26,7 +35,7 @@ def plugin_func(img, drw,
                 channel,
                 vectors,
                 ):
-    """ Does nothing. """
+    """ Just prints results. Does nothing substantive. """
     # TODO checks that each value is valid?
     print(f"Test GIMP GUI results:")
     print(f"File:        {file}")

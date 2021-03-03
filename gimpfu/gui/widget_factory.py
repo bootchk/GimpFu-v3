@@ -5,10 +5,11 @@ from gimpfu.enums.gimpfu_enums import *
 
 # WidgetFactory is main use of Widget constructors
 
-# widget classes groupd by how implemented
+# widget classes grouped by how implemented
 from gimpfu.gui.widgets import *
 from gimpfu.gui.widgets_gimp import *
 from gimpfu.gui.widgets_gtk import *
+from gimpfu.gui.widgets_resource import *
 
 from gimpfu.adapters.rgb import GimpfuRGB
 
@@ -192,20 +193,19 @@ _edit_map = {
         PF_ADJUSTMENT  : FloatEntry,
 
         # finite set of choices: two look-and-feels
-        # radio button group, wvalues are declared
+        # radio button group, values are declared
         PF_RADIO       : RadioButtonsEntry,
         # pull down option menu widget,  values not declared, always int-valued
         PF_OPTION      : OptionMenuEntry,
 
         # PF_COLOUR is deprecated alias for PF_COLOR
         PF_COLOR       : FuColorEntry,
-        PF_COLOUR      : FuColorEntry,
 
         # TODO is PF_FILENAME deprecated alias for PF_FILE?
         PF_FILE        : FuFileEntry,
         PF_FILENAME    : FuFileEntry,
         # TODO how specialize to directory
-        PF_DIRNAME     : FuFileEntry,
+        PF_DIRNAME     : OmittedEntry, # FuFileEntry,
 
         # ??? meaning?
         PF_VALUE       : OmittedEntry,
