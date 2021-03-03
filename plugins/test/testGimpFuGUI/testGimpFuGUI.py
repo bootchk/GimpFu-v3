@@ -15,17 +15,27 @@ from gimpfu import *
 def plugin_func(img, drw,
                 int8, int32, float, string,
                 file,
+                #dir
+
                 #color, # GLib CRITICAL
-                font,  # selector not stay on top
-                #image, # model is empty
+                font,  # selector not stay on top?
+
+                image,
                 drawable,
-                #item,
                 layer,
-                channel):
+                channel,
+                vectors,
+                ):
     """ Does nothing. """
-    # TODO or checks that each value is valid?
+    # TODO checks that each value is valid?
     print(f"Test GIMP GUI results:")
+    print(f"File:        {file}")
+    print(f"Font:        {font}")
+    print(f"Image    ID: {image}")
     print(f"Drawable ID: {drawable}")
+    print(f"Layer    ID: {layer}")
+    print(f"Channel  ID: {channel}")
+    print(f"Vectors  ID: {vectors}")
     return
 
 
@@ -64,27 +74,25 @@ register(
           # generic objects, using only GTK, not GimpUI
           # a button that opens a dialog that chooses a file from file system
           (PF_FILE,          "file",        "file",     None),
+          # TODO PF_DIR
+
           # GIMP objects
           # a button that opens a dialog that chooses a color
           #(PF_COLOR,         "color",       "color",    "red"),
           # a drop down menu button to choose a font
           (PF_FONT,          "font",        "font",     "Helvetica"),
-          # a drop down menu button to choose an image that is open in Gimp app
-          #(PF_IMAGE,          "img",        "image",    None),
-          # ???
-          (PF_DRAWABLE,       "drw",        "drawable", None),
-          # Not implemented
-          #(PF_ITEM,         "item",         "item", None),
+
           #(PF_DISPLAY,      "display",   "foo", None),
+
+          # a drop down menu button to choose an image that is open in Gimp app
+          (PF_IMAGE,          "img",        "image",    None),
+
+          (PF_DRAWABLE,       "drw",        "drawable", None),
           (PF_LAYER,        "layer",        "layer",    None),
           (PF_CHANNEL,      "channel",      "channel",  None),
-          #(PF_VECTORS,      "vectors",   "foo", None),
-
-          # FILE, filename, dir
+          (PF_VECTORS,      "vectors",      "vectors",  None),
 
           # Parasite, bool, enum
-
-          #
       ],
       [],   # no return values
       plugin_func,

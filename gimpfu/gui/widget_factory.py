@@ -60,7 +60,7 @@ class WidgetFactory:
         return result
 
     def is_wrapped_widget(a_formal_param):
-        return a_formal_param.PF_TYPE == PF_DRAWABLE
+        return a_formal_param.PF_TYPE in (PF_IMAGE, PF_DRAWABLE, PF_LAYER, PF_CHANNEL, PF_VECTORS)
 
 
     def _enumerate_names(names_tuple):
@@ -126,8 +126,12 @@ class WidgetFactory:
             # TODO hack, should not even be a control
             # Omitted, use None
             args = [widget_initial_value,]
-        elif pf_type in (PF_DISPLAY, PF_IMAGE, PF_ITEM, PF_DRAWABLE, PF_LAYER, PF_CHANNEL, PF_VECTORS):
+        elif WidgetFactory.is_wrapped_widget(formal_param):
+            # pf_type in (PF_IMAGE, PF_DRAWABLE, PF_LAYER, PF_CHANNEL, PF_VECTORS):
             args = None   # [None,]
+        elif pf_type in (PF_DISPLAY, PF_ITEM):
+            # TODO proceed
+            raise RuntimeError(f"Cannot show GUI to choose Item or Display.")
         else:
             # PF_SPINNER,, PF_OPTION
             raise RuntimeError(f"Unhandled PF_ widget type {pf_type}.")
@@ -210,7 +214,9 @@ _edit_map = {
         # Doesn't work to reference GimpUi.DrawableComboBox, the class is not a constructor??
         # must call GimpUi.DrawableComboBox.new() by a G_OBJECT_WARN_INVALID_PROPERTY_ID
         PF_ITEM        : OmittedEntry,  # TODO user has no use for a generic item
-        PF_DISPLAY     : OmittedEntry,
+        PF_DISPLAY     : OmittedEntry,  # GimpUi has no widget
+
+        # Subclasses of GimpUi.IntComboBox returning a Gimp.Item.ID
         PF_IMAGE       : FuImageWidget,
         PF_LAYER       : FuLayerWidget,
         PF_CHANNEL     : FuChannelWidget,

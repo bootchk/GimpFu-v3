@@ -49,6 +49,10 @@ GimpUi implements widget classes for each Item subclass.
 Each inherits GimpUi.IntComboBox which ultimately inherits Gtk combobox.
 They return (get_value) integer ID's.
 They display item's that are open in the GIMP app (not files that can be opened.)
+
+!!! The Channels widget further excludes color and alpha channels:
+it only displays custom channels.
+I.E. it does NOT display all "open" channels, only "open, custom" channels.
 """
 class ItemWidgetWrapper():
     """ Base class for GimpFu widgets that choose Gimp Items"""
