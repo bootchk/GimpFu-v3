@@ -195,7 +195,7 @@ class FuProcedureConfig():
         values_list = Types.convert_gimpvaluearray_to_list_of_gvalue(value_array)
         wrapped_arg_list = Marshal.wrap_args(values_list)
         # assert values_list is a list of GValues, not prefixed with image, drawable
-
+        self.logger.debug(f"get_initial_settings: {wrapped_arg_list}")
         return wrapped_arg_list
 
 

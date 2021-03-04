@@ -20,6 +20,10 @@ v3 At import time, we don't have access to Gimp types yet.  Define PF enum witho
 We don't use Python 3 enum class FBC.
 
 See also _edit_map dictionary in gui/widget_factory.py
+
+We define aliases, FBC, so that old scripts may continue to work.
+The GimpFu code should use the non-alias, so the aliases can be deleted later.
+The GimpFu code cannot check that an author used an alias, without parsing the script.
 '''
 PF_INT8        = 1  # Should be UINT8 or PF_CHAR
 PF_INT16       = 2  # Should be obsolete, not supported in Gimp?

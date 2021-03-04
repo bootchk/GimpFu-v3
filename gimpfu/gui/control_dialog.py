@@ -108,11 +108,12 @@ class PluginControlDialog():
             # Grid right hand side is control widget
             control_widget = WidgetFactory.produce(a_formal_param, guiable_initial_values[i])
 
+            # if we wrap a Gtk widget, need wrapped inner_widget to add to the dialog
             if WidgetFactory.is_wrapped_widget(a_formal_param):
                 inner_widget = control_widget.get_inner_widget()
             else:
                 inner_widget = control_widget
-            # assert inner_widget is a Gtk widget
+            # assert inner_widget inherits Gtk widget
 
             """
             Do stuff with the Gtk inner widget.
@@ -152,7 +153,7 @@ class PluginControlDialog():
 
         Returns list of control widgets and dialog
         '''
-        PluginControlDialog.logger.debug(f"_create_gimp_dialog:  {guiable_initial_values}: {guiable_formal_params} ")
+        PluginControlDialog.logger.debug(f"_create_gimp_dialog: {guiable_initial_values}: {guiable_formal_params} ")
 
         dialog = Dialog.get(procname)
 

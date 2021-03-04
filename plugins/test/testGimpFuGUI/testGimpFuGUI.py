@@ -26,7 +26,7 @@ def plugin_func(img, drw,
                 file,
                 #dir
 
-                #color, # GLib CRITICAL
+                color, # GLib CRITICAL
                 font,  # selector not stay on top?
                 palette,
                 brush,
@@ -47,6 +47,7 @@ def plugin_func(img, drw,
     print(f"Font:         {font}")
     print(f"palette:      {palette}")
     print(f"brush:        {brush}")
+    print(f"pattern:      {pattern}")
     print(f"gradient:     {gradient}")
 
     print(f"Image    ID: {image}")
@@ -98,12 +99,17 @@ register(
 
           # GIMP objects
           # a button that opens a dialog that chooses a color
-          #(PF_COLOR,         "color",       "color",    "red"),
-          # a drop down menu button to choose a font
+          (PF_COLOR,         "color",       "color",    "red"),
+
+          # Resources
+          # Names are chosen from stock, but stock may change.
+          # In Gimp Dockable dialog, RMB in tab, choose "view as list" to see names
+          # !!! Brush name often includes a cardinal number e.g. "2. "
+          # but the displayed size e.g. "(55 x 55)" is not part of the name
           (PF_FONT,          "font",        "font",      "Helvetica"),
           (PF_PALETTE,       "palette",     "palette",   "Blues"),
-          (PF_BRUSH,         "brush",       "brush",     "Helvetica"),
-          (PF_PATTERN,       "pattern",     "pattern",   "foo"),
+          (PF_BRUSH,         "brush",       "brush",     "2. Star"),
+          (PF_PATTERN,       "pattern",     "pattern",   "Sky"),
           (PF_GRADIENT,      "gradient",    "gradient",  "Default"),
 
           # No Gimp widget: PF_DISPLAY

@@ -1,12 +1,5 @@
 
-
-
 import gi
-
-# !!! Even though docs generated from .gir say widgets are in Gimp, they are in GimpUi
-#gi.require_version("GimpUi", "3.0")
-#from gi.repository import GimpUi
-
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
@@ -18,7 +11,7 @@ module_logger = logging.getLogger("GimpFu.WidgetsGtk")
 
 """
 Classes of GimpFu widgets
-that inherit GTK widgets.
+that directly inherit GTK widgets.
 """
 
 # TODO: DirnameSelector

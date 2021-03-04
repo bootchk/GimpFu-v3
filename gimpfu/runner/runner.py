@@ -178,9 +178,11 @@ class FuRunner:
             '''
             # Wrong: config.get_initial_settings(guiable_actual_args)
             # TEMP: this is correct, but not working:
-            print(guiable_actual_args)
-            guiable_actual_args = config.get_initial_settings()
-            print(guiable_actual_args)
+            # TODO what is wrong here???
+            # Is the config persistent across changes to the plugin definition?
+            # Who handles run with last values?
+            FuRunner.logger.info(f"in guiable args: {guiable_actual_args}")
+            # guiable_actual_args = config.get_initial_settings()
 
             was_canceled, guied_args = PluginControlDialog.show(
                 procedure,

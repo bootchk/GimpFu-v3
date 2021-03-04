@@ -9,48 +9,43 @@ from gi.repository import GimpUi
 
 import logging
 
-module_logger = logging.getLogger("GimpFu.gui.widget.color")
-
 
 """
 A Gimp.ColorButton displays a color, and pops up a Gimp.ColorSelector dialog when clicked.
 
 Color is not a resource, does not inherit GimpUi.SelectButton
+
+Does not inherit GimpUi.ColorButton, but wraps it.
+Failed to init when inherited.
+See widget/gimp.py for similar pattern.
 """
 
-class FuColorWidget(GimpUi.ColorButton):
-    def __init__(self, default="", title = "Foo", ):
-        module_logger.debug(f"ColorButton: default: {default} title: {title}")
+class FuColorWidget():
+    def __init__(self, defaultColor=None, title = "Foo", ):
+        self.logger = logging.getLogger("GimpFu.FuColorWidget")
+        self.logger.debug(f"ColorButton: default: {defaultColor} title: {title}")
 
-        # try setting title before superclass init
-        # throws not initialized
-        #module_logger.debug(f"FuColorWidget: set_title")
-        #self.set_title(title)
-
-        # ColorButton has no init() method but GTK expects its __init__ to be called ???
-        # Both the following yield the same result
-        #Gtk.Button.__init__(self)
-        super().__init__("foo")
-
+        self.widget = GimpUi.ColorButton.new(title, 10, 10, defaultColor, GimpUi.ColorAreaType.SMALL_CHECKS)
         # Gimp requires title, so the pop-up ColorSelector can be titled.
         # Otherwise, at click time:  gimp_dialog_new: assertion 'title != NULL' failed
 
-        # Here, title is same as label of button
-
-        # ??? Gimp constructor has already thrown
-        # critical : gimp_color_button_set_title: assertion 'title != NULL' failed but works anyway?
-        # We will ignore it.
-
-        module_logger.debug(f"FuColorWidget: set_title")
-        self.set_title(title)
-        # self.set_title("Border")
-
-        # set default
-        self.set_color(default)
-
-        # cruft from StringEntry
-        #self.set_activates_default(True)
-
+    def get_inner_widget(self):
+        return self.widget
 
     def get_value(self):
-        return self.get_color()
+        self.logger.debug(f"get_value")
+        return self.widget.get_color()
+
+"""
+Cruft from attempt to inherit.
+
+# try setting title before superclass init
+# throws not initialized
+#module_logger.debug(f"FuColorWidget: set_title")
+#self.set_title(title)
+
+# ColorButton has no init() method but GTK expects its __init__ to be called ???
+# Both the following yield the same result
+#Gtk.Button.__init__(self)
+#super().__init__("foo")
+"""

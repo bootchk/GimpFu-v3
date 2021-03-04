@@ -24,7 +24,6 @@ class WidgetFactory:
     logger = logging.getLogger("GimpFu.WidgetFactory")
 
     def does_widget_have_view(a_formal_param):
-
         return a_formal_param.PF_TYPE == PF_TEXT
 
 
@@ -63,8 +62,14 @@ class WidgetFactory:
 
         return result
 
-    def is_wrapped_widget(a_formal_param):
+    def is_gimp_widget(a_formal_param):
+        """ Does the widget inherit a Gimp widget (for ephemeral Gimp objects) """
         return a_formal_param.PF_TYPE in (PF_IMAGE, PF_DRAWABLE, PF_LAYER, PF_CHANNEL, PF_VECTORS)
+
+    def is_wrapped_widget(a_formal_param):
+        """ Do we wrap a Gimp widget (for which inheriting fails.) """
+        return WidgetFactory.is_gimp_widget(a_formal_param) or a_formal_param.PF_TYPE == PF_COLOR
+
 
 
     def _enumerate_names(names_tuple):
@@ -83,10 +88,6 @@ class WidgetFactory:
         # This is a switch statement on  PF_TYPE
         # Since data comes from , don't trust it
         pf_type = formal_param.PF_TYPE
-
-
-        if pf_type == PF_COLOUR:
-            Deprecation.say("Use PF_COLOR instead of PF_COLOUR")
 
         if pf_type in ( PF_RADIO, ):
             """
@@ -116,7 +117,7 @@ class WidgetFactory:
         elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER, PF_ADJUSTMENT):
             # Hack, we are using FloatEntry, should use Slider???
             args = [widget_initial_value,]
-        elif pf_type in (PF_COLOR, PF_COLOUR):
+        elif pf_type == PF_COLOR:
             # require widget_initial_value is-a string, name of color, or is-a 3-tuple of RGB ints
             # TODO, if initial_value came from ProcedureConfig, could be wrong
             # TODO Widget omitted
@@ -129,7 +130,7 @@ class WidgetFactory:
         elif pf_type in (PF_FONT, PF_PALETTE, PF_PATTERN, PF_BRUSH, PF_GRADIENT):
             # PF_PALETTE is special ???
             args = [widget_initial_value,]
-        elif WidgetFactory.is_wrapped_widget(formal_param):
+        elif WidgetFactory.is_gimp_widget(formal_param):
             # pf_type in (PF_IMAGE, PF_DRAWABLE, PF_LAYER, PF_CHANNEL, PF_VECTORS):
             args = None   # [None,]
         elif pf_type in (PF_DISPLAY, PF_ITEM):
