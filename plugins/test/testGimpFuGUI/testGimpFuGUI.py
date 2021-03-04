@@ -28,6 +28,10 @@ def plugin_func(img, drw,
 
                 #color, # GLib CRITICAL
                 font,  # selector not stay on top?
+                palette,
+                brush,
+                pattern,
+                gradient,
 
                 image,
                 drawable,
@@ -39,7 +43,12 @@ def plugin_func(img, drw,
     # TODO checks that each value is valid?
     print(f"Test GIMP GUI results:")
     print(f"File:        {file}")
-    print(f"Font:        {font}")
+
+    print(f"Font:         {font}")
+    print(f"palette:      {palette}")
+    print(f"brush:        {brush}")
+    print(f"gradient:     {gradient}")
+
     print(f"Image    ID: {image}")
     print(f"Drawable ID: {drawable}")
     print(f"Layer    ID: {layer}")
@@ -69,6 +78,7 @@ register(
           # NO widgets for arrays
 
           # int primitives
+          # TODO PF_BOOL
           # PF_INT         : IntEntry,
           #PF_INT16       : IntEntry,
           (PF_INT8,          "uchar",       "uchar",    1,     (1, 10, 1)),
@@ -80,6 +90,7 @@ register(
           #PF_ADJUSTMENT  : FloatEntry,
           # TODO:
           (PF_STRING,        "string",      "string",   None),
+
           # generic objects, using only GTK, not GimpUI
           # a button that opens a dialog that chooses a file from file system
           (PF_FILE,          "file",        "file",     None),
@@ -89,19 +100,22 @@ register(
           # a button that opens a dialog that chooses a color
           #(PF_COLOR,         "color",       "color",    "red"),
           # a drop down menu button to choose a font
-          (PF_FONT,          "font",        "font",     "Helvetica"),
+          (PF_FONT,          "font",        "font",      "Helvetica"),
+          (PF_PALETTE,       "palette",     "palette",   "Blues"),
+          (PF_BRUSH,         "brush",       "brush",     "Helvetica"),
+          (PF_PATTERN,       "pattern",     "pattern",   "foo"),
+          (PF_GRADIENT,      "gradient",    "gradient",  "Default"),
 
-          #(PF_DISPLAY,      "display",   "foo", None),
+          # No Gimp widget: PF_DISPLAY
 
           # a drop down menu button to choose an image that is open in Gimp app
           (PF_IMAGE,          "img",        "image",    None),
-
           (PF_DRAWABLE,       "drw",        "drawable", None),
           (PF_LAYER,        "layer",        "layer",    None),
           (PF_CHANNEL,      "channel",      "channel",  None),
           (PF_VECTORS,      "vectors",      "vectors",  None),
 
-          # Parasite, bool, enum
+          # Parasite, enum, PF_VALUE ??
       ],
       [],   # no return values
       plugin_func,

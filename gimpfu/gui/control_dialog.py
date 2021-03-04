@@ -17,7 +17,7 @@ from gi.repository import Gtk
 from gimpfu.gui.dialog import Dialog
 from gimpfu.gui.warning_dialog import WarningDialog
 from gimpfu.gui.value_error import EntryValueError
-from gimpfu.gui.widget_factory import WidgetFactory
+from gimpfu.gui.widget.factory import WidgetFactory
 
 from gimpfu.message.deprecation import Deprecation
 
@@ -192,7 +192,9 @@ class PluginControlDialog():
         Present GUI.
         Returns (was_canceled, tuple of result values) from running plugin
         '''
-        PluginControlDialog.logger.debug(f"show_plugin_dialog for {procedure} values: {guiable_initial_values} formal: {guiable_formal_params}")
+        procedureName = procedure.get_name()
+
+        PluginControlDialog.logger.debug(f"show_plugin_dialog for {procedureName} values: {guiable_initial_values} formal: {guiable_formal_params}")
         #assert type(procedure.__name == )
         #assert len(guiable_initial_values) == len(guiable_formal_params )
         #print("after assert")
@@ -201,7 +203,7 @@ class PluginControlDialog():
 
         # choice of implementation
         controls, dialog = PluginControlDialog._create_gimp_dialog(
-            procedure.get_name(),
+            procedureName,
             guiable_initial_values,
             guiable_formal_params)  # implemented by GimpFu in Python
         # show_plugin_procedure_dialog() # implemented by Gimp in C

@@ -6,10 +6,12 @@ from gimpfu.enums.gimpfu_enums import *
 # WidgetFactory is main use of Widget constructors
 
 # widget classes grouped by how implemented
-from gimpfu.gui.widgets import *
-from gimpfu.gui.widgets_gimp import *
-from gimpfu.gui.widgets_gtk import *
-from gimpfu.gui.widgets_resource import *
+from gimpfu.gui.widget.primitive  import *
+from gimpfu.gui.widget.gimp       import *
+from gimpfu.gui.widget.gtk        import *
+from gimpfu.gui.widget.resource   import *
+from gimpfu.gui.widget.brush      import *
+from gimpfu.gui.widget.color      import *
 
 from gimpfu.adapters.rgb import GimpfuRGB
 
@@ -43,14 +45,15 @@ class WidgetFactory:
 
         proc_name = 'bar' # TODO procedure.procedure_name()
 
-        factory_specs = WidgetFactory._get_args_for_widget_constructor(a_formal_param, widget_initial_value)
+        args_for_widget_constructor = WidgetFactory._get_args_for_widget_constructor(a_formal_param, widget_initial_value)
 
         # TODO pass tooltip_text
         # tooltip_text = a_formal_param.tooltip_text)
 
-        WidgetFactory.logger.debug(f"produce: {widget_constructor} specs: {factory_specs}")
-        if factory_specs:
-            result = widget_constructor(*factory_specs)
+        WidgetFactory.logger.debug(f"produce: {widget_constructor}, args: {args_for_widget_constructor}")
+
+        if args_for_widget_constructor:
+            result = widget_constructor(*args_for_widget_constructor)
         else:
             result = widget_constructor()
 
@@ -108,7 +111,7 @@ class WidgetFactory:
             # args = [formal_param.LABEL, "/tmp/lkkfoopluginout"]
 
             args = [formal_param.LABEL, widget_initial_value]
-        elif pf_type in (PF_INT, PF_INT8, PF_INT16, PF_INT32, PF_STRING, PF_BOOL, PF_FONT, PF_TEXT ):
+        elif pf_type in (PF_INT, PF_INT8, PF_INT16, PF_INT32, PF_STRING, PF_BOOL,  PF_TEXT ):
             args = [widget_initial_value]
         elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER, PF_ADJUSTMENT):
             # Hack, we are using FloatEntry, should use Slider???
@@ -123,9 +126,8 @@ class WidgetFactory:
             color = GimpfuRGB.color_from_python_type("orange")
             # title is DESC, not LABEL
             args = [color, formal_param.DESC]
-        elif pf_type in (PF_PALETTE,):
-            # TODO hack, should not even be a control
-            # Omitted, use None
+        elif pf_type in (PF_FONT, PF_PALETTE, PF_PATTERN, PF_BRUSH, PF_GRADIENT):
+            # PF_PALETTE is special ???
             args = [widget_initial_value,]
         elif WidgetFactory.is_wrapped_widget(formal_param):
             # pf_type in (PF_IMAGE, PF_DRAWABLE, PF_LAYER, PF_CHANNEL, PF_VECTORS):
@@ -199,7 +201,7 @@ _edit_map = {
         PF_OPTION      : OptionMenuEntry,
 
         # PF_COLOUR is deprecated alias for PF_COLOR
-        PF_COLOR       : FuColorEntry,
+        PF_COLOR       : FuColorWidget,
 
         # TODO is PF_FILENAME deprecated alias for PF_FILE?
         PF_FILE        : FuFileEntry,
@@ -226,13 +228,13 @@ _edit_map = {
         # Widgets provided by Gimp for Gimp data objects?
         # "data" objects are loaded at run-time, not as ephemeral
         # i.e. configured, static data of the app
-        PF_FONT        : FuFontEntry,
-        PF_BRUSH       : StringEntry,
-        PF_PATTERN     : StringEntry,
-        PF_GRADIENT    : StringEntry,
+        PF_FONT        : FuFontWidget,
+        PF_BRUSH       : FuBrushWidget,
+        PF_PATTERN     : FuPatternWidget,
+        PF_GRADIENT    : FuGradientWidget,
         # formerly gimpui.palette_selector
         # Now I think palette is a parameter, but should not have a control?
         # since the currently selected palette in palette dialog is passed for context menu plugins?
         # Still could have a use by other plugins?
-        PF_PALETTE     : FuPaletteEntry,
+        PF_PALETTE     : FuPaletteWidget,
         }

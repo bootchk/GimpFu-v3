@@ -9,25 +9,22 @@ from gi.repository import GimpUi
 
 import logging
 
-module_logger = logging.getLogger("GimpFu.widgets_resource")
-
-"""
-Widgets for choosing Gimp resources.
-
-Resources
-"""
+module_logger = logging.getLogger("GimpFu.gui.widget.color")
 
 
 """
 A Gimp.ColorButton displays a color, and pops up a Gimp.ColorSelector dialog when clicked.
+
+Color is not a resource, does not inherit GimpUi.SelectButton
 """
-class FuColorEntry(GimpUi.ColorButton):
+
+class FuColorWidget(GimpUi.ColorButton):
     def __init__(self, default="", title = "Foo", ):
         module_logger.debug(f"ColorButton: default: {default} title: {title}")
 
         # try setting title before superclass init
         # throws not initialized
-        #module_logger.debug(f"FuColorEntry: set_title")
+        #module_logger.debug(f"FuColorWidget: set_title")
         #self.set_title(title)
 
         # ColorButton has no init() method but GTK expects its __init__ to be called ???
@@ -44,7 +41,7 @@ class FuColorEntry(GimpUi.ColorButton):
         # critical : gimp_color_button_set_title: assertion 'title != NULL' failed but works anyway?
         # We will ignore it.
 
-        module_logger.debug(f"FuColorEntry: set_title")
+        module_logger.debug(f"FuColorWidget: set_title")
         self.set_title(title)
         # self.set_title("Border")
 
@@ -57,41 +54,3 @@ class FuColorEntry(GimpUi.ColorButton):
 
     def get_value(self):
         return self.get_color()
-
-
-
-
-class FuFontEntry(GimpUi.FontSelectButton):
-    def __init__(self, default="" ):
-        module_logger.debug(f"FuFontEntry: default: {default}")
-
-        # Gimp.FontSelectButton has no init() method but GTK expects its __init__ to be called ???
-        # Gimp.FontSelectButton inherits Gtk.Widget
-        # TODO super().__init__()
-        #Gtk.Widget.__init__(self)
-        super().__init__()
-
-        # Has no set_title
-
-        # set default
-        self.set_font(default)
-
-    def get_value(self):
-        return self.get_font()
-
-
-
-class FuPaletteEntry(GimpUi.PaletteSelectButton):
-    def __init__(self, default="" ):
-        module_logger.debug(f"FuPaletteEntry: default: {default}")
-
-        # Gimp.FontSelectButton has no init() method but GTK expects its __init__ to be called ???
-        # Gimp.FontSelectButton inherits Gtk.Widget
-        super().__init__()
-
-        # Has no set_title
-
-        self.set_palette(default)
-
-    def get_value(self):
-        return self.get_palette()

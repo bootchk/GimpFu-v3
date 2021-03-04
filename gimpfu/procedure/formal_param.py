@@ -80,7 +80,7 @@ class FuFormalParam(GObject.Object):
 
     def __repr__(self):
         """ Not a true repr. """
-        return "PF: " + str(self.PF_TYPE) + "DESC:" + self.DESC + "EXTRAS:" + str(self.EXTRAS)
+        return f"PF: {str(self.PF_TYPE)} DESC:{self.DESC} EXTRAS:{str(self.EXTRAS)}"
 
 
     @property

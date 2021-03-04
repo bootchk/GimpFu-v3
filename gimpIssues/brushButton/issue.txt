@@ -1,0 +1,58 @@
+
+Gimp.BrushSelectButton flaws from bound language using GI
+
+The API 1) still uses C-isms not compatible with GI and 2) is annotated incorrectly
+
+Code in libgimp/gimpbrushselectbutton.c
+
+1.)
+
+```
+/**
+ * gimp_brush_select_button_new:
+ * @title: (nullable): Title of the dialog to use or %NULL means to use the default
+ *              title.
+ * @brush_name: (nullable): Initial brush name or %NULL to use current selection.
+ * @opacity:    Initial opacity. -1 means to use current opacity.
+ * @spacing:    Initial spacing. -1 means to use current spacing.
+ * @paint_mode: Initial paint mode.  -1 means to use current paint mode.
+ ```
+
+ paint_mode is not nullable.  But if you pass -1, e.g. in this Python code:
+
+ ```
+ self.set_brush(default, -1, -1, -1)
+ ```
+
+ Python throws exception: TypeError: Expected a Gimp.LayerMode, but got int
+
+ If instead you pass a Gimp.LayerMode  e.g. self.set_brush(default, -1, -1, Gimp.LayerMode.NORMAL),
+ then you fail to convey that you want to "use current paint mode".
+ There is no Gimp.LayerMode equal to -1, to convey the intent.
+
+ This might be moot.
+ The code just sets a property on the button.
+ But in my reading, I couldn't see that the property was ever referenced.
+ So a workaround, to pass any value of Layer.Mode, might not have any effect on what the widget does.
+ When a user clicks on a brush, the callback sets private variables but not properties?
+
+ 2) calling GimpUi.BrushSelectButton.get_brush()
+
+Currently the annotation does not indicate out parameters.
+Also, the body of get_brush() suggests that out parameters are optional.
+
+I think the annotation should be:
+```
+ /**
+  * gimp_brush_select_button_get_brush:
+  * @button: A #GimpBrushSelectButton
+  * @opacity: (out) (optional): Opacity of the selected brush.
+  * @spacing: (out) (optional): Spacing of the selected brush.
+  * @paint_mode: (out) (optional): Paint mode of the selected brush.
+```
+
+Then in Python:
+```
+name, opacity, spacing, paint_mode = self.get_brush()
+```
+returns the brush name, and 0 for the other returned values.

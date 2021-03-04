@@ -1,14 +1,14 @@
 
 '''
 !!!
-This all should go away when Gimp support for auto plugin GUI lands in Gimp 3.
+This might go away when Gimp support for auto plugin GUI lands in Gimp 3.
 Not well known that such support is on the Gimp roadmap.
 '''
 
 
 """
-Set of classes.
-Each class is a GUI widget.
+Classes GUI widgets.
+Primitive types e.g. int.
 
 Each class ultimately inherits a Gtk widget.
 
