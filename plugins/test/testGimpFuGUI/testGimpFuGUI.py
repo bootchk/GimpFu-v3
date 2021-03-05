@@ -24,7 +24,7 @@ from gimpfu import *
 def plugin_func(img, drw,
                 int8, int32, float, string,
                 file,
-                #dir
+                dir,
 
                 color, # GLib CRITICAL
                 font,  # selector not stay on top?
@@ -33,16 +33,17 @@ def plugin_func(img, drw,
                 pattern,
                 gradient,
 
-                image,
-                drawable,
-                layer,
-                channel,
-                vectors,
+                #image,
+                #drawable,
+                #layer,
+                #channel,
+                #vectors,
                 ):
     """ Just prints results. Does nothing substantive. """
     # TODO checks that each value is valid?
     print(f"Test GIMP GUI results:")
     print(f"File:        {file}")
+    print(f"directory:   {directory}")
 
     print(f"Font:         {font}")
     print(f"palette:      {palette}")
@@ -50,11 +51,12 @@ def plugin_func(img, drw,
     print(f"pattern:      {pattern}")
     print(f"gradient:     {gradient}")
 
-    print(f"Image    ID: {image}")
-    print(f"Drawable ID: {drawable}")
-    print(f"Layer    ID: {layer}")
-    print(f"Channel  ID: {channel}")
-    print(f"Vectors  ID: {vectors}")
+    if False:   # Temporary not test
+        print(f"Image    ID: {image}")
+        print(f"Drawable ID: {drawable}")
+        print(f"Layer    ID: {layer}")
+        print(f"Channel  ID: {channel}")
+        print(f"Vectors  ID: {vectors}")
     return
 
 
@@ -94,7 +96,8 @@ register(
 
           # generic objects, using only GTK, not GimpUI
           # a button that opens a dialog that chooses a file from file system
-          (PF_FILE,          "file",        "file",     None),
+          (PF_FILE,          "file",        "file label",  "tmp.tmp"),
+          (PF_DIRNAME,       "dir",         "dir label",   "/# TEMP: "),
           # TODO PF_DIR
 
           # GIMP objects
@@ -115,11 +118,11 @@ register(
           # No Gimp widget: PF_DISPLAY
 
           # a drop down menu button to choose an image that is open in Gimp app
-          (PF_IMAGE,          "img",        "image",    None),
-          (PF_DRAWABLE,       "drw",        "drawable", None),
-          (PF_LAYER,        "layer",        "layer",    None),
-          (PF_CHANNEL,      "channel",      "channel",  None),
-          (PF_VECTORS,      "vectors",      "vectors",  None),
+          #(PF_IMAGE,          "img",        "image",    None),
+          #(PF_DRAWABLE,       "drw",        "drawable", None),
+          #(PF_LAYER,        "layer",        "layer",    None),
+          #(PF_CHANNEL,      "channel",      "channel",  None),
+          #(PF_VECTORS,      "vectors",      "vectors",  None),
 
           # Parasite, enum, PF_VALUE ??
       ],

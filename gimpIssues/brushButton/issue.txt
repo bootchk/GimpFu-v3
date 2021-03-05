@@ -1,7 +1,9 @@
 
 Gimp.BrushSelectButton flaws from bound language using GI
 
-The API 1) still uses C-isms not compatible with GI and 2) is annotated incorrectly
+The API
+1) still uses C-isms not compatible with GI and
+2) is annotated incorrectly
 
 Code in libgimp/gimpbrushselectbutton.c
 
@@ -26,17 +28,22 @@ Code in libgimp/gimpbrushselectbutton.c
 
  Python throws exception: TypeError: Expected a Gimp.LayerMode, but got int
 
- If instead you pass a Gimp.LayerMode  e.g. self.set_brush(default, -1, -1, Gimp.LayerMode.NORMAL),
+ If instead you pass a Gimp.LayerMode  e.g. Python:
+
+ ```
+ self.set_brush(default, -1, -1, Gimp.LayerMode.NORMAL),
+ ```
  then you fail to convey that you want to "use current paint mode".
  There is no Gimp.LayerMode equal to -1, to convey the intent.
 
  This might be moot.
  The code just sets a property on the button.
- But in my reading, I couldn't see that the property was ever referenced.
- So a workaround, to pass any value of Layer.Mode, might not have any effect on what the widget does.
+ The code doesn't even check for -1.
+ And in my reading, I couldn't see that the property was ever referenced.
+ So a workaround: pass any value of Layer.Mode, might not have any effect on what the widget does.
  When a user clicks on a brush, the callback sets private variables but not properties?
 
- 2) calling GimpUi.BrushSelectButton.get_brush()
+ 2) GimpUi.BrushSelectButton.get_brush()
 
 Currently the annotation does not indicate out parameters.
 Also, the body of get_brush() suggests that out parameters are optional.
@@ -46,9 +53,9 @@ I think the annotation should be:
  /**
   * gimp_brush_select_button_get_brush:
   * @button: A #GimpBrushSelectButton
-  * @opacity: (out) (optional): Opacity of the selected brush.
-  * @spacing: (out) (optional): Spacing of the selected brush.
-  * @paint_mode: (out) (optional): Paint mode of the selected brush.
+  * @opacity:    (out) (optional):  Opacity of the selected brush.
+  * @spacing:    (out) (optional):  Spacing of the selected brush.
+  * @paint_mode: (out) (optional):  Paint mode of the selected brush.
 ```
 
 Then in Python:

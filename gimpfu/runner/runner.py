@@ -38,7 +38,7 @@ class FuRunner:
     logger = logging.getLogger('GimpFu.FuRunner')
 
     @staticmethod
-    def show_exception_dialog(procname):
+    def show_exception_dialog(proc_name):
         """ Show a modal exception dialog. """
         # TODO seems to be modal, is it?
         from gimpfu.gui.exception_dialog import ExceptionDialog

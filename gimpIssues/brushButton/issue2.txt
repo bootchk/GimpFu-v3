@@ -1,0 +1,42 @@
+2.99 From plugin, call GimpUi.BrushSelectButton.get_brush() fails, annotations wrong
+
+#6540
+
+In Python:
+
+```
+name, opacity, spacing, paint_mode = self.get_brush()
+```
+where self is a GimpUi.BrushSelectButton.
+
+Expect: work.
+
+Actual: fail, probably TypeError expected x args, received y (sorry, forgot to capture it before I fixed it.)
+
+Analysis:
+
+Currently the annotation does not indicate out parameters.
+Also, the body of get_brush() suggests that out parameters are optional.
+The body is like:
+
+```
+if (opacity)
+  *opacity = button->priv->opacity;
+```
+
+Which, to me, means the "opacity" arg is an out parameter, optional.
+
+I think the annotation should be:
+```
+ /**
+  * gimp_brush_select_button_get_brush:
+  * @button:                        A #GimpBrushSelectButton
+  * @opacity:    (out) (optional):  Opacity of the selected brush.
+  * @spacing:    (out) (optional):  Spacing of the selected brush.
+  * @paint_mode: (out) (optional):  Paint mode of the selected brush.
+```
+
+I will submit a MR to that effect.
+
+Context:
+Ubuntu20.10.  Self-built, meson build, pulled yesterday.

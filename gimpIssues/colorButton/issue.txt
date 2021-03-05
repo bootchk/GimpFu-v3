@@ -1,0 +1,86 @@
+2.99 Color button in plugin throws GLib-GObject: CRITICAL: g_signal_handlers_block_matched: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed
+
+A Python plugin that:
+
+```
+self.widget = GimpUi.ColorButton.new(title, 10, 10, defaultColor, GimpUi.ColorAreaType.SMALL_CHECKS)
+and put the widget in a dialog and show the dialog
+```
+
+When user clicks on the button, console shows the above.
+
+If the env:
+
+```
+export GIMP_PLUGIN_DEBUG=all,fatal-criticals
+export G_DEBUG=fatal-critical
+```
+
+then you get a stack trace, a relevant snippet:
+
+```
+#3  0x00007f0b24152277 in gimp_fatal_func (log_domain=0x7f0b262783b0 "GLib-GObject", flags=10, message=0x2d9ef50 "g_signal_handlers_block_matched: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed", data=0x0) at ../gimp/libgimp/gimp-debug.c:396
+        sigset = {__val = {0, 4348192, 4, 1661299827355232256, 4294967295, 140724708525264, 8, 0, 0, 8, 43269584, 139685861491632, 139685826732365, 139685862277919, 0, 139685862075121}}
+        level = 0x7f0b24165634 "CRITICAL"
+#4  0x00007f0b262edb79 in g_logv () at /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#5  0x00007f0b262ede13 in g_log () at /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#6  0x00007f0b262643a6 in g_signal_handlers_block_matched () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#7  0x00007f0b234481d3 in gimp_color_notebook_set_color (selector=0x2c2f6d0, rgb=0x2df49d8, hsv=0x2df49b8) at ../gimp/libgimpwidgets/gimpcolornotebook.c:279
+        private = 0x2c2f570
+#8  0x00007f0b2345005a in gimp_color_selector_set_color (selector=0x2c2f6d0, rgb=0x2df49d8, hsv=0x2df49b8) at ../gimp/libgimpwidgets/gimpcolorselector.c:372
+        selector_class = 0x2a7e600
+        __func__ = "gimp_color_selector_set_color"
+#9  0x00007f0b2344fa37 in gimp_color_selector_new (selector_type=Python Exception <class 'gdb.error'> No type named TypeNode.:
+, rgb=0x2df49d8, hsv=0x2df49b8, channel=GIMP_COLOR_SELECTOR_RED) at ../gimp/libgimpwidgets/gimpcolorselector.c:203
+        selector = 0x2c2f6d0
+        __func__ = "gimp_color_selector_new"
+#10 0x00007f0b2344d97b in gimp_color_selection_init (selection=0x2df4b60) at ../gimp/libgimpwidgets/gimpcolorselection.c:217
+        priv = 0x2df49b0
+        main_hbox = 0x2b82190
+        hbox = 0x7f0b24778d31
+        vbox = 0x0
+        frame = 0x7f0b262f6640
+        label = 0x2ece3a8
+        entry = 0x7f0b24778d31
+        button = 0x2f082f0
+        new_group = 0x2df4b60
+        old_group = 0x2f10d80
+#11 0x00007f0b2626c5a1 in g_type_create_instance () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#12 0x00007f0b26252295 in  () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#13 0x00007f0b2625372d in g_object_new_with_properties () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#14 0x00007f0b262543b1 in g_object_new () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#15 0x00007f0b2344e374 in gimp_color_selection_new () at ../gimp/libgimpwidgets/gimpcolorselection.c:388
+#16 0x00007f0b23443886 in gimp_color_button_clicked (button=0x2bfd450) at ../gimp/libgimpwidgets/gimpcolorbutton.c:573
+        dialog = 0x2b3aa70
+        color_button = 0x2bfd450
+        priv = 0x2bfd280
+        color = {r = 2.3889686606692296e-316, g = 6.9527244004316195e-310, b = 6.9527244004312243e-310, a = 6.952724400430829e-310}
+#17 0x00007f0b2624cb56 in  () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#18 0x00007f0b26265bbf in g_signal_emit_valist () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+#19 0x00007f0b26265da3 in g_signal_emit () at /lib/x86_64-linux-gnu/libgobject-2.0.so.0
+```
+
+The # 6 statement in libgimpwidgets/gimpcolornotebook.c line 279:
+
+```
+g_signal_handlers_block_by_func (private->cur_page,
+                                 gimp_color_notebook_color_changed,
+                                 selector);
+```
+
+I would guess that private->cur_page is NULL.
+There are other places in the code that do this:
+
+```
+if (! private->cur_page)
+  private->cur_page = GIMP_COLOR_SELECTOR (page);
+```
+
+I don't know the code, but if I were trying to fix it, I would add that code
+before the call to g_signal_handlers_block_by_func at line 279.
+
+Context:
+Ubuntu 20.10
+self-built, meson build, pulled yesterday
+I have a GimpFu v3 plugin that tests GimpUi widgets.
+If necessary I can extract a short test program for this case.

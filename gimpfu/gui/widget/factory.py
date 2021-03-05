@@ -102,7 +102,7 @@ class WidgetFactory:
             """
             # Enumerate the names into tuple of name/value pairs
             args = [widget_initial_value, WidgetFactory._enumerate_names(formal_param.EXTRAS)]
-        elif pf_type in (PF_FILE, PF_FILENAME):
+        elif pf_type in (PF_FILE, PF_FILENAME, PF_DIRNAME):
             # args template [<title>, <default>]
 
             # TEMP: when widget is omitted, use default defined by author
@@ -207,8 +207,7 @@ _edit_map = {
         # TODO is PF_FILENAME deprecated alias for PF_FILE?
         PF_FILE        : FuFileEntry,
         PF_FILENAME    : FuFileEntry,
-        # TODO how specialize to directory
-        PF_DIRNAME     : OmittedEntry, # FuFileEntry,
+        PF_DIRNAME     : FuDirEntry,
 
         # ??? meaning?
         PF_VALUE       : OmittedEntry,

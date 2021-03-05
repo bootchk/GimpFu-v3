@@ -10,55 +10,63 @@ module_logger = logging.getLogger("GimpFu.WidgetsGtk")
 
 
 """
-Classes of GimpFu widgets
-that directly inherit GTK widgets.
-"""
+Classes of GimpFu widgets that directly inherit GTK widgets.
 
-# TODO: DirnameSelector
-
-
-
-"""
-Is a button for text entry, when clicked shows file chooser dialog.
+Look and feel inherited.
+Is a button, when clicked shows file chooser dialog.
 
 Lets user choose any file, not just image file formats.
+Or choose existing directory.
 
-
-Note some docs say Gimp.FileEntry is deprecated.
+Gimp.FileEntry is deprecated?
 Since Gimp adds nothing to Gtk.FileChooserButton (?) we use the latter.
 Besides Gimp.FileEntry throws: TypeError: function takes at most 0 arguments (1 given)
+directory_only, check_valid are deprecated
+
+!!! FileChooserButton does NOT support SAVE (choose new filename)
+or CREATE_FOLDER (choose new foldername)
+If we want to allow those, need to inherit a different Gtk widget.
 """
 
-#class FuFileEntry(Gimp.FileEntry):
-class FuFileEntry(Gtk.FileChooserButton):
+class FuFileOrDirEntry(Gtk.FileChooserButton):
 
-
-    def __init__(self, title = "Foo", default="", directory_only=False, check_valid=True):
+    def __init__(self, title = "Foo", default=""):
         module_logger.debug(f"FuFileEntry: default: {default} title: {title}")
 
-        #self.fe = Gimp.FileEntry()
-        # TypeError: struct cannot be created directly; try using a constructor, see: help(Gimp.FileEntry)
-        #module_logger.debug(f"After")
-
-        # GTK expects its __init__ to be called ???
+        # Without this, get: RuntimeError: object at 0x7f7xxx of type FuFileEntry is not initialized
         Gtk.FileChooserButton.__init__(self)
 
         '''
-        Requires title, so pop-up dialogs can be titled.
-        Otherwise, at click time:  gimp_dialog_new: assertion 'title != NULL' failed
-        Here, title is same as label of button
+        Without this, dialog box title is what Gtk decides.
+        With this title of dialog box is same as label of button
         '''
-        self.set_title(title)
+        #self.set_title(title)
 
         # set default filename
         # File need not exist.
         self.set_filename(default)
 
-
-
     def get_value(self):
-        # using the Gtk FileChooser interface
+        # using the GtkFileChooser interface
         return self.get_filename()
+
+
+# title and default come from formal declaration of the plugin parameter
+# title is label of button but not of dialog
+
+# Specialize to choose existing file
+class FuFileEntry(FuFileOrDirEntry):
+    def __init__(self, title = "Foo", default="",  ):
+        super().__init__(title, default, )
+        super().set_action(action=Gtk.FileChooserAction.OPEN)
+
+
+# Specialize to choose existing folder
+class FuDirEntry(FuFileOrDirEntry):
+    def __init__(self, title = "Foo", default=""):
+        super().__init__(title, default, )
+        super().set_action(Gtk.FileChooserAction.SELECT_FOLDER)
+
 
 
 '''
