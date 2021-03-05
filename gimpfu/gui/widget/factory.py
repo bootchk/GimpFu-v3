@@ -114,7 +114,7 @@ class WidgetFactory:
             args = [formal_param.LABEL, widget_initial_value]
         elif pf_type in (PF_INT, PF_INT8, PF_INT16, PF_INT32, PF_STRING, PF_BOOL,  PF_TEXT ):
             args = [widget_initial_value]
-        elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER, PF_ADJUSTMENT):
+        elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER):
             # Hack, we are using FloatEntry, should use Slider???
             args = [widget_initial_value,]
         elif pf_type == PF_COLOR:
@@ -135,9 +135,9 @@ class WidgetFactory:
             args = None   # [None,]
         elif pf_type in (PF_DISPLAY, PF_ITEM):
             # TODO proceed
-            raise RuntimeError(f"Cannot show GUI to choose Item or Display.")
+            raise NotImplementedError(f"Not implemented: GUI to choose Item or Display.")
         else:
-            # PF_SPINNER,, PF_OPTION
+            # PF_SPINNER,
             raise RuntimeError(f"Unhandled PF_ widget type {pf_type}.")
 
         return args

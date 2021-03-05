@@ -84,6 +84,12 @@ class FloatEntry(StringEntry):
             except ValueError as e:
                 raise EntryValueError(e.args)
 
+
+# TODO Spinner, Slider
+
+# see GimpUi.ScaleEntry
+# GimpUi.SpinButton
+
 '''
 #    class ArrayEntry(StringEntry):
 #            def get_value(self):

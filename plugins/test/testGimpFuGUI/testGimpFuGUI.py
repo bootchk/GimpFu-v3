@@ -22,7 +22,18 @@ To test:
 from gimpfu import *
 
 def plugin_func(img, drw,
-                int8, int32, float, string,
+                int32,
+
+                bool,
+                radio,
+                option,
+
+                float,
+                slider,
+                spinner,
+                
+                string,
+
                 file,
                 dir,
 
@@ -75,30 +86,36 @@ register(
           # PF_              name          displayed   default  extras
           #                                    name
 
-          # These are really not needed?
-          #(PF_IMAGE,         "image",      "foo",      None),
-          #(PF_DRAWABLE,      "drawable",      "foo",      None),
+          # Stock image and drawable params need to be declared here.
+
           # NO widgets for arrays
 
-          # int primitives
-          # TODO PF_BOOL
-          # PF_INT         : IntEntry,
-          #PF_INT16       : IntEntry,
-          (PF_INT8,          "uchar",       "uchar",    1,     (1, 10, 1)),
+          # int valued, by widget type
+
+          # PF_8, PF_INT, PF_INT32 all use the same widget
+          # (PF_INT8,          "uchar",       "uchar",    1,     (1, 10, 1)),
           (PF_INT32,         "int",         "int",      None),
-          # float primitives by widget type
+          # Toggle widget
+          (PF_BOOL,          "bool",        "bool",     True),
+          # Radio buttons with label,value pairs
+          (PF_RADIO,         "radio",       "radio",    1,     (("foo", 1), ("bar", 5))),
+          # pull down option menu widget,  labels without values declared, always int-valued
+          (PF_OPTION,        "option",       "option",  1,     ("foo", "bar")),
+
+          # float valued, by widget type
           (PF_FLOAT,         "float",       "float",    1.0,    (1.0, 10.0, 1.0)),
-          #PF_SLIDER      : FloatEntry,
-          #PF_SPINNER     : FloatEntry,
-          #PF_ADJUSTMENT  : FloatEntry,
-          # TODO:
+          (PF_SLIDER,        "slider",      "slider",   1.0,    (1.0, 10.0, 1.0)),
+          (PF_SPINNER,        "spinner",    "spinner",  1.0,    (1.0, 10.0, 1.0)),
+          # PF_ADJUSTMENT  is alias
+
+          # string valued, by widget type
+          # TODO: PF_TEXT
           (PF_STRING,        "string",      "string",   None),
 
           # generic objects, using only GTK, not GimpUI
           # a button that opens a dialog that chooses a file from file system
           (PF_FILE,          "file",        "file label",  "tmp.tmp"),
           (PF_DIRNAME,       "dir",         "dir label",   "/# TEMP: "),
-          # TODO PF_DIR
 
           # GIMP objects
           # a button that opens a dialog that chooses a color
