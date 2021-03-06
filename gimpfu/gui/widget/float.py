@@ -7,6 +7,12 @@ from gi.repository import GimpUi
 
 from gimpfu.gui.widget.wrapper import WidgetWrapper
 
+import logging
+
+module_logger = logging.getLogger("GimpFu.gui.widget.float")
+
+
+
 """
 Widgets float-valued
 
@@ -18,16 +24,22 @@ class SpinnerWidget(WidgetWrapper):
     # bounds is (upper, lower, step)
     def __init__(self, default=0, bounds=(0, 100, 5)):
         wrapped = GimpUi.SpinButton.new_with_range(*bounds)
+        # SpinButton new() does not set value
+        module_logger.info(f"Spinner default: {default}")
+        wrapped.set_value(default)
         super().__init__(wrapped)
 
 class SliderWidget(WidgetWrapper):
     # bounds is (upper, lower, step)
-    def __init__(self, title, default=0, bounds=(0, 100, 5)):
+    def __init__(self, default=0, bounds=(0, 100, 5)):
         """
         !!! We pass empty string for label, otherwise it creates
         an extra label on the slider portion.
         We already labeled the entire widget in the dialog.
+
+        ScaleEntry.new() takes a value
         """
+        module_logger.info(f"Slider bounds: {bounds}")
         wrapped = GimpUi.ScaleEntry.new( "", default, *bounds)
         super().__init__(wrapped)
 

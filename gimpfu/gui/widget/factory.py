@@ -15,6 +15,8 @@ from gimpfu.gui.widget.resource   import *
 from gimpfu.gui.widget.brush      import *
 from gimpfu.gui.widget.color      import *
 
+from gimpfu.procedure.extras import Extras
+
 from gimpfu.adapters.rgb import GimpfuRGB
 
 import logging
@@ -58,19 +60,16 @@ class WidgetFactory:
         else:
             result = widget_constructor()
 
-        # # HACK:
-        #if a_formal_param.PF_TYPE == PF_DRAWABLE:
-        #    result = result.get_widget()
-
         return result
 
+
     def is_gimp_widget(a_formal_param):
-        """ Does the widget inherit a Gimp widget (for ephemeral Gimp objects) """
+        """ Does the widget wrap i.e. own a Gimp widget (for ephemeral Gimp objects) """
         return a_formal_param.PF_TYPE in (PF_IMAGE, PF_DRAWABLE, PF_LAYER, PF_CHANNEL, PF_VECTORS)
 
     def is_wrapped_widget(a_formal_param):
         """ Do we wrap a Gimp widget (for which inheriting fails.) """
-        return (   WidgetFactory.is_gimp_widget(a_formal_param)
+        return ( WidgetFactory.is_gimp_widget(a_formal_param)
                 or a_formal_param.PF_TYPE == PF_COLOR
                 or a_formal_param.PF_TYPE == PF_SPINNER
                 or a_formal_param.PF_TYPE == PF_SLIDER
@@ -120,9 +119,13 @@ class WidgetFactory:
             args = [formal_param.LABEL, widget_initial_value]
         elif pf_type in (PF_INT, PF_INT8, PF_INT16, PF_INT32, PF_STRING, PF_BOOL,  PF_TEXT ):
             args = [widget_initial_value]
-        elif pf_type in (PF_SLIDER, PF_FLOAT, PF_SPINNER):
-            # Hack, we are using FloatEntry, should use Slider???
+        elif pf_type in (PF_FLOAT, ):
+            # Using FloatEntry, no range specified
             args = [widget_initial_value,]
+        elif pf_type in (PF_SLIDER, PF_SPINNER, ):
+            # Hack, we are using FloatEntry, should use Slider???
+            minMaxStepTuple = Extras.derive_min_max_step_from_extras(pf_type, formal_param.EXTRAS)
+            args = [widget_initial_value, minMaxStepTuple]
         elif pf_type == PF_COLOR:
             # require widget_initial_value is-a string, name of color, or is-a 3-tuple of RGB ints
             # TODO, if initial_value came from ProcedureConfig, could be wrong

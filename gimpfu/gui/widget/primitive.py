@@ -93,8 +93,6 @@ class ToggleEntry(Gtk.ToggleButton):
 
 
 
-
-
 '''
 To handle author errors.
 Just a label, not allowing interaction.

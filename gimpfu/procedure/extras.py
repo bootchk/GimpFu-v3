@@ -66,19 +66,24 @@ class Extras():
         return (min, max)
 
 
+    def derive_min_max_step_from_extras(pf_type, extras):
+        """ Return a (min, max, step) tuple """
+        assert len(extras) == 3
+        return extras
+
+
 """
 EXTRAS is a mini language or format of gimpfu
 The tuples describe both the GUI widget and the valid ranges for parameter.
 
 extras type  Python type of extras                     example
 0            no extras (typically string or other non-ordered types)
-1            a three-tuple                             (min, max, default)
+1            a three-tuple                             (min, max, step)
 2            extras is a tuple of two-tuple dict       (("label", min), ("label", max))
 3            tuple of strings                          ("label", ...)
                        each label is name of an int-valued choice
 """
 
-# TODO all 'int' below is wrong, should be in range [0,3]
 map_PF_TYPE_to_extras_type = {
     PF_INT8:      1,
     PF_INT16:     1,
@@ -88,7 +93,7 @@ map_PF_TYPE_to_extras_type = {
     PF_STRING:    0,
     PF_TEXT:      0,    # an alternate string valued chooser
 
-    PF_VALUE:     int,  # TODO what is this??
+    # PF_VALUE:    # TODO what is this??
 
     # Gimp chooser widget, no extras
     PF_COLOR:     0,    # PF_COLOUR is alias

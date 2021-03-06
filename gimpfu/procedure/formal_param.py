@@ -1,5 +1,4 @@
 
-
 import gi
 from gi.repository import GObject
 gi.require_version("Gimp", "3.0")
@@ -10,9 +9,7 @@ from gimpfu.enums.gimpfu_enums import *
 from gimpfu.procedure.extras import Extras
 from gimpfu.procedure.prop_holder_factory import PropHolderFactory
 
-
 from gimpfu.message.proceed import proceed
-
 
 import logging
 
