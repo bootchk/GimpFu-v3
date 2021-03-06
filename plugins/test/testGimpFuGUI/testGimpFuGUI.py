@@ -31,11 +31,11 @@ def plugin_func(img, drw,
                 float,
                 slider,
                 spinner,
-                
+
                 string,
 
                 file,
-                dir,
+                directory,
 
                 color, # GLib CRITICAL
                 font,  # selector not stay on top?
@@ -44,25 +44,33 @@ def plugin_func(img, drw,
                 pattern,
                 gradient,
 
-                #image,
-                #drawable,
-                #layer,
-                #channel,
-                #vectors,
+                image,
+                drawable,
+                layer,
+                channel,
+                vectors,
                 ):
     """ Just prints results. Does nothing substantive. """
     # TODO checks that each value is valid?
     print(f"Test GIMP GUI results:")
-    print(f"File:        {file}")
+    print(f"bool:        {bool}")
+    print(f"radio:       {radio}")
+    print(f"option:      {option}")
+
+    print(f"slider:      {slider}")
+    print(f"spinner:     {spinner}")
+
+    print(f"file:        {file}")
     print(f"directory:   {directory}")
 
-    print(f"Font:         {font}")
+    print(f"color:        {color}")
+    print(f"font:         {font}")
     print(f"palette:      {palette}")
     print(f"brush:        {brush}")
     print(f"pattern:      {pattern}")
     print(f"gradient:     {gradient}")
 
-    if False:   # Temporary not test
+    if True:   # Temporary not test
         print(f"Image    ID: {image}")
         print(f"Drawable ID: {drawable}")
         print(f"Layer    ID: {layer}")
@@ -104,8 +112,8 @@ register(
 
           # float valued, by widget type
           (PF_FLOAT,         "float",       "float",    1.0,    (1.0, 10.0, 1.0)),
-          (PF_SLIDER,        "slider",      "slider",   1.0,    (1.0, 10.0, 1.0)),
-          (PF_SPINNER,        "spinner",    "spinner",  1.0,    (1.0, 10.0, 1.0)),
+          (PF_SLIDER,        "slider",      "slider",   5.0,    (1.0, 10.0, 1.0)),
+          (PF_SPINNER,       "spinner",     "spinner",  5.0,    (1.0, 10.0, 1.0)),
           # PF_ADJUSTMENT  is alias
 
           # string valued, by widget type
@@ -135,11 +143,11 @@ register(
           # No Gimp widget: PF_DISPLAY
 
           # a drop down menu button to choose an image that is open in Gimp app
-          #(PF_IMAGE,          "img",        "image",    None),
-          #(PF_DRAWABLE,       "drw",        "drawable", None),
-          #(PF_LAYER,        "layer",        "layer",    None),
-          #(PF_CHANNEL,      "channel",      "channel",  None),
-          #(PF_VECTORS,      "vectors",      "vectors",  None),
+          (PF_IMAGE,          "img",        "image",    None),
+          (PF_DRAWABLE,       "drw",        "drawable", None),
+          (PF_LAYER,        "layer",        "layer",    None),
+          (PF_CHANNEL,      "channel",      "channel",  None),
+          (PF_VECTORS,      "vectors",      "vectors",  None),
 
           # Parasite, enum, PF_VALUE ??
       ],

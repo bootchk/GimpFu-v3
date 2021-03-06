@@ -7,6 +7,8 @@ from gimpfu.enums.gimpfu_enums import *
 
 # widget classes grouped by how implemented
 from gimpfu.gui.widget.primitive  import *
+from gimpfu.gui.widget.float      import *
+from gimpfu.gui.widget.range      import *
 from gimpfu.gui.widget.gimp       import *
 from gimpfu.gui.widget.gtk        import *
 from gimpfu.gui.widget.resource   import *
@@ -68,7 +70,11 @@ class WidgetFactory:
 
     def is_wrapped_widget(a_formal_param):
         """ Do we wrap a Gimp widget (for which inheriting fails.) """
-        return WidgetFactory.is_gimp_widget(a_formal_param) or a_formal_param.PF_TYPE == PF_COLOR
+        return (   WidgetFactory.is_gimp_widget(a_formal_param)
+                or a_formal_param.PF_TYPE == PF_COLOR
+                or a_formal_param.PF_TYPE == PF_SPINNER
+                or a_formal_param.PF_TYPE == PF_SLIDER
+                )
 
 
 
@@ -190,10 +196,10 @@ _edit_map = {
         PF_TOGGLE      : ToggleEntry,  # alias for PF_BOOL
 
         # TODO slider and spinner floats, or int?
+        # PF_ADJUSTMENT is alias for PF_SPINNER
         PF_FLOAT       : FloatEntry,
-        PF_SLIDER      : FloatEntry,
-        PF_SPINNER     : FloatEntry,
-        PF_ADJUSTMENT  : FloatEntry,
+        PF_SLIDER      : SliderWidget,
+        PF_SPINNER     : SpinnerWidget,
 
         # finite set of choices: two look-and-feels
         # radio button group, values are declared
