@@ -154,9 +154,11 @@ class GimpfuPDB():
         # object.__getattribute__(self, "_marshall_args")(proc_name, *args)
 
         # Most PDB calls have side_effects on image, but few return values?
+
         # ensure result is defined and (is-a list OR None)
+
         # TODO throws for GBoxed, so log the types and not the values
-        # self.logger.debug(f"_adaptor_func for: {proc_name}  returns: {result}")
+        self.logger.debug(f"_adaptor_func for: {proc_name}  returns: {result}")
         return result
 
 

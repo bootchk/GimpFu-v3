@@ -209,7 +209,7 @@ class FuResult():
 
             # TODO ensure runFuncResult is an iterable, always iterate
             length = FuResult.lenActualResult(runfuncResult)
-            if length > 0:
+            if length > 1:
                 index = 0
                 for item in runfuncResult:
                     formalType = resultSpecs[index].value_type

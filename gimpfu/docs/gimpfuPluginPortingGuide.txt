@@ -188,16 +188,19 @@ ID versus object
 ================
 
 Formerly, a Python plugin received integer ID's for references to GIMP objects, such as layers.
-(Note that ScriptFu Scheme plugins still receive integer ID's.)
 Most authors were not even aware that the GIMP objects were stored as integer ID's.
+(Note that ScriptFu Scheme plugins still receive integer ID's.
+GIMP uses IDs's for ScriptFu, a language that does not have pointers.
+GIMP also uses ID's across the 'wire protocol' between the GIMP app and plugin processes,
+since pointers cannot be passed between processes with different address spaces.)
 
 Now a Python plugin receives a reference to a GObject (a pointer, more or less.)
 
 GimpFu mostly hides all that:
 
-Some PDB procedures, like gimp-item-is-layer(int ID) are no longer in the PDB (deprecated.)
+Some PDB procedures, like gimp-item-is-layer(int ID) are no longer in the PDB.
 GimpFu provides a backward compatible definition for gimp-item-is-layer(GObject *),
-so you don't need to change code.
+so you don't need to change plugin code.
 
 Now the PDB v3 has gimp-item-ID-is-layer(int ID).
 Also ID is a property of an item.
@@ -208,9 +211,25 @@ You will need to delete the trailing ".ID".
 Almost all PDB procedures now expect a GObject reference, not an ID.
 
 
+Other deprecated PDB procedures
+===============================
 
-TODO other model changes
+This is a partial list of the most common transformations
+for PDB procedures deprecated sometime in the past, and now obsolete.
 
+gimp-image-add-layer(image, layer, position) => gimp-image-insert-layer(image, layer, parent, position)
+For an equivalent to the deprecated procedure, the parent should be None.
+(See documents, the parent is related to layer groups.)
+
+gimp-drawable-get-image => gimp-item-get-image
+GIMP v3 is more polymorphic: many objects inherit Item so you use methods of that class.
+
+
+
+Other model changes
+========================
+
+TODO
 
 Changes to GimpFu formal declaration of plugin characteristics.
 ---------------------------------------------------------------

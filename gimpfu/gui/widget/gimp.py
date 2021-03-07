@@ -3,8 +3,10 @@
 import gi
 
 # !!! Even though docs generated from .gir say widgets are in Gimp, they are in GimpUi
+gi.require_version("Gimp",   "3.0")
 gi.require_version("GimpUi", "3.0")
 from gi.repository import GimpUi
+from gi.repository import Gimp
 # does not import Gtk
 
 import logging
@@ -57,8 +59,9 @@ I.E. it does NOT display all "open" channels, only "open, custom" channels.
 class ItemWidgetWrapper():
     """ Base class for GimpFu widgets that choose Gimp Items"""
 
-    def __init__(self, owned_widget_constructor, description):
+    def __init__(self, owned_widget_constructor, description, result_class=None):
         self.description = description
+        self.result_class = result_class
 
         # instantiate the owned widget by calling its constructor
         # constraints=None, data=None
@@ -73,10 +76,17 @@ class ItemWidgetWrapper():
         active = self.widget.get_active()
         # Discard first element, usually True
         id = active[1]
+        module_logger.debug(f"ItemWidgetWrapper.get_value type: {self.description}.ID: {id} ")
+
+
         #result = Gimp.Drawable.get_by_id(id)
         # assert is-a Gimp.Drawable
-        result = id
-        module_logger.debug(f"ItemWidgetWrapper.get_value type: {self.description}.ID: {result} ")
+        # OLD result = id
+
+        # class get instance by ID
+        result = self.result_class.get_by_id(id)
+
+        module_logger.debug(f"ItemWidgetWrapper.get_value type returns: {result} ")
         return result
 
 
@@ -86,7 +96,7 @@ class FuImageWidget(ItemWidgetWrapper):
 
 class FuDrawableWidget(ItemWidgetWrapper):
     def __init__(self, ):
-        super().__init__(GimpUi.DrawableComboBox.new, "Drawable")
+        super().__init__(GimpUi.DrawableComboBox.new, "Drawable", Gimp.Drawable)
 
 class FuChannelWidget(ItemWidgetWrapper):
     def __init__(self, ):

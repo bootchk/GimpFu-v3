@@ -2,6 +2,27 @@
 from gimpfu.enums.gimpfu_enums import *
 from gimpfu.message.deprecation import Deprecation
 
+from enum import Enum, auto
+
+"""
+EXTRAS is a mini language or format of gimpfu
+The tuples describe the valid ranges for formal parameter.
+Closely related to the widget associated with the PF_ formal parameter
+
+StringsTuple: each string is name of an int-valued choice.
+Values are assigned sequentially starting at 0.
+
+KeyValueTuples: each value can be int or string.
+TODO or float?
+TODO how do we order strings for min, max?
+"""
+
+class ExtrasType(Enum):
+    NotAny = auto()             # no extras (typically string or other non-ordered types)
+    MinMaxStepTuple = auto()    # a three-tuple             (min, max, step)
+    KeyValueTuples = auto()     # tuple of two-tuple dict       (("label", min), ("label", max))
+    StringsTuple = auto()       # tuple of strings ("label", ...)
+
 
 
 
@@ -16,7 +37,7 @@ class Extras():
         """ Log an Author's error in source, in the Params
 
         Don't use proceed(), don't need its stack trace.
-        But the user's code was not fixed so this should be more severe than a warning?
+        But GimpFu did not fixup user's code so this should be more severe than a warning?
         """
         Deprecation.say("Error in plugin author's source: " + message)
 
@@ -27,11 +48,11 @@ class Extras():
 
         min = None
         max = None
-        if extras_type == 0:
+        if extras_type == ExtrasType.NotAny:
             if extras:
                 proceed("Unexpected extras on parameter spec.")
             pass
-        elif extras_type == 1:
+        elif extras_type == ExtrasType.MinMaxStepTuple:
             if extras:
                 min = extras[0]
                 max = extras[1]
@@ -39,30 +60,42 @@ class Extras():
                 # !!! -1
                 min = -1000000 # Fail: - (sys.maxsize - 1) # Fail: float("-inf")
                 max = 1000000 # Fail: sys.maxsize # float("inf")
-        elif extras_type == 2:
-            # Bool represented as int
-            # TODO extras[0][1]
-            min = 0
-            max = 1
-        elif extras_type == 3:
+        elif extras_type == ExtrasType.KeyValueTuples:
             # PF_RADIO and PF_OPTION
             if extras:
-                # TODO should extract the min and max of the given list of option ordinals
+                # TODO extract the min and max of the given list of option ordinals
                 # For most cases, this will suffice but max should be len()-1 ??
-
+                if len(extras) < 2:
+                    # Nonsensical author specification
+                    Extras._on_extras_error(f"Too few extras for PF_OPTION or PF_RADIO.")
+                else:
+                    # Author must understand that values start at 0
+                    # TODO this is wrong for string values.
+                    min = 0
+                    max = len(extras) - 1
+                    # TODO if values not sequential ints
                 """
-                Not currently using the given extras values,
-                but warn if they are not of valid type.
+                See elsewhere.  GimpFu allows string values.
+                #if not isinstance (extras[0][1], int):
+                #    Extras._on_extras_error(f"String literals for extras are obsolete.")
                 """
-                if not isinstance (extras[0][1], int):
-                    Extras._on_extras_error(f"String literals for extras are obsolete.")
-
-                min = 0
-                max = len(extras)
             else:
                 Extras._on_extras_error("Missing extras")
+
+        elif extras_type == ExtrasType.StringsTuple:
+            if pf_type == PF_BOOL:
+                if extras:
+                    if  len(extras) != 2:
+                        Extras._on_extras_error(f"Require none or two values for extras for PF_BOOL.")
+                else:
+                    # user provided no labels, use default labels.
+                    min = 0
+                    max = 1
+            else:
+                # Mistake in the map or in this code
+                Extras._on_extras_error("Error in GimpFu extras map")
         else:
-            # Could be missing code in GimpFu ?
+            # Incorrect implementation in GimpFu
             Extras._on_extras_error(f"Unhandled extras type: {extras_type} on PF_TYPE: {self.PF_TYPE}")
 
         return (min, max)
@@ -74,66 +107,58 @@ class Extras():
         return extras
 
 
-"""
-EXTRAS is a mini language or format of gimpfu
-The tuples describe both the GUI widget and the valid ranges for parameter.
 
-extras type  Python type of extras                     example
-0            no extras (typically string or other non-ordered types)
-1            a three-tuple                             (min, max, step)
-2            extras is a tuple of two-tuple dict       (("label", min), ("label", max))
-3            tuple of strings                          ("label", ...)
-                       each label is name of an int-valued choice
-"""
 
 map_PF_TYPE_to_extras_type = {
-    PF_INT8:      1,
-    PF_INT16:     1,
-    PF_INT32:     1,
-    PF_INT:       1,
-    PF_FLOAT:     1,
-    PF_STRING:    0,
-    PF_TEXT:      0,    # an alternate string valued chooser
+    # TODO does an Entry widget enforce this?
+    PF_INT8:      ExtrasType.MinMaxStepTuple,
+    PF_INT16:     ExtrasType.MinMaxStepTuple,
+    PF_INT32:     ExtrasType.MinMaxStepTuple,
+    PF_INT:       ExtrasType.MinMaxStepTuple,
+    PF_FLOAT:     ExtrasType.MinMaxStepTuple,
+    PF_STRING:    ExtrasType.NotAny,
+    PF_TEXT:      ExtrasType.NotAny,    # an alternate string valued chooser
 
     # PF_VALUE:    # TODO what is this??
 
     # Gimp chooser widget, no extras
-    PF_COLOR:     0,    # PF_COLOUR is alias
-    PF_ITEM:      0,
-    PF_DISPLAY:   0,
-    PF_IMAGE:     0,
-    PF_LAYER:     0,
-    PF_CHANNEL:   0,
-    PF_DRAWABLE:  0,
-    PF_VECTORS:   0,
+    PF_COLOR:     ExtrasType.NotAny,    # PF_COLOUR is alias
+    PF_ITEM:      ExtrasType.NotAny,
+    PF_DISPLAY:   ExtrasType.NotAny,
+    PF_IMAGE:     ExtrasType.NotAny,
+    PF_LAYER:     ExtrasType.NotAny,
+    PF_CHANNEL:   ExtrasType.NotAny,
+    PF_DRAWABLE:  ExtrasType.NotAny,
+    PF_VECTORS:   ExtrasType.NotAny,
 
     # int/bool valued checkbox or toggle widget
-    PF_BOOL:      2,  # PF_TOGGLE is alias, same widget
-    PF_SLIDER:    1,
-    PF_SPINNER:   1,  # PF_ADJUSTMENT is alias, same widget
+    PF_BOOL:      ExtrasType.StringsTuple,  # PF_TOGGLE is alias, same widget
 
     # float valued
-    PF_RADIO:     3,  # radio buttons for a int or string valued enum
-    PF_OPTION:    3,  # pulldown combobox
+    PF_SLIDER:    ExtrasType.MinMaxStepTuple,
+    PF_SPINNER:   ExtrasType.MinMaxStepTuple,  # PF_ADJUSTMENT is alias, same widget
 
-    PF_FONT:      0,
+    PF_RADIO:     ExtrasType.KeyValueTuples,  # radio buttons for a int or string valued enum
+    PF_OPTION:    ExtrasType.KeyValueTuples,  # pulldown combobox
 
-    PF_BRUSH:     0,
-    PF_PATTERN:   0,
-    PF_GRADIENT:  0,
-    PF_PALETTE:   0,
+    PF_FONT:      ExtrasType.NotAny,
+
+    PF_BRUSH:     ExtrasType.NotAny,
+    PF_PATTERN:   ExtrasType.NotAny,
+    PF_GRADIENT:  ExtrasType.NotAny,
+    PF_PALETTE:   ExtrasType.NotAny,
 
     # Gtk widgets, no extras
-    PF_FILE:      0,
-    PF_FILENAME:  0,    # GFile valued file chooser widget
-    PF_DIRNAME:   0,
+    PF_FILE:      ExtrasType.NotAny,
+    PF_FILENAME:  ExtrasType.NotAny,    # GFile valued file chooser widget
+    PF_DIRNAME:   ExtrasType.NotAny,
 
     # Arrays have no extras
     # Arrays have no widgets
-    PF_INT8ARRAY:   0,
-    PF_INT32ARRAY:  0,
-    PF_FLOATARRAY:  0,
-    PF_STRINGARRAY: 0,
-    PF_GIMP_OBJECT_ARRAY: 0,
-    PF_GIMP_RGB_ARRAY:    0,
+    PF_INT8ARRAY:   ExtrasType.NotAny,
+    PF_INT32ARRAY:  ExtrasType.NotAny,
+    PF_FLOATARRAY:  ExtrasType.NotAny,
+    PF_STRINGARRAY: ExtrasType.NotAny,
+    PF_GIMP_OBJECT_ARRAY: ExtrasType.NotAny,
+    PF_GIMP_RGB_ARRAY:    ExtrasType.NotAny,
 }
