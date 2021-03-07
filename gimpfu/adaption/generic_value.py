@@ -31,10 +31,18 @@ class FuGenericValue():
 
     Adapts Python types to GTypes.
 
+    Does a coercion of three kinds:
+    - convert (from one representation and type to another)
+    - cast (just label the value as a different type, without changing representation )
+    - accept (no change, but signify acceptable as is)
+
+    A caller may attempt a series of coercions,
+    and stop when one succeeds.
+
     Stateful:
-    Operations in this sequence:  init, apply conversions and upcasts, get_gvalue
+    Operations in this sequence:  init, coerce [conversion, upcast, accept], get_gvalue
     That is, initially the owned GValue is None.
-    Then, any conversions/upcasts may set owned GValue.
+    Then, any coercion may set owned GValue.
     Finally, a call to get_gvalue will return the set owned GValue,
     or create a GValue to return.
 
@@ -59,8 +67,10 @@ class FuGenericValue():
         self._result_arg_type = None
         self._gvalue = None
 
+        # state
         self._did_convert = False
         self._did_upcast = False
+        self._did_accept = False
         self._did_create_gvalue = False
 
         self.logger = logging.getLogger("GimpFu.FuGenericValue")
@@ -101,14 +111,26 @@ class FuGenericValue():
     def actual_arg(self):
         return self._actual_arg
 
-    # TODO combine these into one isCoherent()
-    @property
-    def did_convert(self):
-        return self._did_convert
+
 
     @property
-    def did_upcast(self):
-        return self._did_upcast
+    def did_coerce(self):
+        """ Does state show has been coerced. """
+        return self._did_convert or self._did_convert or self._did_accept
+
+    @property
+    def did_convert_or_upcast(self):
+        """ Does state show has been converted or upcast """
+        return self._did_convert or self._did_convert
+
+
+
+
+    def accept(self):
+        """ mark state that the actual type is compatible with a desired type. """
+        self.logger.debug(f"Accept type: {self._actual_arg_type}")
+        self._did_accept = True
+
 
 
     '''
@@ -495,17 +517,17 @@ class FuGenericValue():
         '''
 
         Upcast.try_gimp_upcasts(formalArgType, self)
-        if self.did_upcast:
+        if self.did_coerce:
             return
 
         # TODO do this first because it shortcuts coherent types
         # TODO rename try_usual_python_conversion_and_upcast
         Types.try_usual_python_conversion(formalArgType, self)
-        if self.did_convert or self.did_upcast:
+        if self.did_coerce:
             return
 
         Types.try_array_conversions(formalArgType, self)
-        if self.did_convert:
+        if self.did_coerce:
             return
 
         Types.try_file_descriptor_conversion(formalArgType, self)

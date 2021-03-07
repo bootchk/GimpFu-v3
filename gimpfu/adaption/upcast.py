@@ -29,13 +29,13 @@ class Upcast():
         Try the upcasts required by Gimp PDB.
         """
         Upcast.try_to_drawable(formal_arg_type, gen_value)
-        if gen_value.did_upcast:
+        if gen_value.did_coerce:
             return
         Upcast.try_to_item(formal_arg_type, gen_value)
-        if gen_value.did_upcast:
+        if gen_value.did_coerce:
             return
         Upcast.try_to_layer(formal_arg_type, gen_value)
-        if gen_value.did_upcast:
+        if gen_value.did_coerce:
             return
         Upcast.try_to_color(formal_arg_type, gen_value)
 
@@ -99,7 +99,7 @@ class Upcast():
     @staticmethod
     def try_to_color(formal_arg_type, gen_value):
         Upcast._try_to_type(formal_arg_type, gen_value, Gimp.RGB)
-        if gen_value.did_upcast:
+        if gen_value.did_coerce:
             # also convert value
             try:
                 gen_value.to_color()

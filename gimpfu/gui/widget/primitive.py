@@ -69,10 +69,12 @@ class FloatEntry(StringEntry):
 Boolean valued.
 
 TODO What does Gtk do if we omit labels?
+TODO should we pass labels from extras?
 """
 class ToggleEntry(Gtk.ToggleButton):
     def __init__(self, default=0):
-        Gtk.ToggleButton.__init__(self)
+        #Gtk.ToggleButton.__init__(self)
+        super().__init__()
 
         self.label = Gtk.Label(_("No"))
         self.add(self.label)

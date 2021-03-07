@@ -3,6 +3,8 @@ from gimpfu.enums.gimpfu_enums import *
 from gimpfu.message.deprecation import Deprecation
 
 
+
+
 class Extras():
     """
     The extra declarations in a GimpFu formal parameter declaration.

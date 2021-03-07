@@ -56,10 +56,13 @@ class FuFormalParams():
 
     def sanity_test(self, metadata):
         unique_names = []
+        """
+        # TODO: this doesn't work because GimpFu allows user to declare or not declare args that Gimp always passes.
         # since we are using the names to convey properties to Gimp,
         # disallow names already used by Gimp for properties
         unique_names.append("image")
         unique_names.append("drawable")
+        """
         for param in self.PARAMS:
             """
             TODO

@@ -56,8 +56,8 @@ class MarshalPDB():
 
         gen_value.tryConversionsAndUpcasts(formal_arg_type);
 
-        if not gen_value.did_convert:
-            MarshalPDB.logger.debug(f"No type conversions: index {index} formal type: {formal_arg_type}" )
+        if not gen_value.did_coerce:
+            MarshalPDB.logger.debug(f"No type coercion: index {index} formal type: {formal_arg_type}" )
 
 
 

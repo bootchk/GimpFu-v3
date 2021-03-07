@@ -38,14 +38,18 @@ PF_COLOR       = 9
 PF_COLOUR      = PF_COLOR   # FBC, an alias
 
 # gimp ephemeral object related, integer ID valued?
+
+# No widgets, for return values only
 PF_ITEM        = 10
 PF_DISPLAY     = 11
+
 PF_IMAGE       = 12
 PF_LAYER       = 13
 PF_CHANNEL     = 14
 PF_DRAWABLE    = 15
 PF_VECTORS     = 16
 
+# vestiges of v2, what are they?
 #PF_SELECTION   = PDB_SELECTION
 #PF_BOUNDARY    = PDB_BOUNDARY
 #PF_PATH        = PDB_PATH
@@ -80,7 +84,7 @@ PF_PATTERN     = 1202
 PF_GRADIENT    = 1203
 PF_PALETTE     = 1204
 
-# Arrays.  GimpFu has no widgets for these.  Only useful to declare types of return values.
+# Arrays.  GimpFu has no widgets for these.  Only to declare types of return values.
 
 # PF_INTARRAY Obsolete.  Could be an alias for INT32 FBC, but it was never defined in v2
 # PF_INT16ARRAY  was never defined in v2, and won't be implemented in v3

@@ -158,8 +158,13 @@ class FuProcedureMetadata():
         # ensure Gimp.Procedure has proper count of args.
         arg_count = len(procedure.get_arguments())
         self.logger.info(f" Conveyed: {count}, arg_count {arg_count}, omitted: {count_omitted_leading_args}")
+        """
+        # TODO:not correct for certain plugin types:
+        # e.g. map_pdb_name plugin fails
+
         # add one for run mode
         assert  arg_count == count + count_omitted_leading_args + 1
+        """
 
     def convey_out_args_to_gimp(self, procedure):
         count = self.results.convey_to_gimp(procedure, count_omitted_leading_args=0, is_in_arg=False)

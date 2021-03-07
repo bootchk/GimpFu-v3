@@ -109,9 +109,7 @@ class Types():
 
         if gen_value.actual_arg_type is int:
             if FormalTypes.is_int_type(formal_arg_type_name):
-                # TODO make this just set a flag. For now, do an unnecessary upcast.
-                gen_value.int()
-                Types.logger.info(f"try_usual_python_conversion: already proper type")
+                gen_value.accept()
             elif FormalTypes.is_boolean_type(formal_arg_type_name):
                 gen_value.boolean()
             elif FormalTypes.is_float_type(formal_arg_type_name):
@@ -124,7 +122,9 @@ class Types():
                 gen_value.unsigned_char()
         elif gen_value.actual_arg_type is float:
             # TODO convert float to boolean
-            if FormalTypes.is_int_type(formal_arg_type_name):
+            if FormalTypes.is_float_type(formal_arg_type_name):
+                gen_value.accept()
+            elif FormalTypes.is_int_type(formal_arg_type_name):
                 gen_value.int()
             elif FormalTypes.is_str_type(formal_arg_type_name):
                 gen_value.str()
@@ -137,8 +137,6 @@ class Types():
         # ensure result_arg_type == type of actual_arg OR (type(actual_arg) is int AND result_type_arg == float)
         # likewise for value of result_arg
         Types.logger.info(f"try_usual_python_conversion returns {gen_value}")
-
-        # WAS return result_arg, result_arg_type, did_convert
 
 
 
