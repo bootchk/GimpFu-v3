@@ -31,5 +31,5 @@ class GimpPDB:
         if result is not None:
             # wrap
             result = GimpProcedure(result)
-        GimpPDB.logger.info(f"get_procedure_by_name returns {result}")
+        GimpPDB.logger.info(f"get_procedure_by_name name: {proc_name}, returns {result}")
         return result

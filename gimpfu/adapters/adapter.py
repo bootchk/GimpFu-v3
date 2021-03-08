@@ -93,7 +93,7 @@ class Adapter():
     '''
     def unwrap(self):
         ''' Return inner object, of a Gimp type, used when passing args back to Gimp'''
-        AdapterLogger.logger.debug(f"unwrap to type: {self._adaptee}, gtype: {self.adaptee_gtype}")
+        AdapterLogger.logger.debug(f"unwrap, from: {self._adaptee}, to gtype: {self.adaptee_gtype}")
         return self._adaptee
 
     @property
@@ -113,7 +113,11 @@ class Adapter():
     '''
     def __eq__(self, other):
          '''
-         Override equality.
+         Override equality operator.
+
+         This emanates from an "==" in Authors code.
+         GimpFu code usually does not compare adapted instances.
+
          Two Adapted instances are equal if:
          - both have same superclass of Adapter
          - AND their adaptee's are equal.
@@ -121,17 +125,23 @@ class Adapter():
          Require self and other both inherit Adapter, ow exception.
          I.E. not general purpose equality such as: Layer instance == int instance
          '''
+
+         # We know self is an Adaptor, check other
+         try:
+            unwrapped_other = other.unwrap()
+         except AttributeError:
+            message = f"Fail __eq__, failed to unwrap other: {other}"
+            AdapterLogger.logger.info(message)
+            raise Exception(message)
+
          try:
              # Compare ID's or names instead?
              # Could use public unwrap() for more generality
-             return self._adaptee == other.unwrap()
-         except AttributeError:
-             """
-             GimpFu codes does not compare.
-             This emanates from Authors code.
-             """
+             AdapterLogger.logger.info(f"Adaptor.__eq__ between unwrapped: {self} and {unwrapped_other}")
+             return self._adaptee == unwrapped_other
+         except:
              # TODO define GimpFuException class of exceptions and do logging there
-             message = f"Can't compare types: {type(self)}, {type(other)}"
+             message = f"Fail __eq__ between: {self}, {other}"
              AdapterLogger.logger.critical(message)
              raise Exception(message)
 

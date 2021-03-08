@@ -11,7 +11,7 @@ from gi.repository import Gimp
 
 import logging
 
-module_logger = logging.getLogger("GimpFu.widgets_gimp")
+module_logger = logging.getLogger("GimpFu.gui.widgets.gimp")
 
 
 

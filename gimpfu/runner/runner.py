@@ -115,7 +115,7 @@ class FuRunner:
         '''
         FuRunner.logger.info(f"_interact, {procedure}, {list_wrapped_args}")
 
-        # get name from instance of Gimp.Procedure
+        # name from instance of Gimp.Procedure
         proc_name = procedure.get_name()
 
         gf_procedure = FuProcedures.get_by_name(proc_name)
@@ -162,15 +162,8 @@ class FuRunner:
 
             from gimpfu.gui.control_dialog import PluginControlDialog
 
-            '''
-            v2
-            # executes run_script if not canceled, returns tuple of run_script result
-            was_canceled, result = gimpfu_dialog.show_plugin_dialog(
-                procedure,
-                guiable_actual_args,
-                guiable_formal_params, run_script)
-            '''
             nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(list_wrapped_args)
+            FuRunner.logger.info(f"in guiable args: {guiable_actual_args}")
 
             '''
             If you omit this next step, it does not use last_values, instead
@@ -181,25 +174,26 @@ class FuRunner:
             # TODO what is wrong here???
             # Is the config persistent across changes to the plugin definition?
             # Who handles run with last values?
-            FuRunner.logger.info(f"in guiable args: {guiable_actual_args}")
             # guiable_actual_args = config.get_initial_settings()
 
             was_canceled, guied_args = PluginControlDialog.show(
                 procedure,
                 guiable_actual_args,
                 guiable_formal_params)
-            if not was_canceled :
+            # assert results from dialog are primitives or unwrapped GIMP objects
 
+            if not was_canceled :
+                # config takes unwrapped guied args
                 config.set_changed_settings(guied_args)
 
-                # update incoming guiable args with guied args
-                wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args, guied_args)
+                wrapped_guied_args = Marshal.wrap_args(guied_args)
+                wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args, wrapped_guied_args)
                 FuRunner.logger.info(f"Wrapped args to run_func, {wrapped_run_args}" )
 
-                # !!! with args modified since passed in
+                # !!! with args changed by user
                 result = FuRunner._try_run_func(proc_name, function, wrapped_run_args)
             else:
-                # Don't save any gui changes to args
+                # Don't save changes to config i.e. settings
                 result = None
                 pass
 
