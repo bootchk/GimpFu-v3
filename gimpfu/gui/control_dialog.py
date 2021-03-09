@@ -77,11 +77,13 @@ class PluginControlDialog():
         '''
         PluginControlDialog.logger.debug(f"add_control_widgets: {guiable_initial_values}")
 
+        """
+        NOT USED: the dialog box has a label in its header bar, we don't need a label in the box
         # This is a label above the column of value entry Widgets
-        # TODO what should it say?
-        label = Gtk.Label.new_with_mnemonic("Off_set")
+        label = Gtk.Label.new_with_mnemonic("_Offset")
         box.pack_start(label, False, False, 1)
         label.show()
+        """
 
         # Keep reference so can query during response
         control_widgets = []
@@ -147,7 +149,7 @@ class PluginControlDialog():
 
 
     @staticmethod
-    def _create_gimp_dialog(procname, guiable_initial_values, guiable_formal_params):
+    def _create_gimp_dialog(fuProcedure, gimpProcedure, guiable_initial_values, guiable_formal_params):
         '''
         Create plugin dialog
 
@@ -155,7 +157,7 @@ class PluginControlDialog():
         '''
         PluginControlDialog.logger.debug(f"_create_gimp_dialog: {guiable_initial_values}: {guiable_formal_params} ")
 
-        dialog = Dialog.get(procname)
+        dialog = Dialog.create(fuProcedure, gimpProcedure)
 
         dialog.add_button("_Cancel", Gtk.ResponseType.CANCEL)
         dialog.add_button("_OK", Gtk.ResponseType.OK)
@@ -188,23 +190,24 @@ class PluginControlDialog():
     Progress is still shown, but in the image's display window's progress bar.
     '''
     @classmethod
-    def show(cls, procedure, guiable_initial_values, guiable_formal_params):
+    def show(cls, fuProcedure, gimpProcedure, guiable_initial_values, guiable_formal_params):
         '''
         Present GUI.
         Returns (was_canceled, tuple of result values) from running plugin
         '''
-        procedureName = procedure.get_name()
+        procedureName = gimpProcedure.get_name()
 
         PluginControlDialog.logger.debug(f"show_plugin_dialog for {procedureName} values: {guiable_initial_values} formal: {guiable_formal_params}")
         #assert type(procedure.__name == )
         #assert len(guiable_initial_values) == len(guiable_formal_params )
         #print("after assert")
 
-        # This was done eariler:  Gimp.ui_init('foo') # TODO procedure.name()
+        # This was done eariler:  Gimp.ui_init('foo')
 
         # choice of implementation
         controls, dialog = PluginControlDialog._create_gimp_dialog(
-            procedureName,
+            fuProcedure,
+            gimpProcedure,
             guiable_initial_values,
             guiable_formal_params)  # implemented by GimpFu in Python
         # show_plugin_procedure_dialog() # implemented by Gimp in C
@@ -226,7 +229,7 @@ class PluginControlDialog():
             nonlocal control_values
             nonlocal was_canceled
             nonlocal controls
-            nonlocal procedure
+            # nonlocal procedure
 
             if id == Gtk.ResponseType.OK:
                 # Ideal user feedback is disable buttons while working

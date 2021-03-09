@@ -185,6 +185,14 @@ class FuProcedureMetadata():
         self.logger.debug(f"FuProcedureType: {result}")
         return result
 
+    @property
+    def menu_label(self):
+        """ Sanitized menu label (sans _ and ...) """
+        result = self.MENUITEMLABEL
+        result = result.replace('_', '')
+        result = result.replace('...', '')
+        return result
+
     @classmethod
     def _type_from_menu_path(cls, menuPath):
         """

@@ -98,7 +98,7 @@ class FuRunner:
 
 
     @staticmethod
-    def _interact(procedure, list_wrapped_args, config):
+    def _interact(gimpProcedure, list_wrapped_args, config):
         '''
         Show GUI when guiable args, then execute run_func.
         Progress will show in Gimp window, not dialog window.
@@ -113,21 +113,22 @@ class FuRunner:
         from gui.display import Display
         display = Display.get_window(proc_name)
         '''
-        FuRunner.logger.info(f"_interact, {procedure}, {list_wrapped_args}")
+
 
         # name from instance of Gimp.Procedure
-        proc_name = procedure.get_name()
+        proc_name = gimpProcedure.get_name()
+        FuRunner.logger.info(f"_interact, {proc_name}, {list_wrapped_args}")
 
-        gf_procedure = FuProcedures.get_by_name(proc_name)
+        fuProcedure = FuProcedures.get_by_name(proc_name)
 
-        function = gf_procedure.metadata.FUNCTION
+        function = fuProcedure.metadata.FUNCTION
 
-        guiable_formal_params =  gf_procedure.guiable_formal_params
+        guiable_formal_params =  fuProcedure.guiable_formal_params
 
         """
         CRUFT from implementation where dialog executed run_script
-        guiable_formal_params =  gf_procedure.guiable_formal_params
-        nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(list_wrapped_args)
+        guiable_formal_params =  fuProcedure.guiable_formal_params
+        nonguiable_actual_args, guiable_actual_args = fuProcedure.split_guiable_actual_args(list_wrapped_args)
 
         # effectively a closure, partially bound to function, nonguiable_actual_args
         # passed to show_plugin_dialog to be executed after dialog
@@ -136,7 +137,7 @@ class FuRunner:
             nonlocal function
             nonlocal nonguiable_actual_args
 
-            wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args,  guiable_actual_args)
+            wrapped_run_args = fuProcedure.join_nonguiable_to_guiable_args(nonguiable_actual_args,  guiable_actual_args)
             FuRunner.logger.info("wrapped_run_args", wrapped_run_args)
             '''
             invoke Authors func on unpacked args
@@ -158,11 +159,11 @@ class FuRunner:
             # create GUI from guiable formal args, let user edit actual args
 
             #TODO duplicate??
-            gf_procedure.on_run()
+            fuProcedure.on_run()
 
             from gimpfu.gui.control_dialog import PluginControlDialog
 
-            nonguiable_actual_args, guiable_actual_args = gf_procedure.split_guiable_actual_args(list_wrapped_args)
+            nonguiable_actual_args, guiable_actual_args = fuProcedure.split_guiable_actual_args(list_wrapped_args)
             FuRunner.logger.info(f"in guiable args: {guiable_actual_args}")
 
             '''
@@ -177,7 +178,8 @@ class FuRunner:
             # guiable_actual_args = config.get_initial_settings()
 
             was_canceled, guied_args = PluginControlDialog.show(
-                procedure,
+                fuProcedure,
+                gimpProcedure,
                 guiable_actual_args,
                 guiable_formal_params)
             # assert results from dialog are primitives or unwrapped GIMP objects
@@ -187,7 +189,7 @@ class FuRunner:
                 config.set_changed_settings(guied_args)
 
                 wrapped_guied_args = Marshal.wrap_args(guied_args)
-                wrapped_run_args = gf_procedure.join_nonguiable_to_guiable_args(nonguiable_actual_args, wrapped_guied_args)
+                wrapped_run_args = fuProcedure.join_nonguiable_to_guiable_args(nonguiable_actual_args, wrapped_guied_args)
                 FuRunner.logger.info(f"Wrapped args to run_func, {wrapped_run_args}" )
 
                 # !!! with args changed by user
@@ -348,7 +350,7 @@ class FuRunner:
         list_wrapped_args may include some args that are not guiable (i.e. image, drawable)
         '''
 
-        gf_procedure = FuProcedures.get_by_name(name)
+        fuProcedure = FuProcedures.get_by_name(name)
 
         isBatch = (run_mode == Gimp.RunMode.NONINTERACTIVE)
         '''
@@ -358,14 +360,14 @@ class FuRunner:
         If not from last invocation, they are the formal parameter defaults.
         '''
 
-        func = gf_procedure.get_authors_function()
+        func = fuProcedure.get_authors_function()
 
         """
         The ProcedureConfig should have length equal to ????
         original_args is-a GimpValueArray
         """
         # config = FuProcedureConfig(procedure, len(list_wrapped_args)-2 )
-        config = FuProcedureConfig(gf_procedure, procedure, original_args.length() )
+        config = FuProcedureConfig(fuProcedure, procedure, original_args.length() )
         config.begin_run(image, run_mode, original_args)
 
         if isBatch:

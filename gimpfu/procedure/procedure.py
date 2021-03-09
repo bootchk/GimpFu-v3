@@ -187,6 +187,9 @@ class FuProcedure():
     @property
     def type(self):  return self.metadata.type
 
+    @property
+    def menu_label(self):  return self.metadata.menu_label
+
 
     """
     OLD

@@ -207,8 +207,10 @@ Also ID is a property of an item.
 Thus if you want to revise to use ID's, gimp-item-ID-is-layer(item.ID) should also work.
 
 Passing ID's in most other calls to PDB procedures will no longer work.
-You will need to delete the trailing ".ID".
 Almost all PDB procedures now expect a GObject reference, not an ID.
+You will need to delete the trailing ".ID".
+For example: where you once passed "drawable.ID" to a PDB procedure,
+you now pass "drawable".
 
 
 Other deprecated PDB procedures
@@ -469,3 +471,14 @@ Other notes
 
 gimp.message() (which resolves to Gimp.message)
 since Gimp 3 (???) may write to a status bar instead of present a dialog.
+
+
+Frequent errors
+---------------
+
+Calling error for procedure 'gimp-drawable-mask-bounds':
+Item 'Texture' (4) cannot be used because it has not been added to an image.
+
+"has not been added to an image" is the crux.
+Probably you are calling gimp_image_add_layer(), which is deprecated.
+Instead, use gimp_image_insert_layer()  and add "None" for the third i.e. "parent" parameter.
