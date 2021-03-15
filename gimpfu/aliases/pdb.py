@@ -266,7 +266,16 @@ class GimpfuPDB():
     But FBC, here GimpFu provides adaptor procedure.
     """
     def gimp_item_is_layer(self, item):      return Gimp.Item.is_layer(item.unwrap())
-    # TODO there are many more
+    # TODO there are many more related to ID
+
+    """
+    These PDB procedures in v2 took a single layer.
+    In v3 PDB, the procedures take an array of layer.
+
+    FBC
+    Pass a sequence (a tuple) to the v3 function, the binding will convert.
+    """
+    def gimp_edit_copy(self, item):      return Gimp.edit_copy( [item.unwrap(), ] )
 
 
     """

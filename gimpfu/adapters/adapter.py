@@ -182,9 +182,9 @@ class Adapter():
 
          # Marshal knows how to wrap self in AdaptedAdaptee, e.g. GimpfuLayer
          if is_test:
-             from mock.marshal import Marshal
+             from gimpfu.mock.marshal import Marshal
          else:
-             from adaption.marshal import Marshal
+             from gimpfu.adaption.marshal import Marshal
 
          '''
          clone _adaptee
@@ -215,7 +215,7 @@ class Adapter():
         # Note that you can't unpack inside a fstring
         # AdapterLogger.logger.debug(f"_adapter_func called, args: { {*args} }")
 
-        from adaption.marshal import Marshal
+        from gimpfu.adaption.marshal import Marshal
 
         # arg could be a wrapped type, convert to unwrapped type i.e. foreign type
         unwrapped_args = Marshal.unwrap_heterogenous_sequence(args)
