@@ -208,8 +208,10 @@ def make_blob_output(source, source_map, output_map, map_weight, autism, neighbo
         l = pdb.gimp_edit_paste(dest, 0)
         l.set_offsets(dest_x*w, dest_y*w)
         pdb.gimp_floating_sel_anchor(l)
-    result = gimp.Image(w*10,w*5)
-    result_layer = gimp.Layer(result, "Result", result.width, result.height)
+    # lkk add an image type RGB.  TODO should be same as source?
+    result = gimp.Image(w*10,w*5, RGB)
+    # lkk add an image type RGB, opacity 100, and layer mode NORMAL.  TODO should be same as source?
+    result_layer = gimp.Layer(result, "Result", result.width, result.height, RGB, 100, NORMAL_MODE)
     result.add_layer(result_layer)
     # Give the user something to look at while we're working
     # The resynthesis is slow enough there's little to be gained from

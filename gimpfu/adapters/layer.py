@@ -6,6 +6,8 @@ from gi.repository import Gimp
 # !!! Layer => Drawable => Item => Adapter
 from gimpfu.adapters.drawable import GimpfuDrawable
 
+from gimpfu.adapters.adapter_logger import AdapterLogger
+
 
 
 
@@ -29,11 +31,16 @@ class GimpfuLayer( GimpfuDrawable ) :
     '''
 
 
-    def __init__(self, img=None, name=None, width=None, height=None, type=None, opacity=None, layer_mode=None, adaptee=None):
-
+    def __init__(self, img=None, name=None, width=None, height=None,
+                # Reasonable defaults from Gimp, since GimpFu enums not in scope
+                type=Gimp.ImageType.RGB_IMAGE,
+                opacity=100,
+                layer_mode=Gimp.LayerMode.NORMAL,
+                adaptee=None):
         if img is not None:
             # Totally new adaptee, created at behest of author
             # Gimp constructor named "new"
+            AdapterLogger.logger.debug(f"Call Gimp.Layer.new( {img}, {width}, {height}, {type}, {opacity}, {layer_mode} )")
             super().__init__( Gimp.Layer.new(img.unwrap(), name, width, height, type, opacity, layer_mode) )
         else:
             # Create wrapper for existing adaptee (from Gimp)

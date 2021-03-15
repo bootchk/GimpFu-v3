@@ -79,13 +79,15 @@ class GimpfuImage( Adapter ) :
 
     See SO "How to overload __init__ method based on argument type?"
     '''
-    def __init__(self, width=None, height=None, image_mode=None, adaptee=None):
+    def __init__(self, width=None, height=None,
+                 image_mode=Gimp.ImageType.RGB_IMAGE,
+                 adaptee=None):
         '''Initialize  GimpfuImage from attribute values OR instance of Gimp.Image. '''
         if width is None:
             final_adaptee = adaptee
         else:
             # Gimp constructor named "new"
-            AdapterLogger.logger.debug(f"Calling Gimp.Image.new")
+            AdapterLogger.logger.debug(f"Call Gimp.Image.new( {width}, {height}, {image_mode} )")
             final_adaptee = Gimp.Image.new(width, height, image_mode)
 
         # super is Adaper, and it stores adaptee
