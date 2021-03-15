@@ -19,11 +19,17 @@ implemented using Gimp.Dialog, which takes care of parenting
 
 
 class Dialog:
-    def create(fuProcedure, gimpProcedure):
+    def create(fuProcedure, gimpProcedure=None):
         # Configure use_header_bar from Gtk settings, not Gimp settings?
         use_header_bar = Gtk.Settings.get_default().get_property("gtk-dialogs-use-header")
 
         # TODO i18n ?
+
+        """
+        This dialog is only for the plugin/procedure we are implementing
+        (not for procedures we may call.)
+        So we can use the local FuProcedure instead of the Gimp.Procedure.
+        """
         # Configure title the same as the menu label
         # title = gimpProcedure.get_menu_label()  # method of gimpProcedure
         title = fuProcedure.menu_label  # property of fuProcedure

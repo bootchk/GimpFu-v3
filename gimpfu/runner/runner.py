@@ -38,18 +38,18 @@ class FuRunner:
     logger = logging.getLogger('GimpFu.FuRunner')
 
     @staticmethod
-    def show_exception_dialog(proc_name):
+    def show_exception_dialog(fuProcedure):
         """ Show a modal exception dialog. """
         # TODO seems to be modal, is it?
         from gimpfu.gui.exception_dialog import ExceptionDialog
 
-        ExceptionDialog.show(proc_name)
+        ExceptionDialog.show(fuProcedure)
         exc_str, exc_only_str = ExceptionDialog.create_exception_str()
         return exc_str, exc_only_str
 
 
     @staticmethod
-    def _try_run_func(proc_name, function, args):
+    def _try_run_func(fuProcedure, function, args):
         '''
         Run the plugin's run_func with args, catching exceptions.
         Return result of run_func.
@@ -82,7 +82,7 @@ class FuRunner:
             raise
         except:
             # TODO Show dialog here, or pass exception string back to Gimp or both ???
-            exc_str, exc_only_str = FuRunner.show_exception_dialog(proc_name)
+            exc_str, exc_only_str = FuRunner.show_exception_dialog(fuProcedure)
             FuRunner.logger.critical(f"{exc_str}, {exc_only_str}")
             result = None
             # TODO either pass exc_str back so Gimp shows in dialog,
@@ -119,6 +119,7 @@ class FuRunner:
         proc_name = gimpProcedure.get_name()
         FuRunner.logger.info(f"_interact, {proc_name}, {list_wrapped_args}")
 
+        # Use the instance of FuProcedure, it has all data about the procedure
         fuProcedure = FuProcedures.get_by_name(proc_name)
 
         function = fuProcedure.metadata.FUNCTION
@@ -154,7 +155,7 @@ class FuRunner:
             FuRunner.logger.info("no guiable parameters")
             was_canceled = False
             # !!! no gui can change the in_args
-            result = FuRunner._try_run_func(proc_name, function, list_wrapped_args)
+            result = FuRunner._try_run_func(fuProcedure, function, list_wrapped_args)
         else:
             # create GUI from guiable formal args, let user edit actual args
 
@@ -193,7 +194,7 @@ class FuRunner:
                 FuRunner.logger.info(f"Wrapped args to run_func, {wrapped_run_args}" )
 
                 # !!! with args changed by user
-                result = FuRunner._try_run_func(proc_name, function, wrapped_run_args)
+                result = FuRunner._try_run_func(fuProcedure, function, wrapped_run_args)
             else:
                 # Don't save changes to config i.e. settings
                 result = None

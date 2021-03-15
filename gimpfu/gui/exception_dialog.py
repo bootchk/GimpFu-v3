@@ -16,6 +16,17 @@ dialog = Gtk.FileChooserDialog(use_header_bar=use_header_bar,
 """
 
 class ExceptionDialog:
+    """ A specialized Dialog.
+
+    TODO actually make it a subclass instead of owning.
+    For now, this might be redundant.
+    The class hierarchy should be:
+       GimpUi.Dialog
+          Dialog (GimpFu)
+             ControlDialog
+             ExceptionDialog
+             WarningDialog
+    """
 
     # Public so it can be used for logging without a dialog
     @staticmethod
@@ -42,14 +53,14 @@ class ExceptionDialog:
     TODO not tested
     '''
     @staticmethod
-    def _create_error_dialog(proc_name):
+    def _create_error_dialog(fuProcedure):
         ''' Return error dialog containing Python trace for latest exception '''
 
         exc_str, exc_only_str =  ExceptionDialog.create_exception_str()
 
-        title = _("An error occurred running %s") % proc_name
-
         '''
+        proc_name = fuProcedure
+        title = _("An error occurred running %s") % proc_name
         This requires a parent, how to get???
         dlg = Gtk.MessageDialog(
                                 parent,
@@ -58,8 +69,10 @@ class ExceptionDialog:
                                 Gtk.ButtonsType.CLOSE,
                                 title)
         '''
-        # A basic dialog from Gimp works, but is not as pretty as our custom widget
-        dlg = Dialog.get(proc_name)
+        # A basic dialog from GimpUi works, but is not as pretty as our custom widget
+        # TODO this gives it a title which is the menu item that was invoked,
+        # add "Error executing ..." ???
+        dlg = Dialog.create(fuProcedure)
 
         # TODO this pertains only to Gtk.MessageDialog
         # dlg.format_secondary_text(exc_only_str)
@@ -108,11 +121,16 @@ class ExceptionDialog:
 
     # v3 exported.  v2 private
     @staticmethod
-    def show(proc_name):
-        ''' Display error dialog, parented. '''
+    def show(fuProcedure):
+        '''
+        More than the usual "show": create and then show.
+        A convenience method.
+        TODO rename so something other than show.
+        '''
+        #
         # require GTK is running.
 
-        error_dialog = ExceptionDialog._create_error_dialog(proc_name)
+        error_dialog = ExceptionDialog._create_error_dialog(fuProcedure)
         error_dialog.show()
 
         # Enter event loop, does not return until user chooses OK

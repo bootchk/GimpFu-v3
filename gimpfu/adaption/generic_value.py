@@ -115,8 +115,8 @@ class FuGenericValue():
 
     @property
     def did_coerce(self):
-        """ Does state show has been coerced. """
-        return self._did_convert or self._did_convert or self._did_accept
+        """ Does state show has been coerced, any of: [convert, upcast, accept] """
+        return self._did_convert or self._did_upcast or self._did_accept
 
     @property
     def did_convert_or_upcast(self):
