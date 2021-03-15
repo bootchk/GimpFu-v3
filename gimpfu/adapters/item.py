@@ -31,7 +31,12 @@ class GimpfuItem( Adapter ) :
     @classmethod
     def DynamicWriteableAdaptedProperties(cls):
         # !!! return ('name') is not a tuple, use tuple('name') or ('name',)
-        return tuple( 'name' ) + super().DynamicWriteableAdaptedProperties()
+        return ( 'name', ) + super().DynamicWriteableAdaptedProperties()
+
+    # Name of getter() func is property name prefixed with 'get_'
+    @classmethod
+    def DynamicReadOnlyAdaptedProperties(cls):
+        return ('image', ) + super().DynamicReadOnlyAdaptedProperties()
 
 
     '''

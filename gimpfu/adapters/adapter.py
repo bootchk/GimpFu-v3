@@ -76,6 +76,10 @@ class Adapter():
     a tuple of adapted properties or dictionary of mapped methods.
     Each subclass *may* have its own tuple of dynamic adapted properties,
     and MUST concatenate those with super's tuple.
+
+    Similarly for dynamic mapped methods
+    ??? TODO, see GimpfuImage, it seems that dynamic mapped methods is partially implemented.
+    Maybe it is cruft?
     """
     @classmethod
     def DynamicWriteableAdaptedProperties(cls): return tuple()
