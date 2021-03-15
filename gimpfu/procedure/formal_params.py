@@ -126,7 +126,7 @@ class FuFormalParams():
             self.PARAMS.insert(0, FuFormalParams.image_param)
             self.PARAMS.insert(1, FuFormalParams.drawable_param)
             Deprecation.say(" Fixing two image params for Image or Save plugin")
-            if metadata.is_save_procedure_type:
+            if metadata.type == FuProcedureType.Save:
                 self.PARAMS[2:2] = file_params
                 Deprecation.say(" Fixing two file params for Save plugin")
             result = True

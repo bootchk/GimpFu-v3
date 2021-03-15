@@ -27,7 +27,7 @@ class EnumTypeSet():
     def __init__(self):
         self.logger = logging.getLogger("GimpFu.EnumTypeSet")
         # !!! voluminous, so enable logging separately from GIMPFU_DEBUG
-        self.logger.setLevel(logging.WARNING)
+        # self.logger.setLevel(logging.WARNING)
 
         # Map from short, upper case enum name to its enum type.
         self.defined_enums = {}

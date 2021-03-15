@@ -86,6 +86,7 @@ Some modules part of PyGimp v2 are obsolete :
     gimpshelf
     gimpui
     gimpcolor
+    gimpenums
 
 To use GimpFu you only need to import the gimpfu module,
 which then imports any other modules it needs.
@@ -96,7 +97,20 @@ If you do, and your PYTHONPATH is such that it finds modules by those names,
 (which usually only happens for developers)
 it will cause mysterious failures.
 
+gimpenums
+=========
 
+GimpFu defines certain constants (so-called enums) into the global namespace.
+They are upper case, e.g. "NONINTERACTIVE".
+They do not need to be qualified with the "gimpenums" prefix e.g. not "gimpenums.NONINTERACTIVE"
+
+Formerly (GimpFu v2), the constants were also defined in the gimpenums namespace,
+and many authors used the qualified version.
+
+You will need to not "import gimpenums"
+and replace "gimpenums." with the empty string "" everywhere in your plugin.
+
+(This decision may be reversed, for example if significant name clashes are discovered.)
 
 gimpshelf
 =========
@@ -130,7 +144,8 @@ gimpui
 The gimpui module was used when a plugin implemented its own GUI,
 and needed GTK widgets provided by Gimp (in libgimpui), such as a color picker widget.
 
-GimpFu (and Gimp) will create a dialog automatically for most plugins.
+GimpFu (and Gimp) will create a dialog automatically for most plugins,
+from the declared formal parameters.
 
 If your plugin did implement GUI using the gimpui module,
 you will need to recode to use GI to the Gimp objects that implement GUI.
