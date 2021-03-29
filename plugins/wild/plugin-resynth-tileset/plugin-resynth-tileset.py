@@ -266,14 +266,18 @@ def make_blob_output(source, source_map, output_map, map_weight, autism, neighbo
                                                 CHANNEL_OP_ADD,
                                                 t[0]*w,t[1]*w,w,w)
         # Do the actual resynthesize call
+        # lkk
+        print("lkk drawable types")
+        print(pdb.gimp_drawable_type(l))
+        print(pdb.gimp_drawable_type(source))
         if True:
             pdb.plug_in_resynthesizer(i, l,
                                       int(tile_vert),
                                       int(tile_horiz),
                                       1,
-                                      source.ID,
-                                      source_map.ID,
-                                      m.ID,
+                                      source,
+                                      source_map,
+                                      m,
                                       map_weight,
                                       autism,
                                       neighbourhood,

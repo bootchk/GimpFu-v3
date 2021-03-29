@@ -55,12 +55,12 @@ framestack is usually a sequence of frameinfo's like this:
 (this for the case where plugin source and gimpfu source all in /plug-ins/ directory)
 filename                                  code_context               what the code is
 ---------------------------------------------------------------------------------
-.../plug-ins/gimpfu/message.proceed.py   framestack.inspect(stack)  the current line from this source file
-.../plug-ins/gimpfu/message.proceed.py   source_text=...            the calling line
+.../plug-ins/gimpfu/message.proceed.py   framestack.inspect(stack)  the line in this source file that calls inspect()
+.../plug-ins/gimpfu/message.proceed.py   source_text=...            the line in gimpfu source that calls proceed()
 ...
-.../plug-ins/gimpfu/gimpfu.py             <something>                lines from gimpfu source
+.../plug-ins/gimpfu/gimpfu.py             <something>               lines in gimpfu source, the call stack in gimpfu
 ...
-.../plug-ins/sphere/sphere.py             "pdb.foo()"                the errant line of author's run_func
+.../plug-ins/sphere/sphere.py             "pdb.foo()"               the errant line in author's run_func
 ...
 ... (more lines in gimpfu source files)
 ...
@@ -84,6 +84,9 @@ def proceed(message):
     # For debugging inexplicable calls to proceed(), uncomment this line
     # It will print the stack trace at the exception
     # Framestack.print_trace()
+
+    # Uncomment this to stop at the first error
+    raise RuntimeError
 
 
 

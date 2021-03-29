@@ -59,8 +59,9 @@ I.E. it does NOT display all "open" channels, only "open, custom" channels.
 class ItemWidgetWrapper():
     """ Base class for GimpFu widgets that choose Gimp Items"""
 
-    def __init__(self, owned_widget_constructor, description, result_class=None):
+    def __init__(self, owned_widget_constructor, description, result_class):
         self.description = description
+        assert result_class is not None
         self.result_class = result_class
 
         # instantiate the owned widget by calling its constructor
@@ -71,17 +72,12 @@ class ItemWidgetWrapper():
         return self.widget
 
     def get_value(self):
-        """ Returns an ID """
+        """ Returns an instance of a Gimp class of type self.result_class """
         # Delegate to inner widget
         active = self.widget.get_active()
         # Discard first element, usually True
         id = active[1]
         module_logger.debug(f"ItemWidgetWrapper.get_value type: {self.description}.ID: {id} ")
-
-
-        #result = Gimp.Drawable.get_by_id(id)
-        # assert is-a Gimp.Drawable
-        # OLD result = id
 
         # class get instance by ID
         result = self.result_class.get_by_id(id)
@@ -92,7 +88,7 @@ class ItemWidgetWrapper():
 
 class FuImageWidget(ItemWidgetWrapper):
     def __init__(self, ):
-        super().__init__(GimpUi.ImageComboBox.new, "Image")
+        super().__init__(GimpUi.ImageComboBox.new, "Image", Gimp.Image)
 
 class FuDrawableWidget(ItemWidgetWrapper):
     def __init__(self, ):
@@ -100,12 +96,12 @@ class FuDrawableWidget(ItemWidgetWrapper):
 
 class FuChannelWidget(ItemWidgetWrapper):
     def __init__(self, ):
-        super().__init__(GimpUi.ChannelComboBox.new, "Channel")
+        super().__init__(GimpUi.ChannelComboBox.new, "Channel", Gimp.Channel)
 
 class FuLayerWidget(ItemWidgetWrapper):
     def __init__(self, ):
-        super().__init__(GimpUi.LayerComboBox.new, "Layer")
+        super().__init__(GimpUi.LayerComboBox.new, "Layer", Gimp.Layer)
 
 class FuVectorsWidget(ItemWidgetWrapper):
     def __init__(self, ):
-        super().__init__(GimpUi.VectorsComboBox.new, "Vectors")
+        super().__init__(GimpUi.VectorsComboBox.new, "Vectors", Gimp.Vectors)

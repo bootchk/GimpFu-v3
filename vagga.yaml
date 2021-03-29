@@ -418,6 +418,29 @@ containers:
     - !Sh echo "introspection path ->"  $XDG_DATA_DIRS
     - !Sh echo "binary path ->" $PATH
 
+
+    # TEMP to test autoconf 2.70 Mar 20, 2021
+
+    # missing command makeinfo
+    #- !Install [ texinfo, help2man ]
+
+    #- !Git
+    #  url: http://git.sv.gnu.org/r/autoconf.git
+    #  path: /home/autoconf
+    #- !Tar
+    #  url: ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz
+    #  path: /work
+
+    # autoreconf -vi
+    #- !Sh |
+    #    cd /work/autoconf-2.71
+    #    ./configure
+    #    make
+    #    make install
+    #    autoconf --version
+
+
+
     # Build gimp
 
     # My customization of the bare commands
@@ -766,11 +789,23 @@ commands:
       ls /usr/local/lib/x86_64-linux-gnu
       echo "Version of gegl using: pkg-config gegl"
       pkg-config --modversion gegl-0.4
+      echo "Version of autoconf"
+      autoconf --version
 
   # It doesn't seems to matter that /usr/local/lib/x86_64-linux-gnu/pkgconfig is not in PKG_CONFIG_PATH
 
 
 
+  gimpAMVersions: !Command
+    description: describe versions of stuff in container gimpDev (where built Gimp)
+    container: gimpAMDev
+    run: |
+      export HOME=/work/.home
+      export GIMP_PREFIX="/usr/local"
+      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
+      echo "LD_LIBRARY_PATH"
+      echo $LD_LIBRARY_PATH
+      autoconf --version
 
 
 
@@ -1167,6 +1202,9 @@ commands:
       echo "Copying gimpfu to local"
       cp -rv /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
       export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins:${PYTHONPATH}
+
+      # Install another plugin that uses resynthesizer
+      cp -r /work/plugins/wild/plugin-resynth-tileset /work/.home/.config/GIMP/2.99/plug-ins
 
       export GIMP_PLUGIN_DEBUG=all,fatal-warnings
       export GIMPFU_DEBUG=1
