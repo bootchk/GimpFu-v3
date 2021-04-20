@@ -1,0 +1,39 @@
+
+Disclaimer:
+
+I don't deeply understand the problem or the fix.
+The code involves events, callbacks, and the wire; it's hard for me to follow by just reading the code.
+To understand the code, I harnessed the code with g_printerr.
+
+I think commit 6e80a232 is the likely breakage.
+Commit 6e80a232 by mitch, one year ago, for the new plugin API.
+
+
+About the fix:
+
+The fix is in files libgimp/gimp*foo*select.c where *foo* is in [brush, palette, pattern, font, gradient].
+
+Commit 6e80a232 moved a call to gimp_brush_close_popup (brush_data->brush_callback),
+from its original location in the function gimp_brush_select_destroy()
+to a function gimp_brush_data_free().
+
+The fix adds the call to gimp_brush_close_popup() to its original location.
+The fix leaves the same call in the function gimp_brush_data_free, where commit 6e80a232 moved it.
+That is, there are now two calls to gimp_brush_close_popup().
+As far as I know, it is OK to leave the second call to gimp_brush_close_popup,
+but maybe it is now unnecessary.
+
+My fix is largely intuition:
+when creating the BrushSelect in gimp_brush_select_new(),
+the order is:
+   - create temporary procedure "brush_callback"
+   - create the popup dialog, passing the "brush_callback"
+so that when destroying the BrushSelect,
+you must reverse the order:
+   - close the popup (since it knows the temporary procedure callback)
+   - remove the temporary procedure
+
+Which AFAIK is NOT the order used by commit 6e80a232.
+This MR just restores my intuitive order of destruction.
+As explained in the issue text, if you don't do it in this order,
+then closing the popup fails an assertion that the temporary procedure exists.

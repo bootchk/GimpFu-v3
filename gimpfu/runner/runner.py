@@ -248,23 +248,30 @@ class FuRunner:
     !!! Args are Gimp types, not Python types
     '''
     @staticmethod
-    def run_imageprocedure(procedure, run_mode, image, drawable, original_args, data):
+    def run_imageprocedure(procedure, run_mode, image, count_drawables, drawables, original_args, data):
         """
         Mangle args for a procedure of type/signature Image
 
         Signature is (run mode, image, drawable, ...)
         """
 
-        FuRunner.logger.info(f"run_imageprocedure , {procedure}, {run_mode}, {image}, {drawable}, {original_args}")
 
-        '''
-        Create list of *most* args.
-        *most* means (image, drawable, *original_args), but not run_mode!
-        List elements are GValues, not wrapped yet!
-        '''
-        list_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, drawable)
+        # For now, hide multi-layer API
+        if count_drawables > 1 :
+            FuResult.makeException(procedure, "GimpFu does not support multi-layer yet.")
+        else:
+            drawable = drawables[0]
 
-        result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_all_args, original_args, data)
+            FuRunner.logger.info(f"run_imageprocedure , {procedure}, {run_mode}, {image}, {drawable}, {original_args}")
+
+            '''
+            Create list of *most* args.
+            *most* means (image, drawable, *original_args), but not run_mode!
+            List elements are GValues, not wrapped yet!
+            '''
+            list_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, drawable)
+
+            result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_all_args, original_args, data)
         return result
 
 
