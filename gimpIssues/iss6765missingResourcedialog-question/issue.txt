@@ -1,0 +1,43 @@
+6765
+
+2.99 meson build: Gimp-Core-CRITICAL **: Failed to create icon image: The resource at ?/org/gimp/icons/64/dialog-question.png? does not exist
+
+Only seems to happen on the meson build, not on the AM build.
+
+To replicate: I don't have a small test case.  I have a plugin that replicates it, but the plugin is not easily portable.
+
+I think the code is at app/core/gimpviewable.c:
+
+```
+GdkPixbuf *
+gimp_viewable_get_dummy_pixbuf (GimpViewable  *viewable,
+                                gint           width,
+                                gint           height,
+                                gboolean       with_alpha)
+{
+  GdkPixbuf *icon;
+  GdkPixbuf *pixbuf;
+  GError    *error = NULL;
+  gdouble    ratio;
+  gint       w, h;
+
+  g_return_val_if_fail (GIMP_IS_VIEWABLE (viewable), NULL);
+  g_return_val_if_fail (width  > 0, NULL);
+  g_return_val_if_fail (height > 0, NULL);
+
+  icon = gdk_pixbuf_new_from_resource ("/org/gimp/icons/64/dialog-question.png",
+                                       &error);
+  if (! icon)
+    {
+      g_critical ("Failed to create icon image: %s", error->message);
+      g_clear_error (&error);
+      return NULL;
+    }
+```
+
+Its not too important, mainly an annoyance.
+If you dont: export G_DEBUG=fatal-criticals, then the code gets past it.
+
+I don't understand the icon system or the meson build.
+My guess would be that using a GTK stock icon would alleviate it.
+Or that GTK3 now has functions to get a pixbuf scaled from an svg (this code scales a pixbuf) ?

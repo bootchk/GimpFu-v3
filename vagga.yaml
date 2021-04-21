@@ -553,7 +553,8 @@ containers:
          --buildtype=debug \
          -Djavascript=false \
          -Dlua=true \
-         -Dpython=false \
+         -Dpython=true \
+         -Dvala-plugins=disabled \
          -Dgtk-doc=false
 
     #    meson configure /work/gimpBuild \
@@ -1087,12 +1088,13 @@ commands:
       echo $PYTHONPATH
 
       # stop glib at critical
-      export G_DEBUG=fatal-criticals
+      # export G_DEBUG=fatal-criticals
+      #export G_DEBUG=fatal-warnings
 
       # tell Gimp to debug certain plugins
       # all,fatal-warnings
-      # export GIMP_PLUGIN_DEBUG=file-png,fatal-warnings
-      export GIMP_PLUGIN_DEBUG=all,fatal-criticals
+      export GIMP_PLUGIN_DEBUG=file-png,fatal-warnings
+      # export GIMP_PLUGIN_DEBUG=all,fatal-criticals
 
       # export GIMPFU_DEBUG=1
 
@@ -1110,7 +1112,7 @@ commands:
 
       # --verbose --no-data
       # gdb
-      /usr/local/bin/gimp-2.99 --stack-trace-mode query
+      /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
 
 
   gimpMesonBuild: !Command
