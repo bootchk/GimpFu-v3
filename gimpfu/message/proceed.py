@@ -2,6 +2,7 @@
 from gimpfu.message.framestack import Framestack
 
 import logging
+import os
 
 
 '''
@@ -85,8 +86,11 @@ def proceed(message):
     # It will print the stack trace at the exception
     # Framestack.print_trace()
 
-    # Uncomment this to stop at the first error
-    raise RuntimeError
+    # If GIMPFU_NOT_PROCEED defined in env, stop at the first error
+    if os.getenv("GIMPFU_NOT_PROCEED") is not None:
+        raise RuntimeError
+    # else return and keep evaluating the plugin code
+
 
 
 

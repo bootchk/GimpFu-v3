@@ -14,15 +14,22 @@ When writing a new plugin, to be certain it will work in Gimp 3, you should use 
 
 This is a sales pitch to get developers interested in contributing.
 
+The stance of gimp.org is currently that GimpFu the language is obsolete.
+Instead it is to be replace in GIMP 2 by plugins using GObject Introspection (GI) to libgimp.
+
+The stance of this plugin is that the GimpFu language should not be obsoleted.
+From the user's point of view, GimpFu remains valuable as a simplified way to program plugins,
+There are thousands of plugins in the GimpFu language,
+and hundreds of casual and not-so casual programmers who know the language.
+Although porting a GimpFu plugin to GI is not hard,
+most existing GimpFu plugins will not be ported because their authors have moved on,
+and few other people are motivated to port some other author's plugins.
+
 As programming, developing GimpFu v3 is very stimulating.  
 It uses the metaobject protocol of Python
 (e.g. special method __getattr__ etc.).
 It is metaprogramming, generating Python code from the user's code
 and eval'ing it.
-
-From the user's point of view, GimpFu remains valuable as a simplified way to program plugins,
-There are thousands of plugins in the GimpFu language,
-and hundreds of casual and not-so casual programmers who know the language.
 
 From a historical point of view,
 you are standing on the shoulders of giants.
@@ -40,7 +47,9 @@ It lowers the barrier for entry to programming GIMP plugins.
 
 ## Completeness
 
-Work in progress.  It proves the idea is possible.
+Work in progress.  
+It proves the idea is possible.
+It is in constant use by the author.
 
 GimpFu v3 is not complete: some features of GimpFu v2 are not yet supported.
 GimpFu v3  works for many existing plugins in the wild (requiring only a few minor edits to said plugins.)
@@ -110,6 +119,16 @@ has abandoned maintenance of GimpFu v2.
 The files in the Gimp repository (in the /gimp/plug-ins/python/pygimp directory) are relics.
 A 2.99 build does not build or install those files.)
 
+
+# Environment variables
+
+GIMPFU_DEBUG: turns on logging of INFO and DEBUG levels, prints voluminous GimpFu messages.
+Otherwise, only WARNING and ERROR log messages are printed to console.
+
+GIMPFU_NOT_PROCEED : if defined, GimpFu will stop at the first error.
+Otherwise, it will continue to evaluate plugin code.
+Proceeding is useful for plugin developers because, like a compiler, it may find many unrelated errors in a plugin.
+Not proceeding is useful when you are debugging GimpFu itself and don't expect errors.
 
 # Language Guide for Plugin Authors
 
