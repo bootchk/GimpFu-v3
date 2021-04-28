@@ -1,5 +1,5 @@
 
-(define (script-fu-testGegl image drawable)
+(define (210-script-fu-testGegl image drawable)
    (let*
        (
           (a '( 1.0 ))
@@ -13,7 +13,7 @@
 
 
 (script-fu-register
-   "script-fu-testGegl"                    ;func name
+   "210-script-fu-testGegl"                        ;func name
    "Test Gegl ops in scriptfu"                 ;menu label
    "Test gegl op"                              ;description
    "lkk"                       ;author
@@ -23,4 +23,4 @@
    SF-IMAGE "SF-IMAGE" 0
    SF-DRAWABLE "SF-DRAWABLE" 0
 )
-(script-fu-menu-register "script-fu-testGegl" "<Image>/Test")
+(script-fu-menu-register "210-script-fu-testGegl" "<Image>/Test")

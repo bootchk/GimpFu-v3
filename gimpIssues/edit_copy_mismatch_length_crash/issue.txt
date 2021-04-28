@@ -1,0 +1,49 @@
+2.99 PDB procedure gimp-edit-copy crashes when passed wrong array length
+
+Symptom:
+
+```
+... omitted
+clipboard: sending pixbuf data as 'image/png'
+/usr/local/bin/gimp-2.99: fatal error: Segmentation fault
+
+```
+
+Replicate:
+
+In a scriptfu plugin, use this scriptfu construct:
+```
+(gimp-edit-copy 1 ())
+```
+Where 1 is the length of the array and () is an empty list that scriptfu marshals to a GimpObjectArray
+(with changes I am making for #5402).
+This is new signature for gimp-edit-copy, for multi-layer.
+Note that the stated length is 1, but the actual length is 0, so its a mistake
+by the author of any such script.
+But it shouldn't crash GIMP.
+
+Bad Python plugins could also pass wrong arguments when calling the PDB,
+GI is not assisting then.
+
+Discussion:
+
+I don't think that scriptfu should be sanity checking the arguments,
+the checking should be deeper.
+
+Deeper in the code at gimp/pdb/groups/edit.pdb (the source for gimp-edit-copy)
+there doesn't seem to be precondition code to check this case.
+
+Please see #5919, which I wrote 5 months ago.
+Briefly, it proposes the PDB API be object oriented, not passing the length of arrays as a separate argument.
+I can elaborate on the proposed changes and arguments made in #5919 if necessary.
+
+This issue adds to the argument for #5919
+- this issue would be moot, you don't need to check that the length argument is correct if you don't pass it.
+- the changes for #5402 could also more easily ameliorate #6026,
+  with scriptfu converting a single scheme value into a GimpObjectArray (but still deprecate).
+  (More easily: its just a tiny bit harder to convert one value into [length, array])
+  (If you even want to support deprecated API in scriptfu, its only a few lines of code.)
+
+Context:
+
+Self-built very recent 2.99, meson build, Ubuntu, with my incipient MR code for #5402.

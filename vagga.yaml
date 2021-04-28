@@ -1059,6 +1059,9 @@ commands:
       #cp -r /work/plugins/nonGimpFu/myMinPlugin /work/.home/.config/GIMP/2.99/plug-ins
       #cp -r /work/plugins/nonGimpFu/testGegl    /work/.home/.config/GIMP/2.99/plug-ins
 
+      echo "Copying select .scm plugins"
+      cp -r /work/plugins/nonGimpFu/testNumericName.scm   /work/.home/.config/GIMP/2.99/scripts
+
       echo "Copying all my test plugins"
       cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
 
@@ -1100,7 +1103,7 @@ commands:
 
       # print all G_MESSAGES
       export G_MESSAGES_DEBUG=all
-      # export G_MESSAGES_DEBUG=scriptfu
+      export G_MESSAGES_DEBUG=scriptfu
 
       # build Gimp
       #cd /work/gimpBuild
