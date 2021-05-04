@@ -1103,7 +1103,7 @@ commands:
 
       # print all G_MESSAGES
       export G_MESSAGES_DEBUG=all
-      export G_MESSAGES_DEBUG=scriptfu
+      #export G_MESSAGES_DEBUG=scriptfu
 
       # build Gimp
       #cd /work/gimpBuild
