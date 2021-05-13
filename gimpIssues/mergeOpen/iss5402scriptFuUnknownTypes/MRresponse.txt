@@ -1,0 +1,29 @@
+>Can I ....squash and force push yourself?"
+
+Yes, I can and will, ASAP.  (I learned how on my last MR.)
+
+
+"Are these unrelated issues" carve-it and chrome-it
+
+Yes, unrelated.  AFAIK this MR completely fixes this issue.  But carve-it and chrome-it are broken by other issues,
+hidden by this issue.
+
+chrome-it calls gimp-file-load with two strings instead of one, issue 6842.
+(I am working on an MR for that issue.)
+(I can't put a # in front of the issue, else closing this MR will close the issue.)
+
+carve-it calls gimp-edit-copy with a single drawable instead of a len, GimpObjectArray issue 6026.
+For which I submitted MR !439 (that I fear you will reject, but instead it can be fixed in the script.)
+
+Both those cases (and there are other similar cases) are easily fixed in the Scheme script itself (not in C lang ScriptFu machinery.)
+
+
+It is good that you are thorough, and I want to stress that I am also.
+I test all the scripts in the GIMP repository
+(a minimal test, that success is returned, for somewhat arbitrary arguments,
+I can't say that the script functionally succeeds because that would involve comparing the returned images.)
+
+I know most of the outstanding issues with GIMP scripts.
+Except that one bug may hide another, so I may find more.
+
+A few other small scriptfu/script issues already identified: 6841, 6839

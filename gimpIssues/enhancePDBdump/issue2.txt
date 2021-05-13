@@ -1,0 +1,44 @@
+Enhance: refactor code that generates text to document PDB procedures
+
+Currently there are two places that create text that documents a PDB procedure,
+i.e. there is code duplication.
+
+There is a PDB procedure gimp-pdb-dump.
+It is implemented in app/pdb/gimppdb-query.c in function gimp_pdb_dump().
+
+There is also the PDB Browser implemented at libgimp/gimpprocview.c
+
+Elsewhere (in the comments for !214)
+it was suggested that the PDB procedure gimp-pdb-dump be removed from GIMP
+(maybe to eliminate the underlying function in app, gimp_pdb_dump?)
+
+All of it could be more easily implemented in Python:
+- the PDB Browser
+- the PDB dumper
+since the PDB query functions are the foundation.
+
+If the PDB dumper was in Python it could more easily be modified to print JSON,
+and then you could generate html using e.g json2html Python module
+and then you would have a "PDB Reference" document
+to go along with the PDB Browser.
+
+With the goal to use GObject Introspection for most plugins,
+producing a document describing PDB procedures is less important for most plugin authors.
+Instead, they reference documents generated from gir.
+Said documents are language specific to the plugin author's chosen language,
+say Python.
+So you don't need a PDB Browser, you need a "Bound Libgimp Browser"
+(where the user could choose the bound language.)
+
+However, ScriptFu scripts still call the PDB, not introspected libgimp.
+For script authors, the current PDB Browser is less than ideal since it describes C types,
+and not Scheme types.
+
+The PDB dumper could be modified to produce JSON,
+and then you might more easily translate the PDB document,
+translating C type names into Scheme type names for ScriptFu authors.
+(or to say Python type names, for plugin authors who still want to call the PDB.)
+
+It has also been suggested to eliminate ScriptFu in favor of Guile with GI.
+Then you need to document the PDB even less,
+only for core GIMP developers.

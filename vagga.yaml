@@ -360,11 +360,16 @@ containers:
     # !!! Not using     --prefix=${GIMP_PREFIX} \
     # Use cd /home/gegl-0.4.xx for a tar pull
     # Use cd /home/gegl for a git pull
+
+    # May 2021 add sanitize, release=>debug.  Does not affect AM build
+    # but prevents meson build of GIMP, fails at GIR generation
+    # -Db_sanitize=address,undefined
     - !Sh |
         cd /home/gegl
         meson _build \
-         --buildtype=release \
+         --buildtype=debug \
           -Db_lto=true
+
         cd _build
         ninja
         ninja install
@@ -375,18 +380,6 @@ containers:
     # Using !Git, but that does not create a git repository so this doesn't work
     # cd /home/gegl
     # git status
-
-    # setup for building gimp
-    # Source is out of the container; is code we are changing
-    # build dir is not in the container
-    - !Sh |
-        cd /work/gimp
-        meson /work/gimpBuild \
-         --buildtype=debug \
-         -Djavascript=false \
-         -Dlua=false \
-         -Dpython=true \
-         -Dgtk-doc=false
 
 
 
@@ -546,19 +539,22 @@ containers:
     # env CC=clang CXX=clang++ CC_LD=/usr/bin/ld.lld CXX_LD=/usr/bin/ld.lld LDFLAGS=-shared-libasan meson _build
     # -Db_sanitize=address or address,undefined
 
+    # if GEGL is asan, then this needs asan? else "library not first, use PRELOAD"
+    # FAIL -Db_sanitize=address,undefined
+
     # setup build outside the source tree
     - !Sh |
         cd /work/gimp
         meson setup /work/gimpBuild \
          --buildtype=debug \
          -Djavascript=false \
-         -Dlua=true \
+         -Dlua=false \
          -Dpython=true \
          -Dvala-plugins=disabled \
          -Dgtk-doc=false
 
+
     #    meson configure /work/gimpBuild \
-    #     --buildtype=debug \
 
 
     environ:
@@ -615,6 +611,8 @@ containers:
     #   jobs 3?? For more, use: -j 4
     #   print one line per command, for verbose use -v
     # ninja -v -j 4
+
+    # FAIL: export LD_PRELOAD=$(gcc -print-file-name=libasan.so)
     - !Sh |
         cd /work/gimpBuild
         ninja -j 4
@@ -1005,7 +1003,7 @@ commands:
       export GIMP_PLUGIN_DEBUG=all,fatal-criticals
       #export GIMPFU_DEBUG=1
 
-      #export G_MESSAGES_DEBUG=scriptfu
+      export G_MESSAGES_DEBUG=scriptfu
 
       # /usr/local/bin/gimp-2.99 --verbose
       /usr/local/bin/gimp-2.99 --stack-trace-mode query
@@ -1102,8 +1100,8 @@ commands:
       # export GIMPFU_DEBUG=1
 
       # print all G_MESSAGES
-      export G_MESSAGES_DEBUG=all
-      #export G_MESSAGES_DEBUG=scriptfu
+      # export G_MESSAGES_DEBUG=all
+      export G_MESSAGES_DEBUG=scriptfu
 
       # build Gimp
       #cd /work/gimpBuild
