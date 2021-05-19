@@ -1,0 +1,23 @@
+Enhance: add keyword semantics to PDB calls using defaults for missing args
+
+Currently a PDB procedure has defaults for trailing args but a call must pass all args.
+
+The enhancement is to let a PDB procedure be called with a prefix of its formal args,
+and GIMP would supply the formal defaults for missing actual args
+(like Python keyword args.)
+In other words, the GimpValueArray for the arguments could be shorter than usual.
+
+The current use for defaults is only to initialize widgets when a control dialog is shown.
+
+The benefit is to plugin author's.
+They could quickly prototype a call to a PDB procedure
+and defer till later tweaking the defaulted arguments
+(which are often controls to filters.)
+
+I think this is easily implemented in one source code file, for function gimp_procedure_run().
+
+Recent changes to ScriptFu mean that a Scheme call to the PDB with missing trailing arguments would go through with a warning.
+
+This would not affect plugins in other languages,
+since, for a PDB call in a plugin,
+the interpreter and binding does not check the signature of the PDB procedure.

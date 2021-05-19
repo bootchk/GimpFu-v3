@@ -15,13 +15,16 @@ Collaborates with:
   FuProcedure
   Gimp
   GimpFu top
+
+Not quite a factory, since the effect is mostly side effects on the PDB.
+The returned object is not really important.
 """
 
 
 class FuProcedureCreator:
 
     @classmethod
-    def _create_gimp_procedure(cls, procedure_type, plugin, name, gf_procedure, wrapped_run_func):
+    def _create_gimp_procedure(cls, procedure_type, plugin, name, gf_procedure, wrapping_run_func):
         """ Create basic Gimp.Procedure or a subclass as given in procedure_type
 
         Creation common to all subclasses.
@@ -38,7 +41,7 @@ class FuProcedureCreator:
         procedure = procedure_type.new(plugin,
                                         name,
                                         Gimp.PDBProcType.PLUGIN,
-                                        wrapped_run_func, # wraps Author's run_func
+                                        wrapping_run_func, # wraps Author's run_func
                                         None)
         gf_procedure.set_wrapped_procedure(procedure)
         gf_procedure.convey_metadata_to_gimp()
@@ -101,9 +104,9 @@ class FuProcedureCreator:
 
     @classmethod
     def create(cls, plugin, name, gf_procedure,
-       wrapped_image_run_func,
-       wrapped_context_run_func,
-       wrapped_other_run_func):
+       wrapping_image_run_func,
+       wrapping_context_run_func,
+       wrapping_other_run_func):
         '''
         Create and return a subclass of Gimp.Procedure, from GimpFuProcedure.
 
@@ -111,14 +114,14 @@ class FuProcedureCreator:
 
         Dispatch on the locally determined kind
         e.g. by the menu path and by the signature of the formal args.
-        And use a different wrapped_run_runc for each subclass.
+        And use a different wrapping_run_runc for each subclass.
         '''
         if gf_procedure.type == FuProcedureType.Image:
-            procedure =  cls._create_image_procedure(plugin, name, gf_procedure, wrapped_image_run_func)
+            procedure =  cls._create_image_procedure(plugin, name, gf_procedure, wrapping_image_run_func)
         elif gf_procedure.type == FuProcedureType.Context:
-            procedure =  cls._create_context_procedure(plugin, name, gf_procedure, wrapped_context_run_func)
+            procedure =  cls._create_context_procedure(plugin, name, gf_procedure, wrapping_context_run_func)
         elif gf_procedure.type == FuProcedureType.Other:
-            procedure =  cls._create_other_procedure(plugin, name, gf_procedure, wrapped_other_run_func)
+            procedure =  cls._create_other_procedure(plugin, name, gf_procedure, wrapping_other_run_func)
         else:
             # TODO Better message, since this error depends on authored code
             # TODO preflight this at registration time.
@@ -131,7 +134,7 @@ class FuProcedureCreator:
                 procedure = Gimp.Procedure.new(plugin,
                                                 name,
                                                 Gimp.PDBProcType.PLUGIN,
-                                                _run_imagelessprocedure, 	# wrapped plugin method
+                                                _run_imagelessprocedure, 	# wrapping plugin method
                                                 None)
                 gf_procedure.convey_metadata_to_gimp(procedure)
 
@@ -148,6 +151,6 @@ class FuProcedureCreator:
             procedure = Gimp.LoadProcedure.new(plugin,
                                             name,
                                             Gimp.PDBProcType.PLUGIN,
-                                            _run_loadprocedure, 	# wrapped plugin method
+                                            _run_loadprocedure, 	# wrapping plugin method
                                             None)
         """

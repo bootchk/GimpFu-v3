@@ -15,6 +15,8 @@ import logging
 logger = logging.getLogger("GimpFu.FuPlugin")
 
 '''
+FuPlugin: GimpFu's definition of a Gimp.Plugin that wraps the author's "plugin".
+
 See header comments for type Gimp.Plugin in Gimp docs or Gimp C code.
 
 A plugin must define (but not instantiate) a subclass of Gimp.Plugin.
@@ -23,8 +25,9 @@ At runtime, only methods of such a subclass have access to Gimp and its PDB.
 
 FuPlug is wrapper.
 Has no properties itself.
-More generally (unwrapped) properties  represent params (sic arguments) to ultimate plugin.
+More generally (unwrapped) properties represent params (sic arguments) to ultimate plugin.
 
+TODO is this paragraph in the wrong place:
 _run() above wraps Authors "function" i.e. ultimate plugin method,
 which is referred to as "run_func" here and in Gimp documents.
 
@@ -52,14 +55,19 @@ Possibly Gimp calls these methods as class methods.
 
 class FuPlugin (Gimp.PlugIn):
 
-    # See prop_holder.py for GProperty stuff
 
-    ## GimpPlugIn virtual methods ##
-    '''
-    Called at install time,
-    OR when ~/.config/GIMP/2.99/pluginrc (a cache of installed plugins) is being recreated.
-    '''
     def do_query_procedures(self):
+        '''
+        Override a GimpPlugIn virtual method.
+
+        Called at install time,
+        OR when ~/.config/GIMP/2.99/pluginrc (a cache of installed plugins) is being recreated.
+
+        Returns a list of PDB procedure names implemented by a plugin author's source.
+        One source file can implement many PDB procedures.
+        Typically, only one.
+        '''
+
         logger.info("do_query_procedures")
 
         # TODO Why set the locale again?
@@ -91,17 +99,28 @@ class FuPlugin (Gimp.PlugIn):
     It also was registered with Gimp (at installation time.)
     '''
 
-
     def do_create_procedure(self, name):
+        '''
+        Override a GimpPlugIn virtual method.
+
+        For the given name, produce a Gimp.Procedure.
+        The caller register in the PDB)
+        '''
 
         logger.info (f"do_create_procedure: {name}")
 
+        # Get a FuProcedure, GimpFu's representation of the procedure
+        # as determined from the author's source.
         # We need the kind of plugin, and to ensure the passed name is know to us
         gf_procedure = FuProcedures.get_by_name(name)
 
-        # pass all the flavors of wrapped_run_funcs
+        # Produce a Gimp.Procedure from the FuProcedure.
+        # pass all the flavors of wrapped_run_funcs.
+        # Mostly side effects on the PDB, the returned procedure is not important.
         procedure = FuProcedureCreator.create(self, name, gf_procedure,
-            FuRunner.run_imageprocedure,
+            # with comments, choose one API
+            FuRunner.run_imageprocedure_on_drawable,  # prior to 2.99.6
+            # FuRunner.run_imageprocedure_multiple,   # since 2.99.6
             FuRunner.run_context_procedure,
             FuRunner.run_other_procedure)
 

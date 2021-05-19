@@ -211,8 +211,7 @@ class FuRunner:
     These are callbacks from Gimp.
 
     These are GimpFu wrappers of the Authors "main" function, aka run_func.
-    That is, Gimp calls these, and these call the Author's run_func,
-    after mangling args.
+    That is, Gimp calls these, and these call the Author's run_func, after mangling args.
 
     There are several variants, each specializing mangling of args.
     Mangle args to fit our generic runner: _run_procedure_in_mode
@@ -247,14 +246,19 @@ class FuRunner:
 
     !!! Args are Gimp types, not Python types
     '''
+
+    '''
+    Two versions, circa 2.99.6 the signature changed for multi-layer.
+
+    Create the procedure registering one of these two run funcs.
+    '''
     @staticmethod
-    def run_imageprocedure(procedure, run_mode, image, count_drawables, drawables, original_args, data):
+    def run_imageprocedure_multiple(procedure, run_mode, image, count_drawables, drawables, original_args, data):
         """
         Mangle args for a procedure of type/signature Image
 
         Signature is (run mode, image, drawable, ...)
         """
-
 
         # For now, hide multi-layer API
         if count_drawables > 1 :
@@ -262,18 +266,24 @@ class FuRunner:
         else:
             drawable = drawables[0]
 
-            FuRunner.logger.info(f"run_imageprocedure , {procedure}, {run_mode}, {image}, {drawable}, {original_args}")
-
-            '''
-            Create list of *most* args.
-            *most* means (image, drawable, *original_args), but not run_mode!
-            List elements are GValues, not wrapped yet!
-            '''
-            list_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, drawable)
-
-            result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_all_args, original_args, data)
+        result = run_imageprocedure_on_drawable(procedure, run_mode, image, drawable, original_args, data)
         return result
 
+
+    @staticmethod
+    def run_imageprocedure_on_drawable(procedure, run_mode, image, drawable, original_args, data):
+        ''' run procedure on a single drawable. '''
+        FuRunner.logger.info(f"run_imageprocedure , {procedure}, {run_mode}, {image}, {drawable}, {original_args}")
+
+        '''
+        Create list of *most* args.
+        *most* means (image, drawable, *original_args), but not run_mode!
+        List elements are GValues, not wrapped yet!
+        '''
+        list_all_args = Marshal.prefix_image_drawable_to_run_args(original_args, image, drawable)
+
+        result = FuRunner._run_procedure_in_mode(procedure, run_mode, image, list_all_args, original_args, data)
+        return result
 
 
     @staticmethod
