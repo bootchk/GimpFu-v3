@@ -13,6 +13,7 @@ from gimpfu.adapters.rgb import GimpfuRGB
 from gimpfu.message.proceed import proceed
 from gimpfu.message.suggest import Suggest
 
+from gimpfu.adaption.generic_value_array import FuGenericValueArray
 from gimpfu.adaption.formal_types import FormalTypes
 from gimpfu.adaption.types import Types
 from gimpfu.adaption.upcast import Upcast
@@ -197,6 +198,9 @@ class FuGenericValue():
         # Not a conversion, an upcast only
         self.upcast(GObject.TYPE_UCHAR)
 
+
+    '''
+    All extracted to generic_value_array.py
 
     """
     Utilities for conversion to gimp array
@@ -413,33 +417,42 @@ class FuGenericValue():
 
         except Exception as err:
             proceed(f"Fail to_gimp_array: {to_container_gtype.name}: {err}.")
-
+    '''
 
     # Arrays of primitives
 
     def to_float_array(self):
-        """ Make self's GValue hold a GimpFloatArray created from self.actual_arg"""
-        self.to_gimp_array(Gimp.FloatArray.__gtype__, Gimp.value_set_float_array )
+        self._gvalue = FuGenericValueArray.to_gimp_array(self.actual_arg, Gimp.FloatArray.__gtype__, Gimp.value_set_float_array )
+        self._did_create_gvalue = True
+        self._did_convert = True
 
     def to_uint8_array(self):
         """ Make self's GValue hold a GimpUint8Array created from self.actual_arg"""
-        self.to_gimp_array(Gimp.Uint8Array.__gtype__, Gimp.value_set_uint8_array )
+        self._gvalue = FuGenericValueArray.to_gimp_array(self._actual_arg, Gimp.Uint8Array.__gtype__, Gimp.value_set_uint8_array )
+        self._did_create_gvalue = True
+        self._did_convert = True
 
     def to_int32_array(self):
         """ Make self's GValue hold a GimpInt32Array created from self.actual_arg"""
-        self.to_gimp_array(Gimp.Int32Array.__gtype__, Gimp.value_set_int32_array )
+        self._gvalue = FuGenericValueArray.to_gimp_array(self._actual_arg, Gimp.Int32Array.__gtype__, Gimp.value_set_int32_array )
+        self._did_create_gvalue = True
+        self._did_convert = True
 
     # arrays of pointers to opaque GIMP objects
 
     def to_object_array(self):
         """ Make self own a GValue holding a GimpObjectArray """
-        self.to_gimp_array(Gimp.ObjectArray.__gtype__,
+        self._gvalue = FuGenericValueArray.to_gimp_array(self._actual_arg, Gimp.ObjectArray.__gtype__,
                            Gimp.value_set_object_array,
                            is_setter_take_contained_type = True)
+        self._did_create_gvalue = True
+        self._did_convert = True
 
     def to_color_array(self):
         """ Make self's GValue hold a GimpRGBArray created from self.actual_arg"""
-        self.to_gimp_array(Gimp.RGBArray.__gtype__, Gimp.value_set_rgb_array )
+        self._gvalue = FuGenericValueArray.to_gimp_array(self._actual_arg, Gimp.RGBArray.__gtype__, Gimp.value_set_rgb_array )
+        self._did_create_gvalue = True
+        self._did_convert = True
 
 
         # Cruft?
@@ -467,7 +480,11 @@ class FuGenericValue():
        # Setter is not a GIMP method, but a method of GObject.Value
        # See GObject>Structures>Value
        # Fail: self.to_gimp_array(GObject.TYPE_STRV, GObject.Value.set_boxed )
-       self.to_gimp_array(GObject.TYPE_STRV, GObject.Value.set_variant )
+       # Fail: self.to_gimp_array(GObject.TYPE_STRV, GObject.Value.set_variant )
+       # Expected GLib.Variant, but got tuple.
+       self._gvalue = FuGenericValueArray.to_string_array(self._actual_arg)
+       self._did_create_gvalue = True
+       self._did_convert = True
 
 
     def to_file_descriptor(self):
