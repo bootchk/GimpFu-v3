@@ -336,8 +336,10 @@ map_PF_TYPE_to_python_type = {
     # PF_INTARRAY:           "Gimp.Array",
     PF_FLOATARRAY:         "Gimp.FloatArray",
 
-    # Arrays of variables size elements
-    PF_STRINGARRAY:        "Gimp.StringArray",
+    # Arrays of pointers to variable size elements
+    # GIMP v2 used "Gimp.StringArray", GIMP v3 uses GStrv, a GLib type
+    # PyGObject will bind a Python list to GStrv
+    PF_STRINGARRAY:        list,    # "GStrv",
 
     # Arrays of pointers (fixed size) to Gimp objects
     # TODO how does this cross the wire protocol?

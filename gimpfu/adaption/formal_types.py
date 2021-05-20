@@ -39,6 +39,9 @@ class FormalTypes():
 
     These allow type names from either array of GParamSpec
     or Gimp.ValueArray which is array of Gtype
+
+    Note some type names defined by GLib (of form "GParamFoo")
+    others defined by GIMP (of form "GimpParamFoo")
     """
     def is_boolean_type(type_name):      return type_name in ('GParamBoolean', )
     def is_float_type(type_name):        return type_name in ('GParamFloat', 'GParamDouble')
@@ -47,13 +50,20 @@ class FormalTypes():
     def is_unsigned_int_type(type_name): return type_name in ('GParamUInt', )
     def is_unsigned_char_type(type_name): return type_name in ('GParamUChar', )
 
-    # !!!! GimpParam... not GParam...
-    def is_object_array_type(type_name): return type_name in ('GimpParamObjectArray', 'GimpObjectArray')
+    # !!!! Below, GimpParam... not GParam...
+
+    # Arrays of primitives
     def is_float_array_type(type_name):   return type_name in ('GimpParamFloatArray', 'GimpFloatArray')
-    def is_string_array_type(type_name):   return type_name in ('GimpParamStringArray', 'GimpStringArray' )
-    # !!! Uint8, not UInt8
+    # !!! Capitalized: UInt8
     def is_uint8_array_type(type_name):   return type_name in ('GimpParamUInt8Array', 'GimpUint8Array' )
     def is_int32_array_type(type_name):   return type_name in ('GimpParamInt32Array', 'GimpInt32Array')
+
+    # Arrays of pointers to strings or objects
+    def is_object_array_type(type_name): return type_name in ('GimpParamObjectArray', 'GimpObjectArray')
+    # Changed with MR !437 ??  To a GLib type, but GParamStrv, not "GStrv"
+    # def is_string_array_type(type_name):   return type_name in ('GimpParamStringArray', 'GimpStringArray' )
+    # Fail: def is_string_array_type(type_name):   return type_name in ('GParamStrv', )
+    def is_string_array_type(type_name):   return type_name in ('GParamBoxed', )
     def is_color_array_type(type_name):   return type_name in ('GimpParamRGBArray', 'GimpRGBArray')
 
     def is_file_descriptor_type(type_name):

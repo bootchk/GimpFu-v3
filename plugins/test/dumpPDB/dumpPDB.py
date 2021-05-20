@@ -53,10 +53,10 @@ def print_filetype(file):
     print(f"File type is: {info.get_file_type()}")
 
 
-def iterProcNames():
-    count, names = pdb.gimp_pdb_query(".*", ".*", ".*", ".*", ".*", ".*", ".*", )
+def generateProcNames():
+    names = pdb.gimp_pdb_query(".*", ".*", ".*", ".*", ".*", ".*", ".*", )
     for name in names:
-        print(name)
+        yield name
 
 
 
@@ -77,7 +77,14 @@ def plugin_func(image, drawable):
     There exist many dated examples on the net.
     '''
 
-    iterProcNames()
+    for name in generateProcNames():
+        print(name)
+
+    # Temp hack: test a PDB procedure taking a GStrv
+    pdb.file_gih_save(image, 1, (drawable,), "/work/tmp", 10, "foo", 1, 1, 1, 1, 1, (1,), 1, ("bar", "zed"))
+
+
+    result = "foo"  # TODO create JSON text, put it in file
 
     print(result)
     if result:

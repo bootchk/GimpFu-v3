@@ -5,7 +5,7 @@ from gi.repository import GObject
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-# from gi.repository import GLib  # GLib.guint ???
+from gi.repository import GLib  # GLib.VariantType  GLib.guint ???
 from gi.repository import Gio   # Gio.File
 
 from gimpfu.adapters.rgb import GimpfuRGB
@@ -261,8 +261,14 @@ class FuGenericValue():
     # self.contained_gtype_from(to_container_gtype)
     # contained_gtype.name == "GBoxed":  # ??? "GimpObjectArray":
 
-    def is_contained_gtype_a_boxed_type(self, container_gtype):
+
+    def is_contained_gtype_a_gimp_type(self, container_gtype):
         return container_gtype.name == 'GimpObjectArray'
+
+    def is_contained_gtype_a_RGB_type(self, container_gtype):
+        return container_gtype.name == 'GimpRGBArray'
+
+
 
 
     def sequence_for_actual_arg(self):
@@ -284,6 +290,34 @@ class FuGenericValue():
         # items in list might still be wrapped
         assert isinstance(result, Sequence)
         return result
+
+
+    def martial_list_to_bindable_types(self, raw_list, to_container_gtype):
+        """
+        Return a list whose any elements are:
+        - fundamental types
+        - or Gimp types unwrapped from GimpFu wrappers
+        - or Gimp types fabricated from fundamental Python types (e.g. RGB)
+        """
+
+        # return raw_list when no other cases apply
+        list = raw_list
+
+        # unwrap GimpFu wrapped types
+        from gimpfu.adaption.marshal import Marshal
+        if self.is_contained_gtype_a_gimp_type(to_container_gtype):
+            # Each item should be wrapped, how could it not be???
+            # But unwrap_homogenous_sequence doesn't require it.
+            # unwrap_homogenous_sequence does check each item is same unwrapped type
+            list = Marshal.unwrap_homogenous_sequence(raw_list)
+        # else list elements are fundamental types
+
+        # fabricate Gimp types from fundamental types
+        if self.is_contained_gtype_a_RGB_type(to_container_gtype):
+            list = GimpfuRGB.colors_from_list_of_python_type(raw_list)
+            # assert list is now a list of Gimp.RGB
+
+        return list
 
 
     """
@@ -319,16 +353,6 @@ class FuGenericValue():
         except Exception as err:
             proceed(f"Exception in sequence_for_actual_arg: _actual_arg: {self._actual_arg}, {err}")
 
-        """
-        assert list is-a list, but is empty, or items are wrapped or fundamental types
-        But we don't know much about the contained items.
-        (They were passed as arguments by Author.)
-        Could be:
-           wrapped GObjects
-           ??? unwrapped GObjects (responds to .__gtype__)
-           fundamental types
-        """
-
         # setter i.e. factory method needs gtype of contained items.
         # hack
         # use any GIMP boxed type, setter doesn't actually use it???
@@ -336,51 +360,41 @@ class FuGenericValue():
         # it works only when testing GimpObjectArray
         contained_gtype = Gimp.Item.__gtype__
 
-
-        # setter requires fundamental or GIMP types, not GimpFu wrapped types
-        from gimpfu.adaption.marshal import Marshal
-        if self.is_contained_gtype_a_boxed_type(to_container_gtype):
-            # Each item should be wrapped, how could it not be???
-            # But unwrap_homogenous_sequence doesn't require it.
-            # unwrap_homogenous_sequence does check each item is same unwrapped type
-            list = Marshal.unwrap_homogenous_sequence(list)
-        # else list elements are fundamental types
-
-        """
-        assert list is one of:
-        - empty
-        - contains unwrapped Gimp types
-        - fundamental types
-        - fundamental types that can be converted to Gimp types (e.g. RGB)
-        """
-
-        if to_container_gtype.name == 'GimpRGBArray':
-            list = GimpfuRGB.colors_from_list_of_python_type(list)
-            # assert list is now a list of Gimp.RGB
-
-        # Require a GObject.Value to holds a boxed Gimp type
+        # Create GObject.Value of the given to_container_gtype
         try:
             # create empty (i.e. no value) GValue of desired type,
             self._gvalue = GObject.Value (to_container_gtype)
-            # Maybe ??? self._gvalue = GObject.Value (GObject.GBoxed)
         except Exception as err:
-            proceed(f"Fail to create GObject.Value for array: {err}.")
+            proceed(f"Fail to create GObject.Value for array, err is: {err}.")
 
+        """
+        assert list is-a list, but is empty, or items are wrapped or fundamental types
+        But we don't know much about the contained items.
+        (They were passed as arguments by Author.)
+        Could be:
+           GimpFu wrapped GObjects
+           ??? unwrapped GObjects (responds to .__gtype__)
+           fundamental types
+        """
+        list = self.martial_list_to_bindable_types(list, to_container_gtype)
 
         try:
             """
-            Invoke Gimp's setter to set value into GValue.
+            Invoke setter to set value into GValue.
             Invoking via GI i.e. gvalue_setter is-a callable.
+            For Gimp array types, setter is a method on Gimp.
+            For other array types, setter is ???
 
             We are calling e.g. Gimp.value_set_object_array()
             whose C signature is like (...len, array...)
             PyGObject will convert "list" to  "len(list), array"
+            Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
 
             Elsewhere, the length is also passed to a PDB procedure
             since the PDB API is C-like, not Python-like.
-
-            Fail: Gimp.value_set_object_array(self._gvalue, len(list), list)
             """
+
+            # Some arrays want to know the contained type.
             if is_setter_take_contained_type:
                 # Fail GObject.Type.ensure(GimpObjectArray)
                 # Fail GObject.GType.is_a(Gimp.ObjectArray)
@@ -401,21 +415,11 @@ class FuGenericValue():
             proceed(f"Fail to_gimp_array: {to_container_gtype.name}: {err}.")
 
 
-
-
-    def to_object_array(self):
-        """ Make self own a GValue holding a GimpObjectArray """
-        self.to_gimp_array(Gimp.ObjectArray.__gtype__,
-                           Gimp.value_set_object_array,
-                           is_setter_take_contained_type = True)
+    # Arrays of primitives
 
     def to_float_array(self):
         """ Make self's GValue hold a GimpFloatArray created from self.actual_arg"""
         self.to_gimp_array(Gimp.FloatArray.__gtype__, Gimp.value_set_float_array )
-
-    def to_string_array(self):
-        """ Make self's GValue hold a GimpStringArray created from self.actual_arg"""
-        self.to_gimp_array(Gimp.StringArray.__gtype__, Gimp.value_set_string_array )
 
     def to_uint8_array(self):
         """ Make self's GValue hold a GimpUint8Array created from self.actual_arg"""
@@ -424,6 +428,14 @@ class FuGenericValue():
     def to_int32_array(self):
         """ Make self's GValue hold a GimpInt32Array created from self.actual_arg"""
         self.to_gimp_array(Gimp.Int32Array.__gtype__, Gimp.value_set_int32_array )
+
+    # arrays of pointers to opaque GIMP objects
+
+    def to_object_array(self):
+        """ Make self own a GValue holding a GimpObjectArray """
+        self.to_gimp_array(Gimp.ObjectArray.__gtype__,
+                           Gimp.value_set_object_array,
+                           is_setter_take_contained_type = True)
 
     def to_color_array(self):
         """ Make self's GValue hold a GimpRGBArray created from self.actual_arg"""
@@ -436,6 +448,26 @@ class FuGenericValue():
 
         # This is not right, this is a type, not a GObject.type
         # result_arg_type = Gimp.GimpParamFloatArray
+
+    # Null terminated array of pointers to null-terminated strings
+    # Changed with GIMP MR !389
+    # Gimp.StringArray type was deleted
+    '''
+    OLD
+    def to_string_array(self):
+       """ Make self's GValue hold a GimpStringArray created from self.actual_arg"""
+       self.to_gimp_array(Gimp.StringArray.__gtype__, Gimp.value_set_string_array )
+    '''
+    def to_string_array(self):
+       """ Make self's GValue hold instance of type GStrv created from self.actual_arg"""
+       # Fail: GStrv is not a GType, only a C typedef.
+       # Fail: GObject.TYPE_BOXED, cannot initialize GValue with type 'GBoxed', this type has no GTypeValueTable implementation
+       # Fail: GLib.VariantType
+       # G_TYPE_STRV
+       # Setter is not a GIMP method, but a method of GObject.Value
+       # See GObject>Structures>Value
+       # Fail: self.to_gimp_array(GObject.TYPE_STRV, GObject.Value.set_boxed )
+       self.to_gimp_array(GObject.TYPE_STRV, GObject.Value.set_variant )
 
 
     def to_file_descriptor(self):
