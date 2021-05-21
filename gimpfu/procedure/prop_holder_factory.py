@@ -2,8 +2,9 @@
 
 
 """
-We don't use gi directly,
-but it must be in scope for exec
+We don't use gi directly, but it must be in scope for exec.
+Similarly for GObject, Gimp.
+I.E. we evaluate strings like "Gimp.ObjectArray", so "Gimp" must be in scope.
 """
 import gi
 from gi.repository import GObject
@@ -115,7 +116,7 @@ class Foo(GObject.GObject):
             template = string.Template(self.template_string_str)
             code_string = template.substitute(type="str", name=unique_prop_name, default=default)
         elif isinstance(type, str):
-            # assert str names a Gimp type
+            # assert str names a Gimp type or GLib type (GStrv)
             template = string.Template(self.template_string_gimp_value)
             # !!! Omit default
             code_string = template.substitute(type=type, name=unique_prop_name)

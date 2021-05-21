@@ -276,7 +276,7 @@ that specifies widget kind and format of extras.
 """
 
 """
-Map PF_TYPE >> python type or Gimp type
+Map PF_TYPE >> python type or Gimp type or GLib type
 Many to one.
 !!! We return a string for Gimp types, not an instance of Type.
 
@@ -339,7 +339,7 @@ map_PF_TYPE_to_python_type = {
     # Arrays of pointers to variable size elements
     # GIMP v2 used "Gimp.StringArray", GIMP v3 uses GStrv, a GLib type
     # PyGObject will bind a Python list to GStrv
-    PF_STRINGARRAY:        list,    # "GStrv",
+    PF_STRINGARRAY:        "GObject.TYPE_STRV", # "GStrv", # list,
 
     # Arrays of pointers (fixed size) to Gimp objects
     # TODO how does this cross the wire protocol?
