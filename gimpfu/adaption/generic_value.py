@@ -4,21 +4,16 @@ from gi.repository import GObject
 
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
-
-from gi.repository import GLib  # GLib.VariantType  GLib.guint ???
 from gi.repository import Gio   # Gio.File
 
 from gimpfu.adapters.rgb import GimpfuRGB
-
 from gimpfu.message.proceed import proceed
 from gimpfu.message.suggest import Suggest
 
 from gimpfu.adaption.generic_value_array import FuGenericValueArray
-from gimpfu.adaption.formal_types import FormalTypes
 from gimpfu.adaption.types import Types
 from gimpfu.adaption.upcast import Upcast
 
-from collections.abc import Sequence    # ABC for sequences
 import logging
 
 

@@ -5,17 +5,9 @@ from gi.repository import GObject
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-#from gi.repository import GLib  # GLib.VariantType  GLib.guint ???
-#from gi.repository import Gio   # Gio.File
-
 from gimpfu.adapters.rgb import GimpfuRGB
-
 from gimpfu.message.proceed import proceed
-#from gimpfu.message.suggest import Suggest
-
 from gimpfu.adaption.formal_types import FormalTypes
-#from gimpfu.adaption.types import Types
-#from gimpfu.adaption.upcast import Upcast
 
 from collections.abc import Sequence    # ABC for sequences
 import logging
@@ -281,25 +273,37 @@ class FuGenericValueArray():
         cls.logger.info(f"to_string_array")
         # require a sequence
         try:
-           list = FuGenericValueArray.sequence_for_actual_arg(actual_arg)
+           a_list = FuGenericValueArray.sequence_for_actual_arg(actual_arg)
         except Exception as err:
            proceed(f"Exception in sequence_for_actual_arg: _actual_arg: {actual_arg}, {err}")
 
         # Create GObject.Value
+        '''
+        gvalue = GObject.Value(GObject.TYPE_STRV, a_list)
+        '''
+
+        '''
         try:
             # create empty (i.e. no value) GValue of desired type,
             gvalue = GObject.Value (GObject.TYPE_STRV)
         except Exception as err:
             proceed(f"Fail to create GObject.Value for array, err is: {err}.")
 
-        # GObject.GStrv is not a class?  Create instance from Python list.
+        # GObject.GStrv is not a class?
         # Code lifted from PyGObject/tests/test_properties.property
+        # GStrv inherits Python list type
         class GStrv(list):
             __gtype__ = GObject.TYPE_STRV
 
-        GStrv(list)
+        # Create instance from instance of Python list type
+        gstrv = GStrv(a_list)
 
         # put instance in the gvalue.
-        GObject.Value.set_boxed(gstrv)
+        gvalue.set_boxed(gstrv)
+        '''
+        gvalue = GObject.Value (GObject.TYPE_STRV)
+        gvalue.set_boxed(a_list)
+
+        assert GObject.type_check_value_holds(gvalue, GObject.TYPE_STRV)
 
         return gvalue
