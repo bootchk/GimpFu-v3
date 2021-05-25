@@ -1,0 +1,105 @@
+diff --git a/libgimpbase/gimpprotocol.c b/libgimpbase/gimpprotocol.c
+index e02607bf24..08fccb8e7a 100644
+--- a/libgimpbase/gimpprotocol.c
++++ b/libgimpbase/gimpprotocol.c
+@@ -455,6 +455,11 @@ _gp_quit_read (GIOChannel      *channel,
+                GimpWireMessage *msg,
+                gpointer         user_data)
+ {
++  /* For quit messages, there is no message body, only the type, on the wire.
++   * Log this, because a broken protocol can quit mysteriously when a zero
++   * is read on the wire.
++   */
++  g_debug("Protocol read a quit msg.");
+ }
+ 
+ static void
+@@ -1628,24 +1633,35 @@ _gp_params_read (GIOChannel  *channel,
+ 
+         case GP_PARAM_TYPE_STRV:
+           {
+-            guint32 size;
++            guint32 count_strings;
+ 
+-			if (! _gimp_wire_read_int32 (channel, &size, 1, user_data))
++            if (! _gimp_wire_read_int32 (channel, &count_strings, 1, user_data))
+               goto cleanup;
+ 
+-            (*params)[i].data.d_strv = g_new0 (gchar *, size + 1);
+-
+-            if (! _gimp_wire_read_string (channel,
+-                                          (*params)[i].data.d_strv,
+-                                          (int) size,
+-                                          user_data))
++            if (count_strings>0)
++              {
++                /* Allocate extra byte for null to terminate array of pointers.
++                 * Allocate zeroed array so the extra byte is a null.
++                 */
++                (*params)[i].data.d_strv = g_new0 (gchar *, count_strings + 1);
++
++                if (! _gimp_wire_read_string (channel,
++                                              (*params)[i].data.d_strv,
++                                              (int) count_strings,
++                                              user_data))
++                  {
++                    g_strfreev ((*params)[i].data.d_strv);
++                    (*params)[i].data.d_strv = NULL;
++                    goto cleanup;
++                  }
++              }
++            else
+               {
+-                g_strfreev ((*params)[i].data.d_strv);
++                /* Empty array of string is a null handle. */
+                 (*params)[i].data.d_strv = NULL;
+-                goto cleanup;
+               }
+-            break;
+           }
++          break;
+ 
+         case GP_PARAM_TYPE_ID_ARRAY:
+           if (! _gimp_wire_read_string (channel,
+@@ -1792,20 +1808,31 @@ _gp_params_write (GIOChannel *channel,
+           break;
+ 
+         case GP_PARAM_TYPE_STRV:
+-          if (params[i].data.d_strv && (*params[i].data.d_strv))
+-            {
+-              gint size = g_strv_length (params[i].data.d_strv);
++          {
++            gint count_strings = 0;
+ 
+-              if (! _gimp_wire_write_int32 (channel,
+-                                            (guint32*) &size, 1,
+-                                            user_data) ||
+-                  ! _gimp_wire_write_string (channel,
++            if (params[i].data.d_strv)
++              {
++                count_strings = g_strv_length (params[i].data.d_strv);
++              }
++            /* Else null handle means empty array. */
++
++            /* Always write count_strings. */
++            if (! _gimp_wire_write_int32 (channel,
++                                          (guint32*) &count_strings, 1,
++                                          user_data))
++              return;
++
++            /* _gimp_wire_write_string, when count_strings is zero,
++             * will not dereference handle and will write nothing to wire. 
++             */
++            if ( ! _gimp_wire_write_string (channel,
+                                              params[i].data.d_strv,
+-                                             size,
++                                             count_strings,
+                                              user_data))
+                 return;
+-              break;
+-            }
++          }
++          break;
+ 
+         case GP_PARAM_TYPE_ID_ARRAY:
+           if (! _gimp_wire_write_string (channel,

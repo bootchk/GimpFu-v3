@@ -1,27 +1,59 @@
 
 Attached is a diff (on the MR branch) that fixes the issue I described earlier.
 
-Now I will describe the cause of the issue.
-On the wire, a GStrv should be represented by:  string-count [char-count [char]*]*  ,
-where * means zero or more.
-Note that you always must write the string-count, even for an empty array.
-That is a problem with the original code in the MR, it doesn't always write the string-count to the wire
-(yet the wire reader side expects it.)
+The cause of the issue.
+===
 
-(It still baffles me why it was crashing when you enter "zz" in the text box for Procedure Browser,
+On the wire, a GStrv should be represented by:
+
+    string-count [char-count [char]*]*
+
+where * means zero or more.
+Note that you must always write the string-count, even for an empty array, because the wire reader side expects it.
+That is a problem with the original code in the MR, it doesn't always write the string-count to the wire
+
+(It still baffles me why it was crashing when you enter "zz" (or any two chars) in the text box for Procedure Browser,
 since that should return one procedure name, "script-fu-fuzzy-border", i.e. not an empty GStrv.)
 
-Now I will describe how I am testing with the diff in place:
+How I am testing with the diff in place:
+===
+
 - Procedure Browser doesn't crash for "zz"
+
 - a test plugin in Python receives a GStrv from a call to gimp-pdb-query, and it is correctly bound to a Python iterable
-- a test plugin in Python can call a PDB procedure that takes a GStrv, and it correcly crosses the wire.
+- a test plugin in Python can call a test PDB procedure that takes a GStrv, and it correcly crosses the wire.
+- same, but passing an empty Python list (empty string array is received)
+- same, but passing a Python list of empty strings (non-empty array of empty strings is received)
 
-The latter test is failing, probably because I don't understand
-how in Python using GI, to create a GValue holding a GStrv from a Python list of strings.
-Note I am trying to call the only PDB procedure that takes a GStrv, file-gih-save.
-* I would appreciate any help. *
+- a test ScriptFu plugin receives a GStrv from a call to gimp-pdb-query
+- a test ScriptFu plugin can call a test PDB procedure that takes a GStrv, and it correcly crosses the wire.
 
-Note that ScriptFu (and the old GimpFu) have no support (and never had)
+All tests pass.
+
+Which plugins use string arrays.
+===
+
+Only one GIMP PDB procedure takes a GStrv, file-gih-save (and it has unrelated issues that I will submit.)
+Several GIMP PDB procedures return a GStrv, e.g. gimp-pdb-query.
+In the wild, for third-parties, I don't know of any that used GimpStringArray.
+
+Note that ScriptFu (and the old PythonFu) have no support (and never had?)
 for declaring a plugin/PDB procedure taking an parameter of string array type (was GimpStringArray, now is GStrv.)
-In other words there is no ScriptFu constant "SF_STRING_ARRAY".
-This is not an issue for plugins using GI.
+In other words there is no ScriptFu constant "SF_STRING_ARRAY" and no widget implemented by ScriptFu for entering same.
+This is not an issue for plugins using GI, they can register procedures taking GStrv.
+
+ScriptFu is able to call PDB procedures taking GStrv, and receive GStrv (as noted in the tests above.)
+You just can't implement, in a ScriptFu script, a PDB procedure that takes a GStrv.
+
+FYI
+===
+
+The Python for creating a GValue is:
+
+
+    gvalue = GObject.Value (GObject.TYPE_STRV)
+    gvalue.set_boxed(a_list)
+
+OR
+
+    gvalue = GObject.Value (GObject.TYPE_STRV, ["foo", "bar"])

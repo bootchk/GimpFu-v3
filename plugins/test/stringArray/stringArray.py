@@ -8,13 +8,24 @@ from gimpfu import *
 
 def called_plugin_func(image, drawable, strings):
 
-    for string in strings:
-        print(f"String is: {string}")
+    if len(strings) > 0:
+        print("Non empty list of strings received.")
+        for string in strings:
+            print(f"String is: {string}")
+    else :
+        print("Empty list of strings received.")
 
 def calling_plugin_func(image, drawable):
 
     # PyGObject will convert list of strings to GStrv
     pdb.python_fu_test_take_string_array(image, drawable, ["foo", "bar"])
+
+    # Empty list is passed
+    pdb.python_fu_test_take_string_array(image, drawable, [])
+
+    # List of empty strings is passed
+    pdb.python_fu_test_take_string_array(image, drawable, ["", ""])
+
 
 
 # takes a string array
@@ -34,7 +45,7 @@ register(
       ],
       [],
       called_plugin_func,
-      menu="<Image>/Test")
+      )
 
 # calls a proc that takes a string array
 register(

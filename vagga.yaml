@@ -363,12 +363,12 @@ containers:
 
     # May 2021 add sanitize, release=>debug.  Does not affect AM build
     # but prevents meson build of GIMP, fails at GIR generation
-    # -Db_sanitize=address,undefined
+    # -Db_sanitize=address,undefined \
     - !Sh |
         cd /home/gegl
         meson _build \
          --buildtype=debug \
-          -Db_lto=true
+         -Db_lto=true
 
         cd _build
         ninja
@@ -1103,7 +1103,7 @@ commands:
       # export GIMP_PLUGIN_DEBUG=file-png,fatal-warnings
       # export GIMP_PLUGIN_DEBUG=all,fatal-criticals
 
-      export GIMPFU_DEBUG=1
+      #export GIMPFU_DEBUG=1
 
       # print all G_MESSAGES
       export G_MESSAGES_DEBUG=all
