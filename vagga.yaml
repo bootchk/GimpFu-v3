@@ -224,6 +224,10 @@ containers:
     # some my vagga commands want wget
     - !Install [wget]
 
+    # remove DNS file that vagga will recreate after build
+    # !!! You must do this last, and not at the beginning of a container build
+    - !Sh "rm /etc/resolv.conf"
+
     # Larger /tmp for testing
     # 100Mi is default, not enough to create many image files
     volumes:
@@ -241,24 +245,33 @@ containers:
     setup:
     - !Container gimpDeps
 
-    - !Sh rm /etc/resolv.conf
-
-
     # This causes build to fail, can't find git_version.h because this gets only the files, not .git
     #- !Git
     #  url: https://gitlab.gnome.org/GNOME/babl.git
     #  path: /home/babl
 
     # OR use git to clone the repository
-    #- !Sh |
-    #   git clone https://gitlab.gnome.org/GNOME/babl.git /home/babl
+    - !Sh |
+       git clone https://gitlab.gnome.org/GNOME/babl.git /home/babl
 
-    # OR most most recent release archive
-    # 1.72=>1.74=>1.78=>1.84
+    # OR most most recent GIMP release archive
+    # 1.72=>1.74=>1.78=>1.84=>1.86
     # When you change this, also change below the cd
-    - !Tar
-      url: https://download.gimp.org/pub/babl/0.1/babl-0.1.84.tar.xz
-      path: /home
+    #- !Tar
+    #  url: https://download.gimp.org/pub/babl/0.1/babl-0.1.86.tar.xz
+    #  path: /home
+
+    # PR get tarball from babl project, the very latest i.e. master
+    # Fail with "unexpected compression"  https://gitlab.gnome.org/GNOME/babl/repository/archive.tar.gz
+    # Get a specific sha i.e. commit sha256: 69e6b09067f2bbca7ac0dfda0131042d7d1f448c
+    #- !Tar
+    #  url: https://gitlab.gnome.org/GNOME/babl/master/archive.tar.gz
+    #  path: /home
+
+    #- !Git
+    #  url: https://gitlab.gnome.org/GNOME/babl
+    #  path: /home/babl
+    #  revision: 69e6b090
 
 
 
@@ -290,6 +303,8 @@ containers:
       revision: 63b8e5f9
 
 
+    # Get additional tools to build
+
 
 
 
@@ -300,10 +315,7 @@ containers:
 
     # Build (from source) certain prereqs of gimp: babl, gegl
 
-    # We don't do this.  Instead we install to default place.
-    # set prefix: directory where GIMP build scripts will install stuff
-    #- !Env
-    #  GIMP_PREFIX: /home
+    # We don't set GIMP_PREFIX.  Instead we install to default place.
 
     # If Debian, need the architecture label
     # TODO not working, see below, hardcoded
@@ -323,13 +335,24 @@ containers:
 
 
     # Note babl and gegl build the same
-    # WAS: cd /home/babl-0.1.74 => 1.78
+    # WAS: cd /home/babl-0.1.86
+
+
+    # Failed attempt to create missing file
+    #- !GitDescribe
+    #  repo: /home/babl
+    #  output-file: /git-version.h
+
+    # Interferes with gegl build
+    # -Db_sanitize=address,undefined \
+    # -Db_lto=true
+
 
     - !Sh |
-        cd /home/babl-0.1.84
+        cd /home/babl
         meson _build \
-         --buildtype=release \
-          -Db_lto=true
+         --buildtype=debug \
+          -Dwith-docs=false
         cd _build
         ninja
         ninja install
@@ -353,9 +376,7 @@ containers:
     - !Env
       XDG_DATA_DIRS: "/usr/local/share:/usr/share"
 
-    - !Sh echo ">>>>>>  XDG_DATA_DIRS"
-    - !Sh echo $XDG_DATA_DIRS
-    - !Sh echo ">>>>>>"
+    - !Sh echo ">>>>>>  XDG_DATA_DIRS" $XDG_DATA_DIRS
 
     # !!! Not using     --prefix=${GIMP_PREFIX} \
     # Use cd /home/gegl-0.4.xx for a tar pull
@@ -364,12 +385,14 @@ containers:
     # May 2021 add sanitize, release=>debug.  Does not affect AM build
     # but prevents meson build of GIMP, fails at GIR generation
     # -Db_sanitize=address,undefined \
+    # -Dintrospection=false \
+    # -Db_lto=true
     - !Sh |
         cd /home/gegl
         meson _build \
          --buildtype=debug \
-         -Db_lto=true
-
+         -Ddocs=false \
+         -Dgtk-doc=false
         cd _build
         ninja
         ninja install
@@ -490,9 +513,9 @@ containers:
 
     #
     environ:
-      LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
-      XDG_DATA_DIRS: "/usr/local/share:/usr/share"
-      PATH: "/usr/local/bin:/usr/bin:/bin"
+      LD_LIBRARY_PATH: /usr/local/lib/x86_64-linux-gnu:/usr/lib
+      XDG_DATA_DIRS:   /usr/local/share:/usr/share
+      PATH:            /usr/local/bin:/usr/bin:/bin
 
     # Try not to alter this container, it is stock container after GIMP build
     # Note that /usr/local/lib/gimp/2.99/plug-ins/python does not exist
@@ -535,30 +558,47 @@ containers:
     # TODO this may not be necessary
     # - !Install [ libx32asan5 ]
 
-    # -Db_-shared-libasan
-    # env CC=clang CXX=clang++ CC_LD=/usr/bin/ld.lld CXX_LD=/usr/bin/ld.lld LDFLAGS=-shared-libasan meson _build
-    # -Db_sanitize=address or address,undefined
-
     # if GEGL is asan, then this needs asan? else "library not first, use PRELOAD"
-    # FAIL -Db_sanitize=address,undefined
+    # see later, at compile time -Db_sanitize=address,undefined
 
     # setup build outside the source tree
     - !Sh |
         cd /work/gimp
-        meson setup /work/gimpBuild \
+        LDFLAGS=--verbose meson setup /work/gimpBuild \
          --buildtype=debug \
          -Djavascript=false \
          -Dlua=false \
          -Dpython=true \
          -Dvala-plugins=disabled \
+         -Dg-ir-doc=false \
          -Dgtk-doc=false
 
+    # -Db_sanitize=address,undefined
 
+    # setup separate build for clang
+
+    # Fail gcc preprocessor errors at g-ir-scanner
+    # CC=clang CXX=clang++ CC_LD=/usr/bin/ld.lld CXX_LD=/usr/bin/ld.lld LDFLAGS=-shared-libasan meson setup /work/clangBuild \
+
+    # fail: gcc cannot compile programs
+    # unrecognized: shared-libasan
+    # CC=gcc CXX=gcc CC_LD=lld CXX_LD=lld LDFLAGS=-shared-libasan meson setup /work/clangBuild \
+
+    # fail: gold fails in same way
+
+    # use --wipe to insure any changes take effect, but you can't use wipe the first time
+    - !Sh |
+        cd /work/gimp
+        LDFLAGS=--verbose meson setup /work/mesonBuild \
+         --buildtype=debug \
+         -Djavascript=false \
+         -Dlua=false \
+         -Dpython=true \
+         -Dvala-plugins=disabled \
+         -Dg-ir-doc=false \
+         -Dgtk-doc=false
     #    meson configure /work/gimpBuild \
 
-
-    environ:
-      HOME: /work/.home
 
 
   # Container with Guile and Guile-GI
@@ -595,9 +635,9 @@ containers:
     setup:
     - !Container gimpMesonDev
 
-    # This tells vagga that this container depends on changed gimp source
-    # We don't need that because meson knows when it needs to rebuild ??
-    - !Depends /work/gimp
+    # Tells vagga to rebuild this container when this file is touched.
+    # Depends requires a single file, we can't use the entire /gimp directory
+    - !Depends touchToRebuild
 
     # resolve FAILED: cursors/gimp-tool-cursors.c   Related to vector icons?
     - !Env  XDG_DATA_DIRS: "/usr/local/share:/usr/share"
@@ -610,13 +650,19 @@ containers:
     # defaults:
     #   jobs 3?? For more, use: -j 4
     #   print one line per command, for verbose use -v
-    # ninja -v -j 4
+    # ninja -v -j 1 to limit to sequential jobs
 
     # FAIL: export LD_PRELOAD=$(gcc -print-file-name=libasan.so)
+    # cd /work/gimpBuild
+    # cd /work/clangBuild
+    # ,undefined -Db_lto=true
+    # meson configure -Db_sanitize=address
     - !Sh |
-        cd /work/gimpBuild
-        ninja -j 4
-        ninja install
+        cd /work/mesonBuild
+        # echo ">>>>>>>>>>>> running ninja"
+        # ninja -n -v -j 1 -d explain
+        echo ">>>>>>>>>>>> running ninja install"
+        ninja -v -d explain -j 1 install
 
     # Also volumes for test plugins
     volumes:
@@ -628,8 +674,16 @@ containers:
       # 100Mi is default, not enough to create many image files
       /tmp: !Tmpfs { size: 500Mi, mode: 0o1777 }
 
+    # env that GIMP expects
     environ:
-      HOME: /work/.home
+      HOME:            /work/.home
+      GIMP_PREFIX:     /usr/local
+      GEGL_PATH:       /usr/local/lib/x86_64-linux-gnu/gegl-0.4
+      GI_TYPELIB_PATH: /usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      NO_AT_BRIDGE:    1
+      LD_LIBRARY_PATH: /usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}
+      XDG_DATA_DIRS:   /usr/local/share:/usr/share
+      PATH:            /usr/local/bin:/usr/bin
 
 
   # Container with pgi-docgen generated docs
@@ -646,8 +700,6 @@ containers:
     - !Git
       url: https://github.com/pygobject/pgi-docgen
       path: /work/pgi-docgen
-    environ:
-      HOME: /work/.home
 
 
 
@@ -671,8 +723,6 @@ containers:
         ./autogen.sh
         make
         make install
-    environ:
-      HOME: /work/.home
 
 
 
@@ -688,8 +738,6 @@ containers:
         cd /work/resynthBuild
         ninja
         ninja install
-    environ:
-      HOME: /work/.home
 
 
 
@@ -746,10 +794,16 @@ containers:
       # 100Mi is default, not enough to create many image files
       /tmp: !Tmpfs { size: 500Mi, mode: 0o1777 }
 
+    # env that GIMP expects
     environ:
-      HOME: /work/.home
-
-
+      HOME:            /work/.home
+      GIMP_PREFIX:     /usr/local
+      GEGL_PATH:       /usr/local/lib/x86_64-linux-gnu/gegl-0.4
+      GI_TYPELIB_PATH: /usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      NO_AT_BRIDGE:    1
+      LD_LIBRARY_PATH: /usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}
+      XDG_DATA_DIRS:   /usr/local/share:/usr/share
+      PATH:            /usr/local/bin:/usr/bin
 
 
 # Cruft
@@ -759,12 +813,14 @@ containers:
 # - !EmptyDir /usr/local/lib/gimp/2.99/python
 #- !Sh "rm -rf /usr/local/lib/gimp/2.99/python/*"
 
+# gimp typelib in /usr/local/lib/girepository-1.0
+# gegl, babl typelib in /usr/local/lib/x86_64-linux-gnu/gi...
 
 commands:
 
   # baseOS does not contain many tools
-  testOS: !Command
-    description: Test sanity of OS in container baseOS
+  testOSSanity: !Command
+    description: Test sanity of OS in container baseOS. Expect only "which" is found
     container: baseOS
     run: |
       which which
@@ -773,8 +829,9 @@ commands:
       wget --version
       curl --version
 
-  testMeson: !Command
-    description: Test sanity of meson in container withTools
+  # test the container with most dev tools installed
+  testMesonSanity: !Command
+    description: Test sanity of meson in container baseWithTools
     container: baseWithTools
     run: |
       meson -h
@@ -783,27 +840,35 @@ commands:
       which intltool
       python3 -V
       wget --version
+      echo "gold linker"
+      which gold
+      echo "libasan path"   $(gcc -print-file-name=libasan.so)
+      echo "which git"; which git
 
-  testSource: !Command
-    description: List contents of cloned source
+
+  testSourceSanity: !Command
+    description: List contents of source babl and gegl
     container: gimpDepsSource
     run: |
       echo "Contents of /babl"
       ls /home/babl
+      echo "Contents of /gegl"; ls /home/gegl
       which git
       echo "trying: pkg-config gegl"
       pkg-config gegl-0.4 --modversion
 
 
-  bablGeglVersions: !Command
+  getVersionsBablGegl: !Command
     description: Get version of built babl and gegl in bablGeglDev
     container: bablGeglDev
     run: |
-      echo "$PKG_CONFIG_PATH is:" $PKG_CONFIG_PATH
+      echo "$PKG_CONFIG_PATH:"   $PKG_CONFIG_PATH
       export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
       echo "$PKG_CONFIG_PATH is:" $PKG_CONFIG_PATH# Show that it installed .so
       echo "Listing /usr/local/lib/x86_64-linux-gnu"
       ls /usr/local/lib/x86_64-linux-gnu
+      echo "Version of babl using: pkg-config gegl"
+      pkg-config --modversion babl-0.1
       echo "Version of gegl using: pkg-config gegl"
       pkg-config --modversion gegl-0.4
       echo "Version of autoconf"
@@ -813,28 +878,25 @@ commands:
 
 
 
-  gimpAMVersions: !Command
-    description: describe versions of stuff in container gimpDev (where built Gimp)
+  getVersionsGimpAM: !Command
+    description: describe versions of stuff in container gimpAMDev (AM built Gimp)
     container: gimpAMDev
     run: |
-      export HOME=/work/.home
-      export GIMP_PREFIX="/usr/local"
-      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      echo "LD_LIBRARY_PATH"
-      echo $LD_LIBRARY_PATH
+      echo "LD_LIBRARY_PATH" $LD_LIBRARY_PATH
       autoconf --version
 
+  getVersionsGimpAMLocal: !Command
+    description: Get version of gimp in gimpLocal container
+    container: gimpAMLocal
+    run: |
+      echo $LD_LIBRARY_PATH
+      /usr/local/bin/gimp-2.99 --version
 
-
-  gimpMesonVersions: !Command
-    description: describe versions in container gimpMesonInstalled (where built Gimp)
+  getVersionsGimpMeson: !Command
+    description: describe versions in container gimpMesonInstalled (meson built Gimp)
     container: gimpMesonInstalled
     run: |
-      export HOME=/work/.home
-      export GIMP_PREFIX="/usr/local"
-      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      echo "LD_LIBRARY_PATH"
-      echo $LD_LIBRARY_PATH
+      echo "LD_LIBRARY_PATH" $LD_LIBRARY_PATH
       # Note gegl is not in dpkg
       #echo "Gegl version from dpkg"
       #dpkg -l | grep gegl
@@ -853,29 +915,20 @@ commands:
       /usr/local/bin/gimp-2.99 --version
 
 
-  gimpAMVersion: !Command
-    description: Get version of gimp in gimpLocal container
-    container: gimpLocal
-    run: |
-      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      echo $LD_LIBRARY_PATH
-      /usr/local/bin/gimp-2.99 --version
-
-  gimpAMConfig: !Command
-    description: Get config options of gimp in gimpLocal container
-    container: gimpLocal
+  getConfigGimpAM: !Command
+    description: Get build config options of gimp in gimpLocal container
+    container: gimpAMLocal
     run: |
       cd /home/gimp
       ./configure --help
 
+  # Broken
   # if you have yelp installed outside the container, and pwd is vaggaGimp, just "yelp .home/gimp-doc"
-  gimpBrowse: !Command
+  browseGimpGI: !Command
     description: Browse Gimp GI use  >vagga --use-env DISPLAY gimpBrowse
-    container: gimpLocal
+    container: gimpAMLocal
     run: |
       yelp /work/.home/gimp-doc
-
-
 
 
   # to run this, use     vagga --use-env DISPLAY gimpRunGUI
@@ -884,21 +937,12 @@ commands:
   # GEGL_PATH should point to the .so parent directory
   # gegl -v
 
-  # gimp typelib in /usr/local/lib/girepository-1.0
-  # gegl, babl typelib in /usr/local/lib/x86_64-linux-gnu/gi...
 
-  gimpAMGUI: !Command
+
+  runAMGimpGUI: !Command
     description: Run gimp GUI in gimpAMLocal container, with locally installed plugins
     container: gimpAMLocal
     run: |
-      export HOME=/work/.home
-      export GIMP_PREFIX="/usr/local"
-      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
-      export PATH="/usr/local/bin:$PATH"
-      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu"
-      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-      export NO_AT_BRIDGE=1
 
       # local plugins in /work/.home/.config/GIMP/2.99/plug-ins
       # !!! outside the container
@@ -981,41 +1025,6 @@ commands:
 
 
 
-
-
-
-
-  # export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
-
-  gimpMesonGUI: !Command
-    description: Run meson gimp GUI in gimpMesonInstalled container (need --use-env DISPLAY), w/o plugins
-    container: gimpMesonInstalled
-    run: |
-      export HOME=/work/.home
-      echo "HOME" $HOME
-      export GIMP_PREFIX="/usr/local"
-      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      echo $LD_LIBRARY_PATH
-      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
-      echo $XDG_DATA_DIRS
-      export PATH="/usr/local/bin:$PATH"
-      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4/"
-      echo "GEGL_PATH" $GEGL_PATH
-      which gegl
-      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-      echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
-      export NO_AT_BRIDGE=1
-
-      export GIMP_PLUGIN_DEBUG=all,fatal-criticals
-      #export GIMPFU_DEBUG=1
-
-      export G_MESSAGES_DEBUG=scriptfu
-
-      # /usr/local/bin/gimp-2.99 --verbose
-      /usr/local/bin/gimp-2.99 --stack-trace-mode query
-
-
-
   # -O -   means: pipe to stdout
   #wget https://github.com/bootchk/testGimpExportImport/tarball/master
   #tar xz -f master
@@ -1027,19 +1036,10 @@ commands:
   #rm -rf wget-log*
   #curl -L  https://github.com/bootchk/testGimpExportImport/tarball/master | tar xz -C /work/.home/.config/GIMP/2.99/plug-ins
 
-  gimpMesonTestGUI: !Command
-    description: Run gimp GUI in gimpMesonInstalled container, creating user's plugins in home
+  runMesonGimpGUI: !Command
+    description: Run gimp GUI in gimpMesonInstalled container, with test plugins (need --use-env DISPLAY)
     container:  gimpMesonInstalled
     run: |
-      export HOME=/work/.home
-      export GIMP_PREFIX="/usr/local"
-      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
-      export PATH="/usr/local/bin:$PATH"
-      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
-      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-      export NO_AT_BRIDGE=1
-
       echo "HOME"            $HOME
       echo "GIMP_PREFIX"     $GIMP_PREFIX
       echo "LD_LIBRARY_PATH" $LD_LIBRARY_PATH
@@ -1047,7 +1047,6 @@ commands:
       echo "PATH"            $PATH
       echo "GEGL_PATH"       $GEGL_PATH
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
-
 
 
       echo "Removing old plugins and gimpfu source"
@@ -1094,6 +1093,9 @@ commands:
       export PYTHONPATH=/work:${PYTHONPATH}
       echo $PYTHONPATH
 
+
+      # Set debug variables
+
       # stop glib at critical
       # export G_DEBUG=fatal-criticals
       #export G_DEBUG=fatal-warnings
@@ -1122,15 +1124,20 @@ commands:
       /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
 
 
-  gimpMesonBuild: !Command
+  # build in the build directory but install into the container
+  # The container is immutable unless write-mode: transient-hard-link-copy
+  # but that allows the container to be written and possibly corrupted.
+  # use vagga _build --force container_name to fix base container if that was modified.
+  buildMesonGimp: !Command
     description: Build gimp GUI in gimpMesonDev container, but do not install
     container:  gimpMesonDev
+    write-mode: transient-hard-link-copy
     run: |
       echo "lkk building GIMP"
-      cd /work/gimpBuild
-      meson compile -j 4
-      # Can't install to the read-only container
-      # ninja install
+      cd /work/mesonBuild
+      #meson compile -j 4
+      # Can't install to the read-only container unless it is write-mode: ....
+      ninja -v -d explain -j 1 install
 
 
   # quicker startup
@@ -1142,20 +1149,20 @@ commands:
        g-ir-doc-tool --language=Python -o /work/.home/gimpui-doc /usr/local/share/gir-1.0/GimpUi-3.0.gir
        echo "Generated to .home/gimp-doc"
 
-  showEnv: !Command
+  showEnvGimpMesonInstalled: !Command
     description: env in gimpMesonInstalled
     container:  gimpMesonInstalled
     run: env
 
-  gimpListPlugins: !Command
-    description: List local plugins in gimpdev container
-    container: gimpLocal
+  listPluginsGimpAMLocal: !Command
+    description: List local plugins in /work/.home/.config/GIMP/2.99/plug-ins
+    container: gimpAMLocal
     run: |
       ls -alR $HOME/.config/GIMP/2.99/plug-ins
-      cat $HOME/.config/GIMP/2.99/plug-ins/test/test.py
+      # cat $HOME/.config/GIMP/2.99/plug-ins/test/test.py
 
   runUbuntuBug: !Command
-    description: Run ubuntu-bug in the container
+    description: Run ubuntu-bug in the gimpMesonInstalled container
     container: gimpMesonInstalled
     run: |
       ubuntu-bug gkt3
@@ -1164,22 +1171,26 @@ commands:
     description: Run gdb on gimp in container gimpMesonInstalled
     container: gimpMesonInstalled
     run: |
-      export HOME=/work/.home
-      export GIMP_PREFIX="/usr/local"
-      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
       export PATH="/usr/local/bin:$PATH"
-      export GEGL_PATH="/usr/local/lib/x86_64-linux-gnu/gegl-0.4"
-      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-      export NO_AT_BRIDGE=1
       gdb gimp-2.99
 
-  termGimpMeson: !Command
-    description: Open terminal on container gimpMesonInstalled, use vagga --use-env DISPLAY termGimpMeson, wait for container
+  terminalToGimpMesonInstalled: !Command
+    description: Open gnome-terminal on container gimpMesonInstalled, use vagga --use-env DISPLAY termGimpMeson, wait for container
     container: gimpMesonInstalled
     run: |
-      echo "Opening terminal on the GIMP run container"
+      echo "Opening gnome-terminal on the GIMP run container"
       /usr/bin/gnome-terminal
+
+  terminalToGimpMesonDev: !Command
+    description: Open bash in the gimpMesonDev container
+    container:  gimpMesonDev
+    write-mode: transient-hard-link-copy
+    run: |
+      echo "lkk in gimpMesonDev container"
+      echo "Try this: cd /work/mesonBuild"
+      echo "Try this:  ninja -v -d explain -j 1 install"
+      echo "Ctl-D to exit bash and container"
+      bash
 
   testGuile: !Command
     description: Run guile in container gimpGuileGIInstalled
@@ -1192,7 +1203,6 @@ commands:
     description: Run guile in container gimpMesonInstalled
     container: gimpMesonInstalled
     run: |
-      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
       echo "Starting guile"
       guile
 
@@ -1220,10 +1230,6 @@ commands:
       ls /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins
       # Use this to find where:   cd /usr && find . -name despeckle
 
-      export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}"
-      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-      export NO_AT_BRIDGE=1
-
       # Refresh installation of gimpfu from development gimp_directory
       # Copy entire directory into the plug-ins directory
       echo "Copying gimpfu to local"
@@ -1241,14 +1247,8 @@ commands:
     description: Generated and display Python docs
     container: gimpMesonDocs
     run: |
-      export XDG_DATA_DIRS="/usr/local/share:/usr/share:$XDG_DATA_DIRS"
-      # export LD_LIBRARY_PATH="/usr/local/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
-      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-      export NO_AT_BRIDGE=1
 
-      echo LD_LIBRARY_PATH is:
-      echo ${LD_LIBRARY_PATH}
-
+      echo "LD_LIBRARY_PATH:" ${LD_LIBRARY_PATH}
       echo finding libgobject-2.0.so.0
       find / -name libgobject-2.0.so.0
       # should be at /usr/lib/x86_64-linux-gnu/

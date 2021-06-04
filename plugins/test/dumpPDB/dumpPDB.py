@@ -87,16 +87,27 @@ def procedureType(procName):
 
 
 def getDictForParam(param):
+    """
+    Return a dict for a GObject.ParamSpec (by inheritance)
+    E.G. is-a GimpParamImage
+    """
+    print(f"Param: {param}")
+    print(f"Param type: {type(param)}")
+
     dict = {}
     dict["name"]    = param.name
     dict["type"]    = param.value_type.name  # GType
+
     # TODO not working
-    # param is an instance, but get_blurb is a method on the class
+    # param is an instance, but get_blurb is a method on the class?
     #dict["blurb"]   = param.get_blurb()
     #dict["blurb"]   = param.gtype_get_type().get_blurb()
     # TODO default must be dispatched on subclass of GParamSpec
+
     # dict["default"] = param.get_default_value()
     return dict
+
+
 
 def getDictForReturnValue(procName, argIndex):
     param = pdb.gimp_pdb_get_proc_return_value(procName, argIndex)
@@ -104,10 +115,8 @@ def getDictForReturnValue(procName, argIndex):
 
 def getDictForInArg(procName, argIndex):
     param = pdb.gimp_pdb_get_proc_argument(procName, argIndex)
-    # Assert param is-a GObject.ParamSpec (by inheritance)
-    # is-a GimpParamImage
-    print(param)
     return getDictForParam(param)
+
 
 
 def getListOfArgsForProc(procName):
@@ -127,13 +136,14 @@ def getListOfReturnValuesForProc(procName):
         list.append( getDictForReturnValue(procName, i))
     return list
 
-# TODO list of menu paths or empty list
+
 def addKeywordsForMenuPaths(dict, procName):
     list = []
     paths = pdb.gimp_pdb_get_proc_menu_paths(procName)
     for path in paths:
         list.append(path)
     dict["menu paths"]  = list
+
 
 def addKeywordsForPlugin(dict, procName):
     dict["menu label"]  = pdb.gimp_pdb_get_proc_menu_label(procName)

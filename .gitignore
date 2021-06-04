@@ -4,6 +4,7 @@ gimp
 resynthesizer
 gimpBuild
 resynthBuild
+mesonBuild
 guile-gi
 pgi-docgen
 gimpfu/__pycache__
