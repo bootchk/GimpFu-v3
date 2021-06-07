@@ -637,7 +637,7 @@ containers:
 
     # Tells vagga to rebuild this container when this file is touched.
     # Depends requires a single file, we can't use the entire /gimp directory
-    - !Depends touchToRebuild
+    # - !Depends touchToRebuild
 
     # resolve FAILED: cursors/gimp-tool-cursors.c   Related to vector icons?
     - !Env  XDG_DATA_DIRS: "/usr/local/share:/usr/share"
@@ -661,6 +661,8 @@ containers:
         cd /work/mesonBuild
         # echo ">>>>>>>>>>>> running ninja"
         # ninja -n -v -j 1 -d explain
+        echo ">>>>>>>>> meson configure sanitize"
+        meson configure -Db_sanitize=address
         echo ">>>>>>>>>>>> running ninja install"
         ninja -v -d explain -j 1 install
 
@@ -1133,9 +1135,13 @@ commands:
     container:  gimpMesonDev
     write-mode: transient-hard-link-copy
     run: |
-      echo "lkk building GIMP"
+      export GI_SCANNER_DEBUG=1
       cd /work/mesonBuild
-      #meson compile -j 4
+      echo "lkk meson configure ASAN"
+      meson configure -Db_sanitize=address
+      echo "lkk meson compile GIMP"
+      meson compile v -d explain -j 1
+      echo "lkk ninja install GIMP"
       # Can't install to the read-only container unless it is write-mode: ....
       ninja -v -d explain -j 1 install
 
