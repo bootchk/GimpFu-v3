@@ -266,7 +266,7 @@ class FuRunner:
         else:
             drawable = drawables[0]
 
-        result = run_imageprocedure_on_drawable(procedure, run_mode, image, drawable, original_args, data)
+        result = FuRunner.run_imageprocedure_on_drawable(procedure, run_mode, image, drawable, original_args, data)
         return result
 
 
