@@ -119,8 +119,8 @@ class FuPlugin (Gimp.PlugIn):
         # Mostly side effects on the PDB, the returned procedure is not important.
         procedure = FuProcedureCreator.create(self, name, gf_procedure,
             # with comments, choose one API
-            FuRunner.run_imageprocedure_on_drawable,  # prior to 2.99.6
-            # FuRunner.run_imageprocedure_multiple,   # since 2.99.6
+            # FuRunner.run_imageprocedure_on_drawable,  # prior to 2.99.6
+            FuRunner.run_imageprocedure_multiple,   # since 2.99.6
             FuRunner.run_context_procedure,
             FuRunner.run_other_procedure)
 
