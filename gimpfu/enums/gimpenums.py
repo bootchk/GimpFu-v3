@@ -108,6 +108,7 @@ try:
 except:
     raise RuntimeError("Failed to import Gimp from gi.repository")
 
+module_logger.info("from gimpfu.enums.enumTypeSet import EnumTypeSet")
 from gimpfu.enums.enumTypeSet import EnumTypeSet
 
 
@@ -120,9 +121,50 @@ Usually Foo + [Type, Mode, Range]
 """
 
 
+"""
+Now is the soonest we can check that GI is working.
+Sanity test accessing GimpType enums
+If this is the last log message, and we crash, then GI is crashing.
+
+Apparently we can access GimpType:
+module_logger.debug("Calling GimpType.list_gimp_enums")
+module_logger.debug(GimpType.list_gimp_enums())
+
+But we can't call Gimp method until Gimp.main() is called.
+i.e. Gimp.version() will fail.
+"""
+#module_logger.debug("Calling Gimp.version");
+#module_logger.debug(Gimp.version());
+
 
 
 ets = EnumTypeSet()
+
+"""
+This is an alternative code, not currently used.
+
+It would be used in a table-driven approach:
+
+for (gimp_enum, suffix, prefix) in table:
+    define_enum_symbols(gimp_enum, suffix, prefix)
+
+However, since the exec occurs inside a function,
+unless the defining statement defines into global namespace,
+it puts the symbol into the function's local namespace.
+It can work (see defining_statement_for_global_symbol in enumTypeSet.py)
+but the execed statement is simpler if we exec outside a function.
+"""
+def define_enum_symbols(gimpEnum, suffix="", prefix=""):
+    """
+    For a given Gimp Enum type, iterate over its members,
+    defining a new symbol in a Python namespace,
+    where the symbol is the Gimp symbol, now upper cased,
+    and possibly prefixed or suffixed by a string
+    (that was used in the past by GimpFu v2.)
+    """
+    for statement in ets.defining_statements_for_enum(gimpEnum, suffix=suffix, prefix=prefix):
+        exec(statement)
+
 
 module_logger.info("Defining adulterated backward compatible symbols for Gimp enums")
 
@@ -272,11 +314,4 @@ Finally, del superflous symbols from namespace of this module.
 del ets
 del module_logger
 del EnumTypeSet
-
-
-
-# Cruft exploring how to get enum names from properties of enum class
-#for bar in foo:
-#for bar in foo.props:
-#for bar in foo.list_properties():
-#    print(bar)
+del define_enum_symbols

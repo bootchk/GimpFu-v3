@@ -259,7 +259,6 @@ class FuRunner:
 
         Signature is (run mode, image, drawable, ...)
         """
-
         # For now, hide multi-layer API
         if count_drawables > 1 :
             FuResult.makeException(procedure, "GimpFu does not support multi-layer yet.")

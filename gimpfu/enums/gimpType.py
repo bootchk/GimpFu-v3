@@ -19,12 +19,17 @@ class GimpType():
 
     logger = logging.getLogger("GimpFu.GimpType")
     # !!! voluminous, so enable logging separately from GIMPFU_DEBUG
+    # CRITICAL suppresses messages about overwriting already defined symbols
+    # WARNING is the usual
     logger.setLevel(logging.WARNING)
+    #logger.setLevel(logging.DEBUG)
 
 
     @classmethod
     def list_gimp_enums(cls):
         """ Return a list of short names of Gimp enum types. """
+        cls.logger.debug(f"list_gimp_enums")
+
         # call libgimp function.
         gtype_names, count_names = Gimp.enums_get_type_names()
         """

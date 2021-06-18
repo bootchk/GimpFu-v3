@@ -1,18 +1,17 @@
 """
-
 FBC (for backward compatibility)
 
-Put certain constants into global namespace.
+Put certain symbols for constants into global namespace.
 
 These are cases that the code that defines Gimp enums can't handle.
 That is, they don't seem to fit any pattern that can be done programatically.
 They date from the early days of Gimp and GimpFu.
 
-These are evaluated at import time.
+These are evaluated at import time, generally from the top module.
+The order of importing this is important so you don't overwrite any more recently defined enums.
 
-!!! We don't want them to overwrite any more recently defined enums.
-So the order of importing this is important.
-Should be imported AFTER a call to TODO.
+Note that we access Gimp gir but don't call any Gimp methods,
+which will fail until we call Gimp.main()
 """
 
 

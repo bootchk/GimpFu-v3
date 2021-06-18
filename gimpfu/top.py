@@ -16,7 +16,6 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-
 """
 Simple interface to write GIMP plug-ins in Python.
 An alternative is to use GObject Introspection and not import GimpFu.
@@ -139,8 +138,11 @@ TODO v2 class CancelError(RuntimeError): pass
 
 
 """
-Log this top level, because Gimp gives uninformative "wire error"
-when Python crashes.
+Log this top level, because Gimp gives uninformative "wire error" when Python crashes.
+
+The most common error is to call a Gimp method before Gimp.main() is called.
+Then Gimp fails assert that GIMP_IS_PLUGIN(PLUGIN)
+i.e. that the plugin as called Gimp.main() and initialized the Gimp variable "PLUGIN"
 """
 # TODO should this be exposed? Rename to gimpfuLogger so name clash less likely
 from gimpfu.logger.logger import FuLogger
@@ -153,29 +155,32 @@ Define __getattr__ for this module to warn of deprecated enums
 """
 
 '''
-Expose to Authors: abbreviated and backward compatible symbols Gimp enums.
-Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
+Expose to Authors in global namespace:
+   abbreviated and backward compatible symbols Gimp enums
+   GimpFu enums
+   more, abbreviated symbols for Gimp.Enum classes (some for backward compatibility)
+All defined enum symbols are upper case, without dot notation.
 
+TODO Use "from gimpenums import *" form so author does not need prefix gimpenums.RGB
 Name "gimpenums" retained for FBC, some non-GimpFu plugins may "from gimpenums import *"
 '''
-logger.info("defining enums")
-
-# backward compatible, deprecated
+logger.info("defining backward compatible, deprecated enums")
 from gimpfu.enums.backward_enums import *
 
-# generated short names of long names of GI types
-from gimpfu.enums.gimpenums import *
-
-# CRUFT?
-# import define_enums_into_global_namespace
-#define_enums_into_global_namespace()
-
-''' GimpFu enums e.g. PF_INT '''
+logger.info("defining GimpFu enums e.g. PF_INT ")
 from gimpfu.enums.gimpfu_enums import *
 
+logger.info("defining short names of long names of Gimp enum types e.g. HSV_COLOR_MODE")
+from gimpfu.enums.gimpenums import *
+"""
+At one time the above crashed on Alpine but not on Ubuntu.
+with assertion GIMP_IS_PLUGIN(PLUGIN) fail.
+May be a race to create plugin, or maybe I just hacked improperly on Alpine.
+"""
 
 
-logger.info("defining pdb and gimp aliases")
+
+
 '''
 Expose to Authors : alias symbols "gimp" and "pdb"
 It is not as simple as:
@@ -187,6 +192,7 @@ Using GI, convention is first letter capital e.g. "Gimp."
 "Gimp" symbol is NOT equivalent to the "gimp" symbol,
 but they have similar methods/attributes.
 '''
+logger.info("defining pdb and gimp aliases")
 from gimpfu.aliases.pdb import GimpfuPDB
 pdb = GimpfuPDB()
 
@@ -267,58 +273,15 @@ def main():
     from gi.repository import Gimp
     from gimpfu.plugin import FuPlugin
 
-    # !!! Pass a GType which is a class defining a plugin, that Gimp will instantiate.
+    # !!! Pass a GType which is a GObject class defining a plugin, that Gimp will instantiate.
     Gimp.main(FuPlugin.__gtype__, sys.argv)
     """
-    Gimp will put this plugin in the PDB,
-    and eventually call registered "function"
-    the so-called "run func" when this plugin is invoked
-    either from the GUI or from another plugin.
+    Gimp will register this plugin in the PDB,
+    and eventually call the registered Author's "function"
+    the so-called "run func" when this plugin is invoked.
     The actual method that Gimp will call is
     a method of FuRunner (see runner.py)
     which interposes between Gimp and Author's "function".
     """
 
 logger.info("Done with import from top")
-
-"""
-CRUFT
-# TODO still needed in v3?  Not a virtual method of Gimp.Plugin anymore?
-def _query():
-    raise Exception("v2 method _query called.")
-    for plugin in _registered_plugins_.keys():
-        (blurb, help, author, copyright, date,
-         label, imagetypes, plugin_type,
-         params, results, function, menu, domain,
-         on_query, on_run) = _registered_plugins_[plugin]
-
-        def make_params(params):
-            return [(_type_mapping[x[0]],
-                     x[1],
-                     _string.replace(x[2], "_", "")) for x in params]
-
-        params = make_params(params)
-        # add the run mode argument ...
-        params.insert(0, (PDB_INT32, "run-mode",
-                                     "The run mode { RUN-INTERACTIVE (0), RUN-NONINTERACTIVE (1) }"))
-
-        results = make_params(results)
-
-        if domain:
-            try:
-                (domain, locale_dir) = domain
-                Gimp.domain_register(domain, locale_dir)
-            except ValueError:
-                Gimp.domain_register(domain)
-
-        # TODO convert plugin_type type
-        # always PLUGIN i.e. filter
-        Gimp.install_procedure(plugin, blurb, help, author, copyright,
-                               date, label, imagetypes, plugin_type,
-                               params, results)
-
-        if menu:
-            Gimp.menu_register(plugin, menu)
-        if on_query:
-            on_query()
-"""
