@@ -666,8 +666,7 @@ containers:
         #echo ">>>>>>>>> meson configure NO sanitize"
         #meson configure -Db_sanitize=address
         echo ">>>>>>>>>>>> running ninja install"
-        #ninja -v -d explain -j 1 install
-        ninja -v -j 3 install
+        ninja -v -d explain -j 1 install
 
     # Also volumes for test plugins
     volumes:
