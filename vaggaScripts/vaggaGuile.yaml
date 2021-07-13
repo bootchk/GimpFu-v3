@@ -1,0 +1,70 @@
+# Container with Guile and Guile-GI
+# Container NOT have Gimp
+gimpGuileGIInstalled:
+  setup:
+  - !Container bablGeglDev
+
+  # guile package for development
+  - !Install [ guile-3.0-dev ]
+  # missing command makeinfo
+  - !Install [ texinfo ]
+
+  # Clone Guile-GI
+  - !Git
+    url: https://github.com/spk121/guile-gi.git
+    path: /work/guile-gi
+  # Build it
+  # ACLOCAL_PATH=/usr/local/share/aclocal ./bootstrap
+  - !Sh |
+      cd /work/guile-gi
+      ./bootstrap
+      ./configure
+      make
+      make install
+
+
+  testDocs: !Command
+    description: Generated and display Python docs
+    container: gimpMesonDocs
+    run: |
+
+      echo "LD_LIBRARY_PATH:" ${LD_LIBRARY_PATH}
+      echo finding libgobject-2.0.so.0
+      find / -name libgobject-2.0.so.0
+      # should be at /usr/lib/x86_64-linux-gnu/
+      echo finding libgtk-3.0.so.0
+      find / -name libgtk-3.0.so.0
+      echo pkgconfig gtk-3
+      pkg-config --modversion gtk-3.0
+      pkg-config --modversion gtk-3.0:amd64
+      #echo dpkg gtk-3
+      #dpkg -l | grep gtk
+      echo ls /usr/lib/x86_64-linux-gnu
+      ls -l /usr/lib/x86_64-linux-gnu/libgobj*
+
+      echo generating docs
+      cd /work/pgi-docgen
+      #./tools/build.sh Gimp-3.0
+      ./tools/build.sh GimpUi-3.0
+      #./tools/build.sh Gtk-3.0
+      #./tools/build.sh Gst-1.0
+
+      echo generating html
+      ./pgi-docgen build _docs _docs/_build
+
+      echo listing built docs
+      ls _docs/_build
+
+  testGuile: !Command
+    description: Run guile in container gimpGuileGIInstalled
+    container: gimpGuileGIInstalled
+    run: |
+      echo "Starting guile"
+      guile
+
+  testGuileGimp: !Command
+    description: Run guile in container gimpMesonInstalled
+    container: gimpMesonInstalled
+    run: |
+      echo "Starting guile"
+      guile

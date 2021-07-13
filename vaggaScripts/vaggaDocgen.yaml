@@ -1,0 +1,14 @@
+  # Container with pgi-docgen generated docs
+  gimpMesonDocs:
+    setup:
+    - !Container gimpMesonInstalled
+    # Arrange that pip installs transitive dependencies
+    # This means that requirements.txt need not contain ALL the transitive dependencies
+    - !PipConfig
+      dependencies: true
+    # Requirements of pgi-docgen
+    # - !Py3Requirements "/work/docgen/requirements.txt"
+    # git clone tool pgi-docgen
+    - !Git
+      url: https://github.com/pygobject/pgi-docgen
+      path: /work/pgi-docgen

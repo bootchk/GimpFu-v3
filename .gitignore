@@ -4,7 +4,8 @@ gimp
 resynthesizer
 gimpBuild
 resynthBuild
-mesonBuild
+mesonGccBuild
+mesonClangBuild
 guile-gi
 pgi-docgen
 gimpfu/__pycache__
@@ -13,3 +14,4 @@ pdb.txt
 *.pyc
 *.html
 *.css
+gimpTestPlugins
