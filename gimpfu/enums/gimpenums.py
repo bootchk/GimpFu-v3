@@ -112,7 +112,7 @@ module_logger.info("from gimpfu.enums.enumTypeSet import EnumTypeSet")
 from gimpfu.enums.enumTypeSet import EnumTypeSet
 
 
-
+module_logger.info("defining enums for GIMP")
 
 """
 TODO open an issue with Gimp:

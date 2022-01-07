@@ -1,0 +1,374 @@
+# Vagga script to build latest GIMP (2.99)
+
+# Requirements of the host machine:
+# vagga installed (see web)
+# uidmap installed
+#     >sudo apt-get install uidmap
+
+# a chain of containers, to minimize rebuilding as changes are made.
+# Each container depends on previous as specified by "!Container foo"
+
+# Goal or current design of this script:
+# 1) use latest packaged dependencies (e.g. glib) from the distribution of the container
+# 2) build artifacts: babl, gegl, gimp
+# 3) install build artifacts in the usual place (don't worry about polluting the container)
+#    i.e. not define any special GIMP_PREFIX
+
+# This is only the AM make with gcc.
+# I.E. not the experimental meson build of gimp, and not a clang c compiler build.
+# But GEGL and BABL build with meson
+
+# We don't set GIMP_PREFIX.  Instead we install to default place e.g. /usr/local/bin
+
+
+containers:
+
+  # basic OS with dev tools
+  baseOSWithDevTools:
+    setup:
+    # 21.04
+    - !Ubuntu hirsute
+
+    # enable universe repository (where gimp lives)
+    - !UbuntuUniverse
+
+    # basic tools for dev (gcc C compiler)
+    - !Install [build-essential]
+    - !Install [gdb]
+
+    # more required build tools
+
+    # GIMP build needs setuptools
+    - !Install [python3-setuptools]
+
+    # meson and autotools use pkg-config
+    - !Install [pkg-config]
+
+    # babl and gegl use meson build system
+    - !Install [meson]
+
+    # we use git to get source
+    - !Install [git]
+
+    # build uses gobject introspection tools
+    - !Install [gobject-introspection]
+
+    # more tools
+    - !Install [ xsltproc]
+
+    # tool to build API docs
+    - !Install [gtk-doc-tools]
+
+    # specific to autotools build
+    - !Install [libtool]
+
+    # in8n internationalization
+    - !Install [intltool]
+
+    # Since 2.99.2, Gimp requires vala compiler
+    - !Install [ valac ]
+
+    # A tool: gtk-encode-symbolic-svg
+    # To search installed packages: dpkg -S gtk-encode-symbolic-svg
+    # To search Ubuntu in browser "Ubuntu Packages Search"
+    # Prior to Ubuntu 20.04:  - !Install [ gtk-3-examples]
+    - !Install [libgtk-3-bin]
+
+
+
+
+  # container with libraries required by Gimp, BABL, GEGL
+  # Also data and stuff needed at GIMP runtime
+
+  withLibraries:
+    setup:
+    - !Container baseOSWithDevTools
+
+    # babl, gegl, GIMP uses glib group of libraries
+    # package comprises glib, gobject, and gio
+    - !Install [glib2.0-dev]
+
+    # the builds deposit introspection data
+    # If omit, get can't find ...gir... when building gegl
+    - !Install [libgirepository1.0-dev]
+
+    # babl specific
+
+    # links against lcms2 (lite color mgt system) library, need the dev flavor
+    - !Install [liblcms2-dev]
+
+    # gegl specific
+
+    # depends on babl (which we build), and these libraries from packages
+    - !Install [libjson-glib-dev]
+
+    # gimp specific
+
+    # Somewhat in reverse order of complain by build
+
+    # plugin interpreters
+    # Python3 PyGObject.  See earlier, installed Python3
+    - !Install [ python3-gi]
+    # lua
+    - !Install [ luajit]
+    - !Install [ lua-lgi ]
+    # javascript
+    - !Install [ gjs]
+
+
+    # plugins, mainly file format plugins?
+    # JPEG format
+    - !Install [ libjpeg-dev]
+    # TIFF format
+    - !Install [ libtiff-dev]
+    # PDF format
+    - !Install [ libpoppler-glib-dev]
+    - !Install [ poppler-data]
+
+    # file compressors
+    - !Install [ liblzma-dev]
+    - !Install [ libbz2-dev]
+
+    # ???
+    - !Install [ libxmu-dev]
+    - !Install [ libappstream-glib-dev]
+    - !Install [ librsvg2-dev]
+
+    # mypaint
+    - !Install [ mypaint-brushes]
+    - !Install [ libmypaint-dev]
+
+    # accessibility toolkit
+    - !Install [ libatk1.0-dev]
+
+    #image metadata
+    - !Install [ libgexiv2-dev]
+
+    # graphics toolkit: GTK and GDK
+    - !Install [ libgtk-3-dev]
+
+    # ?
+    - !Install [ libgdk-pixbuf2.0-dev]
+
+    # renderers
+    - !Install [ libpango1.0-dev]
+    - !Install [ libcairo2-dev]
+
+
+
+    # runtime dependencies
+
+    # optional but suppress warnings
+    - !Install [ libcanberra-gtk3-module ]
+
+    # Ubuntu requires this else Gimp..Gtk crashes with:  Icon 'image-missing' not present in theme Symbolic
+    - !Install [ gnome-icon-theme ]
+
+    # avoid runtime dbus error messages from gimp
+    - !Install [ dbus-x11 ]
+
+    # remove DNS file that vagga will recreate after build
+    # !!! You must do this last, and not at the beginning of a container build
+    - !Sh "rm /etc/resolv.conf"
+
+
+
+
+  # with babl, gegl, gimp source in the container
+  # and with babl, gegl, gimp built and installed
+
+  # gimp requires latest babl, gegl, so we build instead of install
+  # babl and gegl are relatively stable compared to gimp source
+
+  withBuiltGimp:
+    setup:
+    - !Container withLibraries
+
+    # This causes build to fail, can't find git_version.h because this gets only the files, not .git
+    #- !Git
+    #  url: https://gitlab.gnome.org/GNOME/babl.git
+    #  path: /home/babl
+    #  revision: 69e6b090
+
+    # OR use git to clone the repository
+    - !Sh |
+       git clone https://gitlab.gnome.org/GNOME/babl.git /home/babl
+
+    # OR most most recent GIMP release archive
+    # 1.72=>1.74=>1.78=>1.84=>1.86
+    # When you change this, also change below the cd
+    #- !Tar
+    #  url: https://download.gimp.org/pub/babl/0.1/babl-0.1.86.tar.xz
+    #  path: /home
+
+    # PR get tarball from babl project, the very latest i.e. master
+    # Fail with "unexpected compression"  https://gitlab.gnome.org/GNOME/babl/repository/archive.tar.gz
+    # Get a specific sha i.e. commit sha256: 69e6b09067f2bbca7ac0dfda0131042d7d1f448c
+    #- !Tar
+    #  url: https://gitlab.gnome.org/GNOME/babl/master/archive.tar.gz
+    #  path: /home
+
+
+
+    # Gimp depends on latest gegl which might not be released by gegl.org
+    # i.e. get from gimp.org OR get from gegl.org
+    # !!! If you change this, also change below the cd to the gegl dir, named differently
+
+    # Get from gimp.org
+    #- !Tar
+    #  url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.18.tar.xz
+    #  url: https://download.gimp.org/pub/gegl/0.4/gegl-0.4.24.tar.xz
+    #  path: /home
+
+    # Get latest, bleeding, from shared, bare repository at gegl.org
+
+    # !!! Must specify a revision, else vagga will, the first time get the latest
+    # !!! and subsequently cache it indefinitely.  See vagga docs.
+    # !!! But you can't get the latest revision until it is released.
+    # So delete contents of the cache ~/.cache/vagga/cache when gegl changes
+    # Or delete the directory ...cache/git
+    # Or specify the revision that GIMP wants
+    #  Fail: revision: 4.27
+    # Only a specific commit seems to work, look it up at gitlab gegl
+
+    - !Git
+      url: https://gitlab.gnome.org/GNOME/gegl
+      path: /home/gegl
+      revision: 63b8e5f9
+
+    # Get nightly gimp branch "master"
+    - !Git
+      url: https://gitlab.gnome.org/GNOME/gimp
+      path: /home/gimp
+
+
+    # Establish env for builds
+    # !Env is a vagga stmt that sets an env var temporarily
+
+    - !Env
+      # Used to find the glib-introspection dependencies.
+      # gegl builds its introspection data.
+      # To do so, it must find Babl-0.1.gir
+      XDG_DATA_DIRS: "/usr/local/share:/usr/share"
+      LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
+
+    # GIMP build uses pkgconfig to check dependencies
+    - !Sh |
+        echo "PKG_CONFIG_PATH is:" $PKG_CONFIG_PATH
+        echo "XDG_DATA_DIRS is:"   $XDG_DATA_DIRS
+        echo "LD_LIBRARY_PATH is:" $LD_LIBRARY_PATH
+        echo "HOME is:"            $HOME
+        echo "PATH is:"            $PATH
+
+
+    # Build (from source) babl, gegl, gimp
+
+    # build babl
+    - !Sh |
+        cd /home/babl
+        meson _build \
+         --buildtype=debug \
+          -Dwith-docs=false
+        cd _build
+        ninja
+        ninja install
+
+    # build gegl
+    - !Sh |
+        cd /home/gegl
+        meson _build \
+         --buildtype=debug \
+         -Ddocs=false \
+         -Dgtk-doc=false
+        cd _build
+        ninja
+        ninja install
+
+
+   # Build gimp
+
+    # Options
+    # See INSTALL or INSTALL.in file in repository.  Seems definitive
+    - !Sh |
+        cd /home/gimp
+        ./autogen.sh --disable-docs --enable-debug
+        make all-am -j4
+        make install
+
+
+    # remove DNS file that vagga will recreate after build
+    - !Sh "rm /etc/resolv.conf"
+
+    # env that GIMP expects
+    # This is a vagga statement that creates an evironment in the container
+    environ:
+      HOME:            /work/.home
+      GIMP_PREFIX:     /usr/local
+      GEGL_PATH:       /usr/local/lib/x86_64-linux-gnu/gegl-0.4
+      GI_TYPELIB_PATH: /usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      NO_AT_BRIDGE:    1
+      LD_LIBRARY_PATH: /usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}
+      XDG_DATA_DIRS:   /usr/local/share:/usr/share
+      PATH:            /usr/local/bin:/usr/bin:/bin
+
+
+
+
+
+
+
+
+# Commands that run inside a container
+# E.G. >vagga --use-env DISPLAY runAMGimpGUI
+# which runs the gimp app with a GUI
+
+commands:
+
+  getVersionsGimpAM: !Command
+    description: describe versions of stuff in container withBuiltGimp (AM built Gimp)
+    container: withBuiltGimp
+    run: |
+      echo "LD_LIBRARY_PATH" $LD_LIBRARY_PATH
+      echo "autoconf version"             &&  autoconf --version
+      echo "Gegl version from pkg-config" &&  pkg-config --modversion gegl-0.4
+      echo "GLib version from pkg-config" &&  pkg-config --modversion glib-2.0
+      echo "Gimp version from pkg-config" &&  pkg-config --modversion gimp-3.0
+      echo "Python version from python3 --version" && python3 --version
+      echo "PyGObject version from python" &&  python3 -c "from gi.repository import GObject
+      GObject.pygobject_version"
+
+      echo "Gimp version from gimp-2.99 --version" && /usr/local/bin/gimp-2.99 --version
+
+
+  runAMGimpGUI: !Command
+    description: Run gimp GUI in withBuiltGimp container
+    container: withBuiltGimp
+    run: |
+      echo "XDG_DATA_DIRS introspection path ->"    $XDG_DATA_DIRS
+      echo "GI_TYPELIB_PATH introspection path ->"  $GI_TYPELIB_PATH
+
+      # Set env vars to control logging of debug messages and backtraces
+
+      # stop glib
+      #export G_DEBUG=fatal-warnings
+      export G_DEBUG=fatal-criticals
+
+      # all domains, info and debug
+      #export G_MESSAGES_DEBUG=all
+      export G_MESSAGES_DEBUG=scriptfu
+
+      # Per devel-docs/debugging
+      # Mostly GUI messages
+      #export GIMP_DEBUG=all
+
+      # export GIMP_PLUGIN_DEBUG=all,fatal-criticals
+      # !!! Use the filename, not the procedure name
+      #export GIMP_PLUGIN_DEBUG=plug-in-dbbrowser,run
+      #export GIMP_PLUGIN_DEBUG=procedure-browser,fatal-warnings
+      export GIMP_PLUGIN_DEBUG=all,fatal-warnings
+
+      # GimpFu v3
+      export GIMPFU_DEBUG=1
+
+      echo "Starting gimp"
+      /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query

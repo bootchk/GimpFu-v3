@@ -26,12 +26,12 @@ class EnumTypeSet():
 
     def __init__(self):
         self.logger = logging.getLogger("GimpFu.EnumTypeSet")
+        self.logger.info("GimpFu.EnumTypeSet.init")
+
         # !!! voluminous, so enable logging separately from GIMPFU_DEBUG
         # CRITICAL suppresses warnings about overwriting enums
-        self.logger.setLevel(logging.CRITICAL)
-        #self.logger.setLevel(logging.INFO)
-
-        self.logger.info("GimpFu.EnumTypeSet.init")
+        #self.logger.setLevel(logging.CRITICAL)
+        self.logger.setLevel(logging.INFO)
 
         # Map from short, upper case enum name to its enum type.
         self.defined_enums = {}
@@ -42,6 +42,7 @@ class EnumTypeSet():
             # assert name is a short name
             assert not "." in short_name
             self.checked[short_name] = False
+        self.logger.info("return from GimpFu.EnumTypeSet.init")
 
 
     def checkOff(self, name):

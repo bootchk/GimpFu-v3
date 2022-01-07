@@ -26,8 +26,8 @@ containers:
     # 20.4 LTS- !Ubuntu focal
     # June 16, 2020 focal fails at dbus_cil package from glib2_test package
     # 20.10- !Ubuntu groovy
-    # 21.04
-    - !Ubuntu hirsute
+    # 21.04- !Ubuntu hirsute
+    - !Ubuntu impish
 
 
     # enable universe repository (where gimp lives)
@@ -297,18 +297,28 @@ containers:
     #  Fail: revision: 4.27
     # Only a specific commit seems to work, look it up at gitlab gegl
 
-    - !Git
-      url: https://gitlab.gnome.org/GNOME/gegl
-      path: /home/gegl
-      revision: 63b8e5f9
+    - !Sh |
+       echo "about to git gegl"
+
+    # Fails on SSL certificate expired
+    # 0.4.34
+    #- !Git
+    #  url: https://gitlab.gnome.org/GNOME/gegl
+    #  path: /home/gegl
+    #  revision: 9aaf6b35
+
+    # 0.4.??   revision: 63b8e5f9
+
+    - !Sh |
+       git clone https://gitlab.gnome.org/GNOME/gegl.git /home/gegl
+
+    # starting about Dec. 2021, require gexiv2 > 12.2 which is not present in Ubuntu
+
+    - !Sh |
+       git clone https://gitlab.gnome.org/GNOME/gexiv2.git /home/gexiv2
 
 
-    # Get additional tools to build
-
-
-
-
-  # With built babl, gegl
+  # With built babl, gegl, gexiv2
   bablGeglDev:
     setup:
     - !Container gimpDepsSource
@@ -397,6 +407,16 @@ containers:
         ninja
         ninja install
 
+
+    #
+    - !Sh |
+        cd /home/gexiv2
+        meson _build \
+         --buildtype=debug
+        cd _build
+        ninja
+        ninja install
+
     # remove DNS file that vagga will recreate after build
     - !Sh "rm /etc/resolv.conf"
 
@@ -451,6 +471,9 @@ containers:
     - !Sh echo "introspection path ->"  $XDG_DATA_DIRS
     - !Sh echo "binary path ->" $PATH
 
+    # TEMP for debug
+    - !Install [strace]
+
 
     # TEMP to test autoconf 2.70 Mar 20, 2021
 
@@ -496,10 +519,11 @@ containers:
       path:  /home/gimp
 
     # address,bounds,bounds-strict,alignment,object-size
-    # CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs --enable-debug --with-pdbgen
+    #CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs --enable-debug --with-pdbgen --disable-gi-docgen
+    # OR:  ./autogen.sh --disable-docs --enable-debug --disable-gi-docgen
     - !Sh |
         cd /home/gimp
-        ./autogen.sh --disable-docs --enable-debug
+        CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs --enable-debug --with-pdbgen --disable-gi-docgen
         make all-am -j4
         make install
 
@@ -568,8 +592,27 @@ containers:
   #    pgi-docgen build /work/.home/_docs /work/.home/_docs/_build
 
 
+  # julia and GIMP
+  juliaDev:
+    setup:
+    - !Container gimpAMDev
+    # install both REPL and dev libraries
+    - !Install [libjulia-dev]
+    - !Install [julia]
 
+    # load package at container build time, since volume read only at runtime
+    #- !Sh |
+    #    julia -e 'using Pkg; Pkg.add("Gtk")'
 
+    environ:
+      HOME:            /work/.home
+      GIMP_PREFIX:     /usr/local
+      GEGL_PATH:       /usr/local/lib/x86_64-linux-gnu/gegl-0.4
+      GI_TYPELIB_PATH: /usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      NO_AT_BRIDGE:    1
+      LD_LIBRARY_PATH: /usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}
+      XDG_DATA_DIRS:   /usr/local/share:/usr/share
+      PATH:            /usr/local/bin:/usr/bin
 
 
 
@@ -651,7 +694,8 @@ containers:
          -Dg-ir-doc=false \
          -Dgtk-doc=false
 
-
+    - !Sh |
+        ls /work/mesonGccBuild
 
   # Container with meson and clang built GIMP installed
   # !!! source and build dirs not in the container, but container depends on it.
@@ -899,6 +943,8 @@ commands:
     description: Run gimp GUI in gimpAMDev container, with locally installed plugins
     container: gimpAMDev
     run: |
+      echo "XDG_DATA_DIRS introspection path ->"  $XDG_DATA_DIRS
+      echo "GI_TYPELIB_PATH introspection path ->"  $GI_TYPELIB_PATH
 
       # local plugins in /work/.home/.config/GIMP/2.99/plug-ins
       # !!! outside the container
@@ -949,13 +995,24 @@ commands:
       export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
       echo $PYTHONPATH
 
-      # stop glib at warnings
+      # debugging wayland
+      echo "DISPLAY->"          $DISPLAY
+      echo "XDG_SESSION_TYPE->" $XDG_SESSION_TYPE
+      # export XDG_SESSION_TYPE=wayland
+      # echo "XDG_SESSION_TYPE->" $XDG_SESSION_TYPE
+      echo "GDK_BACKEND->"      $GDK_BACKEND
+      # Fails export GDK_BACKEND=wayland
+      # Fails export DISPLAY=wayland-0
+      echo "DISPLAY->"  $DISPLAY
+
+
+      # stop glib at warnings, without catching in GIMP
       #export G_DEBUG=fatal-warnings
-      export G_DEBUG=fatal-criticals
+      #export G_DEBUG=fatal-criticals
 
       # all domains, info and debug
       #export G_MESSAGES_DEBUG=all
-      export G_MESSAGES_DEBUG=scriptfu
+      #export G_MESSAGES_DEBUG=scriptfu
 
       # Per devel-docs/debugging
       # Mostly GUI messages
@@ -971,13 +1028,16 @@ commands:
       # !!! Use the filename, not the procedure name
       #export GIMP_PLUGIN_DEBUG=plug-in-dbbrowser,run
       #export GIMP_PLUGIN_DEBUG=procedure-browser,fatal-warnings
-      export GIMP_PLUGIN_DEBUG=all,fatal-warnings
+      #export GIMP_PLUGIN_DEBUG=all,fatal-warnings
 
-      export GIMPFU_DEBUG=1
+      #export GIMPFU_DEBUG=1
 
       echo "Starting gimp"
       # /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode always
+      # strace
       /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+      ls -al
+      gdb
 
 
 
@@ -1107,7 +1167,11 @@ commands:
       echo "Running gimp"
       /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
 
-
+  describeMesonDev: !Command
+    description: Describe versions in gimpMesonDev container, but do not
+    container:  gimpMesonDev
+    run: |
+      gcc --version
 
   # quicker startup
   generateGIDocs: !Command
@@ -1153,3 +1217,55 @@ commands:
       echo "Try this:  ninja -v -d explain -j 1 install"
       echo "Ctl-D to exit bash and container"
       bash
+
+  testJulia: !Command
+    description: Compile julia test program
+    container:  juliaDev
+    write-mode: transient-hard-link-copy
+    run: |
+      echo "GI_TYPELIB_PATH introspection path ->"  $GI_TYPELIB_PATH
+      echo "Gimp version from pkg-config"
+      pkg-config --modversion gimp-3.0
+      #echo "libgimp"
+      #ldconfig -p | grep libgimp
+      echo "julia version"
+      julia -v
+      #echo "find julia"
+      #find . -name julia
+      echo "JULIA_DEPOT_PATH" $JULIA_DEPOT_PATH
+      #echo "compile julia"
+      #julia /work/test.jl
+      echo find julia/sys.so
+      find /usr -name sys.so
+      export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/julia
+      which julia
+      export JULIA_BINDIR=/usr/bin
+
+      echo  "build test c program that embeds Julia"
+      cd juliaFuFu
+      gcc -o juliaFu -fPIC -I/usr/include/julia -L/usr/lib -Wl,-rpath,/usr/lib juliaFu.c -ljulia
+
+      echo exec program embedding Julia
+      /work/juliaFuFu/juliaFu
+
+  testJuliaScript: !Command
+    description: Run test.jl
+    container:  juliaDev
+    write-mode: transient-hard-link-copy
+    run: |
+        cd juliaFuFu
+
+        # build the library that test.jl will call
+        meson setup --wipe _build
+        # meson compile -C _build
+        cd _build
+        meson install
+
+        echo "find library we just built and installed"
+        find /usr -name libjuliafu.so
+
+        # julia /work/juliaFuFu/test.jl
+
+        #cat /usr/include/julia/julia.h
+
+        julia

@@ -22,7 +22,7 @@ class GimpType():
     # CRITICAL suppresses messages about overwriting already defined symbols
     # WARNING is the usual
     logger.setLevel(logging.WARNING)
-    #logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG)
 
 
     @classmethod
@@ -31,7 +31,10 @@ class GimpType():
         cls.logger.debug(f"list_gimp_enums")
 
         # call libgimp function.
-        gtype_names, count_names = Gimp.enums_get_type_names()
+        # This is first use of gir, which may crash.  No use to try: except:
+        # TEMP gtype_names, count_names = Gimp.enums_get_type_names()
+        gtype_names = []
+
         """
         Names are like GimpImageType i.e. not in dot notation, but a GType name.
         Except some are like GeglDistanceMetric !!!!
