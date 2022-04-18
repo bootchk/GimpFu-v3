@@ -24,10 +24,10 @@ from gimpfu.message.deprecation import Deprecation
 import logging
 
 
-import gettext
-t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
-_ = t.gettext
-
+"""
+i18n: there is some use of _() here.
+Assume _() is already in builtin scope.
+"""
 
 
 """

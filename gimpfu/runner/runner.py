@@ -248,19 +248,28 @@ class FuRunner:
     '''
 
     '''
-    Two versions, circa 2.99.6 the signature changed for multi-layer.
+    Several versions, circa 2.99.6 the signature changed for multi-layer.
+    OLD: single      ..., drawable, ...
+    NEW: multiple    ..., count_drawables, drawables_array, ...  explicitly passing the count
+    NEW2: multiple   ..., drawables_array, ...                   not passing the count
+
 
     Create the procedure registering one of these two run funcs.
     '''
+
+    '''
+    Note that PyGObject binding:
+        makes drawables a list
+        should eat count_drawables, but doesn't (unlike binding for Lua)
+    '''
+
     @staticmethod
     def run_imageprocedure_multiple(procedure, run_mode, image, count_drawables, drawables, original_args, data):
         """
-        Mangle args for a procedure of type/signature Image
-
-        Signature is (run mode, image, drawable, ...)
+        Run procedure on multiple drawables
         """
-        # For now, hide multi-layer API
-        if count_drawables > 1 :
+        # For now, not implement multi-layer functionality
+        if len(drawables) > 1 :
             FuResult.makeException(procedure, "GimpFu does not support multi-layer yet.")
         else:
             drawable = drawables[0]

@@ -1,0 +1,51 @@
+
+Internationalization, i18n
+
+This is about how plugins are translated for languages other than English.
+
+Note that most GimpFu v3 plugins will not become part of Gimp.org.
+Thus they don't need to be internationalized.
+If you distribute your plugin and want to internationalize it,
+you are responsible for building the translation files and installing them.
+
+GimpFu v3 does put the _() function (an alias for the gettext function that translates)
+into scope for your plugin.
+
+However, it also sets the domain to "gimp30-python".
+That domain is usually used for the Python plugins distributed with GIMP
+that using GObject Introspection.
+There is no convenient way to get translations into the files for that domain.
+
+GimpFu itself has no internationalized text (at the moment.)
+
+The dialog for a plugin is (or will be) implemented by Gimp,
+so some GUI text is translated by GIMP.
+
+The text for the control widgets of a plugin's dialog are specified in
+the register() function of GimpFu and must be internationalized there.
+Again, there is no convenient way to get the translations into the "gimp30-python" domain.
+If you insist on internationalizing your GimpFu v3 plugin,
+you should:
+    use another domain e.g. "myPlugin"
+    make the appropriate calls to gettext before calling register().
+    build the translation  files and install them in the standard locale directory for the domain
+
+Test plans:
+
+Test that GimpFu v3 does not crash under another language.
+
+   1.  Start GIMP
+   2.  Choose Edit>Preferences>Language and choose another language from the pulldown
+   3.  Restart GIMP
+
+      Expect that text in GIMP is translated
+
+   4.  Invoke a GimpFu v3 plugin with a dialog.
+
+      Expect:
+      1.  GimpFu does not throw Python exceptions and crash.
+      2.  The labels on widgets in the plugin dialog is NOT translated
+
+Test that a GimpFu v3 plugin can be translated
+
+  TODO implement as cited above and test that dialog control labels get translated.

@@ -72,11 +72,18 @@ Standard module API
 Some standard modules changed API from Python 2 to Python 3
 
 Examples:
+
+    The standard Python module for gettext has changed in Python 3
+
     import gettext  # standard module
     gettext.install("gimp20-python", gimp.locale_directory, unicode=True) =>
-         gettext.install("gimp30-python", gimp.locale_directory)
+         gettext.install("gimp30-python", Gimp.locale_directory())
 
-
+    Note that most GimpFu v3 plugins will not become part of Gimp.org.
+    Thus they don't need to be internationalized.
+    If you distribute your plugin and want to internationalize it,
+    you are responsible for building the translation files and installing them.
+    GimpFu v3 does put the _() function (that translates) into scope for your plugin.
 
 Obsolete Modules
 -----------------------

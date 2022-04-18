@@ -523,7 +523,7 @@ containers:
     # OR:  ./autogen.sh --disable-docs --enable-debug --disable-gi-docgen
     - !Sh |
         cd /home/gimp
-        CFLAGS="-fsanitize=address -fno-omit-frame-pointer" ./autogen.sh --disable-docs --enable-debug --with-pdbgen --disable-gi-docgen
+        ./autogen.sh --disable-docs --enable-debug --disable-gi-docgen --without-vala
         make all-am -j4
         make install
 
@@ -597,7 +597,7 @@ containers:
     setup:
     - !Container gimpAMDev
     # install both REPL and dev libraries
-    - !Install [libjulia-dev]
+    #- !Install [libjulia-dev]
     - !Install [julia]
 
     # load package at container build time, since volume read only at runtime
@@ -691,7 +691,6 @@ containers:
          -Dlua=false \
          -Dpython=true \
          -Dvala-plugins=disabled \
-         -Dg-ir-doc=false \
          -Dgtk-doc=false
 
     - !Sh |
@@ -927,6 +926,19 @@ commands:
       ./configure --help
 
 
+  installMyPluginsToHome: !Command
+    description: Install a set of plugins to .home/.config/GIMP/2.99/plug-ins (seen by all containers)
+    container: gimpMesonDev
+    run: |
+      echo "Not clearing plugins"
+
+      # Refresh installation of gimpfu from development gimp_directory
+      # Copy entire directory
+      echo "Copying gimpfu"
+      cp -rv /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
+
+
+
   # if you have yelp installed outside the container, and pwd is vaggaGimp, just "yelp .home/gimp-doc"
 
   # export GEGL_PATH="/usr/local/bin/gegl"
@@ -936,6 +948,7 @@ commands:
   # For asan
   #export LD_PRELOAD=$(gcc -print-file-name=libasan.so)
   # each version of gcc has its own libasanx
+
   # this may not be necessary
   # - !Install [ libx32asan5 ]
 
@@ -945,6 +958,8 @@ commands:
     run: |
       echo "XDG_DATA_DIRS introspection path ->"  $XDG_DATA_DIRS
       echo "GI_TYPELIB_PATH introspection path ->"  $GI_TYPELIB_PATH
+
+      which julia
 
       # local plugins in /work/.home/.config/GIMP/2.99/plug-ins
       # !!! outside the container
@@ -1005,39 +1020,44 @@ commands:
       # Fails export DISPLAY=wayland-0
       echo "DISPLAY->"  $DISPLAY
 
+      # ASAN
+      ## export LD_PRELOAD=$(gcc -print-file-name=libasan.so)
+      echo "LD_PRELOAD:" $LD_PRELOAD
+      # suppress error return on leaks from subprocesses
+      export ASAN_OPTIONS=detect_leaks=0
+
 
       # stop glib at warnings, without catching in GIMP
       #export G_DEBUG=fatal-warnings
-      #export G_DEBUG=fatal-criticals
+      export G_DEBUG=fatal-criticals
 
       # all domains, info and debug
-      #export G_MESSAGES_DEBUG=all
+      export G_MESSAGES_DEBUG=all
       #export G_MESSAGES_DEBUG=scriptfu
 
       # Per devel-docs/debugging
       # Mostly GUI messages
       #export GIMP_DEBUG=all
 
-      # This fails to open a terminal ?
-      # /usr/bin/gnome-terminal &
-
-      # Also fails: gimp --stack-trace-mode=always
-      # should be space, not = ??
-
       # export GIMP_PLUGIN_DEBUG=all,fatal-criticals
       # !!! Use the filename, not the procedure name
       #export GIMP_PLUGIN_DEBUG=plug-in-dbbrowser,run
       #export GIMP_PLUGIN_DEBUG=procedure-browser,fatal-warnings
-      #export GIMP_PLUGIN_DEBUG=all,fatal-warnings
+      export GIMP_PLUGIN_DEBUG=all,fatal-warnings
 
       #export GIMPFU_DEBUG=1
 
       echo "Starting gimp"
-      # /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode always
+      # Fail: gimp --stack-trace-mode=always   should be space, not = ??
+
+      /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode always
       # strace
-      /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
-      ls -al
+      #/usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+      # ls -al
       gdb
+
+      # This fails to open a terminal ?
+      # /usr/bin/gnome-terminal &
 
 
 
@@ -1147,25 +1167,42 @@ commands:
     container:  gimpMesonDev
     write-mode: transient-hard-link-copy
     run: |
+      echo "lkk meson compile GIMP"
       #export GI_SCANNER_DEBUG=1
       cd /work/mesonGccBuild
       #echo "lkk meson configure ASAN"
       #meson configure -Db_sanitize=address
       echo "lkk meson gcc compile GIMP"
       meson compile v -d explain -j 1
+
       echo "lkk ninja install GIMP"
       # Can't install to the read-only container unless it is write-mode: ....
       ninja -v -d explain -j 1 install
 
+      # Setup env, the container does not do this
       export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu:/usr/local/lib
       export HOME=/work/.home
       export GIMP_PREFIX=/usr/local
       export XDG_DATA_DIRS=/usr/local/share:/usr/share
+      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      export NO_AT_BRIDGE=1
 
+      echo "Altering PYTHONPATH to find GimpFu"
+      export PYTHONPATH=/work:${PYTHONPATH}
+
+      echo "Usually plugins are already installed to .home/.config..."
       echo "Copying scriptfu scripts"
       cp -rv /work/gimpTestPlugins/scriptFu/testUndefinedFunc.scm /work/.home/.config/GIMP/2.99/scripts
+
+      #echo "G_DEBUG fatal-crit"
+      #export G_DEBUG=fatal-criticals
+      export GIMPFU_DEBUG=1
+
       echo "Running gimp"
       /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+      # /usr/local/bin/gimp-2.99 --stack-trace-mode query
+
+
 
   describeMesonDev: !Command
     description: Describe versions in gimpMesonDev container, but do not
@@ -1218,7 +1255,13 @@ commands:
       echo "Ctl-D to exit bash and container"
       bash
 
-  testJulia: !Command
+
+
+
+
+
+
+  juliaTest: !Command
     description: Compile julia test program
     container:  juliaDev
     write-mode: transient-hard-link-copy
@@ -1248,7 +1291,7 @@ commands:
       echo exec program embedding Julia
       /work/juliaFuFu/juliaFu
 
-  testJuliaScript: !Command
+  juliaScript: !Command
     description: Run test.jl
     container:  juliaDev
     write-mode: transient-hard-link-copy
@@ -1268,4 +1311,38 @@ commands:
 
         #cat /usr/include/julia/julia.h
 
+        julia
+
+
+  juliaPlugin: !Command
+    description: Run GIMP with a Julia interpreter and plugin
+    container:  juliaDev
+    write-mode: transient-hard-link-copy
+    run: |
+        echo "which julia"
+        which julia
+
+        echo "HOME"            $HOME
+
+        echo "cat julia.interp"
+        cat .home/.config/GIMP/2.99/interpreters/julia.interp
+
+        echo "ls plugins"
+        ls .home/.config/GIMP/2.99/plug-ins
+
+        echo "Running gimp"
+        /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+
+  juliaGI: !Command
+    description: Test Julia GI of GimpParasite
+    container:  juliaDev
+    write-mode: transient-hard-link-copy
+    run: |
+        echo "which julia"
+        which julia
+
+        echo "HOME"            $HOME
+
+        echo "Running julia"
+        # julia /work/juliaFuFu/testGI.jl
         julia

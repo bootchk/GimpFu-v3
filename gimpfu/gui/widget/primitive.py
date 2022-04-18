@@ -19,12 +19,8 @@ from gimpfu.gui.value_error import EntryValueError
 
 
 """
-gi.require_version("Gimp", "3.0")
-from gi.repository import Gimp  # only for locale?
-
-import gettext
-t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
-_ = t.gettext
+i18n: there is some use of _() here.
+Assume _() is already in builtin scope.
 """
 
 

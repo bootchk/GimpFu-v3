@@ -203,22 +203,24 @@ gimp = GimpfuGimp()
 
 
 logger.info("Initializing i18n")
-# localization, i18n
-# Python 3 ugettext() is deprecated, use gettext() which also returns unicode
+'''
+localization, i18n
+
+Here the call to gettext.install installs an alias _() into built-in scope (global.)
+
+If instead a plugin author wants to internationalize their plugin,
+or a module of their plugin,
+they might use this code in their modules:
+    t = gettext.translation("myPlugin", Gimp.locale_directory(), fallback=True)
+    _ = t.gettext
+
+See docs/internationalization.txt.
+'''
 import gettext
-'''
-This does not seem to export to the plugin, but maybe we should not.
-This works for this module only.
-See Python gettext documentation.
-Should we install _ locally, or globally?
-Note that this module itself has no translated strings (yet)
-
-t = gettext.translation("gimp30-python", Gimp.locale_directory, fallback=True)
-# similar as gettext.install(): put _() in namespace
-_ = t.gettext
-'''
-
 gettext.install("gimp30-python", Gimp.locale_directory())
+
+logger.warning(f"translations for domain gimp30-python in {Gimp.locale_directory()}")
+
 
 # v2 defined this.  FBC, keep it in v3.
 # But most plugins that use it are probably not doing runtime localization.
