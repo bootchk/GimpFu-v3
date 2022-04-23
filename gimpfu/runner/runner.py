@@ -4,7 +4,7 @@ import gi
 gi.require_version("Gimp", "3.0")
 from gi.repository import Gimp
 
-from gimpfu.procedure.procedure_config import FuProcedureConfig
+from gimpfu.procedureConfig.procedure_config import FuProcedureConfig
 from gimpfu.procedures.procedures import FuProcedures
 
 from gimpfu.adaption.marshal import Marshal
@@ -14,6 +14,8 @@ from gimpfu.message.deprecation import Deprecation
 from gimpfu.message.suggest import Suggest
 
 from gimpfu.runner.result import FuResult
+
+# See below, more, alternative imports
 
 import logging
 
@@ -162,27 +164,28 @@ class FuRunner:
             #TODO duplicate??
             fuProcedure.on_run()
 
-            from gimpfu.gui.control_dialog import PluginControlDialog
-
+            """
+            The procedure knows what its guiable args are (versus args such as "image", already fixed and not guiable).
+            The guiable args are similar to a ProcedureConfig.
+            Here we use the GimpFu implementation.
+            Instead, we could just use the config?
+            """
             nonguiable_actual_args, guiable_actual_args = fuProcedure.split_guiable_actual_args(list_wrapped_args)
-            FuRunner.logger.info(f"in guiable args: {guiable_actual_args}")
+            # FuRunner.logger.info(f"in guiable args: {guiable_actual_args}")
 
-            '''
-            If you omit this next step, it does not use last_values, instead
-            using actual_args, which will be defaults in many cases.
-            '''
-            # Wrong: config.get_initial_settings(guiable_actual_args)
-            # TEMP: this is correct, but not working:
-            # TODO what is wrong here???
-            # Is the config persistent across changes to the plugin definition?
-            # Who handles run with last values?
-            # guiable_actual_args = config.get_initial_settings()
+            """ Choice of implementation here. """
 
-            was_canceled, guied_args = PluginControlDialog.show(
-                fuProcedure,
-                gimpProcedure,
-                guiable_actual_args,
-                guiable_formal_params)
+            # choice 1: use gimpfu.gui
+            from gimpfu.gui.gimpfu_controls_runner import GimpFuControlsRunner
+            was_canceled, guied_args = GimpFuControlsRunner.run(
+                fuProcedure, gimpProcedure, list_wrapped_args, guiable_formal_params)
+
+            # choice 2: use GimpUi
+            # WIP April 23, 2020 works with many missing widgets and proceeds past many errors in GIMP
+            #from gimpfu.gui.gimp_controls_runner import GimpControlsRunner
+            #was_canceled, guied_args = GimpControlsRunner.run(
+            #    fuProcedure, gimpProcedure, config)    # , list_wrapped_args, guiable_formal_params)
+
             # assert results from dialog are primitives or unwrapped GIMP objects
 
             if not was_canceled :

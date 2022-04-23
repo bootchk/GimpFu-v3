@@ -15,6 +15,9 @@ Thin wrapper around Gimp and GTK functions.
 Provides parent widget for ControlDialog and ExceptionDialog
 
 implemented using Gimp.Dialog, which takes care of parenting
+
+But is not a Gimp.ProcedureDialog;
+is an alternative implementation of Gimp.ProcedureDialog
 """
 
 

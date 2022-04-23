@@ -1,8 +1,14 @@
 
 '''
+GUI, a control dialog for the author's plugin.
+
+Implemented in Python=>PyGObject=>Gtk (with some use of GimpUi)
+
+
 !!!
 This all should go away when Gimp support for auto plugin GUI lands in Gimp 3.
 Not well known that such support is on the roadmap.
+Then the GUI is implemented in calls to Python=>PyGObject=>GimpUi=>Gtk
 '''
 
 import gi
@@ -30,22 +36,7 @@ Assume _() is already in builtin scope.
 """
 
 
-"""
-Probably CRUFT
-# FUTURE i.e. work in progress
-# TODO param guiable_initial_values of type Gimp.ValueArray.
-def show_plugin_procedure_dialog():
-    '''
-    Implement using Gimp.ProcedureDialog
 
-    Gimp is capable of displaying a dialog for a Gimp.Procedure.
-    It takes a ProcedureConfig.
-    Before the dialog run, ProcedureConfig contains initial values for widgets.
-    After the dialog run, ProcedureConfig contains values the user chose.
-    '''
-    procedureDialog = Gimp.ProcedureDialog.new(procedure, config, 'foo')
-    procedureDialog.run()
-  """
 
 
 class PluginControlDialog():

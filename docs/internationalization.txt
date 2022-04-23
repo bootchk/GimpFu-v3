@@ -30,6 +30,11 @@ you should:
     make the appropriate calls to gettext before calling register().
     build the translation  files and install them in the standard locale directory for the domain
 
+Note that gimp.locale_directory is no longer defined as a Python variable.
+Instead you can use a call to the function Gimp.locale_directory()
+
+
+
 Test plans:
 
 Test that GimpFu v3 does not crash under another language.

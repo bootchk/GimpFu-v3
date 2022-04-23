@@ -42,13 +42,15 @@ class PropHolderFactory():
 
         Indentation important on template strings.
         # type, nick, blurb, default, min, max, flags
+
+        nick is the documentary name of the property, i.e. nickname, almost always the same as the name of the property
         """
         # TODO float() for float, insure is proper type literal
         self.template_string_numeric = r'''
 global Foo
 class Foo(GObject.GObject):
     __gproperties__ = {
-        "$name": ($type, "nick", "blurb", $min, $max, $default, GObject.ParamFlags.READWRITE ),
+        "$name": ($type, "$name", "blurb", $min, $max, $default, GObject.ParamFlags.READWRITE ),
     }
 '''
 
@@ -57,7 +59,7 @@ class Foo(GObject.GObject):
 global Foo
 class Foo(GObject.GObject):
   __gproperties__ = {
-    "$name": ($type, "nick", "blurb", "$default", GObject.ParamFlags.READWRITE ),
+    "$name": ($type, "$name", "blurb", "$default", GObject.ParamFlags.READWRITE ),
   }
 '''
 
@@ -69,7 +71,7 @@ class Foo(GObject.GObject):
 global Foo
 class Foo(GObject.GObject):
   __gproperties__ = {
-    "$name": ($type, "nick", "blurb", GObject.ParamFlags.READWRITE ),
+    "$name": ($type, "$name", "blurb", GObject.ParamFlags.READWRITE ),
   }
 '''
 
@@ -77,7 +79,7 @@ class Foo(GObject.GObject):
 
 
     """
-    TODO also pass blurb and nick, substitute into template
+    TODO also pass blurb, substitute into template
     """
     def produce(self, unique_prop_name, type, default, min, max):
         """

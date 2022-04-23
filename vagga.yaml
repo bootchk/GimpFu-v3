@@ -1188,6 +1188,7 @@ commands:
       export NO_AT_BRIDGE=1
 
       echo "Altering PYTHONPATH to find GimpFu"
+      echo "!!! This finds the repo for GimpFu, no need to install it in gimp/plug-ins"
       export PYTHONPATH=/work:${PYTHONPATH}
 
       echo "Usually plugins are already installed to .home/.config..."

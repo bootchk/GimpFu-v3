@@ -222,12 +222,20 @@ class Types():
 
     @staticmethod
     def convert_gimpvaluearray_to_list_of_gvalue(array):
-        ''' Convert type of array from  to from *GimpValueArray*, to *list of GValue*. '''
+        ''' Convert from type *GimpValueArray*, to *list of GValue*. '''
 
         list_of_gvalue = []
-        len = array.length()   # !!! not len(actual_args)
+        len = array.length()   # !!! not len()
+        Types.logger.info(f"convert_gimpvaluearray_to_list_of_gvalue length: {len}")
         for i in range(len):
-            gvalue = array.index(i)
+            try:
+                gvalue = array.index(i)
+            except:
+                from gimpfu.adaption.generic_value import FuGenericValue 
+                # Probably a bug in Gimp
+                proceed(f"Fail GimpValueArray.index() at index: {i}.")
+                # Fixup with some arbitrary GValue
+                gvalue = FuGenericValue.new_int_gvalue()
             # Not convert elements from GValue to Python types
             list_of_gvalue.append(gvalue)
 

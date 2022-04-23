@@ -18,9 +18,14 @@ import logging
 class FuProcedureConfig():
     """
     Wraps Gimp.ProcedureConfig
+    A FuProcedureConfig owns (wraps) a Gimp.ProcedureConfig.
 
     A ProcedureConfig is a set of settings for a plugin.
-    It remembers "last values."
+    Each setting is a property the Gimp.ProcedureConfig.
+    Settings are one-to-one with arguments of the corresponding Gimp.Procedure,
+    plus an added property "procedure" ( why, seems like poor design??)
+
+    A Gimp.ProcedureConfig also understands "defaults" and "last values."
     Before a user interaction (GUI dialog), the settings initialize the dialog control's values.
     After a user interaction, a ProcedureConfig is updated with changed settings.
     Gimp sends a ProcedureConfig in a run() call when Gimp invokes the plugin.
@@ -30,6 +35,7 @@ class FuProcedureConfig():
     Persists it at least over a Gimp session,
     so that the user can "Repeat" or "Re-show" a plugin
     and it will use the persisted settings (the last values.)
+
     Gimp also persists ProcedureConfig across Gimp sessions,
     so that next time a user uses a plugin, the initial dialog settings match
     the last use of the dialog in the last session of Gimp.
@@ -41,8 +47,9 @@ class FuProcedureConfig():
         [get_initial_settings(), <show dialog()>, set_changed_settings()],
         end_run()
 
-    A FuProcedureConfig owns (wraps) a Gimp.ProcedureConfig.
-    A ProcedureConfig owns a GimpValueArray, will get() and set() it.
+    A Gimp.ProcedureConfig owns a GimpValueArray, will get() and set() it.
+    A FuProcedureConfig will also get/set by other types, such as list of
+    elements that are not GValues.
     """
 
 
@@ -125,9 +132,11 @@ class FuProcedureConfig():
         """
         self.logger.debug(f"_get_property_value name: {name}")
         try:
+            # get property of the wrapped Gimp.PropertyConfig
             result = self._config.get_property(name)
         except TypeError:
-            """ Usually property not exist.
+            """
+            Usually property not exist.
             Because failed to convey args to Gimp.
             Because of current limitations of patches to Gimp.
             "GParamBoxed is not handled"
@@ -169,12 +178,16 @@ class FuProcedureConfig():
             value = self._get_property_value(name)
             # assert value is-a GValue
             result.append(value)
+
+        # ensure result is-a Gimp.ValueArray
+        self.logger.debug(f"_get_values_using_config_properties length: {length}")
         return result
 
 
 
-    def _get_values(self):
-        """ Get current values out of self.
+    def get_value_array(self):
+        """
+        Get current values out of self.
         Returns Gimp.ValueArray.
         """
         # ??? choice of implementation
@@ -182,12 +195,13 @@ class FuProcedureConfig():
         result = self._get_values_using_config_properties()
         return result
 
+    def get_list_of_wrapped_values(self):
+        """
+        Get current values out of self.
+        Returns list of wrapped values.
+        """
 
-
-    def get_initial_settings(self):
-        """ Returns wrapped values from self, to be passed as initial (last) values to a dialog. """
-
-        value_array = self._get_values()
+        value_array = self.get_value_array()
 
         # Assert config length > 0.  Should not be called unless there one or more guiable args.
         assert value_array.length() > 0
@@ -195,9 +209,13 @@ class FuProcedureConfig():
         values_list = Types.convert_gimpvaluearray_to_list_of_gvalue(value_array)
         wrapped_arg_list = Marshal.wrap_args(values_list)
         # assert values_list is a list of GValues, not prefixed with image, drawable
-        self.logger.debug(f"get_initial_settings: {wrapped_arg_list}")
+        self.logger.debug(f"get_list_of_wrapped_values: {wrapped_arg_list}")
         return wrapped_arg_list
 
+
+    def get_initial_settings(self):
+        """ Returns wrapped values from self, to be passed as initial (last) values to a dialog. """
+        return self.get_list_of_wrapped_values()
 
 
     '''
@@ -259,7 +277,7 @@ class FuProcedureConfig():
         Get the current values in the Gimp.ProcedureConfig.
         The values are still what existed when Gimp invoked the plugin.
         """
-        value_array = self._get_values()
+        value_array = self.get_value_array()
 
         # assert value_array same size as registered args
         # and is appropriate length for set_values()
