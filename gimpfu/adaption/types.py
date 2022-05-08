@@ -57,10 +57,28 @@ class Types():
 
     @staticmethod
     def try_file_descriptor_conversion(formal_arg_type, gen_value):
-        if isinstance(gen_value.actual_arg, str):
-            formal_arg_type_name = formal_arg_type.name
-            if FormalTypes.is_file_descriptor_type(formal_arg_type_name):
+        """
+        Here we first check that a file descriptor is wanted.
+        Then we check whether we convert a string filename.
+        Then we check whether it already is a gtype that is-a file.
+        """
+        formal_arg_type_name = formal_arg_type.name
+        if FormalTypes.is_file_descriptor_type(formal_arg_type_name):
+            # Yes, we need a GFile
+            if isinstance(gen_value.actual_arg, str):
                 gen_value.to_file_descriptor()
+            else:
+                Types.logger.warning(f"GFile needed but str not passed.")
+
+            """
+            TODO:
+            if it already is a GObject of type GLocalFile,
+            we simply need to make a GValue, telling it the type is GFile.
+            We really expect a str, to accept a GLocalFile might be more forgiving.
+            elif gen_value.actual_arg.__gtype__ == GLocalFile
+            """
+
+
 
 
     @staticmethod
@@ -231,7 +249,7 @@ class Types():
             try:
                 gvalue = array.index(i)
             except:
-                from gimpfu.adaption.generic_value import FuGenericValue 
+                from gimpfu.adaption.generic_value import FuGenericValue
                 # Probably a bug in Gimp
                 proceed(f"Fail GimpValueArray.index() at index: {i}.")
                 # Fixup with some arbitrary GValue

@@ -696,6 +696,13 @@ containers:
     - !Sh |
         ls /work/mesonGccBuild
 
+    # Also volumes for test plugins
+    volumes:
+      /work/testGimpPDB: !BindRO /volumes/testGimpPDB
+
+
+
+
   # Container with meson and clang built GIMP installed
   # !!! source and build dirs not in the container, but container depends on it.
   # vagga will rebuild container if gimp source changes.
@@ -930,12 +937,70 @@ commands:
     description: Install a set of plugins to .home/.config/GIMP/2.99/plug-ins (seen by all containers)
     container: gimpMesonDev
     run: |
+
+      # Copy some plugins from volumes of the container
+
       echo "Not clearing plugins"
+      #echo "Removing old plugins and gimpfu source"
+      #rm -rf /work/.home/.config/GIMP/2.99/plug-ins/*
+
+      # local plugins in /work/.home/.config/GIMP/2.99/plug-ins
+      # !!! outside the container
+      mkdir /work/.home/.config/GIMP/2.99/plug-ins
 
       # Refresh installation of gimpfu from development gimp_directory
       # Copy entire directory
       echo "Copying gimpfu"
       cp -rv /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
+
+      # Refresh installation of testGIMPPDB
+      echo "Copying testGimpPDB"
+      #mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
+      cp -r /work/testGimpPDB /work/.home/.config/GIMP/2.99/plug-ins
+      chmod +x /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB/testGimpPDB.py
+
+      echo "Copying selected scriptfu scripts"
+      # cp -rv /work/gimpTestPlugins/scriptFu/testUndefinedFunc.scm /work/.home/.config/GIMP/2.99/scripts
+      #cp -rv /work/gimpTestPlugins/scriptFu/testUndefinedFunc.scm /work/.home/.config/GIMP/2.99/scripts
+      #cp -rv /work/plugins/nonGimpFu/testGeglOp.scm /work/.home/.config/GIMP/2.99/scripts
+      #cp -rv /work/plugins/nonGimpFu/defectsript-v01.scm /work/.home/.config/GIMP/2.99/scripts
+      #cp -r /work/plugins/nonGimpFu/testNumericName.scm   /work/.home/.config/GIMP/2.99/scripts
+
+      #echo "Copying testGimpExportImport"
+      # Copy from a volume of the container
+      #mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+      #cp -r /work/testGimpExportImport/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
+
+      #echo "Copying testGimpScriptFuBinding"
+      #mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
+      #cp -r /work/testGimpScriptFuBinding/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
+
+      #echo "Copying all test plugins"
+      #cp -rv /work/gimpTestPlugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
+      #echo "Copying all my test plugins"
+      #cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
+
+      #echo "Copying all wild test plugins"
+      #cp -r /work/plugins/wild/* /work/.home/.config/GIMP/2.99/plug-ins
+      #cp -r /work/plugins/wild/plugin-resynth-tileset /work/.home/.config/GIMP/2.99/plug-ins
+
+      echo "Copying selected test plugins"
+      # copy a directory containing a plugin.py
+      # One of these is WIP
+      cp -rv /work/gimpTestPlugins/test/dumpPDB /work/.home/.config/GIMP/2.99/plug-ins
+      cp -rv /work/gimpTestPlugins/test/dump_pdb /work/.home/.config/GIMP/2.99/plug-ins
+
+      #echo "Copying selected nonGimpfu plugins"
+      #cp -r /work/plugins/nonGimpFu/myMinPlugin /work/.home/.config/GIMP/2.99/plug-ins
+      #cp -r /work/plugins/nonGimpFu/testGegl    /work/.home/.config/GIMP/2.99/plug-ins
+
+      #echo "Chmoding test plugins"
+      # find -D exec /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' + -print
+      #find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
+
+
+
+
 
 
 
@@ -959,39 +1024,8 @@ commands:
       echo "XDG_DATA_DIRS introspection path ->"  $XDG_DATA_DIRS
       echo "GI_TYPELIB_PATH introspection path ->"  $GI_TYPELIB_PATH
 
-      which julia
-
-      # local plugins in /work/.home/.config/GIMP/2.99/plug-ins
-      # !!! outside the container
-      mkdir /work/.home/.config/GIMP/2.99/plug-ins
-
-      # Copy a scheme script
-      echo "Copying scriptfu scripts"
-      cp -rv /work/gimpTestPlugins/scriptFu/testUndefinedFunc.scm /work/.home/.config/GIMP/2.99/scripts
-      #cp -rv /work/plugins/nonGimpFu/testGeglOp.scm /work/.home/.config/GIMP/2.99/scripts
-      #cp -rv /work/plugins/nonGimpFu/defectsript-v01.scm /work/.home/.config/GIMP/2.99/scripts
-
-
-      # Refresh installation of gimpfu from development gimp_directory
-      # Copy entire directory into the plug-ins directory
-      echo "Copying gimpfu to local"
-      cp -rv /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
-
-      echo "Copying all test plugins"
-      cp -rv /work/gimpTestPlugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
-
-      echo "Copying testGimpPDB"
-      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
-      cp -r /work/testGimpPDB/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
-
-      echo "Copying testGimpExportImport"
-      # Copy from a volume of the container
-      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
-      cp -r /work/testGimpExportImport/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
-
-      echo "Copying testGimpScriptFuBinding"
-      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
-      cp -r /work/testGimpScriptFuBinding/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
+      # We don't copy any plugins here.
+      # Use vagga command installMyPluginsToHome
 
       # -O -   means: pipe to stdout
       #wget https://github.com/bootchk/testGimpPDB/tarball/master
@@ -1002,9 +1036,6 @@ commands:
       #cp -r bootchk-testGimp*/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
       #rm -rf bootchk-testGimp*
       #rm -rf wget-log*
-
-      #echo "Chmoding test plugins"
-      #find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
 
       echo "Altering PYTHONPATH to point to local plug-ins"
       export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
@@ -1084,46 +1115,8 @@ commands:
       echo "GEGL_PATH"       $GEGL_PATH
       echo "GI_TYPELIB_PATH" $GI_TYPELIB_PATH
 
-
-      echo "Removing old plugins and gimpfu source"
-      rm -rf /work/.home/.config/GIMP/2.99/plug-ins/*
-
-      echo "Copying all wild test plugins"
-      #cp -r /work/plugins/wild/* /work/.home/.config/GIMP/2.99/plug-ins
-
-      echo "Copying select wild plugins"
-      cp -r /work/plugins/wild/plugin-resynth-tileset /work/.home/.config/GIMP/2.99/plug-ins
-
-      echo "Copying selected nonGimpfu plugins"
-      #cp -r /work/plugins/nonGimpFu/myMinPlugin /work/.home/.config/GIMP/2.99/plug-ins
-      #cp -r /work/plugins/nonGimpFu/testGegl    /work/.home/.config/GIMP/2.99/plug-ins
-
-      echo "Copying select .scm plugins"
-      cp -r /work/plugins/nonGimpFu/testNumericName.scm   /work/.home/.config/GIMP/2.99/scripts
-
-      echo "Copying all my test plugins"
-      cp -r /work/plugins/test/* /work/.home/.config/GIMP/2.99/plug-ins
-
-      # Copy some plugins from volumes of the container
-
-      echo "Copying testGimpExportImport"
-      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
-      cp -r /work/testGimpExportImport/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpExportImport
-
-      echo "Copying testGimpPDB"
-      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
-      cp -r /work/testGimpPDB/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpPDB
-
-      mkdir /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
-      cp -r /work/testGimpScriptFuBinding/* /work/.home/.config/GIMP/2.99/plug-ins/testGimpScriptFuBinding
-
-      echo "Chmoding test plugins"
-      # find -D exec /work/.home/.config/GIMP/2.99/plug-ins -name *.py -exec chmod +x '{}' + -print
-      find -D exec /work/.home/.config/GIMP/2.99/plug-ins -type f -name "*.py" -exec chmod +x {} \; -print
-
-      #echo "Copying gimpfu source directory to local plugin directory"
-      #cp -r /work/gimpfu /work/.home/.config/GIMP/2.99/plug-ins
-      #export PYTHONPATH=/work/.home/.config/GIMP/2.99/plug-ins/gimpfu:${PYTHONPATH}
+      # We don't install any plugins here
+      # use vagga command installMyPluginsToHome
 
       echo "Altering PYTHONPATH to find GimpFu"
       export PYTHONPATH=/work:${PYTHONPATH}
@@ -1192,12 +1185,14 @@ commands:
       export PYTHONPATH=/work:${PYTHONPATH}
 
       echo "Usually plugins are already installed to .home/.config..."
-      echo "Copying scriptfu scripts"
-      cp -rv /work/gimpTestPlugins/scriptFu/testUndefinedFunc.scm /work/.home/.config/GIMP/2.99/scripts
 
       #echo "G_DEBUG fatal-crit"
       #export G_DEBUG=fatal-criticals
-      export GIMPFU_DEBUG=1
+      #export GIMPFU_DEBUG=1
+
+      # all domains, info and debug
+      #export G_MESSAGES_DEBUG=all
+      #export G_MESSAGES_DEBUG=scriptfu
 
       echo "Running gimp"
       /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query

@@ -495,6 +495,11 @@ class FuGenericValue():
         else:
             self._result_arg = gfile
             self._result_arg_type = Gio.File
+            """
+            Note we are specifying the type as the C type is GFile.  Not  GLocalFile.
+            If we  were to ask the object it's gtype, it would say GLocalFile?
+            I think GFile is an alias for internal class GLocalFile?
+            """
             self._did_convert = True
 
 
