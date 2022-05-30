@@ -27,8 +27,8 @@ containers:
     # June 16, 2020 focal fails at dbus_cil package from glib2_test package
     # 20.10- !Ubuntu groovy
     # 21.04- !Ubuntu hirsute
-    - !Ubuntu impish
-
+    # 21.10- !Ubuntu impish
+    - !Ubuntu jammy
 
     # enable universe repository (where gimp lives)
     - !UbuntuUniverse
@@ -44,8 +44,6 @@ containers:
   baseWithTools:
     setup:
     - !Container baseOS
-
-
 
     # GIMP build needs setuptools
     - !Install [python3-setuptools]
@@ -91,8 +89,12 @@ containers:
 
 
 
-  # with required libraries
-  generalDeps:
+  # with libraries required by gegl, babl, gimp (and other things we build)
+
+  # these are package names, might depend on distribution
+  # e.g. package names are different in alpine
+
+  gimpDeps:
     setup:
     - !Container baseWithTools
 
@@ -129,22 +131,9 @@ containers:
     - !Install [libjson-glib-dev]
 
     # gimp specific
-
-
-
-
-
-  # with more required libraries.
-  # Gimp requires
-  # !!! Some dependency is through gegl, must be here when gegl built
-  # these are package names, might depend on distribution
-  gimpDeps:
-    setup:
-    - !Container generalDeps
-
     # Somewhat in reverse order of complain by build
 
-    # plugin interpreters
+    # interpreters
     # Python3 PyGObject.  See earlier, installed Python3
     - !Install [ python3-gi]
     # lua
@@ -152,7 +141,6 @@ containers:
     - !Install [ lua-lgi ]
     # javascript
     - !Install [ gjs]
-
 
     # plugins, mainly file format plugins?
     # JPEG format
@@ -397,6 +385,7 @@ containers:
     # -Db_sanitize=address,undefined \
     # -Dintrospection=false \
     # -Db_lto=true
+    #
     - !Sh |
         cd /home/gegl
         meson _build \
@@ -431,6 +420,19 @@ containers:
   # !!! Note the containers branch here.
   # Later, choose one of these on which to build gimpLocal
 
+
+  # container with gimp configure to build in a parallel or VPATH dir not in the container
+  gimpAMReady:
+    setup:
+    - !Container bablGeglDev
+
+    - !Sh mkdir /work/gimpAMGccBuild
+
+    - !Sh |
+        # cd to the build dir
+        cd /work/gimpAMGccBuild
+        # configure from the source dir
+        /work/gimp/autogen.sh --disable-docs --enable-debug --disable-gi-docgen --without-vala
 
 
 
@@ -472,8 +474,7 @@ containers:
     - !Sh echo "binary path ->" $PATH
 
     # TEMP for debug
-    - !Install [strace]
-
+    # - !Install [strace]
 
     # TEMP to test autoconf 2.70 Mar 20, 2021
 
@@ -592,27 +593,6 @@ containers:
   #    pgi-docgen build /work/.home/_docs /work/.home/_docs/_build
 
 
-  # julia and GIMP
-  juliaDev:
-    setup:
-    - !Container gimpAMDev
-    # install both REPL and dev libraries
-    #- !Install [libjulia-dev]
-    - !Install [julia]
-
-    # load package at container build time, since volume read only at runtime
-    #- !Sh |
-    #    julia -e 'using Pkg; Pkg.add("Gtk")'
-
-    environ:
-      HOME:            /work/.home
-      GIMP_PREFIX:     /usr/local
-      GEGL_PATH:       /usr/local/lib/x86_64-linux-gnu/gegl-0.4
-      GI_TYPELIB_PATH: /usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
-      NO_AT_BRIDGE:    1
-      LD_LIBRARY_PATH: /usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}
-      XDG_DATA_DIRS:   /usr/local/share:/usr/share
-      PATH:            /usr/local/bin:/usr/bin
 
 
 
@@ -684,17 +664,24 @@ containers:
     #  --wipe \
 
     # meson and gcc
+    # !!! This won't reconfigure the build dir, when you change the options
     - !Sh |
         cd /work/gimp
-        meson setup /work/mesonGccBuild \
+        meson setup --wipe /work/mesonGccBuild \
          -Djavascript=false \
-         -Dlua=false \
+         -Dlua=true \
          -Dpython=true \
-         -Dvala-plugins=disabled \
-         -Dgtk-doc=false
+         -Dvala-plugins=disabled
 
-    - !Sh |
-        ls /work/mesonGccBuild
+    # Force reconfigure
+    # FAIL: meson --reconfigure /work/mesonGccBuild
+    # FAIL: ninja reconfigure /work/mesonGccBuild
+    # FAIL: meson setup --wipe /work/mesonGccBuild
+    #- !Sh |
+    #    meson setup --wipe /work/mesonGccBuild
+
+    #- !Sh |
+    #    ls /work/mesonGccBuild
 
     # Also volumes for test plugins
     volumes:
@@ -1078,6 +1065,9 @@ commands:
 
       #export GIMPFU_DEBUG=1
 
+      echo "ls gimp"
+      ls -l /usr/local/bin/gimp-2.99
+
       echo "Starting gimp"
       # Fail: gimp --stack-trace-mode=always   should be space, not = ??
 
@@ -1151,6 +1141,79 @@ commands:
       /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
 
 
+
+  # build in the build directory but install into the container
+  # The container is immutable unless write-mode: transient-hard-link-copy
+  # but that allows the container to be written and possibly corrupted.
+  # use vagga _build --force container_name to fix base container if that was modified.
+  buildAMGccGimp: !Command
+    description: Build gimp GUI in gimpAMReady container, but do not install there
+    container:  gimpAMReady
+    write-mode: transient-hard-link-copy
+    run: |
+      # cd to the build dir
+      cd /work/gimpAMGccBuild
+
+      echo "lkk make am gcc GIMP"
+      make all-am -j4
+
+      echo "lkk install GIMP"
+      make install
+
+      # Setup env, the container does not do this
+      export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu:/usr/local/lib
+      export HOME=/work/.home
+      export GIMP_PREFIX=/usr/local
+      export XDG_DATA_DIRS=/usr/local/share:/usr/share
+      export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+      export NO_AT_BRIDGE=1
+
+      echo "Altering PYTHONPATH to find GimpFu"
+      echo "!!! This finds the repo for GimpFu, no need to install it in gimp/plug-ins"
+      export PYTHONPATH=/work:${PYTHONPATH}
+
+      echo "Usually plugins are already installed to .home/.config..."
+
+      #echo "G_DEBUG fatal-crit"
+      #export G_DEBUG=fatal-criticals
+      #export GIMPFU_DEBUG=1
+
+      # all domains, info and debug
+      #export G_MESSAGES_DEBUG=all
+      # export G_MESSAGES_DEBUG=scriptfu
+      export G_MESSAGES_DEBUG=gimpSchemeInterpreter,scriptfu
+
+      echo "which gimpSchemeInterpreter"
+      which gimpSchemeInterpreter
+      ls -l /usr/local/bin/gimpSchemeInterpreter
+      # nm /usr/local/bin/gimpSchemeInterpreter
+
+      echo "ls script-fu plugin"
+      ls -l /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins/script-fu
+
+      echo "ls gimp app"
+      ls -l /usr/local/bin/gimp-2.99
+
+      echo "ls libscriptfu"
+      ls -l /usr/local/lib/x86_64-linux-gnu/libscriptfu.so
+
+      #echo "running gimpSchemeInterpreter"
+      # gimpSchemeInterpreter
+
+      # this doesn't work reliably
+      echo "XDG_SESSION_TYPE->" $XDG_SESSION_TYPE
+      # echo "Wayland vs Xorg"
+      # This doesn't work
+      # loginctl show-session $(loginctl | grep $(whoami) | awk '{print $1}') -p Type
+      echo $WAYLAND_DISPLAY
+
+      echo "Running gimp"
+      # /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+      /usr/local/bin/gimp-2.99 --stack-trace-mode query
+
+
+
+
   # build in the build directory but install into the container
   # The container is immutable unless write-mode: transient-hard-link-copy
   # but that allows the container to be written and possibly corrupted.
@@ -1192,11 +1255,36 @@ commands:
 
       # all domains, info and debug
       #export G_MESSAGES_DEBUG=all
-      #export G_MESSAGES_DEBUG=scriptfu
+      # export G_MESSAGES_DEBUG=scriptfu
+      export G_MESSAGES_DEBUG=gimpSchemeInterpreter,scriptfu
+
+      echo "which gimpSchemeInterpreter"
+      which gimpSchemeInterpreter
+      ls -l /usr/local/bin/gimpSchemeInterpreter
+      # nm /usr/local/bin/gimpSchemeInterpreter
+
+      echo "ls script-fu plugin"
+      ls -l /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins/script-fu
+
+      echo "ls gimp app"
+      ls -l /usr/local/bin/gimp-2.99
+
+      echo "ls libscriptfu"
+      ls -l /usr/local/lib/x86_64-linux-gnu/libscriptfu.so
+
+      #echo "running gimpSchemeInterpreter"
+      # gimpSchemeInterpreter
+
+      # this doesn't work reliably
+      echo "XDG_SESSION_TYPE->" $XDG_SESSION_TYPE
+      # echo "Wayland vs Xorg"
+      # This doesn't work
+      # loginctl show-session $(loginctl | grep $(whoami) | awk '{print $1}') -p Type
+      echo $WAYLAND_DISPLAY
 
       echo "Running gimp"
-      /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
-      # /usr/local/bin/gimp-2.99 --stack-trace-mode query
+      # /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+      /usr/local/bin/gimp-2.99 --stack-trace-mode query
 
 
 
@@ -1250,95 +1338,3 @@ commands:
       echo "Try this:  ninja -v -d explain -j 1 install"
       echo "Ctl-D to exit bash and container"
       bash
-
-
-
-
-
-
-
-  juliaTest: !Command
-    description: Compile julia test program
-    container:  juliaDev
-    write-mode: transient-hard-link-copy
-    run: |
-      echo "GI_TYPELIB_PATH introspection path ->"  $GI_TYPELIB_PATH
-      echo "Gimp version from pkg-config"
-      pkg-config --modversion gimp-3.0
-      #echo "libgimp"
-      #ldconfig -p | grep libgimp
-      echo "julia version"
-      julia -v
-      #echo "find julia"
-      #find . -name julia
-      echo "JULIA_DEPOT_PATH" $JULIA_DEPOT_PATH
-      #echo "compile julia"
-      #julia /work/test.jl
-      echo find julia/sys.so
-      find /usr -name sys.so
-      export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/julia
-      which julia
-      export JULIA_BINDIR=/usr/bin
-
-      echo  "build test c program that embeds Julia"
-      cd juliaFuFu
-      gcc -o juliaFu -fPIC -I/usr/include/julia -L/usr/lib -Wl,-rpath,/usr/lib juliaFu.c -ljulia
-
-      echo exec program embedding Julia
-      /work/juliaFuFu/juliaFu
-
-  juliaScript: !Command
-    description: Run test.jl
-    container:  juliaDev
-    write-mode: transient-hard-link-copy
-    run: |
-        cd juliaFuFu
-
-        # build the library that test.jl will call
-        meson setup --wipe _build
-        # meson compile -C _build
-        cd _build
-        meson install
-
-        echo "find library we just built and installed"
-        find /usr -name libjuliafu.so
-
-        # julia /work/juliaFuFu/test.jl
-
-        #cat /usr/include/julia/julia.h
-
-        julia
-
-
-  juliaPlugin: !Command
-    description: Run GIMP with a Julia interpreter and plugin
-    container:  juliaDev
-    write-mode: transient-hard-link-copy
-    run: |
-        echo "which julia"
-        which julia
-
-        echo "HOME"            $HOME
-
-        echo "cat julia.interp"
-        cat .home/.config/GIMP/2.99/interpreters/julia.interp
-
-        echo "ls plugins"
-        ls .home/.config/GIMP/2.99/plug-ins
-
-        echo "Running gimp"
-        /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
-
-  juliaGI: !Command
-    description: Test Julia GI of GimpParasite
-    container:  juliaDev
-    write-mode: transient-hard-link-copy
-    run: |
-        echo "which julia"
-        which julia
-
-        echo "HOME"            $HOME
-
-        echo "Running julia"
-        # julia /work/juliaFuFu/testGI.jl
-        julia

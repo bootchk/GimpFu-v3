@@ -6,6 +6,7 @@ gimpBuild
 resynthBuild
 mesonGccBuild
 mesonClangBuild
+gimpAMGccBuild
 guile-gi
 pgi-docgen
 gimpfu/__pycache__

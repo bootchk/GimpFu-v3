@@ -109,6 +109,8 @@ class MarshalPDB():
            Assume the case that run mode is in the formal args, not in passed actual args.
            Synthesizing runmode might now work, the caller might have made an error
            and not just using the GimpFu convention of not passing runmode.
+
+           !!! This causes wierd errors if script passes wrong number of parameters.
            """
            result.append( MarshalPDB.synthesize_marshalled_run_mode() )
            # skip to the next formal arg
@@ -120,6 +122,8 @@ class MarshalPDB():
             but Gimp would return an error when we call the PDB procedure with too few args.
             '''
             proceed(f"Mismatched count of formal versus actual args for {proc_name}")
+
+
 
         for x in args:
             MarshalPDB.logger.debug(f"marshalling arg value: {x} index: {formal_args_index}" )

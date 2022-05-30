@@ -1,0 +1,112 @@
+
+CRUFT extracted from the main vagga.yaml for Gimp
+
+
+# julia and GIMP
+juliaDev:
+  setup:
+  - !Container gimpAMDev
+  # install both REPL and dev libraries
+  #- !Install [libjulia-dev]
+  - !Install [julia]
+
+  # load package at container build time, since volume read only at runtime
+  #- !Sh |
+  #    julia -e 'using Pkg; Pkg.add("Gtk")'
+
+  environ:
+    HOME:            /work/.home
+    GIMP_PREFIX:     /usr/local
+    GEGL_PATH:       /usr/local/lib/x86_64-linux-gnu/gegl-0.4
+    GI_TYPELIB_PATH: /usr/local/lib/x86_64-linux-gnu/girepository-1.0:/usr/local/lib/girepository-1.0
+    NO_AT_BRIDGE:    1
+    LD_LIBRARY_PATH: /usr/local/lib/x86_64-linux-gnu:/usr/local/lib:${LD_LIBRARY_PATH}
+    XDG_DATA_DIRS:   /usr/local/share:/usr/share
+    PATH:            /usr/local/bin:/usr/bin
+
+
+juliaTest: !Command
+  description: Compile julia test program
+  container:  juliaDev
+  write-mode: transient-hard-link-copy
+  run: |
+    echo "GI_TYPELIB_PATH introspection path ->"  $GI_TYPELIB_PATH
+    echo "Gimp version from pkg-config"
+    pkg-config --modversion gimp-3.0
+    #echo "libgimp"
+    #ldconfig -p | grep libgimp
+    echo "julia version"
+    julia -v
+    #echo "find julia"
+    #find . -name julia
+    echo "JULIA_DEPOT_PATH" $JULIA_DEPOT_PATH
+    #echo "compile julia"
+    #julia /work/test.jl
+    echo find julia/sys.so
+    find /usr -name sys.so
+    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/julia
+    which julia
+    export JULIA_BINDIR=/usr/bin
+
+    echo  "build test c program that embeds Julia"
+    cd juliaFuFu
+    gcc -o juliaFu -fPIC -I/usr/include/julia -L/usr/lib -Wl,-rpath,/usr/lib juliaFu.c -ljulia
+
+    echo exec program embedding Julia
+    /work/juliaFuFu/juliaFu
+
+juliaScript: !Command
+  description: Run test.jl
+  container:  juliaDev
+  write-mode: transient-hard-link-copy
+  run: |
+      cd juliaFuFu
+
+      # build the library that test.jl will call
+      meson setup --wipe _build
+      # meson compile -C _build
+      cd _build
+      meson install
+
+      echo "find library we just built and installed"
+      find /usr -name libjuliafu.so
+
+      # julia /work/juliaFuFu/test.jl
+
+      #cat /usr/include/julia/julia.h
+
+      julia
+
+
+juliaPlugin: !Command
+  description: Run GIMP with a Julia interpreter and plugin
+  container:  juliaDev
+  write-mode: transient-hard-link-copy
+  run: |
+      echo "which julia"
+      which julia
+
+      echo "HOME"            $HOME
+
+      echo "cat julia.interp"
+      cat .home/.config/GIMP/2.99/interpreters/julia.interp
+
+      echo "ls plugins"
+      ls .home/.config/GIMP/2.99/plug-ins
+
+      echo "Running gimp"
+      /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+
+juliaGI: !Command
+  description: Test Julia GI of GimpParasite
+  container:  juliaDev
+  write-mode: transient-hard-link-copy
+  run: |
+      echo "which julia"
+      which julia
+
+      echo "HOME"            $HOME
+
+      echo "Running julia"
+      # julia /work/juliaFuFu/testGI.jl
+      julia
