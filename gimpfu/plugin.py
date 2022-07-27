@@ -72,8 +72,9 @@ class FuPlugin (Gimp.PlugIn):
 
         # TODO Why set the locale again?
         # Maybe this is a requirement documented for class Gimp.Plugin????
-        self.set_translation_domain("Gimp30-python",
-                                    Gio.file_new_for_path(Gimp.locale_directory()))
+        # OBSOLETED circa July 2022
+        # self.set_translation_domain("Gimp30-python",
+        #                            Gio.file_new_for_path(Gimp.locale_directory()))
 
         # return list of all procedures implemented in the Authors source code
         # For testing: result =[ gf_procedure.name, ]

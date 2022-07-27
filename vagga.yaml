@@ -212,6 +212,12 @@ containers:
     # some my vagga commands want wget
     - !Install [wget]
 
+    # gimp tests want x11 virtual frame buffer
+    - !Install [xvfb]
+
+    # New require for Gimp gettext stuff, June 2022
+    - !Install [ autopoint ]
+
     # remove DNS file that vagga will recreate after build
     # !!! You must do this last, and not at the beginning of a container build
     - !Sh "rm /etc/resolv.conf"
@@ -432,8 +438,10 @@ containers:
         # cd to the build dir
         cd /work/gimpAMGccBuild
         # configure from the source dir
-        /work/gimp/autogen.sh --disable-docs --enable-debug --disable-gi-docgen --without-vala
-
+        # --disable-docs obsolete?
+        # CFLAGS="-fsanitize=address -fno-omit-frame-pointer" /work/gimp/autogen.sh --enable-debug --disable-gi-docgen --without-vala --with-pdbgen
+        # /work/gimp/autogen.sh  --enable-debug --disable-gi-docgen --without-vala --with-pdbgen
+        CFLAGS="-fno-stack-clash-protection -fstack-check" /work/gimp/autogen.sh --enable-debug --disable-gi-docgen --without-vala --with-pdbgen
 
 
 
@@ -629,11 +637,11 @@ containers:
     # resolve ../plug-ins/common/file-pdf-load.c:32:10: fatal error: poppler.h: No such file or directory
     - !Env LD_LIBRARY_PATH: "/usr/local/lib/x86_64-linux-gnu:/usr/lib"
 
+    - !Install [ valgrind ]
+
     #### Options for GIMP build
     # -Dpoppler=false => -Dpdf=false is not correct
     # -Dpoppler=false still fails to build
-
-
 
     # if GEGL is asan, then this needs asan? else "library not first, use PRELOAD"
     # see later, at compile time -Db_sanitize=address,undefined
@@ -647,31 +655,29 @@ containers:
     # setup build outside the source tree
 
     # meson and clang
-    #- !Sh |
-    #    cd /work/gimp
-    #    CC=clang CXX=clang CC_LD=lld CXX_LD=lld meson setup /work/mesonClangBuild \
-    #     --wipe \
     #     --buildtype=debug \
-    #     -Db_sanitize=address \
     #     -Db_lundef=false \
-    #     -Djavascript=false \
-    #     -Dlua=false \
-    #     -Dpython=true \
-    #     -Dvala-plugins=disabled \
-    #     -Dg-ir-doc=false \
-    #     -Dgtk-doc=false
-
     #  --wipe \
+    - !Sh |
+        cd /work/gimp
+        CC=clang CXX=clang CC_LD=lld CXX_LD=lld meson setup /work/gimpMesonClangBuild \
+         -Db_sanitize=address \
+         -Djavascript=false \
+         -Dlua=false \
+         -Dpython=true \
+         -Dvala-plugins=disabled \
+         -Dg-ir-doc=false
 
     # meson and gcc
     # !!! This won't reconfigure the build dir, when you change the options
     - !Sh |
         cd /work/gimp
-        meson setup --wipe /work/mesonGccBuild \
+        meson setup /work/mesonGccBuild \
          -Djavascript=false \
          -Dlua=true \
-         -Dpython=true \
-         -Dvala-plugins=disabled
+         -Dpython=true  \
+         -Dvala-plugins=disabled \
+         -Dg-ir-doc=false
 
     # Force reconfigure
     # FAIL: meson --reconfigure /work/mesonGccBuild
@@ -874,6 +880,8 @@ commands:
       pkg-config --modversion gegl-0.4
       echo "Version of autoconf"
       autoconf --version
+      echo "which autopoint"
+      which autopoint
 
   # It doesn't seems to matter that /usr/local/lib/x86_64-linux-gnu/pkgconfig is not in PKG_CONFIG_PATH
 
@@ -974,8 +982,8 @@ commands:
       echo "Copying selected test plugins"
       # copy a directory containing a plugin.py
       # One of these is WIP
-      cp -rv /work/gimpTestPlugins/test/dumpPDB /work/.home/.config/GIMP/2.99/plug-ins
-      cp -rv /work/gimpTestPlugins/test/dump_pdb /work/.home/.config/GIMP/2.99/plug-ins
+      #cp -rv /work/gimpTestPlugins/test/dumpPDB /work/.home/.config/GIMP/2.99/plug-ins
+      #cp -rv /work/gimpTestPlugins/test/dump_pdb /work/.home/.config/GIMP/2.99/plug-ins
 
       #echo "Copying selected nonGimpfu plugins"
       #cp -r /work/plugins/nonGimpFu/myMinPlugin /work/.home/.config/GIMP/2.99/plug-ins
@@ -1154,8 +1162,14 @@ commands:
       # cd to the build dir
       cd /work/gimpAMGccBuild
 
+      #echo "make distclean"
+      #make distclean
+
       echo "lkk make am gcc GIMP"
       make all-am -j4
+
+      #echo "lkk make distcheck GIMP"
+      make distcheck -j4
 
       echo "lkk install GIMP"
       make install
@@ -1180,35 +1194,38 @@ commands:
 
       # all domains, info and debug
       #export G_MESSAGES_DEBUG=all
-      # export G_MESSAGES_DEBUG=scriptfu
-      export G_MESSAGES_DEBUG=gimpSchemeInterpreter,scriptfu
+      export G_MESSAGES_DEBUG=scriptfu
 
-      echo "which gimpSchemeInterpreter"
-      which gimpSchemeInterpreter
-      ls -l /usr/local/bin/gimpSchemeInterpreter
+      echo "whiching script-fu-interpreter"
+      which script-fu-interpreter
+      ls -l /usr/local/bin/script*
       # nm /usr/local/bin/gimpSchemeInterpreter
 
       echo "ls script-fu plugin"
-      ls -l /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins/script-fu
+      ls -al /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins
 
       echo "ls gimp app"
       ls -l /usr/local/bin/gimp-2.99
 
       echo "ls libscriptfu"
       ls -l /usr/local/lib/x86_64-linux-gnu/libscriptfu.so
+      ls -l /usr/local/lib/x86_64-linux-gnu/libscriptfu*
+      ls -l /usr/local/lib/libscriptfu*
+      ls -l /usr/local/lib/x86_64-linux-gnu/gimp/2.99/lib
+      ls -l /usr/local/lib/gimp/2.99/lib
+      # nm /work/gimpAMGccBuild/plug-ins/script-fu/libscriptfu/.libs/libscriptfu-3.0.so
 
       #echo "running gimpSchemeInterpreter"
       # gimpSchemeInterpreter
 
-      # this doesn't work reliably
-      echo "XDG_SESSION_TYPE->" $XDG_SESSION_TYPE
-      # echo "Wayland vs Xorg"
-      # This doesn't work
-      # loginctl show-session $(loginctl | grep $(whoami) | awk '{print $1}') -p Type
-      echo $WAYLAND_DISPLAY
+      #echo "setting spanish LANG"
+      #export LANG="es.UTF-8"
+      #export LANG="es"
+      #localectl list-locales
 
       echo "Running gimp"
       # /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+      # valgrind
       /usr/local/bin/gimp-2.99 --stack-trace-mode query
 
 
@@ -1223,17 +1240,34 @@ commands:
     container:  gimpMesonDev
     write-mode: transient-hard-link-copy
     run: |
-      echo "lkk meson compile GIMP"
+      echo "lkk meson build GIMP"
       #export GI_SCANNER_DEBUG=1
-      cd /work/mesonGccBuild
+
+      # Fail
       #echo "lkk meson configure ASAN"
-      #meson configure -Db_sanitize=address
+      #meson configure -Db_sanitize=address /work/mesonGccBuild
+
+      echo "lkk reconfigure build"
+      meson configure /work/mesonGccBuild
+
+      cd /work/mesonGccBuild
+
       echo "lkk meson gcc compile GIMP"
-      meson compile v -d explain -j 1
+      # -d explain
+      # meson compile v  -j 4
 
       echo "lkk ninja install GIMP"
       # Can't install to the read-only container unless it is write-mode: ....
       ninja -v -d explain -j 1 install
+
+      echo "Reading rpath"
+      readelf -d /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins/script-fu/script-fu | grep 'R.*PATH'
+
+      #echo "meson test"
+      export G_DEBUG=fatal-criticals
+      export G_MESSAGES_DEBUG=all
+      export NO_AT_BRIDGE=1
+      #meson test
 
       # Setup env, the container does not do this
       export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu:/usr/local/lib
@@ -1250,27 +1284,30 @@ commands:
       echo "Usually plugins are already installed to .home/.config..."
 
       #echo "G_DEBUG fatal-crit"
-      #export G_DEBUG=fatal-criticals
+      export G_DEBUG=fatal-criticals
       #export GIMPFU_DEBUG=1
 
+      #export GIMP_DEBUG=all
+
       # all domains, info and debug
-      #export G_MESSAGES_DEBUG=all
+      export G_MESSAGES_DEBUG=all
       # export G_MESSAGES_DEBUG=scriptfu
       export G_MESSAGES_DEBUG=gimpSchemeInterpreter,scriptfu
 
-      echo "which gimpSchemeInterpreter"
-      which gimpSchemeInterpreter
-      ls -l /usr/local/bin/gimpSchemeInterpreter
+      echo "which script-fu-interpreter"
+      which script-fu-interpreter
+      ls -l /usr/local/bin/script*
       # nm /usr/local/bin/gimpSchemeInterpreter
 
-      echo "ls script-fu plugin"
-      ls -l /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins/script-fu
+      #echo "ls script-fu plugins"
+      #ls -l /usr/local/lib/x86_64-linux-gnu/gimp/2.99/plug-ins/script-fu*
 
       echo "ls gimp app"
       ls -l /usr/local/bin/gimp-2.99
 
       echo "ls libscriptfu"
-      ls -l /usr/local/lib/x86_64-linux-gnu/libscriptfu.so
+      ls -l /usr/local/lib/x86_64-linux-gnu/libgimp*
+      ls -l /usr/local/lib/x86_64-linux-gnu/gimp/2.99/lib
 
       #echo "running gimpSchemeInterpreter"
       # gimpSchemeInterpreter
@@ -1282,10 +1319,42 @@ commands:
       # loginctl show-session $(loginctl | grep $(whoami) | awk '{print $1}') -p Type
       echo $WAYLAND_DISPLAY
 
-      echo "Running gimp"
-      # /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
-      /usr/local/bin/gimp-2.99 --stack-trace-mode query
+      #echo "catting /etc/locale.gen"
+      #cat /etc/locale.gen
+      # sed 's/# es/es/' /etc/locale.gen >/etc/locale.gen
+      # es_HN.UTF-8 UTF-8
+      # echo 'es_HN.UTF-8 UTF-8' >/etc/locale.gen
+      #echo 'es_ES.UTF-8 UTF-8' >/etc/locale.gen
+      #cat /etc/locale.gen
+      #echo "generating locale"
+      #locale-gen
+      #echo "list availble locales"
+      #locale -a
+      #export LANG='es_ES.UTF-8'
+      #env
 
+      echo "Running gimp"
+      # valgrind /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+      /usr/local/bin/gimp-2.99 --verbose --stack-trace-mode query
+      #/usr/local/bin/gimp-2.99 --stack-trace-mode query
+      #gdb /usr/local/bin/gimp-2.99
+
+      #echo "Testing batch start of server"
+      #/usr/local/bin/gimp-2.99 -i --verbose --batch-interpreter='plug-in-script-fu-eval' -b '(plug-in-script-fu-server 1 "127.0.0.1" 10008 "/work/gimp-log")'
+      #cat /work/gimp-log
+
+  buildMesonClangGimp: !Command
+    description: Build gimp GUI in gimpMesonDev container, but do not install
+    container:  gimpMesonDev
+    write-mode: transient-hard-link-copy
+    run: |
+      echo "lkk meson clang build GIMP"
+      echo "lkk reconfigure build"
+      meson configure /work/gimpMesonClangBuild
+      cd /work/gimpMesonClangBuild
+      echo "lkk meson clang compile GIMP"
+      # -d explain
+      meson compile -j 4
 
 
   describeMesonDev: !Command
